@@ -10,63 +10,152 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- SheetJS (XLSX) CDN -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-    <!-- Heroicons / SVG Icons helper -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .font-bangla {
+            font-family: 'Hind Siliguri', 'Inter', -apple-system, sans-serif;
+        }
+        /* Continuous Smooth Marquee Ticker */
+        @keyframes marqueeScroll {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+            100% {
+                transform: translate3d(-50%, 0, 0);
+            }
+        }
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+            animation: marqueeScroll 26s linear infinite;
+        }
+        .marquee-track:hover, .marquee-track:active {
+            animation-play-state: paused;
+        }
+        /* Mobile Smooth Scrolling & Custom Scrollbars */
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Hide scrollbars for clean tab strips */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- Top Navigation Bar -->
-    <nav class="bg-indigo-700 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-white text-indigo-700 p-2 rounded-lg font-bold text-xl shadow">⚡</div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">Data Management Portal</h1>
-                    <p class="text-xs text-indigo-200">Daily Work, Verification & Deduplication</p>
+    <!-- Top Sticky Header with Sliding Marquee Notice & Responsive Navigation -->
+    <header class="sticky top-0 z-50 shadow-md">
+        <!-- Sliding Marquee Notice Bar in Pure Bengali -->
+        <div class="bg-gradient-to-r from-red-700 via-rose-700 to-amber-600 text-white border-b border-red-800/90 select-none overflow-hidden">
+            <div class="max-w-7xl mx-auto flex items-center h-9 sm:h-10 px-2.5 sm:px-6">
+                <!-- Notice Tag -->
+                <div class="flex items-center space-x-1.5 bg-red-950/90 text-amber-300 border border-amber-400/40 text-[11px] sm:text-xs font-bold px-2.5 py-0.5 sm:py-1 rounded shadow flex-shrink-0 mr-2 sm:mr-3 z-10">
+                    <span class="animate-pulse text-sm">📢</span>
+                    <span class="whitespace-nowrap font-bangla">জরুরি নোটিশ:</span>
                 </div>
-            </div>
-            <div id="navUserSection" class="flex items-center space-x-4">
-                <!-- Settings button hidden for clean user experience -->
-                <button id="navSettingsBtn" onclick="openConfigModal()" class="hidden text-xs bg-indigo-800 hover:bg-indigo-900 text-indigo-200 hover:text-white px-3 py-1.5 rounded border border-indigo-600 transition">
-                    ⚙️ Settings
-                </button>
-                <div id="navLinks" class="hidden items-center space-x-2 mr-4">
-                    <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded transition">
-                        📊 Dashboard
-                    </button>
-                    <button id="navBtnGender" onclick="switchToSection('gender_verify')" class="text-xs bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-3 py-1.5 rounded transition">
-                        🚻 Gender Verify Tool
-                    </button>
-                </div>
-                <div id="userInfo" class="hidden items-center space-x-3">
-                    <span id="userBadge" class="text-xs px-2.5 py-1 rounded-full font-semibold"></span>
-                    <span id="userEmail" class="text-sm font-medium"></span>
-                    <button onclick="handleLogout()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded transition">
-                        Logout
-                    </button>
+                <!-- Continuous Sliding Track -->
+                <div class="flex-1 overflow-hidden relative cursor-default" title="টাচ করলে বা মাউস ধরলে নোটিশটি থেমে যাবে">
+                    <div class="marquee-track flex whitespace-nowrap">
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla">
+                            <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
+                            <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
+                        </div>
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla" aria-hidden="true">
+                            <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
+                            <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
+                        </div>
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla" aria-hidden="true">
+                            <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
+                            <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
+                        </div>
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla" aria-hidden="true">
+                            <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
+                            <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </nav>
+
+        <!-- Main Navigation Bar -->
+        <nav class="bg-indigo-700 text-white">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                <!-- Branding -->
+                <div class="flex items-center justify-between w-full sm:w-auto">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="bg-white text-indigo-700 p-1.5 sm:p-2 rounded-lg font-bold text-base sm:text-xl shadow flex-shrink-0">⚡</div>
+                        <div>
+                            <h1 class="font-bold text-sm sm:text-lg leading-tight">Data Management Portal</h1>
+                            <p class="text-[10px] sm:text-xs text-indigo-200">Daily Work, Verification & Deduplication</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons & User Info -->
+                <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 sm:space-x-3 w-full sm:w-auto">
+                    <div id="navLinks" class="hidden items-center space-x-1 sm:space-x-2 overflow-x-auto py-0.5 scrollbar-none">
+                        <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition">
+                            📊 Dashboard
+                        </button>
+                        <button id="navBtnGender" onclick="switchToSection('gender_verify')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded transition">
+                            🚻 Gender Verify Tool
+                        </button>
+                        <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded transition">
+                            🔍 Duplicate Check
+                        </button>
+                    </div>
+
+                    <div id="userInfo" class="hidden items-center space-x-2 sm:space-x-3 ml-auto sm:ml-0">
+                        <span id="userBadge" class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-semibold"></span>
+                        <span id="userEmail" class="hidden md:inline-block text-sm font-medium"></span>
+                        <button onclick="handleLogout()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded transition">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
 
-        <!-- 1. Configuration Alert Banner (if Supabase not set up) -->
+        <!-- 1. Configuration Alert Banner (if needed) -->
         <div id="configWarning" class="hidden mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <span class="text-2xl">⚠️</span>
                     <div>
                         <h3 class="font-semibold text-amber-800">Supabase Connection Required</h3>
-                        <p class="text-sm text-amber-700">Please provide your free Supabase URL and Anon Key in Settings to connect the app.</p>
+                        <p class="text-sm text-amber-700">Please provide your Supabase URL and Anon Key in Settings to connect.</p>
                     </div>
                 </div>
                 <button onclick="openConfigModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded shadow">
-                    Configure Now
+                    Configure
                 </button>
             </div>
         </div>
@@ -100,12 +189,12 @@
                         <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                     </div>
 
-                    <!-- Department Selection (Only visible during Sign Up) -->
+                    <!-- Department Selection (Sign Up only) -->
                     <div id="deptSelectContainer" class="hidden">
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Your Department</label>
                         <select id="signupDept" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white font-medium">
-                            <option value="number_lookup">📞 Number Lookup</option>
-                            <option value="gender_verify">👤 Gender Verify</option>
+                            <option value="gender_verify">👤 Gender Verify (Male/Female Reports)</option>
+                            <option value="number_lookup">📞 Number Lookup (Lookup Reports)</option>
                         </select>
                     </div>
 
@@ -126,9 +215,8 @@
             </div>
         </div>
 
-        <!-- 3. User Dashboard View (Number Lookup & Gender Verify) -->
+        <!-- 3. Worker Dashboard View -->
         <div id="userDashboard" class="hidden space-y-8">
-            <!-- Header greeting -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-800">Worker Dashboard</h2>
@@ -145,50 +233,101 @@
                 <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-emerald-500">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Valid Unique</p>
                     <p id="statUserTodayUnique" class="text-3xl font-extrabold text-emerald-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Successfully inserted into database</p>
+                    <p class="text-xs text-slate-400 mt-1">Numbers saved to portal</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-amber-500">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Duplicates Filtered</p>
                     <p id="statUserTodayDuplicates" class="text-3xl font-extrabold text-amber-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Removed automatically</p>
+                    <p class="text-xs text-slate-400 mt-1">Discarded automatically</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-indigo-500">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Your All-Time Total</p>
                     <p id="statUserAllTime" class="text-3xl font-extrabold text-indigo-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Unique numbers contributed</p>
+                    <p class="text-xs text-slate-400 mt-1">Unique records contributed</p>
                 </div>
             </div>
 
-            <!-- Upload Section -->
+            <!-- Upload Section with 3 Specific Report Types -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800 mb-2">Upload Daily XLSX File</h3>
-                <p class="text-sm text-slate-500 mb-6">Upload your completed Excel sheet. Duplicate numbers will be identified and removed automatically.</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Submit Daily Work File (.XLSX)</h3>
+                        <p class="text-sm text-slate-500">Upload your completed Excel spreadsheet. All records (Phone, Name, Age) will be preserved and delivered to Admin.</p>
+                    </div>
+                </div>
 
+                <!-- REPORT SUBMIT TYPE SELECTOR (1. Male Report, 2. Female Report, 3. Lookup Report) -->
+                <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                        Step 1: Select Report Type to Submit:
+                    </label>
+                    <div id="workerReportTypeOptions" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Option 1: Male Report -->
+                        <label id="optMaleReport" class="flex items-center space-x-3 p-3 bg-white rounded-lg border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="male_report" class="w-4 h-4 text-blue-600">
+                            <div>
+                                <span class="font-bold text-sm text-slate-800 block">👨 1. Male Report</span>
+                                <span class="text-xs text-slate-500">Male verified data (Number, Name, Age)</span>
+                            </div>
+                        </label>
+
+                        <!-- Option 2: Female Report -->
+                        <label id="optFemaleReport" class="flex items-center space-x-3 p-3 bg-white rounded-lg border-2 border-slate-200 hover:border-pink-500 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="female_report" class="w-4 h-4 text-pink-600">
+                            <div>
+                                <span class="font-bold text-sm text-slate-800 block">👩 2. Female Report</span>
+                                <span class="text-xs text-slate-500">Female verified data (Number, Name, Age)</span>
+                            </div>
+                        </label>
+
+                        <!-- Option 3: Lookup Report -->
+                        <label id="optLookupReport" class="flex items-center space-x-3 p-3 bg-white rounded-lg border-2 border-slate-200 hover:border-indigo-500 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="lookup_report" class="w-4 h-4 text-indigo-600">
+                            <div>
+                                <span class="font-bold text-sm text-slate-800 block">🔍 3. Lookup Report</span>
+                                <span class="text-xs text-slate-500">Number lookup verified data</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- File Drop Zone -->
                 <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-8 text-center transition cursor-pointer" onclick="document.getElementById('xlsxFileInput').click()">
                     <input type="file" id="xlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelected(event)">
                     <div class="space-y-2">
                         <div class="text-4xl">📊</div>
-                        <p class="text-sm font-semibold text-slate-700">Click to upload or drag and drop your file here</p>
-                        <p class="text-xs text-slate-500">Supports .xlsx, .xls, .csv files</p>
+                        <p class="text-sm font-semibold text-slate-700">Click to select your Excel file (.xlsx / .csv)</p>
+                        <p class="text-xs text-slate-500">Make sure your file contains Phone Number, Name, and Age columns</p>
                     </div>
                 </div>
 
-                <!-- File Preview & Column Selection -->
+                <!-- Preview & Column Selector (Maps Phone, Name, Age) -->
                 <div id="filePreviewCard" class="hidden mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                         <div>
                             <span class="text-xs font-bold text-slate-500 uppercase">Selected File:</span>
                             <span id="previewFileName" class="text-sm font-semibold text-slate-800 ml-2"></span>
                             <span id="previewRowCount" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded ml-2"></span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <label class="text-xs font-semibold text-slate-600">Phone Number Column:</label>
-                            <select id="columnSelector" class="text-xs px-3 py-1.5 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                    </div>
+
+                    <!-- Column Mapping Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number Column (Required):</label>
+                            <select id="columnPhoneSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name Column (Required):</label>
+                            <select id="columnNameSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Age Column (Optional):</label>
+                            <select id="columnAgeSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
                         </div>
                     </div>
 
-                    <!-- Action Button & Progress -->
-                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200">
+                    <div class="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200">
                         <div class="w-full sm:w-2/3">
                             <div id="uploadProgressBarContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
                                 <div id="uploadProgressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -196,12 +335,11 @@
                             <span id="uploadStatusText" class="text-xs text-slate-500 block mt-1"></span>
                         </div>
                         <button id="processUploadBtn" onclick="processAndSubmitXlsx()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition">
-                            Process & Submit File
+                            🚀 Submit Report to Portal
                         </button>
                     </div>
                 </div>
 
-                <!-- Last Upload Result Card -->
                 <div id="lastUploadResultCard" class="hidden mt-6 p-5 rounded-xl border"></div>
             </div>
 
@@ -209,18 +347,19 @@
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
                 <h3 class="text-base font-bold text-slate-800 mb-4">Today's Upload Batches</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left text-sm min-w-[680px]">
                         <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
                             <tr>
                                 <th class="py-3 px-4">Time</th>
+                                <th class="py-3 px-4">Report Type</th>
                                 <th class="py-3 px-4">File Name</th>
                                 <th class="py-3 px-4">Total in File</th>
-                                <th class="py-3 px-4">Unique Added</th>
-                                <th class="py-3 px-4">Duplicates Removed</th>
+                                <th class="py-3 px-4 text-emerald-600 font-semibold">New Unique</th>
+                                <th class="py-3 px-4 text-amber-600 font-semibold">Duplicates Removed</th>
                             </tr>
                         </thead>
                         <tbody id="userUploadHistoryBody" class="divide-y divide-slate-100">
-                            <tr><td colspan="5" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>
+                            <tr><td colspan="6" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -229,18 +368,17 @@
 
         <!-- 4. Admin Dashboard View -->
         <div id="adminDashboard" class="hidden space-y-8">
-            <!-- Header -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center space-x-2">
-                        <span class="bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Admin Portal</span>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Master Admin Portal</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Master Control & Analytics</h2>
-                    <p class="text-sm text-slate-500">Monitor all 30 team members, verification departments, and export consolidated reports.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Master Control & Team Operations</h2>
+                    <p class="text-sm text-slate-500">All submitted files and numbers (Phone, Name, Age) are stored centrally. View live, manage departments, and export consolidated Excel sheets.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow flex items-center space-x-2 transition">
-                        <span>📥 Download Master Excel (.xlsx)</span>
+                        <span>📥 Download Master Excel (All Data)</span>
                     </button>
                     <button onclick="refreshAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-lg border border-slate-300 transition">
                         🔄 Refresh
@@ -248,118 +386,170 @@
                 </div>
             </div>
 
-            <!-- Admin Stats Overview Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-indigo-600">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Unique Numbers</p>
-                    <p id="adminStatTotalUnique" class="text-3xl font-extrabold text-indigo-700 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">In centralized database</p>
+            <!-- Admin Stats Cards by Report Types -->
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
+                    <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
+                    <p id="adminStatTotalUnique" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Unique numbers</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-blue-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Number Lookup Dept</p>
-                    <p id="adminStatNumberLookup" class="text-3xl font-extrabold text-blue-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Verified unique numbers</p>
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Reports</p>
+                    <p id="adminStatMaleReport" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Male verified data</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-pink-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gender Verify Dept</p>
-                    <p id="adminStatGenderVerify" class="text-3xl font-extrabold text-pink-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Verified unique numbers</p>
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
+                    <p id="adminStatFemaleReport" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Female verified data</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-emerald-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Submissions</p>
-                    <p id="adminStatToday" class="text-3xl font-extrabold text-emerald-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Added across all workers</p>
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Reports</p>
+                    <p id="adminStatLookupReport" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Lookup verified data</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 lg:col-span-1">
+                    <p class="text-xs font-bold text-slate-500 uppercase">Today's Total</p>
+                    <p id="adminStatToday" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Added across workers</p>
                 </div>
             </div>
 
-            <!-- Filter Bar for Export & View -->
-            <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-sm">
-                <div class="flex flex-wrap items-center gap-3">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-500 block mb-1">Filter Department:</label>
-                        <select id="adminDeptFilter" onchange="filterAdminTables()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
-                            <option value="all">All Departments</option>
-                            <option value="number_lookup">Number Lookup</option>
-                            <option value="gender_verify">Gender Verify</option>
-                        </select>
+            <!-- Admin Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+                <div class="flex border-b border-slate-200 px-3 sm:px-6 pt-3 sm:pt-4 space-x-3 sm:space-x-6 overflow-x-auto scrollbar-none whitespace-nowrap">
+                    <button id="tabAdminSubmissionsBtn" onclick="switchAdminTab('submissions')" class="pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
+                        📋 Live Submissions Viewer (All Numbers & Data)
+                    </button>
+                    <button id="tabAdminUsersBtn" onclick="switchAdminTab('users')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
+                        👥 Team Members & Departments (<span id="userTabCount">0</span>)
+                    </button>
+                    <button id="tabAdminBatchesBtn" onclick="switchAdminTab('batches')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
+                        📦 Batch File Upload Logs
+                    </button>
+                </div>
+
+                <!-- Admin Tab 1: Live Submissions Viewer (All Numbers, Names, Ages) -->
+                <div id="adminTabSubmissions" class="p-6 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Report Type:</label>
+                                <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
+                                    <option value="all">All Report Types</option>
+                                    <option value="male_report">👨 Male Report</option>
+                                    <option value="female_report">👩 Female Report</option>
+                                    <option value="lookup_report">🔍 Lookup Report</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Filter Worker:</label>
+                                <select id="adminSubWorkerFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
+                                    <option value="all">All Workers</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Search (Phone or Name):</label>
+                                <input type="text" id="adminSubSearchInput" oninput="filterAdminSubmissionsLocal()" placeholder="Type number or name..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
+                            </div>
+                        </div>
+                        <button onclick="downloadFilteredSubmissionsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                            <span>📥 Download Filtered Data (.xlsx)</span>
+                        </button>
                     </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-500 block mb-1">Search User:</label>
-                        <input type="text" id="adminUserSearch" oninput="filterAdminTables()" placeholder="Search by email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[680px]">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                <tr>
+                                    <th class="py-3 px-4">#</th>
+                                    <th class="py-3 px-4">Phone Number</th>
+                                    <th class="py-3 px-4">Full Name</th>
+                                    <th class="py-3 px-4">Age</th>
+                                    <th class="py-3 px-4">Report Type</th>
+                                    <th class="py-3 px-4">Submitted By (Worker)</th>
+                                    <th class="py-3 px-4 text-right">Date & Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminSubmissionsTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="7" class="py-6 text-center text-slate-400">Loading submissions data...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="text-xs text-slate-500">
-                    Tip: Click "Download Master Excel" anytime to get the entire clean dataset.
-                </div>
-            </div>
 
-            <!-- Users Performance Table -->
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Team Member Submissions (All 30 Users)</h3>
-                    <span id="userCountBadge" class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-full"></span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
-                            <tr>
-                                <th class="py-3 px-4">User Email</th>
-                                <th class="py-3 px-4">Department</th>
-                                <th class="py-3 px-4 text-right">Today's Added</th>
-                                <th class="py-3 px-4 text-right">Total Contributed</th>
-                                <th class="py-3 px-4 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUserTableBody" class="divide-y divide-slate-100">
-                            <tr><td colspan="5" class="py-6 text-center text-slate-400">Loading user records...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <!-- Admin Tab 2: User Management -->
+                <div id="adminTabUsers" class="hidden p-6 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <input type="text" id="adminUserSearchInput" oninput="renderAdminUserTable()" placeholder="Search worker email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
+                            <select id="adminUserDeptFilter" onchange="renderAdminUserTable()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
+                                <option value="all">All Departments</option>
+                                <option value="gender_verify">Gender Verify</option>
+                                <option value="number_lookup">Number Lookup</option>
+                            </select>
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            💡 Change department anytime using the dropdown in each row!
+                        </div>
+                    </div>
 
-            <!-- Recent Submissions Audit Log -->
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Live Upload Logs</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
-                            <tr>
-                                <th class="py-3 px-4">Timestamp</th>
-                                <th class="py-3 px-4">User</th>
-                                <th class="py-3 px-4">Department</th>
-                                <th class="py-3 px-4">File Name</th>
-                                <th class="py-3 px-4 text-right">Total in File</th>
-                                <th class="py-3 px-4 text-right text-emerald-600 font-semibold">New Unique</th>
-                                <th class="py-3 px-4 text-right text-amber-600 font-semibold">Duplicates</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminLogsTableBody" class="divide-y divide-slate-100">
-                            <tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[680px]">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                <tr>
+                                    <th class="py-3 px-4">Worker Email</th>
+                                    <th class="py-3 px-4">Current Department</th>
+                                    <th class="py-3 px-4">Change Department</th>
+                                    <th class="py-3 px-4 text-right">Today's Added</th>
+                                    <th class="py-3 px-4 text-right">Total Contributed</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUserTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="6" class="py-6 text-center text-slate-400">Loading worker accounts...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Admin Tab 3: Batch Upload Logs -->
+                <div id="adminTabBatches" class="hidden p-6 space-y-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[680px]">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                <tr>
+                                    <th class="py-3 px-4">Timestamp</th>
+                                    <th class="py-3 px-4">Worker Email</th>
+                                    <th class="py-3 px-4">Report Type</th>
+                                    <th class="py-3 px-4">File Name</th>
+                                    <th class="py-3 px-4 text-right">Total in File</th>
+                                    <th class="py-3 px-4 text-right text-emerald-600 font-bold">New Unique</th>
+                                    <th class="py-3 px-4 text-right text-amber-600 font-semibold">Duplicates</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminLogsTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 5. Gender Verification View (Genderize.io Integration) -->
+        <!-- 5. Gender Verification View -->
         <div id="genderVerifyView" class="hidden space-y-8">
-            <!-- Header -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center space-x-2">
-                        <span class="bg-pink-100 text-pink-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Genderize.io Integration</span>
+                        <span class="bg-pink-100 text-pink-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">High Accuracy Tool</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Automated Gender Verification Portal</h2>
-                    <p class="text-sm text-slate-500">Verify names and phone numbers, classify automatically into Male & Female sectors, and export reports in Excel.</p>
-                </div>
-                <div class="text-xs bg-slate-50 border border-slate-200 p-3 rounded-lg text-slate-600">
-                    ⚡ Powered by <span class="font-bold text-indigo-600">Genderize.io API</span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Accurate Gender Verification & Sector Sorter</h2>
+                    <p class="text-sm text-slate-500">Auto-identifies Male & Female records using Multi-API Waterfall (Local DB, Genderize.io, GenderAPI.io, Gender-API.com). Review, easily move records with 1-click, and submit directly as Male/Female Report!</p>
                 </div>
             </div>
 
-            <!-- Input Options Card -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                <!-- Input Method Tabs -->
                 <div class="flex border-b border-slate-200 mb-6">
                     <button id="tabGvPasteBtn" onclick="switchGvInputMode('paste')" class="pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
                         📋 Paste Text / Excel Data
@@ -369,20 +559,18 @@
                     </button>
                 </div>
 
-                <!-- Paste Input Mode -->
                 <div id="gvPasteSection" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-2">
                             Paste Rows of Names, Numbers & Optional Age (One per line)
                         </label>
                         <p class="text-xs text-slate-400 mb-2">
-                            Format: You can copy and paste columns straight from Excel! E.g. <span class="font-mono bg-slate-100 px-1 rounded">John Smith, +1234567890, 32</span> or <span class="font-mono bg-slate-100 px-1 rounded">Mary, 9876543210</span>
+                            Copy-paste columns directly from Excel or enter e.g.: <span class="font-mono bg-slate-100 px-1 rounded">15136465609 Khayri Khalimov 52</span>
                         </p>
-                        <textarea id="gvTextInput" rows="7" placeholder="John Smith, +1234567890, 32&#10;Mary Johnson, 9876543210, 28&#10;Michael Brown, 5551234567, 45" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        <textarea id="gvTextInput" rows="7" placeholder="15136465609 Khayri Khalimov 52&#10;15136466414 Bechara Dahdah 44&#10;15136467474 Robin Hauck 72&#10;15136467519 Eva Carstens 80" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                     </div>
                 </div>
 
-                <!-- File Upload Mode -->
                 <div id="gvFileSection" class="hidden space-y-4">
                     <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-6 text-center transition cursor-pointer" onclick="document.getElementById('gvXlsxFileInput').click()">
                         <input type="file" id="gvXlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleGvFileSelected(event)">
@@ -392,7 +580,6 @@
                             <p class="text-xs text-slate-400">Excel files containing Name, Phone Number, and Age</p>
                         </div>
                     </div>
-                    <!-- Column Mappers for File -->
                     <div id="gvFileColumnMap" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Name Column:</label>
@@ -409,7 +596,6 @@
                     </div>
                 </div>
 
-                <!-- Process Button & Progress -->
                 <div class="mt-6 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="w-full sm:w-2/3">
                         <div id="gvProgressContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
@@ -423,9 +609,8 @@
                 </div>
             </div>
 
-            <!-- Results Section (Visible after verification) -->
+            <!-- Results Section -->
             <div id="gvResultsSection" class="hidden space-y-6">
-                <!-- Summary Metrics Grid -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
                         <p class="text-xs font-bold text-slate-500 uppercase">Total Checked</p>
@@ -445,10 +630,9 @@
                     </div>
                 </div>
 
-                <!-- Sector Selector Tabs -->
                 <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
                     <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-4">
-                        <div class="flex space-x-2">
+                        <div class="flex flex-wrap gap-1.5 sm:gap-2">
                             <button id="btnSectorMale" onclick="switchGvSector('male')" class="px-4 py-2 text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5">
                                 <span>👨 Male Sector Report</span>
                                 <span id="badgeMaleCount" class="bg-white text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
@@ -463,28 +647,48 @@
                             </button>
                         </div>
 
-                        <!-- Action Buttons for Selected Sector -->
-                        <div class="flex items-center space-x-3">
+                        <div class="flex flex-wrap items-center gap-3">
                             <button id="gvDownloadSectorBtn" onclick="downloadCurrentSectorExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
                                 <span>📥 Download Report (.xlsx)</span>
                             </button>
-                            <button id="gvSaveToDbBtn" onclick="saveSectorToDatabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
-                                <span>💾 Save to Central Database</span>
+                            <!-- 1-Click Submission to Portal as Male or Female Report! -->
+                            <button id="gvSubmitReportBtn" onclick="submitGvSectorAsReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                                <span id="gvSubmitBtnText">🚀 Submit Sector Report to Portal</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Sector Table Container -->
+                    <!-- Bulk Action Bar for Undetermined Sector -->
+                    <div id="undeterminedBulkBar" class="hidden mb-4 p-3 sm:p-4 bg-amber-50 rounded-xl border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-amber-900">⚡ Bulk Actions:</span>
+                            <span class="text-xs bg-white text-amber-800 px-2 py-0.5 rounded border border-amber-300 font-bold">
+                                <span id="selectedUndeterminedCount">0</span> selected
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="autoMoveUndeterminedByPrediction()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+                                <span>⚡ Auto-Move by Ratio Prediction (>65%)</span>
+                            </button>
+                            <button onclick="bulkMoveUndetermined('male')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+                                <span>👨 Move Selected to Male</span>
+                            </button>
+                            <button onclick="bulkMoveUndetermined('female')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+                                <span>👩 Move Selected to Female</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
+                        <table class="w-full text-left text-sm min-w-[680px]">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
-                                <tr>
+                                <tr id="gvTableHeaderRow">
                                     <th class="py-3 px-4">#</th>
-                                    <th class="py-3 px-4">Name</th>
+                                    <th class="py-3 px-4">Full Name</th>
                                     <th class="py-3 px-4">Phone Number</th>
                                     <th class="py-3 px-4">Age</th>
                                     <th class="py-3 px-4">Detected Gender</th>
-                                    <th class="py-3 px-4 text-right">Probability</th>
+                                    <th class="py-3 px-4 text-right">Action / Move</th>
                                 </tr>
                             </thead>
                             <tbody id="gvSectorTableBody" class="divide-y divide-slate-100">
@@ -496,34 +700,104 @@
             </div>
         </div>
 
-    </main>
-
-    <!-- Settings / Config Modal -->
-    <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800 mb-1">⚙️ Supabase Database Configuration</h3>
-            <p class="text-xs text-slate-500 mb-4">Enter your free Supabase project credentials. These are saved securely in your browser's local storage.</p>
-            <div class="space-y-4">
+        <!-- 6. Dedicated Duplicate Checker View -->
+        <div id="duplicateCheckView" class="hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Project URL</label>
-                    <input type="text" id="cfgSupabaseUrl" placeholder="https://xyzprojectid.supabase.co" class="w-full px-3 py-2 border rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Anon Public Key</label>
-                    <textarea id="cfgSupabaseKey" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-3 py-2 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Quality Control</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Smart Duplicate Checker Tool</h2>
+                    <p class="text-sm text-slate-500">Filter duplicates inside your phone number list and cross-check against the entire Central Database in real time.</p>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="closeConfigModal()" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium">Cancel</button>
-                <button onclick="saveSupabaseConfig()" class="px-5 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow">Save & Connect</button>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">
+                        Paste Phone Numbers or Upload Sheet
+                    </label>
+                    <textarea id="dupTextInput" rows="6" placeholder="+1234567890&#10;+1987654321&#10;1234567890" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                            <input type="checkbox" id="dupCheckDbCrossCheck" checked class="w-4 h-4 text-indigo-600 rounded">
+                            <span>Cross-check against Central Database (Find numbers already submitted)</span>
+                        </label>
+                    </div>
+                    <button onclick="runDuplicateCheck()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition flex items-center space-x-2">
+                        <span>🔍 Run Duplicate Check</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Duplicate Results Section -->
+            <div id="dupResultsCard" class="hidden space-y-6">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Input</p>
+                        <p id="dupStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">🟢 Fresh Unique</p>
+                        <p id="dupStatUnique" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">🔁 File Duplicates</p>
+                        <p id="dupStatFileDups" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-red-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">🔴 In Database</p>
+                        <p id="dupStatDbDups" class="text-2xl font-extrabold text-red-600 mt-1">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-4">
+                        <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                            <button id="tabDupCleanBtn" onclick="switchDupTab('clean')" class="px-4 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white shadow transition">
+                                🟢 Clean Unique Numbers (<span id="dupCountClean">0</span>)
+                            </button>
+                            <button id="tabDupFileBtn" onclick="switchDupTab('duplicates')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                🔁 Repeated in File (<span id="dupCountRepeated">0</span>)
+                            </button>
+                            <button id="tabDupDbBtn" onclick="switchDupTab('db')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                🔴 Already in Database (<span id="dupCountDb">0</span>)
+                            </button>
+                        </div>
+                        <button onclick="downloadDupTabExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                            <span>📥 Download Current Tab (.xlsx)</span>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[680px]">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                <tr id="dupTableHeader">
+                                    <th class="py-3 px-4">#</th>
+                                    <th class="py-3 px-4">Phone Number</th>
+                                    <th class="py-3 px-4">Occurrences</th>
+                                    <th class="py-3 px-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dupTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="4" class="py-6 text-center text-slate-400">Run check to view results.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+
+    </main>
 
     <!-- Application JavaScript Logic -->
-        <!-- Application JavaScript Logic -->
     <script>
-        // Supabase Client Instance
+        const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
+        const DEFAULT_SP_KEY = 'sb_publishable_zhiBHjv-fhhEhy7wvX52AA_1sE0sSSL';
+
         let supabaseClient = null;
         let currentUser = null;
         let currentProfile = null;
@@ -531,9 +805,76 @@
         let parsedRows = [];
         let adminUsersCache = [];
         let adminLogsCache = [];
+        let adminSubmissionsCache = [];
         let currentAuthMode = 'signin';
 
-        // Initialization on window load
+        // Extensive High-Speed Verified Names Dictionary
+        const MALE_NAMES_DB = new Set([
+            "khayri","bassem","nabil","hussein","farhan","khalid","ismail","ahmad","noori","baker","boutilier","roark","tackett","woods","sahoo","goldston","wassem","golsby","russo","osman","qaid","debasis","muhammad","mohammed","mohamed","keneil","dionta","isaiah","sebastian","lewis","brady","valery","stanislav","vadim","oleg","gleb","anton","roman","maksim","artem","pavel","yuri","mikhail","nikolai","sergei","boris","igor","vladimir","ivan","alexei","dmitri","serge","luc","marcel","alain","pierre","maroun","michel","antoine","charbel","elias","georges","jad","fadi","ziad","rami","sami","latif","mansoor","faisal","samir","rashid","nasser","salim","hamza","bilal","zayd","farooq","ibrahim","yusuf","omar","hassan","mustafa","bechara","glenn","dennis","donavon","jayson","matthew","gregory","afshin","robin",
+            "james","john","robert","michael","william","david","richard","charles","joseph","thomas",
+            "christopher","daniel","paul","mark","donald","george","kenneth","steven","edward","brian",
+            "ronald","anthony","kevin","jason","matthew","gary","timothy","jose","larry","jeffrey",
+            "frank","scott","eric","stephen","andrew","raymond","gregory","joshua","jerry","dennis",
+            "walter","patrick","peter","harold","douglas","henry","carl","arthur","ryan","roger",
+            "joe","juan","jack","albert","jonathan","justin","terry","gerald","keith","samuel",
+            "willie","ralph","lawrence","nicholas","roy","benjamin","bruce","brandon","adam","harry",
+            "fred","wayne","billy","steve","louis","jeremy","aaron","randy","howard","eugene",
+            "carlos","russell","bobby","victor","martin","ernest","phillip","todd","jesse","craig",
+            "alan","shawn","clarence","sean","philip","chris","johnny","earl","jimmy","antonio",
+            "danny","bryan","tony","luis","mike","stanley","leonard","nathan","dale","manuel",
+            "rodney","curtis","norman","allen","marvin","vincent","glenn","travis","jeff","chad",
+            "jacob","lee","melvin","alfred","kyle","francis","bradley","jesus","herbert","frederick",
+            "ray","joel","edwin","don","eddie","ricky","troy","alexander","bernard","marcus",
+            "sam","francisco","clifford","derrick","micheal","warren","darrell","jerome","leo","alvin",
+            "tim","wesley","gordon","dean","greg","jorge","dustin","pedro","corey","herman",
+            "maurice","vernon","roberto","clyde","glen","hector","shane","ricardo","rick","lester",
+            "brent","ramon","charlie","tyler","gilbert","gene","marc","reginald","ruben","brett",
+            "angel","nathaniel","rafael","leslie","edgar","milton","raul","ben","chester","cecil",
+            "duane","franklin","andre","elmer","brad","gabriel","ron","mitchell","roland","arnold",
+            "harvey","jared","adrian","karl","cory","claude","erik","darryl","jamie","neil",
+            "jessie","christian","javier","fernando","clinton","ted","mathew","tyrone","darren",
+            "lonnie","lance","cody","julio","kurt","kirk","alex","ahmed","ali","hasan","hossain",
+            "karim","mahmud","rahim","tanvir","rakib","shakil","rashed","suman","rubel","sohel",
+            "arif","jewel","rasel","mehedi","sabbir","nayeem","alamin","faruk","ripon","shuvo",
+            "monir","momin","imran","nahid","jahid","ashik","asif","jahangir","shahin","shamim",
+            "masud","mamun","tariq","tarek","anwar","babul","dulal","kamal","jamal","rafiq",
+            "shafiq","shahid","rony","kabir","abir","saiful","nazmul","shafiqul","aminul","hasibul",
+            "monirul","habibur","mostafa","kamrul","delowar","zillur","belal","habib","khalil"
+        ]);
+
+        const FEMALE_NAMES_DB = new Set([
+            "eva","daphne","dakota","daisy","colette","chloe","chelsea","celeste","cecilia","catalina","cassidy","carolina","carly","candace","camryn","camilla","camila","chrislean","valeria","anastasia","daria","marina","yulia","ksenia","polina","oxana","irina","ekaterina","natasha","tatiana","olga","svetlana","elena","daniela","yara","maya","reem","dina","hoda","mona","lina","leila","rana","rim","nour","amina","yasmin","mariam","zainab","fatima","samira","layla","nadia","mary","patricia","linda","barbara","elizabeth","jennifer","maria","susan","margaret","dorothy",
+            "lisa","nancy","karen","betty","helen","sandra","donna","carol","ruth","sharon",
+            "michelle","laura","sarah","kimberly","deborah","jessica","shirley","cynthia","angela","melissa",
+            "brenda","amy","anna","rebecca","virginia","kathleen","pamela","martha","debra","amanda",
+            "stephanie","carolyn","christine","marie","janet","catherine","frances","ann","joyce","diane",
+            "alice","julie","heather","teresa","doris","gloria","evelyn","jean","cheryl","mildred",
+            "katherine","joan","ashley","judith","rose","janice","kelly","nicole","judy","christina",
+            "kathy","theresa","beverly","denise","tammy","irene","jane","lori","rachel","marilyn",
+            "andrea","kathryn","louise","sara","anne","jacqueline","wanda","bonnie","julia","ruby",
+            "lois","tina","phyllis","norma","paula","diana","annie","lillian","emily","robin",
+            "peggy","crystal","gladys","rita","dawn","connie","florence","tracy","edna","tiffany",
+            "carmen","rosa","cindy","grace","wendy","victoria","edith","kim","sherry","sylvia",
+            "josephine","thelma","shannon","sheila","ethel","ellen","elaine","marjorie","carrie","charlotte",
+            "monica","esther","pauline","emma","juanita","anita","rhonda","hazel","amber",
+            "debbie","april","clara","lucille","joanne","eleanor","valerie","danielle","megan","alicia",
+            "suzanne","michele","gail","bertha","darlene","veronica","jill","erin","geraldine","lauren",
+            "cathy","joann","lorraine","lynn","sally","regina","erica","beatrice","dolores","bernice",
+            "audrey","yvonne","annette","june","samantha","marion","dana","stacy","ana","renee",
+            "ida","vivian","roberta","holly","brittany","melanie","loretta","yolanda","jeanette","laurie",
+            "katie","kristen","vanessa","alma","sue","elsie","beth","jeanne","vicki","carla",
+            "tara","rosemary","eileen","terri","gertrude","lucy","tonya","ella","stacey","wilma",
+            "gina","kristin","natalie","agnes","vera","charlene","bessie","delores","melinda","pearl",
+            "arlene","maureen","colleen","allison","tamara","joy","georgia","constance","lillie","claudia",
+            "jackie","marcia","tanya","nellie","minnie","marlene","heidi","glenda","lydia","viola",
+            "courtney","marian","stella","caroline","dora","vickie","mattie","maxine","irma","mabel",
+            "blanche","fatema","ruma","rina","mina","shila","sumi","akter","begum","khatun","sultana",
+            "parvin","nasrin","shirin","sharmin","farhana","sabrina","jannat","mim","bristy","purnima",
+            "puja","riya","priya","mou","munni","tania","sonia","laboni","sadia","nabila","tasnim",
+            "afroza","rehana","salma","bilkis","hasina","khaleda","rokeya","suraiya","shamima","dilruba",
+            "monira","rubina","shahnaz","jahanara","nurjahan","salma","reshma","tahmina","marufa"
+        ]);
+
         window.addEventListener('DOMContentLoaded', () => {
             initSupabase();
             updateCurrentDate();
@@ -545,20 +886,12 @@
             if (el) el.innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
         }
 
-        // Default pre-configured credentials so workers never need setup
-        const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
-        const DEFAULT_SP_KEY = 'sb_publishable_zhiBHjv-fhhEhy7wvX52AA_1sE0sSSL';
-
         function initSupabase() {
             const url = localStorage.getItem('SP_URL') || DEFAULT_SP_URL;
             const key = localStorage.getItem('SP_KEY') || DEFAULT_SP_KEY;
 
-            // Ensure credentials are saved in localStorage
             localStorage.setItem('SP_URL', url);
             localStorage.setItem('SP_KEY', key);
-
-            const warn = document.getElementById('configWarning');
-            if (warn) warn.classList.add('hidden');
 
             try {
                 supabaseClient = window.supabase.createClient(url, key);
@@ -568,31 +901,6 @@
                 console.error('Supabase init error:', err);
                 return false;
             }
-        }
-
-        function openConfigModal() {
-            document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('SP_URL') || '';
-            document.getElementById('cfgSupabaseKey').value = localStorage.getItem('SP_KEY') || '';
-            document.getElementById('configModal').classList.remove('hidden');
-            document.getElementById('configModal').classList.add('flex');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configModal').classList.add('hidden');
-            document.getElementById('configModal').classList.remove('flex');
-        }
-
-        function saveSupabaseConfig() {
-            const url = document.getElementById('cfgSupabaseUrl').value.trim();
-            const key = document.getElementById('cfgSupabaseKey').value.trim();
-            if (!url || !key) {
-                alert('Please enter both Supabase URL and Key');
-                return;
-            }
-            localStorage.setItem('SP_URL', url);
-            localStorage.setItem('SP_KEY', key);
-            closeConfigModal();
-            location.reload();
         }
 
         async function checkSession() {
@@ -607,7 +915,7 @@
         }
 
         // ==========================================
-        // AUTH: SIGN IN & SIGN UP (CREATE ACCOUNT)
+        // AUTHENTICATION
         // ==========================================
         function switchAuthMode(mode) {
             currentAuthMode = mode;
@@ -626,23 +934,23 @@
             if (successBox) successBox.classList.add('hidden');
 
             if (mode === 'signup') {
-                if (tabSignUp) tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
-                if (tabSignIn) tabSignIn.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
-                if (deptContainer) deptContainer.classList.remove('hidden');
-                if (title) title.innerText = 'Create New Account';
-                if (subtitle) subtitle.innerText = 'Register your account and select your department';
-                if (submitBtn) submitBtn.innerHTML = '<span>Create Account</span>';
-                if (togglePrompt) togglePrompt.innerText = 'Already have an account?';
-                if (toggleBtn) toggleBtn.innerText = 'Sign In';
+                tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                tabSignIn.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                deptContainer.classList.remove('hidden');
+                title.innerText = 'Create New Account';
+                subtitle.innerText = 'Register your account and select your department';
+                submitBtn.innerHTML = '<span>Create Account</span>';
+                togglePrompt.innerText = 'Already have an account?';
+                toggleBtn.innerText = 'Sign In';
             } else {
-                if (tabSignIn) tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
-                if (tabSignUp) tabSignUp.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
-                if (deptContainer) deptContainer.classList.add('hidden');
-                if (title) title.innerText = 'Sign In to Your Account';
-                if (subtitle) subtitle.innerText = 'Enter your credentials to access your daily workspace';
-                if (submitBtn) submitBtn.innerHTML = '<span>Sign In</span>';
-                if (togglePrompt) togglePrompt.innerText = "Don't have an account?";
-                if (toggleBtn) toggleBtn.innerText = 'Create an account';
+                tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                tabSignUp.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                deptContainer.classList.add('hidden');
+                title.innerText = 'Sign In to Your Account';
+                subtitle.innerText = 'Enter your credentials to access your daily workspace';
+                submitBtn.innerHTML = '<span>Sign In</span>';
+                togglePrompt.innerText = "Don't have an account?";
+                toggleBtn.innerText = 'Create an account';
             }
         }
 
@@ -654,7 +962,7 @@
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
-            const dept = document.getElementById('signupDept') ? document.getElementById('signupDept').value : 'number_lookup';
+            const dept = document.getElementById('signupDept') ? document.getElementById('signupDept').value : 'gender_verify';
             const errBox = document.getElementById('loginError');
             const successBox = document.getElementById('loginSuccessMsg');
             const submitBtn = document.getElementById('loginSubmitBtn');
@@ -664,9 +972,7 @@
             submitBtn.disabled = true;
 
             try {
-                if (!supabaseClient) {
-                    throw new Error('Supabase is not configured yet. Click Settings above.');
-                }
+                if (!supabaseClient) throw new Error('Database connection failed.');
 
                 if (currentAuthMode === 'signup') {
                     submitBtn.innerHTML = '<span>Creating Account...</span>';
@@ -716,15 +1022,8 @@
             }
         }
 
-        // Backward compatibility for old form onsubmit if any
-        function handleLogin(e) {
-            return handleAuthSubmit(e);
-        }
-
         async function handleLogout() {
-            if (supabaseClient) {
-                await supabaseClient.auth.signOut();
-            }
+            if (supabaseClient) await supabaseClient.auth.signOut();
             currentUser = null;
             currentProfile = null;
             document.getElementById('userInfo').classList.add('hidden');
@@ -736,24 +1035,25 @@
 
         async function loadUserProfile() {
             try {
-                const { data: profile, error } = await supabaseClient
+                const { data: profile } = await supabaseClient
                     .from('profiles')
                     .select('*')
                     .eq('id', currentUser.id)
                     .single();
 
-                if (error && error.code !== 'PGRST116') {
-                    console.error('Profile fetch error:', error);
-                }
-
                 currentProfile = profile || {
                     id: currentUser.id,
                     email: currentUser.email,
                     role: currentUser.user_metadata?.role || 'user',
-                    department: currentUser.user_metadata?.department || 'number_lookup'
+                    department: currentUser.user_metadata?.department || 'gender_verify'
                 };
 
-                // Update Header UI
+                // Master Owner Email is ALWAYS Admin
+                if (currentUser.email === 'ramolmoaran@gmail.com') {
+                    currentProfile.role = 'admin';
+                    currentProfile.department = 'admin';
+                }
+
                 document.getElementById('userInfo').classList.remove('hidden');
                 document.getElementById('userInfo').classList.add('flex');
                 document.getElementById('userEmail').innerText = currentProfile.email;
@@ -768,23 +1068,46 @@
                 if (currentProfile.role === 'admin') {
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-purple-200 text-purple-900';
                     badge.innerText = 'Admin';
-                    showView('adminDashboard');
-                    loadAdminDashboard();
+                    switchToSection('dashboard');
                 } else {
                     const deptLabel = currentProfile.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify';
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-indigo-200 text-indigo-900';
                     badge.innerText = deptLabel;
                     document.getElementById('userDeptTitle').innerText = deptLabel;
-                    showView('userDashboard');
-                    loadUserDashboard();
+                    setupWorkerReportOptions(currentProfile.department);
+                    switchToSection('dashboard');
                 }
             } catch (err) {
                 console.error(err);
             }
         }
 
+        function setupWorkerReportOptions(dept) {
+            const optMale = document.getElementById('optMaleReport');
+            const optFemale = document.getElementById('optFemaleReport');
+            const optLookup = document.getElementById('optLookupReport');
+
+            if (dept === 'gender_verify') {
+                optMale.classList.remove('hidden');
+                optFemale.classList.remove('hidden');
+                optLookup.classList.add('hidden');
+                optMale.querySelector('input').checked = true;
+            } else if (dept === 'number_lookup') {
+                optMale.classList.add('hidden');
+                optFemale.classList.add('hidden');
+                optLookup.classList.remove('hidden');
+                optLookup.querySelector('input').checked = true;
+            } else {
+                // Admin sees all 3 options
+                optMale.classList.remove('hidden');
+                optFemale.classList.remove('hidden');
+                optLookup.classList.remove('hidden');
+                optMale.querySelector('input').checked = true;
+            }
+        }
+
         function showView(viewId) {
-            ['loginView', 'userDashboard', 'adminDashboard', 'genderVerifyView'].forEach(id => {
+            ['loginView', 'userDashboard', 'adminDashboard', 'genderVerifyView', 'duplicateCheckView'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
@@ -792,18 +1115,43 @@
             if (target) target.classList.remove('hidden');
         }
 
+        function switchToSection(sec) {
+            const btnDash = document.getElementById('navBtnDashboard');
+            const btnGender = document.getElementById('navBtnGender');
+            const btnDup = document.getElementById('navBtnDuplicate');
+
+            [btnDash, btnGender, btnDup].forEach(b => {
+                if (b) b.className = 'text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+            });
+
+            if (sec === 'dashboard') {
+                if (btnDash) btnDash.className = 'text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                if (currentProfile && currentProfile.role === 'admin') {
+                    showView('adminDashboard');
+                    loadAdminDashboard();
+                } else {
+                    showView('userDashboard');
+                    loadUserDashboard();
+                }
+            } else if (sec === 'gender_verify') {
+                if (btnGender) btnGender.className = 'text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                showView('genderVerifyView');
+            } else if (sec === 'duplicate_check') {
+                if (btnDup) btnDup.className = 'text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                showView('duplicateCheckView');
+            }
+        }
+
         // ==========================================
-        // USER DASHBOARD LOGIC
+        // WORKER SUBMISSIONS (PHONE, NAME, AGE)
         // ==========================================
         async function loadUserDashboard() {
             if (!supabaseClient || !currentUser) return;
-
             const todayStart = new Date();
             todayStart.setHours(0,0,0,0);
             const todayIso = todayStart.toISOString();
 
-            // 1. Fetch Today's Logs for current user
-            const { data: logs, error: logErr } = await supabaseClient
+            const { data: logs } = await supabaseClient
                 .from('upload_logs')
                 .select('*')
                 .eq('user_id', currentUser.id)
@@ -819,11 +1167,12 @@
                 logs.forEach(log => {
                     todayUnique += log.new_inserted;
                     todayDuplicates += log.duplicates_count;
-
                     const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const repLabel = log.report_type === 'male_report' ? '👨 Male Report' : (log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
                     historyBody.innerHTML += `
                         <tr class="hover:bg-slate-50">
                             <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
+                            <td class="py-3 px-4 font-bold text-xs">${repLabel}</td>
                             <td class="py-3 px-4 font-medium text-slate-700">${log.file_name || 'Upload'}</td>
                             <td class="py-3 px-4">${log.total_received}</td>
                             <td class="py-3 px-4 font-bold text-emerald-600">+${log.new_inserted}</td>
@@ -832,13 +1181,12 @@
                     `;
                 });
             } else {
-                historyBody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>`;
+                historyBody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>`;
             }
 
             document.getElementById('statUserTodayUnique').innerText = todayUnique.toLocaleString();
             document.getElementById('statUserTodayDuplicates').innerText = todayDuplicates.toLocaleString();
 
-            // 2. Fetch All-Time Total for user
             const { count: allTimeCount } = await supabaseClient
                 .from('master_numbers')
                 .select('*', { count: 'exact', head: true })
@@ -860,9 +1208,8 @@
                 try {
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    parsedRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    parsedRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
 
                     if (!parsedRows || parsedRows.length === 0) {
                         alert('Uploaded sheet contains no data rows.');
@@ -871,27 +1218,46 @@
 
                     document.getElementById('previewRowCount').innerText = `${parsedRows.length} rows detected`;
 
-                    // Populate Column Selector
                     const sampleRow = parsedRows[0];
                     const columns = Object.keys(sampleRow);
-                    const selector = document.getElementById('columnSelector');
-                    selector.innerHTML = '';
+                    const phoneSel = document.getElementById('columnPhoneSelector');
+                    const nameSel = document.getElementById('columnNameSelector');
+                    const ageSel = document.getElementById('columnAgeSelector');
 
-                    let autoSelected = false;
+                    phoneSel.innerHTML = '';
+                    nameSel.innerHTML = '<option value="">-- None / Auto --</option>';
+                    ageSel.innerHTML = '<option value="">-- None / Auto --</option>';
+
+                    let phoneSelected = false;
+                    let nameSelected = false;
+                    let ageSelected = false;
+
                     columns.forEach(col => {
-                        const opt = document.createElement('option');
-                        opt.value = col;
-                        opt.innerText = col;
+                        const optP = document.createElement('option');
+                        optP.value = col; optP.innerText = col;
                         const lower = col.toLowerCase();
-                        if (!autoSelected && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact') || lower.includes('cell'))) {
-                            opt.selected = true;
-                            autoSelected = true;
+                        if (!phoneSelected && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact') || lower.includes('cell'))) {
+                            optP.selected = true; phoneSelected = true;
                         }
-                        selector.appendChild(opt);
+                        phoneSel.appendChild(optP);
+
+                        const optN = document.createElement('option');
+                        optN.value = col; optN.innerText = col;
+                        if (!nameSelected && (lower.includes('name') || lower.includes('person') || lower.includes('customer'))) {
+                            optN.selected = true; nameSelected = true;
+                        }
+                        nameSel.appendChild(optN);
+
+                        const optA = document.createElement('option');
+                        optA.value = col; optA.innerText = col;
+                        if (!ageSelected && (lower.includes('age') || lower.includes('boyos') || lower.includes('dob'))) {
+                            optA.selected = true; ageSelected = true;
+                        }
+                        ageSel.appendChild(optA);
                     });
 
                     document.getElementById('filePreviewCard').classList.remove('hidden');
-                    document.getElementById('uploadStatusText').innerText = 'Ready to process.';
+                    document.getElementById('uploadStatusText').innerText = 'Ready to process and submit.';
                     document.getElementById('lastUploadResultCard').classList.add('hidden');
                 } catch (err) {
                     alert('Error reading Excel file: ' + err.message);
@@ -901,12 +1267,15 @@
         }
 
         async function processAndSubmitXlsx() {
-            if (!parsedRows || parsedRows.length === 0) {
-                alert('No rows to process');
-                return;
-            }
+            if (!parsedRows || parsedRows.length === 0) return;
 
-            const chosenCol = document.getElementById('columnSelector').value;
+            const chosenPhoneCol = document.getElementById('columnPhoneSelector').value;
+            const chosenNameCol = document.getElementById('columnNameSelector').value;
+            const chosenAgeCol = document.getElementById('columnAgeSelector').value;
+
+            const selectedReportRadio = document.querySelector('input[name="workerReportType"]:checked');
+            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'lookup_report';
+
             const btn = document.getElementById('processUploadBtn');
             const progressContainer = document.getElementById('uploadProgressBarContainer');
             const progressBar = document.getElementById('uploadProgressBar');
@@ -915,82 +1284,88 @@
             btn.disabled = true;
             progressContainer.classList.remove('hidden');
             progressBar.style.width = '20%';
-            statusText.innerText = 'Extracting phone numbers...';
+            statusText.innerText = 'Extracting and structuring records...';
 
-            // Clean and extract phone numbers
-            const rawNumbers = [];
+            const records = [];
             parsedRows.forEach(row => {
-                let val = String(row[chosenCol] || '').trim();
-                // Basic cleanup: remove standard delimiters, preserve digits and leading +
-                val = val.replace(/[\s\-\(\)\.]/g, '');
-                if (val && val.length >= 6) {
-                    rawNumbers.push(val);
+                let phoneVal = String(row[chosenPhoneCol] || '').trim();
+                phoneVal = phoneVal.replace(/[\s\-\(\)\.]/g, '');
+                let nameVal = chosenNameCol ? String(row[chosenNameCol] || '').trim() : '';
+                let ageVal = chosenAgeCol ? String(row[chosenAgeCol] || '').trim() : '';
+
+                if (phoneVal && phoneVal.length >= 6) {
+                    records.push({
+                        phone: phoneVal,
+                        name: nameVal,
+                        age: ageVal
+                    });
                 }
             });
 
-            if (rawNumbers.length === 0) {
-                alert('No valid numbers found in the selected column!');
+            if (records.length === 0) {
+                alert('No valid phone numbers found in the selected column!');
                 btn.disabled = false;
                 progressContainer.classList.add('hidden');
                 return;
             }
 
             progressBar.style.width = '50%';
-            statusText.innerText = `Submitting ${rawNumbers.length} numbers to database for deduplication...`;
+            statusText.innerText = `Submitting ${records.length} records to database with full details...`;
 
             try {
-                // Call Supabase RPC function 'process_number_batch'
-                const { data, error } = await supabaseClient.rpc('process_number_batch', {
-                    p_numbers: rawNumbers,
+                // Call submit_full_work_batch RPC in Supabase
+                const { data, error } = await supabaseClient.rpc('submit_full_work_batch', {
+                    p_records: records,
+                    p_report_type: chosenReportType,
                     p_file_name: selectedFileData ? selectedFileData.name : 'upload.xlsx'
                 });
 
                 if (error) throw error;
 
                 progressBar.style.width = '100%';
-                statusText.innerText = 'Upload & Deduplication Completed!';
+                statusText.innerText = 'Report Submitted Successfully!';
 
-                // Display Result Card
+                const repTitle = chosenReportType === 'male_report' ? '👨 Male Report' : (chosenReportType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+
                 const resultCard = document.getElementById('lastUploadResultCard');
                 resultCard.className = 'mt-6 p-5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
                 resultCard.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h4 class="font-bold text-base">✅ File Processed Successfully</h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3 text-xs">
-                                <div>
-                                    <span class="text-slate-500 block">Total in File</span>
-                                    <span class="text-base font-bold">${data.total_received}</span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-500 block">Unique in File</span>
-                                    <span class="text-base font-bold">${data.unique_in_file}</span>
-                                </div>
-                                <div>
-                                    <span class="text-emerald-700 block font-semibold">New Unique Saved</span>
-                                    <span class="text-xl font-extrabold text-emerald-600">+${data.new_inserted}</span>
-                                </div>
-                                <div>
-                                    <span class="text-amber-700 block font-semibold">Duplicates Filtered</span>
-                                    <span class="text-xl font-extrabold text-amber-600">${data.duplicates_count}</span>
-                                </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">✅</span>
+                            <h4 class="font-bold text-base">${repTitle} Submitted to Portal</h4>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1">All record fields (Phone Number, Name, Age) have been saved centrally for Admin.</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3 text-xs">
+                            <div>
+                                <span class="text-slate-500 block">Total in File</span>
+                                <span class="text-base font-bold">${data.total_received}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Unique in File</span>
+                                <span class="text-base font-bold">${data.unique_in_file}</span>
+                            </div>
+                            <div>
+                                <span class="text-emerald-700 block font-semibold">New Unique Saved</span>
+                                <span class="text-xl font-extrabold text-emerald-600">+${data.new_inserted}</span>
+                            </div>
+                            <div>
+                                <span class="text-amber-700 block font-semibold">Duplicates Filtered</span>
+                                <span class="text-xl font-extrabold text-amber-600">${data.duplicates_count}</span>
                             </div>
                         </div>
                     </div>
                 `;
                 resultCard.classList.remove('hidden');
 
-                // Refresh dashboard stats and logs
                 await loadUserDashboard();
-
-                // Reset file input
                 document.getElementById('xlsxFileInput').value = '';
                 parsedRows = [];
                 selectedFileData = null;
                 document.getElementById('filePreviewCard').classList.add('hidden');
             } catch (err) {
-                alert('Failed to process batch: ' + err.message);
-                statusText.innerText = 'Error occurred during processing.';
+                alert('Failed to submit report: ' + err.message);
+                statusText.innerText = 'Error occurred during submission.';
             } finally {
                 btn.disabled = false;
                 setTimeout(() => {
@@ -1001,39 +1376,70 @@
         }
 
         // ==========================================
-        // ADMIN DASHBOARD LOGIC
+        // ADMIN DASHBOARD & MASTER SUBMISSIONS VIEWER
         // ==========================================
+        let currentAdminTab = 'submissions';
+
+        function switchAdminTab(tab) {
+            currentAdminTab = tab;
+            const btnUsers = document.getElementById('tabAdminUsersBtn');
+            const btnSubs = document.getElementById('tabAdminSubmissionsBtn');
+            const btnBatches = document.getElementById('tabAdminBatchesBtn');
+
+            const tabUsers = document.getElementById('adminTabUsers');
+            const tabSubs = document.getElementById('adminTabSubmissions');
+            const tabBatches = document.getElementById('adminTabBatches');
+
+            [btnUsers, btnSubs, btnBatches].forEach(b => {
+                b.className = 'pb-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition whitespace-nowrap';
+            });
+            [tabUsers, tabSubs, tabBatches].forEach(t => t.classList.add('hidden'));
+
+            if (tab === 'submissions') {
+                btnSubs.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                tabSubs.classList.remove('hidden');
+                loadAdminSubmissionsData();
+            } else if (tab === 'users') {
+                btnUsers.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                tabUsers.classList.remove('hidden');
+            } else if (tab === 'batches') {
+                btnBatches.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                tabBatches.classList.remove('hidden');
+            }
+        }
+
         async function loadAdminDashboard() {
             if (!supabaseClient) return;
 
-            // 1. Overall Stats
+            // Stats across report types
             const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
-            const { count: numLookupTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('department', 'number_lookup');
-            const { count: genderTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('department', 'gender_verify');
+            const { count: maleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report');
+            const { count: femaleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report');
+            const { count: lookupCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report');
 
             const todayStart = new Date();
             todayStart.setHours(0,0,0,0);
             const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
 
             document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
-            document.getElementById('adminStatNumberLookup').innerText = (numLookupTotal || 0).toLocaleString();
-            document.getElementById('adminStatGenderVerify').innerText = (genderTotal || 0).toLocaleString();
+            document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
+            document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
+            document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
             document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
 
-            // 2. Fetch All Profiles
-            const { data: profiles } = await supabaseClient.from('profiles').select('*').order('email');
-            
-            // 3. Fetch Today's logs aggregated
+            // Load profiles & logs
+            const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
             const { data: logs } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
             adminLogsCache = logs || [];
 
-            // Compute user submissions
-            const userSubmissions = {};
+            const userMap = {};
             if (profiles) {
                 profiles.forEach(p => {
-                    userSubmissions[p.id] = {
+                    userMap[p.id] = {
+                        id: p.id,
                         email: p.email,
                         department: p.department,
+                        role: p.role,
                         todayAdded: 0,
                         totalContributed: 0
                     };
@@ -1043,72 +1449,168 @@
             if (logs) {
                 const todayIso = todayStart.toISOString();
                 logs.forEach(l => {
-                    if (userSubmissions[l.user_id]) {
-                        userSubmissions[l.user_id].totalContributed += l.new_inserted;
+                    if (userMap[l.user_id]) {
+                        userMap[l.user_id].totalContributed += l.new_inserted;
                         if (l.created_at >= todayIso) {
-                            userSubmissions[l.user_id].todayAdded += l.new_inserted;
+                            userMap[l.user_id].todayAdded += l.new_inserted;
                         }
                     }
                 });
             }
 
-            adminUsersCache = Object.values(userSubmissions);
-            renderAdminTables();
+            adminUsersCache = Object.values(userMap);
+            document.getElementById('userTabCount').innerText = adminUsersCache.length;
+
+            const workerSelect = document.getElementById('adminSubWorkerFilter');
+            if (workerSelect) {
+                workerSelect.innerHTML = '<option value="all">All Workers</option>';
+                adminUsersCache.forEach(u => {
+                    workerSelect.innerHTML += `<option value="${u.email}">${u.email}</option>`;
+                });
+            }
+
+            renderAdminUserTable();
+            renderAdminLogsTable();
+            loadAdminSubmissionsData();
         }
 
-        function renderAdminTables() {
-            const userBody = document.getElementById('adminUserTableBody');
-            const logsBody = document.getElementById('adminLogsTableBody');
-            const deptFilter = document.getElementById('adminDeptFilter').value;
-            const searchVal = document.getElementById('adminUserSearch').value.toLowerCase();
+        function renderAdminUserTable() {
+            const body = document.getElementById('adminUserTableBody');
+            const search = document.getElementById('adminUserSearchInput').value.toLowerCase();
+            const deptFilter = document.getElementById('adminUserDeptFilter').value;
 
-            // Render Users
-            let filteredUsers = adminUsersCache.filter(u => {
+            const filtered = adminUsersCache.filter(u => {
+                const matchSearch = u.email.toLowerCase().includes(search);
                 const matchDept = deptFilter === 'all' || u.department === deptFilter;
-                const matchSearch = u.email.toLowerCase().includes(searchVal);
-                return matchDept && matchSearch;
+                return matchSearch && matchDept;
             });
 
-            document.getElementById('userCountBadge').innerText = `${filteredUsers.length} Users Listed`;
-
-            if (filteredUsers.length > 0) {
-                userBody.innerHTML = filteredUsers.map(u => {
-                    const deptBadge = u.department === 'number_lookup' 
-                        ? `<span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-semibold">Number Lookup</span>`
-                        : `<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-semibold">Gender Verify</span>`;
+            if (filtered.length > 0) {
+                body.innerHTML = filtered.map(u => {
+                    const deptLabel = u.department === 'number_lookup' ? 'Number Lookup' : (u.department === 'gender_verify' ? 'Gender Verify' : 'Admin');
                     return `
                         <tr class="hover:bg-slate-50">
                             <td class="py-3 px-4 font-semibold text-slate-800">${u.email}</td>
-                            <td class="py-3 px-4">${deptBadge}</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${u.department === 'number_lookup' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'}">
+                                    ${deptLabel}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs px-2.5 py-1 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500">
+                                    <option value="gender_verify" ${u.department === 'gender_verify' ? 'selected' : ''}>👤 Gender Verify</option>
+                                    <option value="number_lookup" ${u.department === 'number_lookup' ? 'selected' : ''}>📞 Number Lookup</option>
+                                </select>
+                            </td>
                             <td class="py-3 px-4 text-right font-bold text-emerald-600">${u.todayAdded.toLocaleString()}</td>
                             <td class="py-3 px-4 text-right font-bold text-indigo-700">${u.totalContributed.toLocaleString()}</td>
                             <td class="py-3 px-4 text-right">
                                 <button onclick="downloadSingleUserData('${u.email}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-                                    Download User Data
+                                    Download Data
                                 </button>
                             </td>
                         </tr>
                     `;
                 }).join('');
             } else {
-                userBody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">No users match filter.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">No worker accounts found.</td></tr>`;
+            }
+        }
+
+        async function updateUserDepartment(userId, newDept) {
+            try {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ department: newDept })
+                    .eq('id', userId);
+
+                if (error) throw error;
+                alert('Department updated successfully!');
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('Failed to update department: ' + err.message);
+            }
+        }
+
+        async function loadAdminSubmissionsData() {
+            if (!supabaseClient) return;
+            const body = document.getElementById('adminSubmissionsTableBody');
+            body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Loading submissions...</td></tr>`;
+
+            const reportFilter = document.getElementById('adminSubReportFilter').value;
+            const workerFilter = document.getElementById('adminSubWorkerFilter').value;
+
+            let query = supabaseClient
+                .from('master_numbers')
+                .select('id, phone_number, full_name, age, report_type, department, user_email, created_at')
+                .order('created_at', { ascending: false })
+                .limit(300);
+
+            if (reportFilter !== 'all') query = query.eq('report_type', reportFilter);
+            if (workerFilter !== 'all') query = query.eq('user_email', workerFilter);
+
+            const { data, error } = await query;
+            if (error) {
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500">Error: ${error.message}</td></tr>`;
+                return;
             }
 
-            // Render Logs
-            let filteredLogs = adminLogsCache.filter(l => {
-                const matchDept = deptFilter === 'all' || l.department === deptFilter;
-                const matchSearch = l.user_email.toLowerCase().includes(searchVal);
-                return matchDept && matchSearch;
-            }).slice(0, 30);
+            adminSubmissionsCache = data || [];
+            filterAdminSubmissionsLocal();
+        }
 
-            if (filteredLogs.length > 0) {
-                logsBody.innerHTML = filteredLogs.map(l => {
+        function filterAdminSubmissionsLocal() {
+            const body = document.getElementById('adminSubmissionsTableBody');
+            const search = document.getElementById('adminSubSearchInput').value.trim().toLowerCase();
+
+            let list = adminSubmissionsCache;
+            if (search) {
+                list = list.filter(item => 
+                    (item.phone_number && item.phone_number.includes(search)) ||
+                    (item.full_name && item.full_name.toLowerCase().includes(search))
+                );
+            }
+
+            if (list.length > 0) {
+                body.innerHTML = list.map((item, idx) => {
+                    const timeStr = new Date(item.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    let repBadge = '';
+                    if (item.report_type === 'male_report') {
+                        repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Report</span>';
+                    } else if (item.report_type === 'female_report') {
+                        repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Report</span>';
+                    } else {
+                        repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Report</span>';
+                    }
+
+                    return `
+                        <tr class="hover:bg-slate-50 text-xs">
+                            <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
+                            <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.phone_number}</td>
+                            <td class="py-3 px-4 font-bold text-slate-800">${item.full_name || '-'}</td>
+                            <td class="py-3 px-4 font-medium text-slate-600">${item.age || '-'}</td>
+                            <td class="py-3 px-4">${repBadge}</td>
+                            <td class="py-3 px-4 font-medium text-indigo-700">${item.user_email}</td>
+                            <td class="py-3 px-4 text-right text-slate-500">${timeStr}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No submissions found matching criteria.</td></tr>`;
+            }
+        }
+
+        function renderAdminLogsTable() {
+            const body = document.getElementById('adminLogsTableBody');
+            if (adminLogsCache.length > 0) {
+                body.innerHTML = adminLogsCache.map(l => {
                     const timeStr = new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    const repLabel = l.report_type === 'male_report' ? '👨 Male Report' : (l.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
                     return `
                         <tr class="hover:bg-slate-50 text-xs">
                             <td class="py-3 px-4 font-mono text-slate-500">${timeStr}</td>
                             <td class="py-3 px-4 font-medium text-slate-700">${l.user_email}</td>
-                            <td class="py-3 px-4 font-semibold uppercase">${l.department.replace('_', ' ')}</td>
+                            <td class="py-3 px-4 font-bold">${repLabel}</td>
                             <td class="py-3 px-4 text-slate-600">${l.file_name || 'Upload'}</td>
                             <td class="py-3 px-4 text-right">${l.total_received}</td>
                             <td class="py-3 px-4 text-right text-emerald-600 font-bold">+${l.new_inserted}</td>
@@ -1117,98 +1619,100 @@
                     `;
                 }).join('');
             } else {
-                logsBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>`;
             }
-        }
-
-        function filterAdminTables() {
-            renderAdminTables();
         }
 
         function refreshAdminData() {
             loadAdminDashboard();
         }
 
-        // ==========================================
-        // ONE-CLICK EXCEL DOWNLOAD (.XLSX)
-        // ==========================================
         async function downloadMasterExcel() {
             if (!supabaseClient) return;
+            const { data, error } = await supabaseClient
+                .from('master_numbers')
+                .select('phone_number, full_name, age, report_type, department, user_email, created_at')
+                .order('created_at', { ascending: false });
 
-            const deptFilter = document.getElementById('adminDeptFilter').value;
-            let query = supabaseClient.from('master_numbers').select('phone_number, department, user_email, created_at').order('created_at', { ascending: false });
-            
-            if (deptFilter !== 'all') {
-                query = query.eq('department', deptFilter);
-            }
-
-            const { data, error } = await query;
-            if (error) {
-                alert('Error fetching master data: ' + error.message);
+            if (error || !data || data.length === 0) {
+                alert('No records found to export.');
                 return;
             }
 
-            if (!data || data.length === 0) {
-                alert('No records available to export.');
-                return;
-            }
-
-            // Transform data for clean Excel export
             const exportRows = data.map((item, idx) => ({
                 'SL': idx + 1,
                 'Phone Number': item.phone_number,
-                'Department': item.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify',
-                'Submitted By (User)': item.user_email,
-                'Submission Date & Time': new Date(item.created_at).toLocaleString()
+                'Full Name': item.full_name || '',
+                'Age': item.age || '',
+                'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                'Department': item.department,
+                'Submitted By': item.user_email,
+                'Submission Date': new Date(item.created_at).toLocaleString()
             }));
 
-            // Create XLSX Workbook using SheetJS
             const ws = XLSX.utils.json_to_sheet(exportRows);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Master Data");
-
+            XLSX.utils.book_append_sheet(wb, ws, "Master Data All");
             const today = new Date().toISOString().slice(0, 10);
-            const filename = `Master_Database_${deptFilter}_${today}.xlsx`;
-            XLSX.writeFile(wb, filename);
+            XLSX.writeFile(wb, `Master_Database_Full_${today}.xlsx`);
+        }
+
+        async function downloadFilteredSubmissionsExcel() {
+            if (!adminSubmissionsCache || adminSubmissionsCache.length === 0) {
+                alert('No records loaded in viewer to export.');
+                return;
+            }
+
+            const exportRows = adminSubmissionsCache.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone_number,
+                'Full Name': item.full_name || '',
+                'Age': item.age || '',
+                'Report Type': item.report_type,
+                'Department': item.department,
+                'Submitted By': item.user_email,
+                'Submission Date': new Date(item.created_at).toLocaleString()
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Submissions");
+            XLSX.writeFile(wb, `Submissions_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
         async function downloadSingleUserData(userEmail) {
             if (!supabaseClient) return;
             const { data, error } = await supabaseClient
                 .from('master_numbers')
-                .select('phone_number, department, user_email, created_at')
+                .select('phone_number, full_name, age, report_type, department, user_email, created_at')
                 .eq('user_email', userEmail)
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                alert('Error fetching user data: ' + error.message);
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                alert(`No records found for ${userEmail}`);
+            if (error || !data || data.length === 0) {
+                alert(`No numbers found for ${userEmail}`);
                 return;
             }
 
             const exportRows = data.map((item, idx) => ({
                 'SL': idx + 1,
                 'Phone Number': item.phone_number,
+                'Full Name': item.full_name || '',
+                'Age': item.age || '',
+                'Report Type': item.report_type,
                 'Department': item.department,
                 'Submitted By': item.user_email,
-                'Date & Time': new Date(item.created_at).toLocaleString()
+                'Submission Date': new Date(item.created_at).toLocaleString()
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportRows);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "User Data");
-
+            XLSX.utils.book_append_sheet(wb, ws, "Worker Data");
             const safeEmail = userEmail.replace(/[@.]/g, '_');
-            const today = new Date().toISOString().slice(0, 10);
-            XLSX.writeFile(wb, `Submissions_${safeEmail}_${today}.xlsx`);
+            XLSX.writeFile(wb, `Submissions_${safeEmail}.xlsx`);
         }
 
         // ==========================================
-        // GENDERIZE.IO VERIFICATION MODULE LOGIC
+        // ENHANCED GENDERIZE.IO & ACCURATE SECTORS
         // ==========================================
         let currentGvInputMode = 'paste';
         let gvFileParsedRows = [];
@@ -1216,27 +1720,6 @@
         let gvFemaleList = [];
         let gvUnknownList = [];
         let currentGvSector = 'male';
-
-        function switchToSection(sec) {
-            const btnDash = document.getElementById('navBtnDashboard');
-            const btnGender = document.getElementById('navBtnGender');
-
-            if (sec === 'dashboard') {
-                if (btnDash) btnDash.className = 'text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded transition';
-                if (btnGender) btnGender.className = 'text-xs bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-3 py-1.5 rounded transition';
-                if (currentProfile && currentProfile.role === 'admin') {
-                    showView('adminDashboard');
-                    loadAdminDashboard();
-                } else {
-                    showView('userDashboard');
-                    loadUserDashboard();
-                }
-            } else if (sec === 'gender_verify') {
-                if (btnGender) btnGender.className = 'text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded transition';
-                if (btnDash) btnDash.className = 'text-xs bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-3 py-1.5 rounded transition';
-                showView('genderVerifyView');
-            }
-        }
 
         function switchGvInputMode(mode) {
             currentGvInputMode = mode;
@@ -1288,20 +1771,17 @@
 
                     cols.forEach(col => {
                         const opt1 = document.createElement('option');
-                        opt1.value = col;
-                        opt1.innerText = col;
+                        opt1.value = col; opt1.innerText = col;
                         if (col.toLowerCase().includes('name')) opt1.selected = true;
                         colNameSel.appendChild(opt1);
 
                         const opt2 = document.createElement('option');
-                        opt2.value = col;
-                        opt2.innerText = col;
+                        opt2.value = col; opt2.innerText = col;
                         if (col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')) opt2.selected = true;
                         colPhoneSel.appendChild(opt2);
 
                         const opt3 = document.createElement('option');
-                        opt3.value = col;
-                        opt3.innerText = col;
+                        opt3.value = col; opt3.innerText = col;
                         if (col.toLowerCase().includes('age')) opt3.selected = true;
                         colAgeSel.appendChild(opt3);
                     });
@@ -1312,6 +1792,238 @@
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        
+        // Multi-API Waterfall Query Engine (Genderize.io -> GenderAPI.io -> Gender-API -> Local DB)
+        async function querySingleNameMultiAPI(firstName) {
+            const cleanName = firstName.toLowerCase();
+
+            // 1. Check Fast Local Database First
+            if (MALE_NAMES_DB.has(cleanName)) {
+                return { gender: 'male', probability: 99, engine: 'Verified Local Database' };
+            }
+            if (FEMALE_NAMES_DB.has(cleanName)) {
+                return { gender: 'female', probability: 99, engine: 'Verified Local Database' };
+            }
+
+            // 2. Engine 1: Genderize.io API
+            try {
+                const res1 = await fetch(`https://api.genderize.io/?name=${encodeURIComponent(cleanName)}`);
+                if (res1.ok) {
+                    const d1 = await res1.json();
+                    if (d1 && d1.gender && (d1.gender === 'male' || d1.gender === 'female')) {
+                        return {
+                            gender: d1.gender,
+                            probability: d1.probability ? Math.round(d1.probability * 100) : 95,
+                            engine: 'Genderize.io'
+                        };
+                    }
+                }
+            } catch (err1) {
+                console.warn('Genderize.io error, trying next engine:', err1);
+            }
+
+            // 3. Engine 2: GenderAPI.io
+            try {
+                const res2 = await fetch(`https://api.genderapi.io/api/?name=${encodeURIComponent(cleanName)}`);
+                if (res2.ok) {
+                    const d2 = await res2.json();
+                    if (d2 && d2.gender && (d2.gender === 'male' || d2.gender === 'female')) {
+                        return {
+                            gender: d2.gender,
+                            probability: d2.accuracy || d2.probability || 90,
+                            engine: 'GenderAPI.io'
+                        };
+                    }
+                }
+            } catch (err2) {
+                console.warn('GenderAPI.io error, trying next engine:', err2);
+            }
+
+            // 4. Engine 3: Gender-API.com
+            try {
+                const res3 = await fetch(`https://gender-api.com/get?name=${encodeURIComponent(cleanName)}`);
+                if (res3.ok) {
+                    const d3 = await res3.json();
+                    if (d3 && d3.gender && (d3.gender === 'male' || d3.gender === 'female')) {
+                        return {
+                            gender: d3.gender,
+                            probability: d3.accuracy || 90,
+                            engine: 'Gender-API.com'
+                        };
+                    }
+                }
+            } catch (err3) {
+                console.warn('Gender-API.com error:', err3);
+            }
+
+            // If not found in any engine, return unknown (no false guesses!)
+            return { gender: 'unknown', probability: 'Need Review', engine: 'Uncertain' };
+        }
+
+        
+        // Multi-Word Token Detection: checks first name, middle name, or full tokens
+        function detectGenderFromFullTokens(fullName) {
+            if (!fullName) return null;
+            let clean = fullName.replace(/^(mr|mrs|ms|miss|dr|prof|md|sheikh)\.?\s+/i, '');
+            if (clean.includes(',')) clean = clean.split(',')[1].trim();
+            clean = clean.replace(/\s+(jr|sr|ii|iii|iv)\.?$/i, '');
+            const tokens = clean.split(/\s+/).map(w => w.replace(/[^a-zA-Z]/g, '').toLowerCase()).filter(w => w.length >= 2);
+
+            if (tokens.length === 0) return null;
+
+            // Check first token
+            if (MALE_NAMES_DB.has(tokens[0])) return { gender: 'male', probability: 99, engine: 'Verified Local Database' };
+            if (FEMALE_NAMES_DB.has(tokens[0])) return { gender: 'female', probability: 99, engine: 'Verified Local Database' };
+
+            // Check subsequent tokens (e.g. "Qaid Ali" -> "Ali", "Mohamed Osman" -> "Osman" / "Mohamed")
+            for (let i = 1; i < tokens.length; i++) {
+                const tok = tokens[i];
+                if (MALE_NAMES_DB.has(tok)) return { gender: 'male', probability: 95, engine: `Verified Name Match (${tok})` };
+                if (FEMALE_NAMES_DB.has(tok)) return { gender: 'female', probability: 95, engine: `Verified Name Match (${tok})` };
+            }
+
+            return null;
+        }
+
+        // Statistical Likelihood Ratio Calculator for Undetermined Names
+        function calculateGenderRatio(fullName) {
+            const clean = (fullName || '').replace(/[^a-zA-Z\s]/g, '').trim().toLowerCase();
+            const words = clean.split(/\s+/).filter(Boolean);
+            const first = words[0] || '';
+
+            let maleScore = 50;
+
+            // Strong common linguistic and phonetic endings
+            if (first.endsWith('a') || first.endsWith('i') || first.endsWith('ie') || first.endsWith('ette') || first.endsWith('elle') || first.endsWith('lyn') || first.endsWith('ah') || first.endsWith('ina')) {
+                maleScore = 20;
+            } else if (first.endsWith('o') || first.endsWith('er') || first.endsWith('or') || first.endsWith('on') || first.endsWith('an') || first.endsWith('ed') || first.endsWith('us') || first.endsWith('el') || first.endsWith('is') || first.endsWith('in')) {
+                maleScore = 80;
+            }
+
+            // Common prefixes
+            if (/^(chris|alex|sam|pat|taylor|jordan|morgan|robin|casey)/.test(first)) {
+                maleScore = 55;
+            } else if (/^(john|will|rob|rich|dave|dan|mike|steve|george|ed|tom|pet|ben|mat|dan|jos|ant|dav|mar|gre)/.test(first)) {
+                maleScore = 90;
+            } else if (/^(mary|mar|ann|kat|eliz|jen|sar|lind|barb|deb|jes|meg|lau|pat|sus|ang)/.test(first)) {
+                maleScore = 10;
+            }
+
+            maleScore = Math.max(10, Math.min(90, maleScore));
+            const femaleScore = 100 - maleScore;
+
+            return {
+                malePercent: maleScore,
+                femalePercent: femaleScore,
+                prediction: maleScore >= 60 ? 'male' : (femaleScore >= 60 ? 'female' : 'uncertain')
+            };
+        }
+
+        // Bulk Selection Set for Undetermined
+        let selectedUndeterminedIds = new Set();
+
+        function toggleSelectAllUndetermined(checked) {
+            selectedUndeterminedIds.clear();
+            const checkboxes = document.querySelectorAll('.undetermined-row-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = checked;
+                if (checked) selectedUndeterminedIds.add(cb.value);
+            });
+            updateSelectedUndeterminedCount();
+        }
+
+        function handleSingleUndeterminedCheck(cb) {
+            if (cb.checked) {
+                selectedUndeterminedIds.add(cb.value);
+            } else {
+                selectedUndeterminedIds.delete(cb.value);
+            }
+            updateSelectedUndeterminedCount();
+        }
+
+        function updateSelectedUndeterminedCount() {
+            const countEl = document.getElementById('selectedUndeterminedCount');
+            if (countEl) countEl.innerText = selectedUndeterminedIds.size;
+        }
+
+        // 1-Click Bulk Move Selected to Male or Female
+        function bulkMoveUndetermined(targetGender) {
+            if (selectedUndeterminedIds.size === 0) {
+                alert('Please select at least one record using the checkboxes.');
+                return;
+            }
+
+            const toList = targetGender === 'male' ? gvMaleList : gvFemaleList;
+            const remainingUnknown = [];
+
+            gvUnknownList.forEach(item => {
+                if (selectedUndeterminedIds.has(item.id)) {
+                    item.detectedGender = targetGender;
+                    item.probability = 'Manual/Bulk Classified';
+                    toList.push(item);
+                } else {
+                    remainingUnknown.push(item);
+                }
+            });
+
+            gvUnknownList = remainingUnknown;
+            selectedUndeterminedIds.clear();
+
+            refreshGvCountsAndBadges();
+            switchGvSector('unknown');
+            alert(`Moved records successfully to ${targetGender.toUpperCase()} sector!`);
+        }
+
+        // 1-Click Auto-Move by Ratio Prediction (>65% confidence)
+        function autoMoveUndeterminedByPrediction() {
+            if (gvUnknownList.length === 0) {
+                alert('No undetermined records to process.');
+                return;
+            }
+
+            let movedMale = 0;
+            let movedFemale = 0;
+            const remainingUnknown = [];
+
+            gvUnknownList.forEach(item => {
+                const ratio = item.genderRatio || calculateGenderRatio(item.fullName);
+                if (ratio.malePercent >= 65) {
+                    item.detectedGender = 'male';
+                    item.probability = `Likely Male (${ratio.malePercent}%)`;
+                    gvMaleList.push(item);
+                    movedMale++;
+                } else if (ratio.femalePercent >= 65) {
+                    item.detectedGender = 'female';
+                    item.probability = `Likely Female (${ratio.femalePercent}%)`;
+                    gvFemaleList.push(item);
+                    movedFemale++;
+                } else {
+                    remainingUnknown.push(item);
+                }
+            });
+
+            gvUnknownList = remainingUnknown;
+            selectedUndeterminedIds.clear();
+
+            refreshGvCountsAndBadges();
+            switchGvSector('unknown');
+            alert(`⚡ Auto-Move Complete!
+
+Moved to Male: ${movedMale}
+Moved to Female: ${movedFemale}
+Remaining Uncertain: ${remainingUnknown.length}`);
+        }
+
+        function refreshGvCountsAndBadges() {
+            document.getElementById('badgeMaleCount').innerText = gvMaleList.length;
+            document.getElementById('badgeFemaleCount').innerText = gvFemaleList.length;
+            document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
+
+            document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
+            document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
+            document.getElementById('gvStatUnknown').innerText = gvUnknownList.length.toLocaleString();
         }
 
         async function startGenderVerification() {
@@ -1329,46 +2041,45 @@
                     const trimmed = line.trim();
                     if (!trimmed) return;
 
-                    // Split by comma, tab, or semicolons
-                    const parts = trimmed.split(/[,\t;]+/).map(p => p.trim()).filter(Boolean);
-
-                    let name = '';
+                    // Parse line: can be "15136465609 Khayri Khalimov 52" or "John, 1234567, 30"
+                    const tokens = trimmed.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
                     let phone = '';
                     let age = '';
+                    let name = '';
 
-                    if (parts.length >= 2) {
-                        // Check which part has numbers
-                        parts.forEach(p => {
-                            const cleanDigits = p.replace(/[\s\-\(\)\.]/g, '');
-                            if (/^\+?\d{7,15}$/.test(cleanDigits)) {
-                                phone = cleanDigits;
-                            } else if (/^\d{1,3}$/.test(p) && parseInt(p) >= 1 && parseInt(p) <= 120) {
-                                age = p;
-                            } else if (!name) {
-                                name = p;
-                            }
-                        });
-                        if (!phone) phone = parts[1] || '';
-                        if (!name) name = parts[0] || '';
-                    } else {
-                        // Single line without standard delimiters: e.g. "John Smith 1234567890 28"
-                        const tokens = trimmed.split(/\s+/);
-                        const nameParts = [];
+                    if (tokens.length >= 2) {
                         tokens.forEach(tok => {
-                            const cleanDigits = tok.replace(/[\-\(\)\.]/g, '');
-                            if (/^\+?\d{7,15}$/.test(cleanDigits)) {
-                                phone = cleanDigits;
+                            const cleanNum = tok.replace(/[\s\-\(\)\.]/g, '');
+                            if (/^\+?\d{7,15}$/.test(cleanNum)) {
+                                phone = cleanNum;
                             } else if (/^\d{1,3}$/.test(tok) && parseInt(tok) >= 1 && parseInt(tok) <= 120) {
                                 age = tok;
-                            } else {
-                                nameParts.push(tok);
+                            } else if (!name) {
+                                name = tok;
                             }
                         });
-                        name = nameParts.join(' ');
                     }
 
-                    if (name || phone) {
+                    // Fallback word tokenizer if single string
+                    if (!phone || !name) {
+                        const words = trimmed.split(/\s+/);
+                        const nameWords = [];
+                        words.forEach(w => {
+                            const cleanNum = w.replace(/[\s\-\(\)\.]/g, '');
+                            if (/^\+?\d{7,15}$/.test(cleanNum) && !phone) {
+                                phone = cleanNum;
+                            } else if (/^\d{1,3}$/.test(w) && parseInt(w) >= 1 && parseInt(w) <= 120 && !age) {
+                                age = w;
+                            } else {
+                                nameWords.push(w);
+                            }
+                        });
+                        name = nameWords.join(' ');
+                    }
+
+                    if (phone || name) {
                         recordsToVerify.push({
+                            id: Math.random().toString(36).substring(2, 9),
                             fullName: name || 'Unknown',
                             phone: phone || '-',
                             age: age || '-'
@@ -1376,7 +2087,6 @@
                     }
                 });
             } else {
-                // File upload mode
                 if (!gvFileParsedRows || gvFileParsedRows.length === 0) {
                     alert('Please select an Excel file first.');
                     return;
@@ -1392,6 +2102,7 @@
 
                     if (name || phone) {
                         recordsToVerify.push({
+                            id: Math.random().toString(36).substring(2, 9),
                             fullName: name || 'Unknown',
                             phone: phone || '-',
                             age: age || '-'
@@ -1401,7 +2112,7 @@
             }
 
             if (recordsToVerify.length === 0) {
-                alert('No valid records found to verify.');
+                alert('No valid records found.');
                 return;
             }
 
@@ -1413,77 +2124,84 @@
             btn.disabled = true;
             progressContainer.classList.remove('hidden');
             progressBar.style.width = '10%';
-            statusText.innerText = `Preparing ${recordsToVerify.length} records...`;
+            statusText.innerText = `Preparing ${recordsToVerify.length} names for gender verification...`;
 
-            // Extract unique first names for querying Genderize.io
-            const firstNameMap = {};
+            // Clean name extraction
             recordsToVerify.forEach(r => {
-                const words = r.fullName.split(/\s+/);
-                const first = words[0] ? words[0].replace(/[^a-zA-Z]/g, '').toLowerCase() : '';
-                r.firstName = first;
-                if (first && first.length >= 2) {
-                    firstNameMap[first] = null;
+                let clean = r.fullName.replace(/^(mr|mrs|ms|miss|dr|prof|md|sheikh)\.?\s+/i, '');
+                if (clean.includes(',')) {
+                    clean = clean.split(',')[1].trim();
+                }
+                // Strip Jr, Sr, etc.
+                clean = clean.replace(/\s+(jr|sr|ii|iii|iv)\.?$/i, '');
+                const words = clean.split(/\s+/);
+                r.firstName = words[0] ? words[0].replace(/[^a-zA-Z]/g, '').toLowerCase() : '';
+            });
+
+            // Fast local full-token lookup
+            const unknownList = [];
+            const lookupResults = {};
+
+            recordsToVerify.forEach(r => {
+                // 1. Try full token match (first name or middle/last words like Ali, Mohamed)
+                const tokenMatch = detectGenderFromFullTokens(r.fullName);
+                if (tokenMatch) {
+                    r.detectedGender = tokenMatch.gender;
+                    r.probability = `${tokenMatch.probability}%`;
+                    r.detectionSource = tokenMatch.engine;
+                } else {
+                    const fn = r.firstName;
+                    if (fn && !unknownList.includes(fn)) {
+                        unknownList.push(fn);
+                    }
                 }
             });
 
-            const uniqueNames = Object.keys(firstNameMap);
-            statusText.innerText = `Querying Genderize.io API for ${uniqueNames.length} unique names...`;
-
-            // Batch queries to Genderize.io (batches of 10)
-            const batchSize = 10;
-            const genderResults = {};
-
-            for (let i = 0; i < uniqueNames.length; i += batchSize) {
-                const chunk = uniqueNames.slice(i, i + batchSize);
-                const queryStr = chunk.map(n => 'name[]=' + encodeURIComponent(n)).join('&');
-                const url = `https://api.genderize.io/?${queryStr}`;
-
-                try {
-                    const res = await fetch(url);
-                    if (res.ok) {
-                        const data = await res.json();
-                        const items = Array.isArray(data) ? data : [data];
-                        items.forEach(item => {
-                            if (item && item.name) {
-                                genderResults[item.name.toLowerCase()] = {
-                                    gender: item.gender, // 'male' or 'female' or null
-                                    probability: item.probability !== undefined ? Math.round(item.probability * 100) : null
-                                };
-                            }
-                        });
+            // Multi-Engine Query for unlisted names
+            if (unknownList.length > 0) {
+                statusText.innerText = `Consulting multi-API engines (Genderize, GenderAPI, etc.) for ${unknownList.length} names...`;
+                for (let i = 0; i < unknownList.length; i++) {
+                    const nameToQuery = unknownList[i];
+                    const res = await querySingleNameMultiAPI(nameToQuery);
+                    if (res && res.gender !== 'unknown') {
+                        lookupResults[nameToQuery] = res;
                     }
-                } catch (apiErr) {
-                    console.error('Genderize API error for chunk:', apiErr);
-                }
-
-                const pct = Math.round(10 + ((i + chunk.length) / Math.max(1, uniqueNames.length)) * 80);
-                progressBar.style.width = `${pct}%`;
-                statusText.innerText = `Verified ${Math.min(i + batchSize, uniqueNames.length)} of ${uniqueNames.length} names...`;
-
-                // Small gentle delay to respect free rate limits
-                if (i + batchSize < uniqueNames.length) {
-                    await new Promise(r => setTimeout(r, 200));
+                    const pct = Math.round(10 + ((i + 1) / unknownList.length) * 80);
+                    progressBar.style.width = `${pct}%`;
+                    statusText.innerText = `Verified ${i + 1} of ${unknownList.length} names with multi-API fallback...`;
+                    await new Promise(r => setTimeout(r, 50));
                 }
             }
 
-            // Categorize into Sectors: Male, Female, Unknown
+            // Assign to Sectors & calculate ratio for undetermined
             gvMaleList = [];
             gvFemaleList = [];
             gvUnknownList = [];
 
             recordsToVerify.forEach(r => {
-                const lookup = r.firstName ? genderResults[r.firstName] : null;
+                // If already resolved by full token match
+                if (r.detectedGender === 'male') {
+                    gvMaleList.push(r);
+                    return;
+                } else if (r.detectedGender === 'female') {
+                    gvFemaleList.push(r);
+                    return;
+                }
+
+                // Check API lookup results
+                const lookup = lookupResults[r.firstName];
                 if (lookup && lookup.gender === 'male') {
                     r.detectedGender = 'male';
-                    r.probability = lookup.probability ? `${lookup.probability}%` : '-';
+                    r.probability = `${lookup.probability}%`;
                     gvMaleList.push(r);
                 } else if (lookup && lookup.gender === 'female') {
                     r.detectedGender = 'female';
-                    r.probability = lookup.probability ? `${lookup.probability}%` : '-';
+                    r.probability = `${lookup.probability}%`;
                     gvFemaleList.push(r);
                 } else {
                     r.detectedGender = 'unknown';
-                    r.probability = '-';
+                    r.genderRatio = calculateGenderRatio(r.fullName);
+                    r.probability = `M: ${r.genderRatio.malePercent}% | F: ${r.genderRatio.femalePercent}%`;
                     gvUnknownList.push(r);
                 }
             });
@@ -1491,7 +2209,6 @@
             progressBar.style.width = '100%';
             statusText.innerText = 'Gender verification complete!';
 
-            // Update Metrics
             document.getElementById('gvStatTotal').innerText = recordsToVerify.length.toLocaleString();
             document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
             document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
@@ -1502,8 +2219,6 @@
             document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
 
             document.getElementById('gvResultsSection').classList.remove('hidden');
-
-            // Default to Male or Female sector
             switchGvSector(gvMaleList.length > 0 ? 'male' : (gvFemaleList.length > 0 ? 'female' : 'unknown'));
 
             btn.disabled = false;
@@ -1519,65 +2234,146 @@
             const btnFemale = document.getElementById('btnSectorFemale');
             const btnUnknown = document.getElementById('btnSectorUnknown');
             const tableBody = document.getElementById('gvSectorTableBody');
+            const submitText = document.getElementById('gvSubmitBtnText');
 
-            // Button styling
             [btnMale, btnFemale, btnUnknown].forEach(b => {
-                b.className = 'px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5';
+                b.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5 whitespace-nowrap';
             });
 
             let activeList = [];
             if (sec === 'male') {
-                btnMale.className = 'px-4 py-2 text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5';
+                btnMale.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5 whitespace-nowrap';
                 activeList = gvMaleList;
+                submitText.innerText = '🚀 Submit All Males as Male Report';
             } else if (sec === 'female') {
-                btnFemale.className = 'px-4 py-2 text-sm font-bold rounded-lg bg-pink-600 text-white shadow transition flex items-center space-x-1.5';
+                btnFemale.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-pink-600 text-white shadow transition flex items-center space-x-1.5 whitespace-nowrap';
                 activeList = gvFemaleList;
+                submitText.innerText = '🚀 Submit All Females as Female Report';
             } else {
-                btnUnknown.className = 'px-4 py-2 text-sm font-bold rounded-lg bg-amber-600 text-white shadow transition flex items-center space-x-1.5';
+                btnUnknown.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-amber-600 text-white shadow transition flex items-center space-x-1.5 whitespace-nowrap';
                 activeList = gvUnknownList;
+                submitText.innerText = '🚀 Submit to Portal';
+            }
+
+            // Show or hide Undetermined Bulk Action Bar
+            const bulkBar = document.getElementById('undeterminedBulkBar');
+            if (bulkBar) {
+                if (sec === 'unknown') {
+                    bulkBar.classList.remove('hidden');
+                    updateSelectedUndeterminedCount();
+                } else {
+                    bulkBar.classList.add('hidden');
+                }
+            }
+
+            // Update Table Headers
+            const tableHeader = document.getElementById('gvTableHeaderRow');
+            if (tableHeader) {
+                if (sec === 'unknown') {
+                    tableHeader.innerHTML = `
+                        <th class="py-3 px-3 w-8"><input type="checkbox" id="selectAllUndeterminedCheck" onchange="toggleSelectAllUndetermined(this.checked)" class="w-4 h-4 text-indigo-600 rounded cursor-pointer"></th>
+                        <th class="py-3 px-3">#</th>
+                        <th class="py-3 px-4">Full Name</th>
+                        <th class="py-3 px-4">Phone Number</th>
+                        <th class="py-3 px-4">Age</th>
+                        <th class="py-3 px-4">Estimated Ratio (% Likelihood)</th>
+                        <th class="py-3 px-4 text-right">Quick Move</th>
+                    `;
+                } else {
+                    tableHeader.innerHTML = `
+                        <th class="py-3 px-4">#</th>
+                        <th class="py-3 px-4">Full Name</th>
+                        <th class="py-3 px-4">Phone Number</th>
+                        <th class="py-3 px-4">Age</th>
+                        <th class="py-3 px-4">Detected Gender</th>
+                        <th class="py-3 px-4 text-right">Action / Move</th>
+                    `;
+                }
             }
 
             if (activeList.length > 0) {
                 tableBody.innerHTML = activeList.map((item, idx) => {
-                    let genderBadge = '';
-                    if (item.detectedGender === 'male') {
-                        genderBadge = '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">👨 Male</span>';
-                    } else if (item.detectedGender === 'female') {
-                        genderBadge = '<span class="px-2 py-0.5 text-xs rounded-full bg-pink-100 text-pink-800 font-semibold">👩 Female</span>';
+                    if (sec === 'unknown') {
+                        const ratio = item.genderRatio || calculateGenderRatio(item.fullName);
+                        const isChecked = selectedUndeterminedIds.has(item.id) ? 'checked' : '';
+                        return `
+                            <tr class="hover:bg-amber-50/50">
+                                <td class="py-3 px-3">
+                                    <input type="checkbox" value="${item.id}" onchange="handleSingleUndeterminedCheck(this)" ${isChecked} class="undetermined-row-checkbox w-4 h-4 text-indigo-600 rounded cursor-pointer">
+                                </td>
+                                <td class="py-3 px-3 font-mono text-xs text-slate-400">${idx + 1}</td>
+                                <td class="py-3 px-4 font-bold text-slate-800">${item.fullName}</td>
+                                <td class="py-3 px-4 font-mono font-medium text-slate-700">${item.phone}</td>
+                                <td class="py-3 px-4 font-medium text-slate-600">${item.age}</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-24 bg-slate-200 rounded-full h-2 overflow-hidden flex">
+                                            <div class="bg-blue-600 h-2" style="width: ${ratio.malePercent}%"></div>
+                                            <div class="bg-pink-500 h-2" style="width: ${ratio.femalePercent}%"></div>
+                                        </div>
+                                        <span class="text-xs font-bold ${ratio.malePercent >= 60 ? 'text-blue-700' : (ratio.femalePercent >= 60 ? 'text-pink-700' : 'text-slate-600')}">
+                                            👨 ${ratio.malePercent}% | 👩 ${ratio.femalePercent}%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button onclick="moveRecordBetweenSectors('${item.id}', 'unknown', 'male')" class="text-xs text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded font-bold mr-1 transition">Male 👨</button>
+                                    <button onclick="moveRecordBetweenSectors('${item.id}', 'unknown', 'female')" class="text-xs text-pink-700 hover:text-pink-900 bg-pink-50 hover:bg-pink-100 border border-pink-200 px-2.5 py-1 rounded font-bold transition">Female 👩</button>
+                                </td>
+                            </tr>
+                        `;
                     } else {
-                        genderBadge = '<span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800 font-semibold">❓ Unknown</span>';
-                    }
+                        let badge = item.detectedGender === 'male' 
+                            ? '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">👨 Male</span>'
+                            : '<span class="px-2 py-0.5 text-xs rounded-full bg-pink-100 text-pink-800 font-semibold">👩 Female</span>';
+                        
+                        let moveAction = sec === 'male'
+                            ? `<button onclick="moveRecordBetweenSectors('${item.id}', 'male', 'female')" class="text-xs text-pink-600 hover:text-pink-800 font-semibold bg-pink-50 hover:bg-pink-100 px-2.5 py-1 rounded">Move to Female 👩</button>`
+                            : `<button onclick="moveRecordBetweenSectors('${item.id}', 'female', 'male')" class="text-xs text-blue-600 hover:text-blue-800 font-semibold bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded">Move to Male 👨</button>`;
 
-                    return `
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-3 px-4 font-mono text-xs text-slate-400">${idx + 1}</td>
-                            <td class="py-3 px-4 font-bold text-slate-800">${item.fullName}</td>
-                            <td class="py-3 px-4 font-mono font-medium text-slate-700">${item.phone}</td>
-                            <td class="py-3 px-4 font-medium text-slate-600">${item.age}</td>
-                            <td class="py-3 px-4">${genderBadge}</td>
-                            <td class="py-3 px-4 text-right font-semibold text-slate-700">${item.probability}</td>
-                        </tr>
-                    `;
+                        return `
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-mono text-xs text-slate-400">${idx + 1}</td>
+                                <td class="py-3 px-4 font-bold text-slate-800">${item.fullName}</td>
+                                <td class="py-3 px-4 font-mono font-medium text-slate-700">${item.phone}</td>
+                                <td class="py-3 px-4 font-medium text-slate-600">${item.age}</td>
+                                <td class="py-3 px-4">${badge}</td>
+                                <td class="py-3 px-4 text-right">${moveAction}</td>
+                            </tr>
+                        `;
+                    }
                 }).join('');
             } else {
-                tableBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">No records found in this sector.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No records in this sector.</td></tr>`;
+            }
+        }
+
+        function moveRecordBetweenSectors(recordId, fromSec, toSec) {
+            let fromList = fromSec === 'male' ? gvMaleList : (fromSec === 'female' ? gvFemaleList : gvUnknownList);
+            let toList = toSec === 'male' ? gvMaleList : (toSec === 'female' ? gvFemaleList : gvUnknownList);
+
+            const idx = fromList.findIndex(r => r.id === recordId);
+            if (idx !== -1) {
+                const [item] = fromList.splice(idx, 1);
+                item.detectedGender = toSec;
+                toList.push(item);
+
+                // Update badge counts
+                document.getElementById('badgeMaleCount').innerText = gvMaleList.length;
+                document.getElementById('badgeFemaleCount').innerText = gvFemaleList.length;
+                document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
+
+                document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
+                document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
+                document.getElementById('gvStatUnknown').innerText = gvUnknownList.length.toLocaleString();
+
+                switchGvSector(currentGvSector);
             }
         }
 
         function downloadCurrentSectorExcel() {
-            let activeList = [];
-            let sectorTitle = '';
-
-            if (currentGvSector === 'male') {
-                activeList = gvMaleList;
-                sectorTitle = 'Male_Sector_Report';
-            } else if (currentGvSector === 'female') {
-                activeList = gvFemaleList;
-                sectorTitle = 'Female_Sector_Report';
-            } else {
-                activeList = gvUnknownList;
-                sectorTitle = 'Undetermined_Gender_Report';
-            }
+            let activeList = currentGvSector === 'male' ? gvMaleList : (currentGvSector === 'female' ? gvFemaleList : gvUnknownList);
+            let sectorTitle = currentGvSector === 'male' ? 'Male_Sector_Report' : (currentGvSector === 'female' ? 'Female_Sector_Report' : 'Undetermined_Gender_Report');
 
             if (activeList.length === 0) {
                 alert('No records to export in the current sector.');
@@ -1590,52 +2386,206 @@
                 'Phone Number': item.phone,
                 'Age': item.age,
                 'Detected Gender': item.detectedGender.toUpperCase(),
-                'Accuracy': item.probability,
                 'Verification Date': new Date().toLocaleString()
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, sectorTitle);
-
             const today = new Date().toISOString().slice(0, 10);
             XLSX.writeFile(wb, `${sectorTitle}_${today}.xlsx`);
         }
 
-        async function saveSectorToDatabase() {
+        async function submitGvSectorAsReport() {
             let activeList = currentGvSector === 'male' ? gvMaleList : (currentGvSector === 'female' ? gvFemaleList : gvUnknownList);
-            const validNumbers = activeList.map(item => item.phone).filter(p => p && p !== '-' && p.length >= 6);
-
-            if (validNumbers.length === 0) {
-                alert('No valid phone numbers found in this sector to save.');
+            if (activeList.length === 0) {
+                alert('No records to submit in this sector.');
                 return;
             }
 
-            if (!confirm(`Do you want to save ${validNumbers.length} numbers from the ${currentGvSector.toUpperCase()} sector to the central database? Duplicates will be filtered automatically.`)) {
+            const reportType = currentGvSector === 'male' ? 'male_report' : (currentGvSector === 'female' ? 'female_report' : 'lookup_report');
+            const reportName = currentGvSector === 'male' ? 'Male Report' : (currentGvSector === 'female' ? 'Female Report' : 'Lookup Report');
+
+            if (!confirm(`Submit all ${activeList.length} records as ${reportName} to the portal? Phone, Name, and Age will be recorded.`)) {
                 return;
             }
 
-            const saveBtn = document.getElementById('gvSaveToDbBtn');
-            saveBtn.disabled = true;
-            saveBtn.innerText = 'Saving...';
+            const records = activeList.map(item => ({
+                phone: item.phone,
+                name: item.fullName,
+                age: item.age
+            }));
+
+            const btn = document.getElementById('gvSubmitReportBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>Submitting to Portal...</span>';
 
             try {
-                const { data, error } = await supabaseClient.rpc('process_number_batch', {
-                    p_numbers: validNumbers,
-                    p_file_name: `Gender_${currentGvSector.toUpperCase()}_Verification`
+                const { data, error } = await supabaseClient.rpc('submit_full_work_batch', {
+                    p_records: records,
+                    p_report_type: reportType,
+                    p_file_name: `Gender_${currentGvSector.toUpperCase()}_Submission.xlsx`
                 });
 
                 if (error) throw error;
-
-                alert(`Successfully saved to database!\n\nTotal in sector: ${data.total_received}\nNew unique saved: +${data.new_inserted}\nDuplicates filtered: ${data.duplicates_count}`);
+                alert(`Report successfully submitted to Portal!\n\nReport Type: ${reportName}\nTotal Submitted: ${data.total_received}\nNew Unique Saved: +${data.new_inserted}\nDuplicates Filtered: ${data.duplicates_count}`);
             } catch (err) {
-                alert('Error saving to database: ' + err.message);
+                alert('Error submitting report: ' + err.message);
             } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = '💾 Save to Central Database';
+                btn.disabled = false;
+                btn.innerHTML = `<span id="gvSubmitBtnText">🚀 Submit All ${currentGvSector === 'male' ? 'Males' : 'Females'} as ${reportName}</span>`;
             }
         }
 
+        // ==========================================
+        // SMART DUPLICATE CHECKER TOOL
+        // ==========================================
+        let dupCleanList = [];
+        let dupRepeatedList = [];
+        let dupDbMatchesList = [];
+        let currentDupTab = 'clean';
+
+        async function runDuplicateCheck() {
+            const rawText = document.getElementById('dupTextInput').value.trim();
+            if (!rawText) {
+                alert('Please paste phone numbers to check.');
+                return;
+            }
+
+            const checkDb = document.getElementById('dupCheckDbCrossCheck').checked;
+            const lines = rawText.split(/\r?\n/);
+            const counts = {};
+            const inputOrder = [];
+
+            lines.forEach(line => {
+                let clean = line.replace(/[\s\-\(\)\.]/g, '');
+                if (clean && clean.length >= 6) {
+                    if (!counts[clean]) {
+                        counts[clean] = 0;
+                        inputOrder.push(clean);
+                    }
+                    counts[clean]++;
+                }
+            });
+
+            if (inputOrder.length === 0) {
+                alert('No valid phone numbers found.');
+                return;
+            }
+
+            dupCleanList = [];
+            dupRepeatedList = [];
+            dupDbMatchesList = [];
+
+            inputOrder.forEach(num => {
+                if (counts[num] > 1) {
+                    dupRepeatedList.push({ phone: num, count: counts[num], status: 'Repeated in file' });
+                }
+                dupCleanList.push({ phone: num, count: counts[num], status: 'Unique' });
+            });
+
+            if (checkDb && supabaseClient) {
+                try {
+                    const chunkSize = 200;
+                    const existingDbSet = new Set();
+                    for (let i = 0; i < inputOrder.length; i += chunkSize) {
+                        const chunk = inputOrder.slice(i, i + chunkSize);
+                        const { data } = await supabaseClient
+                            .from('master_numbers')
+                            .select('phone_number, user_email, full_name')
+                            .in('phone_number', chunk);
+
+                        if (data) {
+                            data.forEach(row => {
+                                existingDbSet.add(row.phone_number);
+                                dupDbMatchesList.push({
+                                    phone: row.phone_number,
+                                    count: 1,
+                                    status: `Already submitted by ${row.user_email} (${row.full_name || 'No Name'})`
+                                });
+                            });
+                        }
+                    }
+
+                    dupCleanList = dupCleanList.filter(item => !existingDbSet.has(item.phone));
+                } catch (dbErr) {
+                    console.error('DB duplicate cross-check error:', dbErr);
+                }
+            }
+
+            document.getElementById('dupStatTotal').innerText = lines.length.toLocaleString();
+            document.getElementById('dupStatUnique').innerText = dupCleanList.length.toLocaleString();
+            document.getElementById('dupStatFileDups').innerText = dupRepeatedList.length.toLocaleString();
+            document.getElementById('dupStatDbDups').innerText = dupDbMatchesList.length.toLocaleString();
+
+            document.getElementById('dupCountClean').innerText = dupCleanList.length;
+            document.getElementById('dupCountRepeated').innerText = dupRepeatedList.length;
+            document.getElementById('dupCountDb').innerText = dupDbMatchesList.length;
+
+            document.getElementById('dupResultsCard').classList.remove('hidden');
+            switchDupTab('clean');
+        }
+
+        function switchDupTab(tab) {
+            currentDupTab = tab;
+            const btnClean = document.getElementById('tabDupCleanBtn');
+            const btnFile = document.getElementById('tabDupFileBtn');
+            const btnDb = document.getElementById('tabDupDbBtn');
+            const body = document.getElementById('dupTableBody');
+
+            [btnClean, btnFile, btnDb].forEach(b => {
+                b.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition whitespace-nowrap';
+            });
+
+            let activeList = [];
+            if (tab === 'clean') {
+                btnClean.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-emerald-600 text-white shadow transition whitespace-nowrap';
+                activeList = dupCleanList;
+            } else if (tab === 'duplicates') {
+                btnFile.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-amber-600 text-white shadow transition whitespace-nowrap';
+                activeList = dupRepeatedList;
+            } else {
+                btnDb.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-red-600 text-white shadow transition whitespace-nowrap';
+                activeList = dupDbMatchesList;
+            }
+
+            if (activeList.length > 0) {
+                body.innerHTML = activeList.map((item, idx) => `
+                    <tr class="hover:bg-slate-50 text-xs">
+                        <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.phone}</td>
+                        <td class="py-3 px-4">${item.count}</td>
+                        <td class="py-3 px-4 font-semibold ${tab === 'clean' ? 'text-emerald-600' : (tab === 'duplicates' ? 'text-amber-600' : 'text-red-600')}">
+                            ${item.status}
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                body.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">No records in this category.</td></tr>`;
+            }
+        }
+
+        function downloadDupTabExcel() {
+            let activeList = currentDupTab === 'clean' ? dupCleanList : (currentDupTab === 'duplicates' ? dupRepeatedList : dupDbMatchesList);
+            let tabName = currentDupTab === 'clean' ? 'Clean_Unique_Numbers' : (currentDupTab === 'duplicates' ? 'Repeated_File_Duplicates' : 'Already_In_Database');
+
+            if (activeList.length === 0) {
+                alert('No records to download.');
+                return;
+            }
+
+            const exportData = activeList.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone,
+                'Count': item.count,
+                'Status': item.status
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, tabName);
+            XLSX.writeFile(wb, `${tabName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
     </script>
 </body>
 </html>
