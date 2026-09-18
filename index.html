@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work & Data Manager Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SheetJS (XLSX) CDN -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Heroicons / SVG Icons helper -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-indigo-700 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white text-indigo-700 p-2 rounded-lg font-bold text-xl shadow">⚡</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Data Management Portal</h1>
+                    <p class="text-xs text-indigo-200">Daily Work, Verification & Deduplication</p>
+                </div>
+            </div>
+            <div id="navUserSection" class="flex items-center space-x-4">
+                <!-- Settings button hidden for clean user experience -->
+                <button id="navSettingsBtn" onclick="openConfigModal()" class="hidden text-xs bg-indigo-800 hover:bg-indigo-900 text-indigo-200 hover:text-white px-3 py-1.5 rounded border border-indigo-600 transition">
+                    ⚙️ Settings
+                </button>
+                <div id="navLinks" class="hidden items-center space-x-2 mr-4">
+                    <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded transition">
+                        📊 Dashboard
+                    </button>
+                    <button id="navBtnGender" onclick="switchToSection('gender_verify')" class="text-xs bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-3 py-1.5 rounded transition">
+                        🚻 Gender Verify Tool
+                    </button>
+                </div>
+                <div id="userInfo" class="hidden items-center space-x-3">
+                    <span id="userBadge" class="text-xs px-2.5 py-1 rounded-full font-semibold"></span>
+                    <span id="userEmail" class="text-sm font-medium"></span>
+                    <button onclick="handleLogout()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. Configuration Alert Banner (if Supabase not set up) -->
+        <div id="configWarning" class="hidden mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">⚠️</span>
+                    <div>
+                        <h3 class="font-semibold text-amber-800">Supabase Connection Required</h3>
+                        <p class="text-sm text-amber-700">Please provide your free Supabase URL and Anon Key in Settings to connect the app.</p>
+                    </div>
+                </div>
+                <button onclick="openConfigModal()" class="bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded shadow">
+                    Configure Now
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. Login & Sign Up View -->
+        <div id="loginView" class="max-w-md mx-auto mt-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+                <!-- Toggle Tabs -->
+                <div class="flex border-b border-slate-200 mb-6">
+                    <button id="tabSignInBtn" onclick="switchAuthMode('signin')" class="flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
+                        Sign In
+                    </button>
+                    <button id="tabSignUpBtn" onclick="switchAuthMode('signup')" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
+                        Create Account
+                    </button>
+                </div>
+
+                <div class="text-center mb-6">
+                    <h2 id="authTitle" class="text-2xl font-bold text-slate-800">Sign In to Your Account</h2>
+                    <p id="authSubtitle" class="text-sm text-slate-500 mt-1">Enter your credentials to access your daily workspace</p>
+                </div>
+
+                <!-- Form -->
+                <form id="loginForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
+                        <input type="email" id="loginEmail" required placeholder="worker@company.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                    </div>
+
+                    <!-- Department Selection (Only visible during Sign Up) -->
+                    <div id="deptSelectContainer" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Your Department</label>
+                        <select id="signupDept" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white font-medium">
+                            <option value="number_lookup">📞 Number Lookup</option>
+                            <option value="gender_verify">👤 Gender Verify</option>
+                        </select>
+                    </div>
+
+                    <div id="loginError" class="hidden p-3 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-200"></div>
+                    <div id="loginSuccessMsg" class="hidden p-3 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium border border-emerald-200"></div>
+
+                    <button type="submit" id="loginSubmitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow transition text-sm flex items-center justify-center">
+                        <span>Sign In</span>
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center text-xs text-slate-500">
+                    <span id="authTogglePrompt">Don't have an account?</span>
+                    <button type="button" id="authToggleBtn" onclick="toggleAuthMode()" class="font-semibold text-indigo-600 hover:text-indigo-800 ml-1">
+                        Create an account
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. User Dashboard View (Number Lookup & Gender Verify) -->
+        <div id="userDashboard" class="hidden space-y-8">
+            <!-- Header greeting -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Worker Dashboard</h2>
+                    <p class="text-sm text-slate-500">Department: <span id="userDeptTitle" class="font-semibold text-indigo-600 uppercase"></span></p>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+                    <span>📅 Today:</span>
+                    <span id="currentDateStr" class="font-semibold text-slate-700"></span>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-emerald-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Valid Unique</p>
+                    <p id="statUserTodayUnique" class="text-3xl font-extrabold text-emerald-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">Successfully inserted into database</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-amber-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Duplicates Filtered</p>
+                    <p id="statUserTodayDuplicates" class="text-3xl font-extrabold text-amber-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">Removed automatically</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-indigo-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Your All-Time Total</p>
+                    <p id="statUserAllTime" class="text-3xl font-extrabold text-indigo-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">Unique numbers contributed</p>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-800 mb-2">Upload Daily XLSX File</h3>
+                <p class="text-sm text-slate-500 mb-6">Upload your completed Excel sheet. Duplicate numbers will be identified and removed automatically.</p>
+
+                <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-8 text-center transition cursor-pointer" onclick="document.getElementById('xlsxFileInput').click()">
+                    <input type="file" id="xlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelected(event)">
+                    <div class="space-y-2">
+                        <div class="text-4xl">📊</div>
+                        <p class="text-sm font-semibold text-slate-700">Click to upload or drag and drop your file here</p>
+                        <p class="text-xs text-slate-500">Supports .xlsx, .xls, .csv files</p>
+                    </div>
+                </div>
+
+                <!-- File Preview & Column Selection -->
+                <div id="filePreviewCard" class="hidden mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-bold text-slate-500 uppercase">Selected File:</span>
+                            <span id="previewFileName" class="text-sm font-semibold text-slate-800 ml-2"></span>
+                            <span id="previewRowCount" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded ml-2"></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-xs font-semibold text-slate-600">Phone Number Column:</label>
+                            <select id="columnSelector" class="text-xs px-3 py-1.5 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+
+                    <!-- Action Button & Progress -->
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200">
+                        <div class="w-full sm:w-2/3">
+                            <div id="uploadProgressBarContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                                <div id="uploadProgressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <span id="uploadStatusText" class="text-xs text-slate-500 block mt-1"></span>
+                        </div>
+                        <button id="processUploadBtn" onclick="processAndSubmitXlsx()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition">
+                            Process & Submit File
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Last Upload Result Card -->
+                <div id="lastUploadResultCard" class="hidden mt-6 p-5 rounded-xl border"></div>
+            </div>
+
+            <!-- Upload History for Today -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <h3 class="text-base font-bold text-slate-800 mb-4">Today's Upload Batches</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                            <tr>
+                                <th class="py-3 px-4">Time</th>
+                                <th class="py-3 px-4">File Name</th>
+                                <th class="py-3 px-4">Total in File</th>
+                                <th class="py-3 px-4">Unique Added</th>
+                                <th class="py-3 px-4">Duplicates Removed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userUploadHistoryBody" class="divide-y divide-slate-100">
+                            <tr><td colspan="5" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Admin Dashboard View -->
+        <div id="adminDashboard" class="hidden space-y-8">
+            <!-- Header -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Admin Portal</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Master Control & Analytics</h2>
+                    <p class="text-sm text-slate-500">Monitor all 30 team members, verification departments, and export consolidated reports.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow flex items-center space-x-2 transition">
+                        <span>📥 Download Master Excel (.xlsx)</span>
+                    </button>
+                    <button onclick="refreshAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-lg border border-slate-300 transition">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Stats Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-indigo-600">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Unique Numbers</p>
+                    <p id="adminStatTotalUnique" class="text-3xl font-extrabold text-indigo-700 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">In centralized database</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-blue-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Number Lookup Dept</p>
+                    <p id="adminStatNumberLookup" class="text-3xl font-extrabold text-blue-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">Verified unique numbers</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-pink-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Gender Verify Dept</p>
+                    <p id="adminStatGenderVerify" class="text-3xl font-extrabold text-pink-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">Verified unique numbers</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-emerald-500">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Submissions</p>
+                    <p id="adminStatToday" class="text-3xl font-extrabold text-emerald-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1">Added across all workers</p>
+                </div>
+            </div>
+
+            <!-- Filter Bar for Export & View -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-sm">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 block mb-1">Filter Department:</label>
+                        <select id="adminDeptFilter" onchange="filterAdminTables()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
+                            <option value="all">All Departments</option>
+                            <option value="number_lookup">Number Lookup</option>
+                            <option value="gender_verify">Gender Verify</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 block mb-1">Search User:</label>
+                        <input type="text" id="adminUserSearch" oninput="filterAdminTables()" placeholder="Search by email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
+                    </div>
+                </div>
+                <div class="text-xs text-slate-500">
+                    Tip: Click "Download Master Excel" anytime to get the entire clean dataset.
+                </div>
+            </div>
+
+            <!-- Users Performance Table -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Team Member Submissions (All 30 Users)</h3>
+                    <span id="userCountBadge" class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-full"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                            <tr>
+                                <th class="py-3 px-4">User Email</th>
+                                <th class="py-3 px-4">Department</th>
+                                <th class="py-3 px-4 text-right">Today's Added</th>
+                                <th class="py-3 px-4 text-right">Total Contributed</th>
+                                <th class="py-3 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserTableBody" class="divide-y divide-slate-100">
+                            <tr><td colspan="5" class="py-6 text-center text-slate-400">Loading user records...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Submissions Audit Log -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Live Upload Logs</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                            <tr>
+                                <th class="py-3 px-4">Timestamp</th>
+                                <th class="py-3 px-4">User</th>
+                                <th class="py-3 px-4">Department</th>
+                                <th class="py-3 px-4">File Name</th>
+                                <th class="py-3 px-4 text-right">Total in File</th>
+                                <th class="py-3 px-4 text-right text-emerald-600 font-semibold">New Unique</th>
+                                <th class="py-3 px-4 text-right text-amber-600 font-semibold">Duplicates</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminLogsTableBody" class="divide-y divide-slate-100">
+                            <tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Gender Verification View (Genderize.io Integration) -->
+        <div id="genderVerifyView" class="hidden space-y-8">
+            <!-- Header -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-pink-100 text-pink-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Genderize.io Integration</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Automated Gender Verification Portal</h2>
+                    <p class="text-sm text-slate-500">Verify names and phone numbers, classify automatically into Male & Female sectors, and export reports in Excel.</p>
+                </div>
+                <div class="text-xs bg-slate-50 border border-slate-200 p-3 rounded-lg text-slate-600">
+                    ⚡ Powered by <span class="font-bold text-indigo-600">Genderize.io API</span>
+                </div>
+            </div>
+
+            <!-- Input Options Card -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <!-- Input Method Tabs -->
+                <div class="flex border-b border-slate-200 mb-6">
+                    <button id="tabGvPasteBtn" onclick="switchGvInputMode('paste')" class="pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
+                        📋 Paste Text / Excel Data
+                    </button>
+                    <button id="tabGvFileBtn" onclick="switchGvInputMode('file')" class="pb-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
+                        📁 Upload XLSX File
+                    </button>
+                </div>
+
+                <!-- Paste Input Mode -->
+                <div id="gvPasteSection" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">
+                            Paste Rows of Names, Numbers & Optional Age (One per line)
+                        </label>
+                        <p class="text-xs text-slate-400 mb-2">
+                            Format: You can copy and paste columns straight from Excel! E.g. <span class="font-mono bg-slate-100 px-1 rounded">John Smith, +1234567890, 32</span> or <span class="font-mono bg-slate-100 px-1 rounded">Mary, 9876543210</span>
+                        </p>
+                        <textarea id="gvTextInput" rows="7" placeholder="John Smith, +1234567890, 32&#10;Mary Johnson, 9876543210, 28&#10;Michael Brown, 5551234567, 45" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- File Upload Mode -->
+                <div id="gvFileSection" class="hidden space-y-4">
+                    <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-6 text-center transition cursor-pointer" onclick="document.getElementById('gvXlsxFileInput').click()">
+                        <input type="file" id="gvXlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleGvFileSelected(event)">
+                        <div class="space-y-1">
+                            <div class="text-3xl">📑</div>
+                            <p class="text-sm font-semibold text-slate-700">Select XLSX file to verify genders</p>
+                            <p class="text-xs text-slate-400">Excel files containing Name, Phone Number, and Age</p>
+                        </div>
+                    </div>
+                    <!-- Column Mappers for File -->
+                    <div id="gvFileColumnMap" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Name Column:</label>
+                            <select id="gvColName" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-white"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Column:</label>
+                            <select id="gvColPhone" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-white"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Age Column (Optional):</label>
+                            <select id="gvColAge" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-white"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Button & Progress -->
+                <div class="mt-6 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="w-full sm:w-2/3">
+                        <div id="gvProgressContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <div id="gvProgressBar" class="bg-pink-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <span id="gvStatusText" class="text-xs text-slate-500 block mt-1"></span>
+                    </div>
+                    <button id="gvStartBtn" onclick="startGenderVerification()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition flex items-center justify-center space-x-2">
+                        <span>⚡ Verify Genders Now</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section (Visible after verification) -->
+            <div id="gvResultsSection" class="hidden space-y-6">
+                <!-- Summary Metrics Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Checked</p>
+                        <p id="gvStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Detected</p>
+                        <p id="gvStatMale" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Detected</p>
+                        <p id="gvStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">❓ Undetermined</p>
+                        <p id="gvStatUnknown" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
+                    </div>
+                </div>
+
+                <!-- Sector Selector Tabs -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-4">
+                        <div class="flex space-x-2">
+                            <button id="btnSectorMale" onclick="switchGvSector('male')" class="px-4 py-2 text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5">
+                                <span>👨 Male Sector Report</span>
+                                <span id="badgeMaleCount" class="bg-white text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </button>
+                            <button id="btnSectorFemale" onclick="switchGvSector('female')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5">
+                                <span>👩 Female Sector Report</span>
+                                <span id="badgeFemaleCount" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </button>
+                            <button id="btnSectorUnknown" onclick="switchGvSector('unknown')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5">
+                                <span>❓ Undetermined</span>
+                                <span id="badgeUnknownCount" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Action Buttons for Selected Sector -->
+                        <div class="flex items-center space-x-3">
+                            <button id="gvDownloadSectorBtn" onclick="downloadCurrentSectorExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                                <span>📥 Download Report (.xlsx)</span>
+                            </button>
+                            <button id="gvSaveToDbBtn" onclick="saveSectorToDatabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                                <span>💾 Save to Central Database</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sector Table Container -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                <tr>
+                                    <th class="py-3 px-4">#</th>
+                                    <th class="py-3 px-4">Name</th>
+                                    <th class="py-3 px-4">Phone Number</th>
+                                    <th class="py-3 px-4">Age</th>
+                                    <th class="py-3 px-4">Detected Gender</th>
+                                    <th class="py-3 px-4 text-right">Probability</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gvSectorTableBody" class="divide-y divide-slate-100">
+                                <tr><td colspan="6" class="py-6 text-center text-slate-400">No records to display.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Settings / Config Modal -->
+    <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200">
+            <h3 class="text-lg font-bold text-slate-800 mb-1">⚙️ Supabase Database Configuration</h3>
+            <p class="text-xs text-slate-500 mb-4">Enter your free Supabase project credentials. These are saved securely in your browser's local storage.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Project URL</label>
+                    <input type="text" id="cfgSupabaseUrl" placeholder="https://xyzprojectid.supabase.co" class="w-full px-3 py-2 border rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Anon Public Key</label>
+                    <textarea id="cfgSupabaseKey" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-3 py-2 border rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="closeConfigModal()" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium">Cancel</button>
+                <button onclick="saveSupabaseConfig()" class="px-5 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow">Save & Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+        <!-- Application JavaScript Logic -->
+    <script>
+        // Supabase Client Instance
+        let supabaseClient = null;
+        let currentUser = null;
+        let currentProfile = null;
+        let selectedFileData = null;
+        let parsedRows = [];
+        let adminUsersCache = [];
+        let adminLogsCache = [];
+        let currentAuthMode = 'signin';
+
+        // Initialization on window load
+        window.addEventListener('DOMContentLoaded', () => {
+            initSupabase();
+            updateCurrentDate();
+        });
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const el = document.getElementById('currentDateStr');
+            if (el) el.innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Default pre-configured credentials so workers never need setup
+        const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
+        const DEFAULT_SP_KEY = 'sb_publishable_zhiBHjv-fhhEhy7wvX52AA_1sE0sSSL';
+
+        function initSupabase() {
+            const url = localStorage.getItem('SP_URL') || DEFAULT_SP_URL;
+            const key = localStorage.getItem('SP_KEY') || DEFAULT_SP_KEY;
+
+            // Ensure credentials are saved in localStorage
+            localStorage.setItem('SP_URL', url);
+            localStorage.setItem('SP_KEY', key);
+
+            const warn = document.getElementById('configWarning');
+            if (warn) warn.classList.add('hidden');
+
+            try {
+                supabaseClient = window.supabase.createClient(url, key);
+                checkSession();
+                return true;
+            } catch (err) {
+                console.error('Supabase init error:', err);
+                return false;
+            }
+        }
+
+        function openConfigModal() {
+            document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('SP_URL') || '';
+            document.getElementById('cfgSupabaseKey').value = localStorage.getItem('SP_KEY') || '';
+            document.getElementById('configModal').classList.remove('hidden');
+            document.getElementById('configModal').classList.add('flex');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.add('hidden');
+            document.getElementById('configModal').classList.remove('flex');
+        }
+
+        function saveSupabaseConfig() {
+            const url = document.getElementById('cfgSupabaseUrl').value.trim();
+            const key = document.getElementById('cfgSupabaseKey').value.trim();
+            if (!url || !key) {
+                alert('Please enter both Supabase URL and Key');
+                return;
+            }
+            localStorage.setItem('SP_URL', url);
+            localStorage.setItem('SP_KEY', key);
+            closeConfigModal();
+            location.reload();
+        }
+
+        async function checkSession() {
+            if (!supabaseClient) return;
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                currentUser = session.user;
+                await loadUserProfile();
+            } else {
+                showView('loginView');
+            }
+        }
+
+        // ==========================================
+        // AUTH: SIGN IN & SIGN UP (CREATE ACCOUNT)
+        // ==========================================
+        function switchAuthMode(mode) {
+            currentAuthMode = mode;
+            const tabSignIn = document.getElementById('tabSignInBtn');
+            const tabSignUp = document.getElementById('tabSignUpBtn');
+            const deptContainer = document.getElementById('deptSelectContainer');
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const togglePrompt = document.getElementById('authTogglePrompt');
+            const toggleBtn = document.getElementById('authToggleBtn');
+            const errBox = document.getElementById('loginError');
+            const successBox = document.getElementById('loginSuccessMsg');
+
+            if (errBox) errBox.classList.add('hidden');
+            if (successBox) successBox.classList.add('hidden');
+
+            if (mode === 'signup') {
+                if (tabSignUp) tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                if (tabSignIn) tabSignIn.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                if (deptContainer) deptContainer.classList.remove('hidden');
+                if (title) title.innerText = 'Create New Account';
+                if (subtitle) subtitle.innerText = 'Register your account and select your department';
+                if (submitBtn) submitBtn.innerHTML = '<span>Create Account</span>';
+                if (togglePrompt) togglePrompt.innerText = 'Already have an account?';
+                if (toggleBtn) toggleBtn.innerText = 'Sign In';
+            } else {
+                if (tabSignIn) tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                if (tabSignUp) tabSignUp.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                if (deptContainer) deptContainer.classList.add('hidden');
+                if (title) title.innerText = 'Sign In to Your Account';
+                if (subtitle) subtitle.innerText = 'Enter your credentials to access your daily workspace';
+                if (submitBtn) submitBtn.innerHTML = '<span>Sign In</span>';
+                if (togglePrompt) togglePrompt.innerText = "Don't have an account?";
+                if (toggleBtn) toggleBtn.innerText = 'Create an account';
+            }
+        }
+
+        function toggleAuthMode() {
+            switchAuthMode(currentAuthMode === 'signin' ? 'signup' : 'signin');
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const dept = document.getElementById('signupDept') ? document.getElementById('signupDept').value : 'number_lookup';
+            const errBox = document.getElementById('loginError');
+            const successBox = document.getElementById('loginSuccessMsg');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+
+            if (errBox) errBox.classList.add('hidden');
+            if (successBox) successBox.classList.add('hidden');
+            submitBtn.disabled = true;
+
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase is not configured yet. Click Settings above.');
+                }
+
+                if (currentAuthMode === 'signup') {
+                    submitBtn.innerHTML = '<span>Creating Account...</span>';
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                department: dept,
+                                role: 'user'
+                            }
+                        }
+                    });
+
+                    if (error) throw error;
+
+                    if (data && data.session) {
+                        currentUser = data.user;
+                        await loadUserProfile();
+                    } else {
+                        if (successBox) {
+                            successBox.innerText = 'Account created successfully! You can now Sign In.';
+                            successBox.classList.remove('hidden');
+                        }
+                        switchAuthMode('signin');
+                    }
+                } else {
+                    submitBtn.innerHTML = '<span>Signing In...</span>';
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (error) throw error;
+                    currentUser = data.user;
+                    await loadUserProfile();
+                }
+            } catch (err) {
+                console.error(err);
+                if (errBox) {
+                    errBox.innerText = err.message || 'Authentication failed';
+                    errBox.classList.remove('hidden');
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = currentAuthMode === 'signup' ? '<span>Create Account</span>' : '<span>Sign In</span>';
+            }
+        }
+
+        // Backward compatibility for old form onsubmit if any
+        function handleLogin(e) {
+            return handleAuthSubmit(e);
+        }
+
+        async function handleLogout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            currentUser = null;
+            currentProfile = null;
+            document.getElementById('userInfo').classList.add('hidden');
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) navLinks.classList.add('hidden');
+            showView('loginView');
+            switchAuthMode('signin');
+        }
+
+        async function loadUserProfile() {
+            try {
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Profile fetch error:', error);
+                }
+
+                currentProfile = profile || {
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    role: currentUser.user_metadata?.role || 'user',
+                    department: currentUser.user_metadata?.department || 'number_lookup'
+                };
+
+                // Update Header UI
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('userInfo').classList.add('flex');
+                document.getElementById('userEmail').innerText = currentProfile.email;
+
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks) {
+                    navLinks.classList.remove('hidden');
+                    navLinks.classList.add('flex');
+                }
+
+                const badge = document.getElementById('userBadge');
+                if (currentProfile.role === 'admin') {
+                    badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-purple-200 text-purple-900';
+                    badge.innerText = 'Admin';
+                    showView('adminDashboard');
+                    loadAdminDashboard();
+                } else {
+                    const deptLabel = currentProfile.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify';
+                    badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-indigo-200 text-indigo-900';
+                    badge.innerText = deptLabel;
+                    document.getElementById('userDeptTitle').innerText = deptLabel;
+                    showView('userDashboard');
+                    loadUserDashboard();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function showView(viewId) {
+            ['loginView', 'userDashboard', 'adminDashboard', 'genderVerifyView'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(viewId);
+            if (target) target.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // USER DASHBOARD LOGIC
+        // ==========================================
+        async function loadUserDashboard() {
+            if (!supabaseClient || !currentUser) return;
+
+            const todayStart = new Date();
+            todayStart.setHours(0,0,0,0);
+            const todayIso = todayStart.toISOString();
+
+            // 1. Fetch Today's Logs for current user
+            const { data: logs, error: logErr } = await supabaseClient
+                .from('upload_logs')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .gte('created_at', todayIso)
+                .order('created_at', { ascending: false });
+
+            let todayUnique = 0;
+            let todayDuplicates = 0;
+            const historyBody = document.getElementById('userUploadHistoryBody');
+
+            if (logs && logs.length > 0) {
+                historyBody.innerHTML = '';
+                logs.forEach(log => {
+                    todayUnique += log.new_inserted;
+                    todayDuplicates += log.duplicates_count;
+
+                    const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    historyBody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
+                            <td class="py-3 px-4 font-medium text-slate-700">${log.file_name || 'Upload'}</td>
+                            <td class="py-3 px-4">${log.total_received}</td>
+                            <td class="py-3 px-4 font-bold text-emerald-600">+${log.new_inserted}</td>
+                            <td class="py-3 px-4 text-amber-600">${log.duplicates_count}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                historyBody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>`;
+            }
+
+            document.getElementById('statUserTodayUnique').innerText = todayUnique.toLocaleString();
+            document.getElementById('statUserTodayDuplicates').innerText = todayDuplicates.toLocaleString();
+
+            // 2. Fetch All-Time Total for user
+            const { count: allTimeCount } = await supabaseClient
+                .from('master_numbers')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', currentUser.id);
+
+            document.getElementById('statUserAllTime').innerText = (allTimeCount || 0).toLocaleString();
+        }
+
+        function handleFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            selectedFileData = file;
+            document.getElementById('previewFileName').innerText = file.name;
+            document.getElementById('uploadStatusText').innerText = 'Reading file contents...';
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    parsedRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+                    if (!parsedRows || parsedRows.length === 0) {
+                        alert('Uploaded sheet contains no data rows.');
+                        return;
+                    }
+
+                    document.getElementById('previewRowCount').innerText = `${parsedRows.length} rows detected`;
+
+                    // Populate Column Selector
+                    const sampleRow = parsedRows[0];
+                    const columns = Object.keys(sampleRow);
+                    const selector = document.getElementById('columnSelector');
+                    selector.innerHTML = '';
+
+                    let autoSelected = false;
+                    columns.forEach(col => {
+                        const opt = document.createElement('option');
+                        opt.value = col;
+                        opt.innerText = col;
+                        const lower = col.toLowerCase();
+                        if (!autoSelected && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact') || lower.includes('cell'))) {
+                            opt.selected = true;
+                            autoSelected = true;
+                        }
+                        selector.appendChild(opt);
+                    });
+
+                    document.getElementById('filePreviewCard').classList.remove('hidden');
+                    document.getElementById('uploadStatusText').innerText = 'Ready to process.';
+                    document.getElementById('lastUploadResultCard').classList.add('hidden');
+                } catch (err) {
+                    alert('Error reading Excel file: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function processAndSubmitXlsx() {
+            if (!parsedRows || parsedRows.length === 0) {
+                alert('No rows to process');
+                return;
+            }
+
+            const chosenCol = document.getElementById('columnSelector').value;
+            const btn = document.getElementById('processUploadBtn');
+            const progressContainer = document.getElementById('uploadProgressBarContainer');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const statusText = document.getElementById('uploadStatusText');
+
+            btn.disabled = true;
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '20%';
+            statusText.innerText = 'Extracting phone numbers...';
+
+            // Clean and extract phone numbers
+            const rawNumbers = [];
+            parsedRows.forEach(row => {
+                let val = String(row[chosenCol] || '').trim();
+                // Basic cleanup: remove standard delimiters, preserve digits and leading +
+                val = val.replace(/[\s\-\(\)\.]/g, '');
+                if (val && val.length >= 6) {
+                    rawNumbers.push(val);
+                }
+            });
+
+            if (rawNumbers.length === 0) {
+                alert('No valid numbers found in the selected column!');
+                btn.disabled = false;
+                progressContainer.classList.add('hidden');
+                return;
+            }
+
+            progressBar.style.width = '50%';
+            statusText.innerText = `Submitting ${rawNumbers.length} numbers to database for deduplication...`;
+
+            try {
+                // Call Supabase RPC function 'process_number_batch'
+                const { data, error } = await supabaseClient.rpc('process_number_batch', {
+                    p_numbers: rawNumbers,
+                    p_file_name: selectedFileData ? selectedFileData.name : 'upload.xlsx'
+                });
+
+                if (error) throw error;
+
+                progressBar.style.width = '100%';
+                statusText.innerText = 'Upload & Deduplication Completed!';
+
+                // Display Result Card
+                const resultCard = document.getElementById('lastUploadResultCard');
+                resultCard.className = 'mt-6 p-5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
+                resultCard.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-bold text-base">✅ File Processed Successfully</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3 text-xs">
+                                <div>
+                                    <span class="text-slate-500 block">Total in File</span>
+                                    <span class="text-base font-bold">${data.total_received}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block">Unique in File</span>
+                                    <span class="text-base font-bold">${data.unique_in_file}</span>
+                                </div>
+                                <div>
+                                    <span class="text-emerald-700 block font-semibold">New Unique Saved</span>
+                                    <span class="text-xl font-extrabold text-emerald-600">+${data.new_inserted}</span>
+                                </div>
+                                <div>
+                                    <span class="text-amber-700 block font-semibold">Duplicates Filtered</span>
+                                    <span class="text-xl font-extrabold text-amber-600">${data.duplicates_count}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultCard.classList.remove('hidden');
+
+                // Refresh dashboard stats and logs
+                await loadUserDashboard();
+
+                // Reset file input
+                document.getElementById('xlsxFileInput').value = '';
+                parsedRows = [];
+                selectedFileData = null;
+                document.getElementById('filePreviewCard').classList.add('hidden');
+            } catch (err) {
+                alert('Failed to process batch: ' + err.message);
+                statusText.innerText = 'Error occurred during processing.';
+            } finally {
+                btn.disabled = false;
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                    progressBar.style.width = '0%';
+                }, 3000);
+            }
+        }
+
+        // ==========================================
+        // ADMIN DASHBOARD LOGIC
+        // ==========================================
+        async function loadAdminDashboard() {
+            if (!supabaseClient) return;
+
+            // 1. Overall Stats
+            const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
+            const { count: numLookupTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('department', 'number_lookup');
+            const { count: genderTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('department', 'gender_verify');
+
+            const todayStart = new Date();
+            todayStart.setHours(0,0,0,0);
+            const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
+
+            document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
+            document.getElementById('adminStatNumberLookup').innerText = (numLookupTotal || 0).toLocaleString();
+            document.getElementById('adminStatGenderVerify').innerText = (genderTotal || 0).toLocaleString();
+            document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
+
+            // 2. Fetch All Profiles
+            const { data: profiles } = await supabaseClient.from('profiles').select('*').order('email');
+            
+            // 3. Fetch Today's logs aggregated
+            const { data: logs } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
+            adminLogsCache = logs || [];
+
+            // Compute user submissions
+            const userSubmissions = {};
+            if (profiles) {
+                profiles.forEach(p => {
+                    userSubmissions[p.id] = {
+                        email: p.email,
+                        department: p.department,
+                        todayAdded: 0,
+                        totalContributed: 0
+                    };
+                });
+            }
+
+            if (logs) {
+                const todayIso = todayStart.toISOString();
+                logs.forEach(l => {
+                    if (userSubmissions[l.user_id]) {
+                        userSubmissions[l.user_id].totalContributed += l.new_inserted;
+                        if (l.created_at >= todayIso) {
+                            userSubmissions[l.user_id].todayAdded += l.new_inserted;
+                        }
+                    }
+                });
+            }
+
+            adminUsersCache = Object.values(userSubmissions);
+            renderAdminTables();
+        }
+
+        function renderAdminTables() {
+            const userBody = document.getElementById('adminUserTableBody');
+            const logsBody = document.getElementById('adminLogsTableBody');
+            const deptFilter = document.getElementById('adminDeptFilter').value;
+            const searchVal = document.getElementById('adminUserSearch').value.toLowerCase();
+
+            // Render Users
+            let filteredUsers = adminUsersCache.filter(u => {
+                const matchDept = deptFilter === 'all' || u.department === deptFilter;
+                const matchSearch = u.email.toLowerCase().includes(searchVal);
+                return matchDept && matchSearch;
+            });
+
+            document.getElementById('userCountBadge').innerText = `${filteredUsers.length} Users Listed`;
+
+            if (filteredUsers.length > 0) {
+                userBody.innerHTML = filteredUsers.map(u => {
+                    const deptBadge = u.department === 'number_lookup' 
+                        ? `<span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-semibold">Number Lookup</span>`
+                        : `<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-semibold">Gender Verify</span>`;
+                    return `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-semibold text-slate-800">${u.email}</td>
+                            <td class="py-3 px-4">${deptBadge}</td>
+                            <td class="py-3 px-4 text-right font-bold text-emerald-600">${u.todayAdded.toLocaleString()}</td>
+                            <td class="py-3 px-4 text-right font-bold text-indigo-700">${u.totalContributed.toLocaleString()}</td>
+                            <td class="py-3 px-4 text-right">
+                                <button onclick="downloadSingleUserData('${u.email}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                                    Download User Data
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                userBody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">No users match filter.</td></tr>`;
+            }
+
+            // Render Logs
+            let filteredLogs = adminLogsCache.filter(l => {
+                const matchDept = deptFilter === 'all' || l.department === deptFilter;
+                const matchSearch = l.user_email.toLowerCase().includes(searchVal);
+                return matchDept && matchSearch;
+            }).slice(0, 30);
+
+            if (filteredLogs.length > 0) {
+                logsBody.innerHTML = filteredLogs.map(l => {
+                    const timeStr = new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <tr class="hover:bg-slate-50 text-xs">
+                            <td class="py-3 px-4 font-mono text-slate-500">${timeStr}</td>
+                            <td class="py-3 px-4 font-medium text-slate-700">${l.user_email}</td>
+                            <td class="py-3 px-4 font-semibold uppercase">${l.department.replace('_', ' ')}</td>
+                            <td class="py-3 px-4 text-slate-600">${l.file_name || 'Upload'}</td>
+                            <td class="py-3 px-4 text-right">${l.total_received}</td>
+                            <td class="py-3 px-4 text-right text-emerald-600 font-bold">+${l.new_inserted}</td>
+                            <td class="py-3 px-4 text-right text-amber-600">${l.duplicates_count}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                logsBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>`;
+            }
+        }
+
+        function filterAdminTables() {
+            renderAdminTables();
+        }
+
+        function refreshAdminData() {
+            loadAdminDashboard();
+        }
+
+        // ==========================================
+        // ONE-CLICK EXCEL DOWNLOAD (.XLSX)
+        // ==========================================
+        async function downloadMasterExcel() {
+            if (!supabaseClient) return;
+
+            const deptFilter = document.getElementById('adminDeptFilter').value;
+            let query = supabaseClient.from('master_numbers').select('phone_number, department, user_email, created_at').order('created_at', { ascending: false });
+            
+            if (deptFilter !== 'all') {
+                query = query.eq('department', deptFilter);
+            }
+
+            const { data, error } = await query;
+            if (error) {
+                alert('Error fetching master data: ' + error.message);
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                alert('No records available to export.');
+                return;
+            }
+
+            // Transform data for clean Excel export
+            const exportRows = data.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone_number,
+                'Department': item.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify',
+                'Submitted By (User)': item.user_email,
+                'Submission Date & Time': new Date(item.created_at).toLocaleString()
+            }));
+
+            // Create XLSX Workbook using SheetJS
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Master Data");
+
+            const today = new Date().toISOString().slice(0, 10);
+            const filename = `Master_Database_${deptFilter}_${today}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        async function downloadSingleUserData(userEmail) {
+            if (!supabaseClient) return;
+            const { data, error } = await supabaseClient
+                .from('master_numbers')
+                .select('phone_number, department, user_email, created_at')
+                .eq('user_email', userEmail)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                alert('Error fetching user data: ' + error.message);
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                alert(`No records found for ${userEmail}`);
+                return;
+            }
+
+            const exportRows = data.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone_number,
+                'Department': item.department,
+                'Submitted By': item.user_email,
+                'Date & Time': new Date(item.created_at).toLocaleString()
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "User Data");
+
+            const safeEmail = userEmail.replace(/[@.]/g, '_');
+            const today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `Submissions_${safeEmail}_${today}.xlsx`);
+        }
+
+        // ==========================================
+        // GENDERIZE.IO VERIFICATION MODULE LOGIC
+        // ==========================================
+        let currentGvInputMode = 'paste';
+        let gvFileParsedRows = [];
+        let gvMaleList = [];
+        let gvFemaleList = [];
+        let gvUnknownList = [];
+        let currentGvSector = 'male';
+
+        function switchToSection(sec) {
+            const btnDash = document.getElementById('navBtnDashboard');
+            const btnGender = document.getElementById('navBtnGender');
+
+            if (sec === 'dashboard') {
+                if (btnDash) btnDash.className = 'text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded transition';
+                if (btnGender) btnGender.className = 'text-xs bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-3 py-1.5 rounded transition';
+                if (currentProfile && currentProfile.role === 'admin') {
+                    showView('adminDashboard');
+                    loadAdminDashboard();
+                } else {
+                    showView('userDashboard');
+                    loadUserDashboard();
+                }
+            } else if (sec === 'gender_verify') {
+                if (btnGender) btnGender.className = 'text-xs bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-3 py-1.5 rounded transition';
+                if (btnDash) btnDash.className = 'text-xs bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-3 py-1.5 rounded transition';
+                showView('genderVerifyView');
+            }
+        }
+
+        function switchGvInputMode(mode) {
+            currentGvInputMode = mode;
+            const tabPaste = document.getElementById('tabGvPasteBtn');
+            const tabFile = document.getElementById('tabGvFileBtn');
+            const pasteSec = document.getElementById('gvPasteSection');
+            const fileSec = document.getElementById('gvFileSection');
+
+            if (mode === 'paste') {
+                tabPaste.className = 'pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                tabFile.className = 'pb-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                pasteSec.classList.remove('hidden');
+                fileSec.classList.add('hidden');
+            } else {
+                tabFile.className = 'pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                tabPaste.className = 'pb-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                fileSec.classList.remove('hidden');
+                pasteSec.classList.add('hidden');
+            }
+        }
+
+        function handleGvFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    gvFileParsedRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+                    if (!gvFileParsedRows || gvFileParsedRows.length === 0) {
+                        alert('No rows found in Excel sheet.');
+                        return;
+                    }
+
+                    const sample = gvFileParsedRows[0];
+                    const cols = Object.keys(sample);
+
+                    const colNameSel = document.getElementById('gvColName');
+                    const colPhoneSel = document.getElementById('gvColPhone');
+                    const colAgeSel = document.getElementById('gvColAge');
+
+                    colNameSel.innerHTML = '';
+                    colPhoneSel.innerHTML = '';
+                    colAgeSel.innerHTML = '<option value="">-- None / Auto --</option>';
+
+                    cols.forEach(col => {
+                        const opt1 = document.createElement('option');
+                        opt1.value = col;
+                        opt1.innerText = col;
+                        if (col.toLowerCase().includes('name')) opt1.selected = true;
+                        colNameSel.appendChild(opt1);
+
+                        const opt2 = document.createElement('option');
+                        opt2.value = col;
+                        opt2.innerText = col;
+                        if (col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')) opt2.selected = true;
+                        colPhoneSel.appendChild(opt2);
+
+                        const opt3 = document.createElement('option');
+                        opt3.value = col;
+                        opt3.innerText = col;
+                        if (col.toLowerCase().includes('age')) opt3.selected = true;
+                        colAgeSel.appendChild(opt3);
+                    });
+
+                    document.getElementById('gvFileColumnMap').classList.remove('hidden');
+                } catch (err) {
+                    alert('Error reading file: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function startGenderVerification() {
+            let recordsToVerify = [];
+
+            if (currentGvInputMode === 'paste') {
+                const rawText = document.getElementById('gvTextInput').value.trim();
+                if (!rawText) {
+                    alert('Please paste some text/records to verify.');
+                    return;
+                }
+
+                const lines = rawText.split(/\r?\n/);
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (!trimmed) return;
+
+                    // Split by comma, tab, or semicolons
+                    const parts = trimmed.split(/[,\t;]+/).map(p => p.trim()).filter(Boolean);
+
+                    let name = '';
+                    let phone = '';
+                    let age = '';
+
+                    if (parts.length >= 2) {
+                        // Check which part has numbers
+                        parts.forEach(p => {
+                            const cleanDigits = p.replace(/[\s\-\(\)\.]/g, '');
+                            if (/^\+?\d{7,15}$/.test(cleanDigits)) {
+                                phone = cleanDigits;
+                            } else if (/^\d{1,3}$/.test(p) && parseInt(p) >= 1 && parseInt(p) <= 120) {
+                                age = p;
+                            } else if (!name) {
+                                name = p;
+                            }
+                        });
+                        if (!phone) phone = parts[1] || '';
+                        if (!name) name = parts[0] || '';
+                    } else {
+                        // Single line without standard delimiters: e.g. "John Smith 1234567890 28"
+                        const tokens = trimmed.split(/\s+/);
+                        const nameParts = [];
+                        tokens.forEach(tok => {
+                            const cleanDigits = tok.replace(/[\-\(\)\.]/g, '');
+                            if (/^\+?\d{7,15}$/.test(cleanDigits)) {
+                                phone = cleanDigits;
+                            } else if (/^\d{1,3}$/.test(tok) && parseInt(tok) >= 1 && parseInt(tok) <= 120) {
+                                age = tok;
+                            } else {
+                                nameParts.push(tok);
+                            }
+                        });
+                        name = nameParts.join(' ');
+                    }
+
+                    if (name || phone) {
+                        recordsToVerify.push({
+                            fullName: name || 'Unknown',
+                            phone: phone || '-',
+                            age: age || '-'
+                        });
+                    }
+                });
+            } else {
+                // File upload mode
+                if (!gvFileParsedRows || gvFileParsedRows.length === 0) {
+                    alert('Please select an Excel file first.');
+                    return;
+                }
+                const nameCol = document.getElementById('gvColName').value;
+                const phoneCol = document.getElementById('gvColPhone').value;
+                const ageCol = document.getElementById('gvColAge').value;
+
+                gvFileParsedRows.forEach(row => {
+                    const name = String(row[nameCol] || '').trim();
+                    let phone = String(row[phoneCol] || '').trim().replace(/[\s\-\(\)\.]/g, '');
+                    const age = ageCol ? String(row[ageCol] || '').trim() : '-';
+
+                    if (name || phone) {
+                        recordsToVerify.push({
+                            fullName: name || 'Unknown',
+                            phone: phone || '-',
+                            age: age || '-'
+                        });
+                    }
+                });
+            }
+
+            if (recordsToVerify.length === 0) {
+                alert('No valid records found to verify.');
+                return;
+            }
+
+            const btn = document.getElementById('gvStartBtn');
+            const progressContainer = document.getElementById('gvProgressContainer');
+            const progressBar = document.getElementById('gvProgressBar');
+            const statusText = document.getElementById('gvStatusText');
+
+            btn.disabled = true;
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '10%';
+            statusText.innerText = `Preparing ${recordsToVerify.length} records...`;
+
+            // Extract unique first names for querying Genderize.io
+            const firstNameMap = {};
+            recordsToVerify.forEach(r => {
+                const words = r.fullName.split(/\s+/);
+                const first = words[0] ? words[0].replace(/[^a-zA-Z]/g, '').toLowerCase() : '';
+                r.firstName = first;
+                if (first && first.length >= 2) {
+                    firstNameMap[first] = null;
+                }
+            });
+
+            const uniqueNames = Object.keys(firstNameMap);
+            statusText.innerText = `Querying Genderize.io API for ${uniqueNames.length} unique names...`;
+
+            // Batch queries to Genderize.io (batches of 10)
+            const batchSize = 10;
+            const genderResults = {};
+
+            for (let i = 0; i < uniqueNames.length; i += batchSize) {
+                const chunk = uniqueNames.slice(i, i + batchSize);
+                const queryStr = chunk.map(n => 'name[]=' + encodeURIComponent(n)).join('&');
+                const url = `https://api.genderize.io/?${queryStr}`;
+
+                try {
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const items = Array.isArray(data) ? data : [data];
+                        items.forEach(item => {
+                            if (item && item.name) {
+                                genderResults[item.name.toLowerCase()] = {
+                                    gender: item.gender, // 'male' or 'female' or null
+                                    probability: item.probability !== undefined ? Math.round(item.probability * 100) : null
+                                };
+                            }
+                        });
+                    }
+                } catch (apiErr) {
+                    console.error('Genderize API error for chunk:', apiErr);
+                }
+
+                const pct = Math.round(10 + ((i + chunk.length) / Math.max(1, uniqueNames.length)) * 80);
+                progressBar.style.width = `${pct}%`;
+                statusText.innerText = `Verified ${Math.min(i + batchSize, uniqueNames.length)} of ${uniqueNames.length} names...`;
+
+                // Small gentle delay to respect free rate limits
+                if (i + batchSize < uniqueNames.length) {
+                    await new Promise(r => setTimeout(r, 200));
+                }
+            }
+
+            // Categorize into Sectors: Male, Female, Unknown
+            gvMaleList = [];
+            gvFemaleList = [];
+            gvUnknownList = [];
+
+            recordsToVerify.forEach(r => {
+                const lookup = r.firstName ? genderResults[r.firstName] : null;
+                if (lookup && lookup.gender === 'male') {
+                    r.detectedGender = 'male';
+                    r.probability = lookup.probability ? `${lookup.probability}%` : '-';
+                    gvMaleList.push(r);
+                } else if (lookup && lookup.gender === 'female') {
+                    r.detectedGender = 'female';
+                    r.probability = lookup.probability ? `${lookup.probability}%` : '-';
+                    gvFemaleList.push(r);
+                } else {
+                    r.detectedGender = 'unknown';
+                    r.probability = '-';
+                    gvUnknownList.push(r);
+                }
+            });
+
+            progressBar.style.width = '100%';
+            statusText.innerText = 'Gender verification complete!';
+
+            // Update Metrics
+            document.getElementById('gvStatTotal').innerText = recordsToVerify.length.toLocaleString();
+            document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
+            document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
+            document.getElementById('gvStatUnknown').innerText = gvUnknownList.length.toLocaleString();
+
+            document.getElementById('badgeMaleCount').innerText = gvMaleList.length;
+            document.getElementById('badgeFemaleCount').innerText = gvFemaleList.length;
+            document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
+
+            document.getElementById('gvResultsSection').classList.remove('hidden');
+
+            // Default to Male or Female sector
+            switchGvSector(gvMaleList.length > 0 ? 'male' : (gvFemaleList.length > 0 ? 'female' : 'unknown'));
+
+            btn.disabled = false;
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+                progressBar.style.width = '0%';
+            }, 3000);
+        }
+
+        function switchGvSector(sec) {
+            currentGvSector = sec;
+            const btnMale = document.getElementById('btnSectorMale');
+            const btnFemale = document.getElementById('btnSectorFemale');
+            const btnUnknown = document.getElementById('btnSectorUnknown');
+            const tableBody = document.getElementById('gvSectorTableBody');
+
+            // Button styling
+            [btnMale, btnFemale, btnUnknown].forEach(b => {
+                b.className = 'px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5';
+            });
+
+            let activeList = [];
+            if (sec === 'male') {
+                btnMale.className = 'px-4 py-2 text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5';
+                activeList = gvMaleList;
+            } else if (sec === 'female') {
+                btnFemale.className = 'px-4 py-2 text-sm font-bold rounded-lg bg-pink-600 text-white shadow transition flex items-center space-x-1.5';
+                activeList = gvFemaleList;
+            } else {
+                btnUnknown.className = 'px-4 py-2 text-sm font-bold rounded-lg bg-amber-600 text-white shadow transition flex items-center space-x-1.5';
+                activeList = gvUnknownList;
+            }
+
+            if (activeList.length > 0) {
+                tableBody.innerHTML = activeList.map((item, idx) => {
+                    let genderBadge = '';
+                    if (item.detectedGender === 'male') {
+                        genderBadge = '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">👨 Male</span>';
+                    } else if (item.detectedGender === 'female') {
+                        genderBadge = '<span class="px-2 py-0.5 text-xs rounded-full bg-pink-100 text-pink-800 font-semibold">👩 Female</span>';
+                    } else {
+                        genderBadge = '<span class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800 font-semibold">❓ Unknown</span>';
+                    }
+
+                    return `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-mono text-xs text-slate-400">${idx + 1}</td>
+                            <td class="py-3 px-4 font-bold text-slate-800">${item.fullName}</td>
+                            <td class="py-3 px-4 font-mono font-medium text-slate-700">${item.phone}</td>
+                            <td class="py-3 px-4 font-medium text-slate-600">${item.age}</td>
+                            <td class="py-3 px-4">${genderBadge}</td>
+                            <td class="py-3 px-4 text-right font-semibold text-slate-700">${item.probability}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">No records found in this sector.</td></tr>`;
+            }
+        }
+
+        function downloadCurrentSectorExcel() {
+            let activeList = [];
+            let sectorTitle = '';
+
+            if (currentGvSector === 'male') {
+                activeList = gvMaleList;
+                sectorTitle = 'Male_Sector_Report';
+            } else if (currentGvSector === 'female') {
+                activeList = gvFemaleList;
+                sectorTitle = 'Female_Sector_Report';
+            } else {
+                activeList = gvUnknownList;
+                sectorTitle = 'Undetermined_Gender_Report';
+            }
+
+            if (activeList.length === 0) {
+                alert('No records to export in the current sector.');
+                return;
+            }
+
+            const exportData = activeList.map((item, idx) => ({
+                'SL': idx + 1,
+                'Full Name': item.fullName,
+                'Phone Number': item.phone,
+                'Age': item.age,
+                'Detected Gender': item.detectedGender.toUpperCase(),
+                'Accuracy': item.probability,
+                'Verification Date': new Date().toLocaleString()
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sectorTitle);
+
+            const today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `${sectorTitle}_${today}.xlsx`);
+        }
+
+        async function saveSectorToDatabase() {
+            let activeList = currentGvSector === 'male' ? gvMaleList : (currentGvSector === 'female' ? gvFemaleList : gvUnknownList);
+            const validNumbers = activeList.map(item => item.phone).filter(p => p && p !== '-' && p.length >= 6);
+
+            if (validNumbers.length === 0) {
+                alert('No valid phone numbers found in this sector to save.');
+                return;
+            }
+
+            if (!confirm(`Do you want to save ${validNumbers.length} numbers from the ${currentGvSector.toUpperCase()} sector to the central database? Duplicates will be filtered automatically.`)) {
+                return;
+            }
+
+            const saveBtn = document.getElementById('gvSaveToDbBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'Saving...';
+
+            try {
+                const { data, error } = await supabaseClient.rpc('process_number_batch', {
+                    p_numbers: validNumbers,
+                    p_file_name: `Gender_${currentGvSector.toUpperCase()}_Verification`
+                });
+
+                if (error) throw error;
+
+                alert(`Successfully saved to database!\n\nTotal in sector: ${data.total_received}\nNew unique saved: +${data.new_inserted}\nDuplicates filtered: ${data.duplicates_count}`);
+            } catch (err) {
+                alert('Error saving to database: ' + err.message);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = '💾 Save to Central Database';
+            }
+        }
+
+    </script>
+</body>
+</html>
+
