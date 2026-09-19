@@ -357,9 +357,21 @@
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name Column (Required):</label>
                             <select id="columnNameSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
                         </div>
-                        <div>
+                        <div id="workerColAgeContainer">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Age Column (Optional):</label>
                             <select id="columnAgeSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+
+                    <!-- Auto Extra Columns for Lookup Report (Income & Market Value) -->
+                    <div id="lookupExtraCols" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                        <div>
+                            <label class="block text-xs font-bold text-purple-800 mb-1">💰 Household Income Column (গৃহস্থালি আয়):</label>
+                            <select id="columnIncomeSelector" class="w-full text-xs px-3 py-2 rounded border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-purple-800 mb-1">🏡 Est. Market Value Column (মার্কেট ভ্যালু):</label>
+                            <select id="columnMarketValueSelector" class="w-full text-xs px-3 py-2 rounded border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
                         </div>
                     </div>
 
@@ -465,6 +477,9 @@
                     </button>
                     <button id="tabAdminBatchesBtn" onclick="switchAdminTab('batches')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
                         📦 Batch File Upload Logs
+                    </button>
+                    <button id="tabAdminCompanyBtn" onclick="switchAdminTab('company')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
+                        🏢 Company Deliveries (কোম্পানিকে দেওয়া ডাটা) (<span id="companyDelivTotalBadge">0</span>)
                     </button>
                 </div>
 
@@ -586,6 +601,209 @@
                                 <tr><td colspan="7" class="py-6 text-center text-slate-400">No logs found.</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Admin Tab 4: Company Deliveries (Numbers Given to Company) -->
+                <div id="adminTabCompany" class="hidden p-4 sm:p-6 space-y-6">
+                    <!-- Banner -->
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 sm:p-5 rounded-2xl border border-indigo-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-indigo-600 text-white text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Company Handover Hub</span>
+                                <span class="text-xs text-slate-500 font-medium">Daily Outgoing Records</span>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">Company Delivery Tracker (কোম্পানিকে দেওয়া ডাটা ট্র্যাকার)</h3>
+                            <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                                প্রতিদিন কোম্পানিকে যেসব নাম্বার দিচ্ছেন তা ৩টি ক্যাটাগরিতে (Male, Female, Lookup) তারিখ অনুযায়ী আপলোড করে রাখুন। ডুপ্লিকেট নাম্বার স্বয়ংক্রিয়ভাবে ফিল্টার হয়ে যাবে।
+                            </p>
+                        </div>
+                        <button onclick="downloadCompanyDeliveriesExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition flex items-center space-x-2 flex-shrink-0 self-start md:self-auto">
+                            <span>📥 Export Company Excel (.xlsx)</span>
+                        </button>
+                    </div>
+
+                    <!-- Stat Cards for Company Deliveries -->
+                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Total Given</p>
+                            <p id="cdStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Total delivered</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Data</p>
+                            <p id="cdStatMale" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Delivered to company</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Data</p>
+                            <p id="cdStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Delivered to company</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Data</p>
+                            <p id="cdStatLookup" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Income & Market Val</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 lg:col-span-1">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Today's Given</p>
+                            <p id="cdStatToday" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Delivered today</p>
+                        </div>
+                    </div>
+
+                    <!-- Upload & Add Numbers to Company -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xl">📤</span>
+                                <h4 class="font-bold text-base text-slate-800">Add / Upload Numbers Given to Company (কোম্পানিকে দেওয়া নতুন ডাটা আপলোড)</h4>
+                            </div>
+                        </div>
+
+                        <!-- Form controls -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    📅 Delivery Date (ডেলিভারির তারিখ):
+                                </label>
+                                <input type="date" id="cdInputDate" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    📂 Data Category (ক্যাটাগরি - ৩টি আলাদা সেক্টর):
+                                </label>
+                                <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
+                                    <option value="male_data">👨 1. Male Data (পুরুষ ডাটা)</option>
+                                    <option value="female_data">👩 2. Female Data (মহিলা ডাটা)</option>
+                                    <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    🏢 Company / Client Name (কোম্পানির নাম):
+                                </label>
+                                <input type="text" id="cdInputCompany" placeholder="e.g. Primary Client" value="Company" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- Input Mode Tabs: Paste vs File -->
+                        <div class="flex border-b border-slate-200 mt-2">
+                            <button id="tabCdPasteBtn" onclick="switchCdInputMode('paste')" class="pb-2.5 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
+                                📋 Paste Text / Excel Data
+                            </button>
+                            <button id="tabCdFileBtn" onclick="switchCdInputMode('file')" class="pb-2.5 px-4 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
+                                📁 Upload XLSX File
+                            </button>
+                        </div>
+
+                        <!-- Mode 1: Paste Text -->
+                        <div id="cdPasteSection" class="space-y-2">
+                            <p id="cdPasteHint" class="text-xs text-slate-500">
+                                Enter or copy-paste rows (e.g. <span class="font-mono bg-slate-100 px-1 rounded">15136465609 Khayri 52</span>)
+                            </p>
+                            <textarea id="cdTextInput" rows="6" placeholder="Paste data here..." class="w-full px-4 py-3 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        </div>
+
+                        <!-- Mode 2: File Upload -->
+                        <div id="cdFileSection" class="hidden space-y-3">
+                            <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/30 rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('cdFileInput').click()">
+                                <input type="file" id="cdFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCdFileSelected(event)">
+                                <div class="text-3xl">📑</div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-700 mt-1">Select Excel file delivered to company</p>
+                                <p id="cdFileStatus" class="text-xs text-slate-400">XLSX, XLS or CSV</p>
+                            </div>
+                            <div id="cdColMapGrid" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Phone Column (Required):</label>
+                                    <select id="cdColPhone" class="w-full text-xs px-2.5 py-1.5 rounded border border-slate-300 bg-white font-medium"></select>
+                                </div>
+                                <div id="cdColNameContainer">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Full Name Column:</label>
+                                    <select id="cdColName" class="w-full text-xs px-2.5 py-1.5 rounded border border-slate-300 bg-white font-medium"></select>
+                                </div>
+                                <div id="cdColAgeContainer">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Age Column:</label>
+                                    <select id="cdColAge" class="w-full text-xs px-2.5 py-1.5 rounded border border-slate-300 bg-white font-medium"></select>
+                                </div>
+                                <div id="cdColIncomeContainer" class="hidden">
+                                    <label class="block text-xs font-bold text-purple-700 mb-1">💰 Household Income Column:</label>
+                                    <select id="cdColIncome" class="w-full text-xs px-2.5 py-1.5 rounded border border-purple-300 bg-white font-medium"></select>
+                                </div>
+                                <div id="cdColMarketContainer" class="hidden">
+                                    <label class="block text-xs font-bold text-purple-700 mb-1">🏡 Est. Market Value Column:</label>
+                                    <select id="cdColMarket" class="w-full text-xs px-2.5 py-1.5 rounded border border-purple-300 bg-white font-medium"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Card -->
+                        <div id="cdResultCard" class="hidden p-4 rounded-xl border text-xs font-medium"></div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                            <div class="text-xs text-slate-400">
+                                ⚡ ডুপ্লিকেট ফোন নাম্বার নিজে থেকেই বাদ পড়ে যাবে (Automatic deduplication).
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="clearCdForm()" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition">
+                                    🧹 Clear
+                                </button>
+                                <button type="button" id="cdSubmitBtn" onclick="submitCompanyDelivery()" class="px-6 py-2 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow transition flex items-center space-x-1.5">
+                                    <span>📤 Save & Record Company Delivery</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date-Wise Delivery History Table & Search -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <div>
+                                    <label class="text-xs font-bold text-slate-700 block mb-1">📅 Filter by Delivery Date:</label>
+                                    <div class="flex items-center space-x-1">
+                                        <input type="date" id="cdFilterDate" onchange="loadCompanyDeliveriesData()" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold bg-white">
+                                        <button type="button" onclick="clearCdDateFilter()" class="text-xs text-indigo-600 hover:text-indigo-800 underline px-1">All Dates</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-slate-700 block mb-1">📂 Category:</label>
+                                    <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
+                                        <option value="all">All Categories (সবগুলো)</option>
+                                        <option value="male_data">👨 Male Data</option>
+                                        <option value="female_data">👩 Female Data</option>
+                                        <option value="lookup_data">🔍 Lookup Data</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-slate-700 block mb-1">🔍 Search Number / Name / Income:</label>
+                                    <input type="text" id="cdFilterSearch" oninput="filterCompanyDeliveriesLocal()" placeholder="Type number, income, name..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium">
+                                </div>
+                            </div>
+                            <button onclick="downloadCompanyDeliveriesExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                                <span>📥 Download Filtered Company Sheet (.xlsx)</span>
+                            </button>
+                        </div>
+
+                        <!-- Delivery Table -->
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-sm min-w-[750px]">
+                                <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                                    <tr>
+                                        <th class="py-3 px-4">#</th>
+                                        <th class="py-3 px-4">Delivery Date</th>
+                                        <th class="py-3 px-4">Category</th>
+                                        <th class="py-3 px-4">Phone Number</th>
+                                        <th class="py-3 px-4">Details (Name / Age / Income / Market Value)</th>
+                                        <th class="py-3 px-4">Company</th>
+                                        <th class="py-3 px-4 text-right">Delivered Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cdTableBody" class="divide-y divide-slate-100">
+                                    <tr><td colspan="7" class="py-6 text-center text-slate-400">Loading delivery records...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1633,111 +1851,36 @@
             const btnUsers = document.getElementById('tabAdminUsersBtn');
             const btnSubs = document.getElementById('tabAdminSubmissionsBtn');
             const btnBatches = document.getElementById('tabAdminBatchesBtn');
+            const btnCompany = document.getElementById('tabAdminCompanyBtn');
 
             const tabUsers = document.getElementById('adminTabUsers');
             const tabSubs = document.getElementById('adminTabSubmissions');
             const tabBatches = document.getElementById('adminTabBatches');
+            const tabCompany = document.getElementById('adminTabCompany');
 
-            [btnUsers, btnSubs, btnBatches].forEach(b => {
-                b.className = 'pb-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition whitespace-nowrap';
+            [btnUsers, btnSubs, btnBatches, btnCompany].forEach(b => {
+                if (b) b.className = 'pb-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition whitespace-nowrap';
             });
-            [tabUsers, tabSubs, tabBatches].forEach(t => t.classList.add('hidden'));
+            [tabUsers, tabSubs, tabBatches, tabCompany].forEach(t => {
+                if (t) t.classList.add('hidden');
+            });
 
             if (tab === 'submissions') {
-                btnSubs.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
-                tabSubs.classList.remove('hidden');
+                if (btnSubs) btnSubs.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (tabSubs) tabSubs.classList.remove('hidden');
                 loadAdminSubmissionsData();
             } else if (tab === 'users') {
-                btnUsers.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
-                tabUsers.classList.remove('hidden');
-            } else if (tab === 'batches') {
-                btnBatches.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
-                tabBatches.classList.remove('hidden');
-            }
-        }
-
-        async function loadAdminDashboard() {
-            if (!supabaseClient) return;
-
-            try {
-                // Stats across report types
-                const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
-                const { count: maleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report');
-                const { count: femaleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report');
-                const { count: lookupCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report');
-
-                const todayStart = new Date();
-                todayStart.setHours(0,0,0,0);
-                const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
-
-                document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
-                document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
-                document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
-                document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
-                document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
-            } catch (err) {
-                console.error('Error loading stats:', err);
-            }
-
-            try {
-                // Load profiles & logs
-                const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
-                const { data: logs } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
-                adminLogsCache = logs || [];
-
-                const userMap = {};
-                userEmailToNameMap = {};
-                if (profiles) {
-                    profiles.forEach(p => {
-                        const uname = p.username || p.email.split('@')[0];
-                        userEmailToNameMap[p.email] = uname;
-                        userMap[p.id] = {
-                            id: p.id,
-                            email: p.email,
-                            username: uname,
-                            department: p.department,
-                            role: p.role,
-                            todayAdded: 0,
-                            totalContributed: 0
-                        };
-                    });
-                }
-
-                if (logs) {
-                    const todayStart = new Date();
-                    todayStart.setHours(0,0,0,0);
-                    const todayIso = todayStart.toISOString();
-                    logs.forEach(l => {
-                        if (userMap[l.user_id]) {
-                            userMap[l.user_id].totalContributed += l.new_inserted;
-                            if (l.created_at >= todayIso) {
-                                userMap[l.user_id].todayAdded += l.new_inserted;
-                            }
-                        }
-                    });
-                }
-
-                adminUsersCache = Object.values(userMap);
-                document.getElementById('userTabCount').innerText = adminUsersCache.length;
-
-                const workerSelect = document.getElementById('adminSubWorkerFilter');
-                if (workerSelect) {
-                    workerSelect.innerHTML = '<option value="all">All Workers</option>';
-                    adminUsersCache.forEach(u => {
-                        workerSelect.innerHTML += `<option value="${u.email}">👤 ${u.username} (${u.email})</option>`;
-                    });
-                }
-
+                if (btnUsers) btnUsers.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (tabUsers) tabUsers.classList.remove('hidden');
                 renderAdminUserTable();
+            } else if (tab === 'batches') {
+                if (btnBatches) btnBatches.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (tabBatches) tabBatches.classList.remove('hidden');
                 renderAdminLogsTable();
-            } catch (err) {
-                console.error('Error loading profiles or logs:', err);
-            }
-
-            try {
-                await loadAdminSubmissionsData();
-            } catch (err) {
-                console.error('Error loading submissions:', err);
+            } else if (tab === 'company') {
+                if (btnCompany) btnCompany.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (tabCompany) tabCompany.classList.remove('hidden');
+                loadCompanyDeliveriesData();
             }
         }
 
@@ -3244,6 +3387,504 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             if (tableBody) {
                 tableBody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-400">Run check to view results.</td></tr>';
             }
+        }
+
+
+        // ==================== COMPANY DELIVERIES HUB LOGIC ====================
+        let cdDeliveriesCache = [];
+        let cdParsedRows = [];
+        let cdSelectedFile = null;
+        let currentCdInputMode = 'paste';
+
+        function switchCdInputMode(mode) {
+            currentCdInputMode = mode;
+            const btnPaste = document.getElementById('tabCdPasteBtn');
+            const btnFile = document.getElementById('tabCdFileBtn');
+            const pasteSec = document.getElementById('cdPasteSection');
+            const fileSec = document.getElementById('cdFileSection');
+
+            if (mode === 'paste') {
+                btnPaste.className = 'pb-2.5 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                btnFile.className = 'pb-2.5 px-4 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                pasteSec.classList.remove('hidden');
+                fileSec.classList.add('hidden');
+            } else {
+                btnFile.className = 'pb-2.5 px-4 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
+                btnPaste.className = 'pb-2.5 px-4 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+                fileSec.classList.remove('hidden');
+                pasteSec.classList.add('hidden');
+            }
+        }
+
+        function onCdCategoryChanged() {
+            const cat = document.getElementById('cdInputCategory')?.value || 'male_data';
+            const hint = document.getElementById('cdPasteHint');
+            const nameContainer = document.getElementById('cdColNameContainer');
+            const ageContainer = document.getElementById('cdColAgeContainer');
+            const incomeContainer = document.getElementById('cdColIncomeContainer');
+            const marketContainer = document.getElementById('cdColMarketContainer');
+
+            if (cat === 'lookup_data') {
+                if (hint) hint.innerHTML = 'Enter or paste: <span class="font-mono bg-purple-50 text-purple-900 px-1 rounded font-bold">Phone [tab/space] Household Income [tab/space] Est Market Value</span> (e.g. 15136465609 $85,000 $320,000)';
+                if (incomeContainer) incomeContainer.classList.remove('hidden');
+                if (marketContainer) marketContainer.classList.remove('hidden');
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+            } else {
+                if (hint) hint.innerHTML = `Enter or paste rows for ${cat === 'male_data' ? 'Male' : 'Female'} Data: <span class="font-mono bg-slate-100 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            }
+        }
+
+        function handleCdFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            cdSelectedFile = file;
+            document.getElementById('cdFileStatus').innerText = `Selected: ${file.name}`;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    cdParsedRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+                    if (!cdParsedRows || cdParsedRows.length === 0) {
+                        alert('Uploaded sheet contains no data rows.');
+                        return;
+                    }
+
+                    document.getElementById('cdFileStatus').innerText = `${file.name} (${cdParsedRows.length} rows loaded)`;
+
+                    const columns = Object.keys(cdParsedRows[0]);
+                    const colPhone = document.getElementById('cdColPhone');
+                    const colName = document.getElementById('cdColName');
+                    const colAge = document.getElementById('cdColAge');
+                    const colIncome = document.getElementById('cdColIncome');
+                    const colMarket = document.getElementById('cdColMarket');
+
+                    colPhone.innerHTML = '';
+                    colName.innerHTML = '<option value="">-- None / Empty --</option>';
+                    colAge.innerHTML = '<option value="">-- None / Empty --</option>';
+                    colIncome.innerHTML = '<option value="">-- None / Empty --</option>';
+                    colMarket.innerHTML = '<option value="">-- None / Empty --</option>';
+
+                    let phoneSet = false, nameSet = false, ageSet = false, incSet = false, mktSet = false;
+
+                    columns.forEach(col => {
+                        const lower = col.toLowerCase();
+
+                        const optP = document.createElement('option');
+                        optP.value = col; optP.innerText = col;
+                        if (!phoneSet && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact'))) {
+                            optP.selected = true; phoneSet = true;
+                        }
+                        colPhone.appendChild(optP);
+
+                        const optN = document.createElement('option');
+                        optN.value = col; optN.innerText = col;
+                        if (!nameSet && (lower.includes('name') || lower.includes('full') || lower.includes('client'))) {
+                            optN.selected = true; nameSet = true;
+                        }
+                        colName.appendChild(optN);
+
+                        const optA = document.createElement('option');
+                        optA.value = col; optA.innerText = col;
+                        if (!ageSet && (lower.includes('age') || lower.includes('dob') || lower.includes('year'))) {
+                            optA.selected = true; ageSet = true;
+                        }
+                        colAge.appendChild(optA);
+
+                        const optI = document.createElement('option');
+                        optI.value = col; optI.innerText = col;
+                        if (!incSet && (lower.includes('income') || lower.includes('hhi') || lower.includes('salary'))) {
+                            optI.selected = true; incSet = true;
+                        }
+                        colIncome.appendChild(optI);
+
+                        const optM = document.createElement('option');
+                        optM.value = col; optM.innerText = col;
+                        if (!mktSet && (lower.includes('market') || lower.includes('value') || lower.includes('home') || lower.includes('property'))) {
+                            optM.selected = true; mktSet = true;
+                        }
+                        colMarket.appendChild(optM);
+                    });
+
+                    document.getElementById('cdColMapGrid').classList.remove('hidden');
+                    onCdCategoryChanged();
+
+                } catch (err) {
+                    alert('Error reading Excel file: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function submitCompanyDelivery() {
+            const dateInput = document.getElementById('cdInputDate');
+            const deliveryDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().slice(0, 10);
+            const category = document.getElementById('cdInputCategory')?.value || 'male_data';
+            const companyName = document.getElementById('cdInputCompany')?.value.trim() || 'Company';
+            const btn = document.getElementById('cdSubmitBtn');
+            const resultCard = document.getElementById('cdResultCard');
+
+            let records = [];
+
+            if (currentCdInputMode === 'paste') {
+                const text = document.getElementById('cdTextInput')?.value.trim();
+                if (!text) {
+                    alert('Please paste numbers and data to upload.');
+                    return;
+                }
+                const lines = text.split(/\r?\n/);
+                lines.forEach(line => {
+                    const cleanLine = line.trim();
+                    if (!cleanLine) return;
+
+                    if (category === 'lookup_data') {
+                        // Check tab or comma or multiple spaces
+                        const parts = cleanLine.split(/\t|,|\s{2,}/);
+                        if (parts.length >= 2) {
+                            const p = parts[0].replace(/[\s\-\(\)\.]/g, '');
+                            const inc = parts[1] ? parts[1].trim() : '';
+                            const mkt = parts[2] ? parts[2].trim() : '';
+                            if (p.length >= 6) {
+                                records.push({ phone: p, income: inc, market_value: mkt });
+                            }
+                        } else {
+                            const spaceParts = cleanLine.split(/\s+/);
+                            const p = spaceParts[0].replace(/[\s\-\(\)\.]/g, '');
+                            if (p.length >= 6) {
+                                records.push({
+                                    phone: p,
+                                    income: spaceParts[1] || '',
+                                    market_value: spaceParts[2] || ''
+                                });
+                            }
+                        }
+                    } else {
+                        // Male or female data
+                        const parts = cleanLine.split(/\t|,|\s{2,}/);
+                        if (parts.length >= 2) {
+                            const p = parts[0].replace(/[\s\-\(\)\.]/g, '');
+                            const name = parts[1] ? parts[1].trim() : '';
+                            const age = parts[2] ? parts[2].trim() : '';
+                            if (p.length >= 6) records.push({ phone: p, name: name, age: age });
+                        } else {
+                            const spaceParts = cleanLine.split(/\s+/);
+                            const p = spaceParts[0].replace(/[\s\-\(\)\.]/g, '');
+                            if (p.length >= 6) {
+                                records.push({
+                                    phone: p,
+                                    name: spaceParts.slice(1, spaceParts.length - 1).join(' ') || spaceParts[1] || '',
+                                    age: spaceParts.length > 2 ? spaceParts[spaceParts.length - 1] : ''
+                                });
+                            }
+                        }
+                    }
+                });
+            } else {
+                // File upload mode
+                if (!cdParsedRows || cdParsedRows.length === 0) {
+                    alert('Please select an Excel file first.');
+                    return;
+                }
+                const phoneCol = document.getElementById('cdColPhone')?.value;
+                const nameCol = document.getElementById('cdColName')?.value;
+                const ageCol = document.getElementById('cdColAge')?.value;
+                const incCol = document.getElementById('cdColIncome')?.value;
+                const mktCol = document.getElementById('cdColMarket')?.value;
+
+                cdParsedRows.forEach(row => {
+                    const rawPhone = String(row[phoneCol] || '').trim().replace(/[\s\-\(\)\.]/g, '');
+                    if (rawPhone.length >= 6) {
+                        records.push({
+                            phone: rawPhone,
+                            name: nameCol ? String(row[nameCol] || '').trim() : '',
+                            age: ageCol ? String(row[ageCol] || '').trim() : '',
+                            income: incCol ? String(row[incCol] || '').trim() : '',
+                            market_value: mktCol ? String(row[mktCol] || '').trim() : ''
+                        });
+                    }
+                });
+            }
+
+            if (records.length === 0) {
+                alert('No valid phone numbers found in input.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>Processing Delivery...</span>';
+
+            try {
+                // Try calling RPC with automatic deduplication
+                let result = null;
+                try {
+                    const { data, error } = await supabaseClient.rpc('admin_upload_company_delivery', {
+                        p_records: records,
+                        p_category: category,
+                        p_delivery_date: deliveryDate,
+                        p_company_name: companyName,
+                        p_batch_name: `Batch_${deliveryDate}`
+                    });
+                    if (error) throw error;
+                    result = data;
+                } catch (rpcErr) {
+                    // Fallback to direct insert with deduplication
+                    const dedupMap = new Map();
+                    records.forEach(r => {
+                        if (!dedupMap.has(r.phone)) dedupMap.set(r.phone, r);
+                    });
+                    const uniqueRecords = Array.from(dedupMap.values());
+                    const rowsToInsert = uniqueRecords.map(r => ({
+                        delivery_date: deliveryDate,
+                        category: category,
+                        phone_number: r.phone,
+                        full_name: r.name || '',
+                        age: r.age || '',
+                        household_income: r.income || '',
+                        est_market_value: r.market_value || '',
+                        company_name: companyName,
+                        batch_name: `Batch_${deliveryDate}`
+                    }));
+
+                    const { data: insertedData, error: insErr } = await supabaseClient
+                        .from('company_deliveries')
+                        .upsert(rowsToInsert, { onConflict: 'phone_number', ignoreDuplicates: true })
+                        .select('phone_number');
+
+                    const newCount = insertedData ? insertedData.length : uniqueRecords.length;
+                    result = {
+                        success: true,
+                        total_received: records.length,
+                        unique_in_file: uniqueRecords.length,
+                        new_inserted: newCount,
+                        duplicates_count: records.length - newCount
+                    };
+                }
+
+                const catLabel = category === 'male_data' ? '👨 Male Data' : (category === 'female_data' ? '👩 Female Data' : '🔍 Lookup Data');
+
+                resultCard.className = 'p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900 block';
+                resultCard.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">✅</span>
+                        <h5 class="font-bold text-sm text-emerald-800">Company Delivery Recorded for ${deliveryDate} (${catLabel})</h5>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1">সব ডুপ্লিকেট নাম্বার স্বয়ংক্রিয়ভাবে বাদ দেওয়া হয়েছে এবং নতুন নাম্বারগুলো ডাটাবেজে সংরক্ষিত হয়েছে।</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3 text-xs">
+                        <div class="bg-white p-2.5 rounded-lg border border-emerald-100">
+                            <span class="text-slate-500 block">Total Received</span>
+                            <span class="text-base font-bold text-slate-800">${result.total_received}</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-emerald-100">
+                            <span class="text-slate-500 block">Unique in File</span>
+                            <span class="text-base font-bold text-slate-800">${result.unique_in_file}</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-emerald-200">
+                            <span class="text-emerald-700 block font-semibold">New Unique to Company</span>
+                            <span class="text-lg font-extrabold text-emerald-600">+${result.new_inserted}</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-200">
+                            <span class="text-amber-700 block font-semibold">Duplicates Filtered</span>
+                            <span class="text-lg font-extrabold text-amber-600">${result.duplicates_count}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Reload company table & stats
+                await loadCompanyDeliveriesData();
+
+            } catch (err) {
+                resultCard.className = 'p-4 rounded-xl border bg-red-50 border-red-200 text-red-800 block';
+                resultCard.innerText = 'Failed to record company delivery: ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
+            }
+        }
+
+        async function loadCompanyDeliveriesData() {
+            if (!supabaseClient) return;
+
+            const dateFilter = document.getElementById('cdFilterDate')?.value || '';
+            const catFilter = document.getElementById('cdFilterCategory')?.value || 'all';
+
+            // 1. Calculate overall stats
+            try {
+                const { count: totalDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true });
+                const { count: maleDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'male_data');
+                const { count: femaleDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data');
+                const { count: lookupDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data');
+
+                const todayStr = new Date().toISOString().slice(0, 10);
+                const { count: todayDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayStr);
+
+                const elTotal = document.getElementById('cdStatTotal');
+                const elMale = document.getElementById('cdStatMale');
+                const elFemale = document.getElementById('cdStatFemale');
+                const elLookup = document.getElementById('cdStatLookup');
+                const elToday = document.getElementById('cdStatToday');
+                const badgeTotal = document.getElementById('companyDelivTotalBadge');
+
+                if (elTotal) elTotal.innerText = (totalDeliv || 0).toLocaleString();
+                if (elMale) elMale.innerText = (maleDeliv || 0).toLocaleString();
+                if (elFemale) elFemale.innerText = (femaleDeliv || 0).toLocaleString();
+                if (elLookup) elLookup.innerText = (lookupDeliv || 0).toLocaleString();
+                if (elToday) elToday.innerText = (todayDeliv || 0).toLocaleString();
+                if (badgeTotal) badgeTotal.innerText = (totalDeliv || 0).toLocaleString();
+            } catch (statErr) {
+                console.warn('Company stats note:', statErr);
+            }
+
+            // 2. Fetch rows for table
+            const tableBody = document.getElementById('cdTableBody');
+            if (tableBody) tableBody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-400">Loading delivery records...</td></tr>';
+
+            try {
+                let query = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).limit(500);
+                if (dateFilter) query = query.eq('delivery_date', dateFilter);
+                if (catFilter !== 'all') query = query.eq('category', catFilter);
+
+                const { data, error } = await query;
+                if (error) {
+                    if (tableBody) {
+                        tableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-amber-600">
+                            ⚠️ Notice: ${error.message}
+                            <br><span class="text-xs text-slate-500">Please make sure to run the latest SQL update in your Supabase SQL Editor.</span>
+                        </td></tr>`;
+                    }
+                    return;
+                }
+
+                cdDeliveriesCache = data || [];
+                filterCompanyDeliveriesLocal();
+
+            } catch (err) {
+                if (tableBody) tableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function filterCompanyDeliveriesLocal() {
+            const tableBody = document.getElementById('cdTableBody');
+            if (!tableBody) return;
+
+            const search = (document.getElementById('cdFilterSearch')?.value || '').trim().toLowerCase();
+
+            let list = cdDeliveriesCache;
+            if (search) {
+                list = list.filter(item => {
+                    const phone = (item.phone_number || '');
+                    const name = (item.full_name || '').toLowerCase();
+                    const inc = (item.household_income || '').toLowerCase();
+                    const mkt = (item.est_market_value || '').toLowerCase();
+                    const comp = (item.company_name || '').toLowerCase();
+                    const ddate = (item.delivery_date || '');
+                    return phone.includes(search) || name.includes(search) || inc.includes(search) || mkt.includes(search) || comp.includes(search) || ddate.includes(search);
+                });
+            }
+
+            if (list.length > 0) {
+                tableBody.innerHTML = list.map((item, idx) => {
+                    const timeStr = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    let catBadge = '';
+                    if (item.category === 'male_data') {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Data</span>';
+                    } else if (item.category === 'female_data') {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Data</span>';
+                    } else {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Data</span>';
+                    }
+
+                    let detailHtml = '';
+                    if (item.category === 'lookup_data') {
+                        detailHtml = `
+                            <div class="space-y-0.5">
+                                ${item.household_income ? `<div class="text-xs font-bold text-emerald-700">💰 Income: ${item.household_income}</div>` : ''}
+                                ${item.est_market_value ? `<div class="text-xs font-bold text-purple-700">🏡 Market Val: ${item.est_market_value}</div>` : ''}
+                                ${!item.household_income && !item.est_market_value ? '<span class="text-slate-400">-</span>' : ''}
+                            </div>
+                        `;
+                    } else {
+                        detailHtml = `
+                            <div>
+                                <span class="font-bold text-slate-800">${item.full_name || '-'}</span>
+                                ${item.age ? `<span class="text-slate-500 text-xs ml-1">(${item.age} yrs)</span>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <tr class="hover:bg-slate-50 text-xs">
+                            <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
+                            <td class="py-3 px-4 font-bold text-slate-700 font-mono">${item.delivery_date}</td>
+                            <td class="py-3 px-4">${catBadge}</td>
+                            <td class="py-3 px-4 font-mono font-bold text-indigo-700 text-sm">${item.phone_number}</td>
+                            <td class="py-3 px-4">${detailHtml}</td>
+                            <td class="py-3 px-4 font-medium text-slate-600">${item.company_name || 'Company'}</td>
+                            <td class="py-3 px-4 text-right text-slate-400 font-mono">${timeStr}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-400">No company delivery records found for this selection.</td></tr>';
+            }
+        }
+
+        function downloadCompanyDeliveriesExcel() {
+            const list = cdDeliveriesCache;
+            if (!list || list.length === 0) {
+                alert('No delivery records to download.');
+                return;
+            }
+
+            const exportRows = list.map((item, idx) => ({
+                'SL': idx + 1,
+                'Delivery Date': item.delivery_date,
+                'Category': item.category === 'male_data' ? 'Male Data' : (item.category === 'female_data' ? 'Female Data' : 'Lookup Data'),
+                'Phone Number': item.phone_number,
+                'Full Name': item.full_name || '-',
+                'Age': item.age || '-',
+                'Household Income': item.household_income || '-',
+                'Est Market Value': item.est_market_value || '-',
+                'Company': item.company_name || 'Company',
+                'Recorded Time': new Date(item.created_at).toLocaleString()
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Company_Deliveries');
+            const dateVal = document.getElementById('cdFilterDate')?.value || new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `Company_Delivery_Export_${dateVal}.xlsx`);
+        }
+
+        function clearCdForm() {
+            const textInput = document.getElementById('cdTextInput');
+            const fileInput = document.getElementById('cdFileInput');
+            const resultCard = document.getElementById('cdResultCard');
+            const colMap = document.getElementById('cdColMapGrid');
+            const fileStatus = document.getElementById('cdFileStatus');
+
+            if (textInput) textInput.value = '';
+            if (fileInput) fileInput.value = '';
+            if (resultCard) resultCard.classList.add('hidden');
+            if (colMap) colMap.classList.add('hidden');
+            if (fileStatus) fileStatus.innerText = 'XLSX, XLS or CSV';
+
+            cdParsedRows = [];
+            cdSelectedFile = null;
+        }
+
+        function clearCdDateFilter() {
+            const dateFilter = document.getElementById('cdFilterDate');
+            if (dateFilter) dateFilter.value = '';
+            loadCompanyDeliveriesData();
         }
 
     </script>
