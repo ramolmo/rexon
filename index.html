@@ -615,9 +615,15 @@
 
                 <div id="gvPasteSection" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">
-                            Paste Rows of Names, Numbers & Optional Age (One per line)
-                        </label>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-bold text-slate-600 uppercase">
+                                Paste Rows of Names, Numbers & Optional Age (One per line)
+                            </label>
+                            <button type="button" onclick="clearGenderVerifyForm()" class="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-md font-bold transition flex items-center space-x-1 border border-rose-200" title="এক ক্লিকে সব লেখা ও রেজাল্ট মুছে নতুন করে শুরু করুন">
+                                <span>🧹</span>
+                                <span>Clear / নতুন শুরু</span>
+                            </button>
+                        </div>
                         <p class="text-xs text-slate-400 mb-2">
                             Copy-paste columns directly from Excel or enter e.g.: <span class="font-mono bg-slate-100 px-1 rounded">15136465609 Khayri Khalimov 52</span>
                         </p>
@@ -650,16 +656,21 @@
                     </div>
                 </div>
 
-                <div class="mt-6 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="w-full sm:w-2/3">
+                <div class="mt-6 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                    <div class="w-full sm:w-1/2">
                         <div id="gvProgressContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
                             <div id="gvProgressBar" class="bg-pink-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
                         </div>
                         <span id="gvStatusText" class="text-xs text-slate-500 block mt-1"></span>
                     </div>
-                    <button id="gvStartBtn" onclick="startGenderVerification()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition flex items-center justify-center space-x-2">
-                        <span>⚡ Verify Genders Now</span>
-                    </button>
+                    <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                        <button type="button" onclick="clearGenderVerifyForm()" class="w-1/2 sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-lg border border-slate-300 transition flex items-center justify-center space-x-1.5" title="Clear all text and reset results">
+                            <span>🧹 Clear (মুছে ফেলুন)</span>
+                        </button>
+                        <button id="gvStartBtn" onclick="startGenderVerification()" class="w-1/2 sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow transition flex items-center justify-center space-x-2">
+                            <span>⚡ Verify Genders Now</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -768,9 +779,15 @@
 
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">
-                        Paste Phone Numbers or Upload Sheet
-                    </label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-slate-600 uppercase">
+                            Paste Phone Numbers or Upload Sheet
+                        </label>
+                        <button type="button" onclick="clearDuplicateCheckForm()" class="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-md font-bold transition flex items-center space-x-1 border border-rose-200" title="এক ক্লিকে সব নাম্বার ও রেজাল্ট মুছে নতুন করে শুরু করুন">
+                            <span>🧹</span>
+                            <span>Clear / নতুন শুরু</span>
+                        </button>
+                    </div>
                     <textarea id="dupTextInput" rows="6" placeholder="+1234567890&#10;+1987654321&#10;1234567890" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                 </div>
 
@@ -781,9 +798,14 @@
                             <span>Cross-check against Central Database (Find numbers already submitted)</span>
                         </label>
                     </div>
-                    <button onclick="runDuplicateCheck()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition flex items-center space-x-2">
-                        <span>🔍 Run Duplicate Check</span>
-                    </button>
+                    <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                        <button type="button" onclick="clearDuplicateCheckForm()" class="w-1/2 sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-lg border border-slate-300 transition flex items-center justify-center space-x-1.5" title="Clear all text and reset results">
+                            <span>🧹 Clear (মুছে ফেলুন)</span>
+                        </button>
+                        <button onclick="runDuplicateCheck()" class="w-1/2 sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow transition flex items-center justify-center space-x-2">
+                            <span>🔍 Run Duplicate Check</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -3140,6 +3162,87 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 msgBox.innerText = 'Failed to reset data: ' + err.message;
                 btn.disabled = false;
                 btn.innerHTML = '<span>🗑️ Confirm & Delete Data</span>';
+            }
+        }
+
+
+        // ==================== 1-CLICK FORM CLEAR & RESET FUNCTIONS ====================
+        function clearGenderVerifyForm() {
+            const textInput = document.getElementById('gvTextInput');
+            const fileInput = document.getElementById('gvXlsxFileInput');
+            const colMap = document.getElementById('gvFileColumnMap');
+            const resultsSec = document.getElementById('gvResultsSection');
+            const progressContainer = document.getElementById('gvProgressContainer');
+            const statusText = document.getElementById('gvStatusText');
+
+            if (textInput) textInput.value = '';
+            if (fileInput) fileInput.value = '';
+            if (colMap) colMap.classList.add('hidden');
+            if (resultsSec) resultsSec.classList.add('hidden');
+            if (progressContainer) progressContainer.classList.add('hidden');
+            if (statusText) statusText.innerText = '';
+
+            gvDataList = [];
+            gvMaleList = [];
+            gvFemaleList = [];
+            gvUnknownList = [];
+            if (window.selectedUndeterminedIds) selectedUndeterminedIds.clear();
+
+            const statTotal = document.getElementById('gvStatTotal');
+            const statMale = document.getElementById('gvStatMale');
+            const statFemale = document.getElementById('gvStatFemale');
+            const statUnknown = document.getElementById('gvStatUnknown');
+            const badgeMale = document.getElementById('badgeMaleCount');
+            const badgeFemale = document.getElementById('badgeFemaleCount');
+            const badgeUnknown = document.getElementById('badgeUnknownCount');
+
+            if (statTotal) statTotal.innerText = '0';
+            if (statMale) statMale.innerText = '0';
+            if (statFemale) statFemale.innerText = '0';
+            if (statUnknown) statUnknown.innerText = '0';
+            if (badgeMale) badgeMale.innerText = '0';
+            if (badgeFemale) badgeFemale.innerText = '0';
+            if (badgeUnknown) badgeUnknown.innerText = '0';
+
+            const tableBody = document.getElementById('gvSectorTableBody');
+            if (tableBody) tableBody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400">No records to display.</td></tr>';
+
+            if (textInput) textInput.focus();
+        }
+
+        function clearDuplicateCheckForm() {
+            const textInput = document.getElementById('dupTextInput');
+            const resultsCard = document.getElementById('dupResultsCard');
+
+            if (textInput) {
+                textInput.value = '';
+                textInput.focus();
+            }
+            if (resultsCard) resultsCard.classList.add('hidden');
+
+            dupCleanList = [];
+            dupRepeatedList = [];
+            dupDbMatchesList = [];
+
+            const dTotal = document.getElementById('dupStatTotal');
+            const dUnique = document.getElementById('dupStatUnique');
+            const dFile = document.getElementById('dupStatFileDups');
+            const dDb = document.getElementById('dupStatDbDups');
+            const cClean = document.getElementById('dupCountClean');
+            const cRepeated = document.getElementById('dupCountRepeated');
+            const cDb = document.getElementById('dupCountDb');
+
+            if (dTotal) dTotal.innerText = '0';
+            if (dUnique) dUnique.innerText = '0';
+            if (dFile) dFile.innerText = '0';
+            if (dDb) dDb.innerText = '0';
+            if (cClean) cClean.innerText = '0';
+            if (cRepeated) cRepeated.innerText = '0';
+            if (cDb) cDb.innerText = '0';
+
+            const tableBody = document.getElementById('dupTableBody');
+            if (tableBody) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-400">Run check to view results.</td></tr>';
             }
         }
 
