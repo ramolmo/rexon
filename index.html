@@ -412,11 +412,14 @@
                     <h2 class="text-2xl font-bold text-slate-800 mt-1">Master Control & Team Operations</h2>
                     <p class="text-sm text-slate-500">All submitted files and numbers (Phone, Name, Age) are stored centrally. View live, manage departments, and export consolidated Excel sheets.</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow flex items-center space-x-2 transition">
-                        <span>📥 Download Master Excel (All Data)</span>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Download all consolidated data across workers">
+                        <span>📥 Download Master Excel</span>
                     </button>
-                    <button onclick="refreshAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-lg border border-slate-300 transition">
+                    <button onclick="openResetDataModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Clear/delete previous data to start fresh daily data">
+                        <span>🗑️ Reset / Delete Data</span>
+                    </button>
+                    <button onclick="refreshAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-300 transition">
                         🔄 Refresh
                     </button>
                 </div>
@@ -470,6 +473,15 @@
                     <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                         <div class="flex flex-wrap items-center gap-3">
                             <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">📅 Record Date (তারিখ):</label>
+                                <div class="flex items-center space-x-1">
+                                    <input type="date" id="adminSubDateFilter" onchange="loadAdminSubmissionsData()" class="px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
+                                    <button type="button" onclick="clearAdminSubDateFilter()" class="text-xs text-indigo-600 hover:text-indigo-800 underline px-1" title="Show all dates">
+                                        All
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
                                 <label class="text-xs font-semibold text-slate-600 block mb-1">Report Type:</label>
                                 <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                     <option value="all">All Report Types</option>
@@ -485,13 +497,18 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-slate-600 block mb-1">Search (Phone or Name):</label>
-                                <input type="text" id="adminSubSearchInput" oninput="filterAdminSubmissionsLocal()" placeholder="Type number or name..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Search (Phone / Name / Worker):</label>
+                                <input type="text" id="adminSubSearchInput" oninput="filterAdminSubmissionsLocal()" placeholder="Type number, name, worker..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
                             </div>
                         </div>
-                        <button onclick="downloadFilteredSubmissionsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
-                            <span>📥 Download Filtered Data (.xlsx)</span>
-                        </button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="downloadDateFilteredExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition" title="Export dated Excel file for the selected date">
+                                <span>📥 Export Date Record (.xlsx)</span>
+                            </button>
+                            <button onclick="downloadFilteredSubmissionsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                                <span>📥 Download All Filtered (.xlsx)</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -864,6 +881,100 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+        <!-- Modal: Reset / Delete Previous Data -->
+    <div id="resetDataModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🗑️</span>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Reset & Delete Previous Data</h3>
+                        <p class="text-xs text-slate-500">পূর্বের ডাটা মুছে ফেলে প্রতিদিন নতুন করে ডাটা শুরু করুন</p>
+                    </div>
+                </div>
+                <button onclick="closeResetDataModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-600">
+                <!-- Option Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">
+                        মুছার ধরণ নির্বাচন করুন (Select Deletion Scope):
+                    </label>
+                    <div class="space-y-2">
+                        <label class="flex items-start space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-rose-300 cursor-pointer">
+                            <input type="radio" name="deleteScope" value="all" checked class="mt-0.5 w-4 h-4 text-rose-600" onchange="toggleDateInputVisibility()">
+                            <div>
+                                <span class="font-bold text-slate-800 block text-xs">🔴 পূর্বের সমস্ত ডাটা মুছে ফেলুন (Delete All Previous Data)</span>
+                                <span class="text-slate-500 text-[11px]">ডাটাবেজের সব ফোন নম্বর খালি হয়ে যাবে এবং কাউন্টার ০ হয়ে যাবে। সম্পূর্ণ নতুন করে কাজ শুরু হবে।</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-rose-300 cursor-pointer">
+                            <input type="radio" name="deleteScope" value="specific_date" class="mt-0.5 w-4 h-4 text-rose-600" onchange="toggleDateInputVisibility()">
+                            <div>
+                                <span class="font-bold text-slate-800 block text-xs">📅 শুধুমাত্র নির্দিষ্ট একটি তারিখের ডাটা মুছুন (Delete Specific Date)</span>
+                                <span class="text-slate-500 text-[11px]">যে তারিখটি নির্বাচন করবেন, শুধুমাত্র সেই দিনের সাবমিট করা ডাটা মুছে যাবে।</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-rose-300 cursor-pointer">
+                            <input type="radio" name="deleteScope" value="before_date" class="mt-0.5 w-4 h-4 text-rose-600" onchange="toggleDateInputVisibility()">
+                            <div>
+                                <span class="font-bold text-slate-800 block text-xs">⏳ অমুক তারিখের পূর্বের সমস্ত পুরোনো ডাটা মুছুন (Delete Before Date)</span>
+                                <span class="text-slate-500 text-[11px]">নির্দিষ্ট তারিখের আগের পুরোনো ডাটা মুছে ফেলা হবে, কিন্তু সাম্প্রতিক ডাটা থাকবে।</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Date selector container -->
+                <div id="deleteDateSelectContainer" class="hidden p-3 bg-indigo-50/60 rounded-lg border border-indigo-200">
+                    <label class="block font-bold text-slate-700 mb-1">তারিখ নির্বাচন করুন (Select Date):</label>
+                    <input type="date" id="targetDeleteDateInput" class="w-full px-3 py-2 bg-white rounded border border-slate-300 text-xs font-semibold">
+                </div>
+
+                <!-- Auto Backup Checkbox -->
+                <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <label class="flex items-center space-x-2.5 cursor-pointer">
+                        <input type="checkbox" id="autoBackupBeforeDeleteCheck" checked class="w-4 h-4 text-emerald-600 rounded">
+                        <div>
+                            <span class="font-bold text-emerald-900 block text-xs">📥 মোছার আগে তারিখ অনুযায়ী রেকর্ড ফাইল ডাউনলোড করুন (Auto-Backup)</span>
+                            <span class="text-emerald-700 text-[11px]">ডিলেট হওয়ার আগে সম্পূর্ণ ডাটা একটি তারিখযুক্ত এক্সেল ফাইল (<code class="font-mono bg-white px-1 rounded">Records_Archive_YYYY-MM-DD.xlsx</code>) হিসেবে আপনার কম্পিউটারে স্বয়ংক্রিয়ভাবে সেভ হবে।</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Clear upload logs checkbox -->
+                <div class="px-1">
+                    <label class="flex items-center space-x-2 cursor-pointer text-slate-600">
+                        <input type="checkbox" id="clearUploadLogsTooCheck" checked class="w-4 h-4 text-slate-600 rounded">
+                        <span>আপলোড হিস্টোরি ও ব্যাচ লগও রিসেট করুন (Reset Upload Logs)</span>
+                    </label>
+                </div>
+
+                <!-- Confirmation Word Input -->
+                <div class="pt-2 border-t border-slate-200">
+                    <label class="block font-bold text-rose-700 mb-1">নিশ্চিত করতে নিচে <span class="font-mono bg-rose-100 px-1 py-0.5 rounded text-rose-900">DELETE</span> লিখুন:</label>
+                    <input type="text" id="confirmDeleteWordInput" placeholder="Type DELETE to confirm" class="w-full px-3 py-2 border-2 border-rose-300 focus:border-rose-600 rounded text-xs font-bold font-mono">
+                </div>
+
+                <div id="resetModalMsg" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100 mt-4">
+                <button type="button" onclick="closeResetDataModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition">
+                    Cancel
+                </button>
+                <button type="button" id="executeResetBtn" onclick="executeDatabaseReset()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow transition flex items-center space-x-1.5">
+                    <span>🗑️ Confirm & Delete Data</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1686,16 +1797,22 @@
 
             const reportFilter = document.getElementById('adminSubReportFilter').value;
             const workerFilter = document.getElementById('adminSubWorkerFilter').value;
+            const dateFilter = document.getElementById('adminSubDateFilter') ? document.getElementById('adminSubDateFilter').value : '';
 
             try {
                 let query = supabaseClient
                     .from('master_numbers')
-                    .select('id, phone_number, full_name, age, report_type, department, user_email, created_at')
+                    .select('id, phone_number, full_name, age, report_type, department, user_email, username, created_at')
                     .order('created_at', { ascending: false })
-                    .limit(300);
+                    .limit(500);
 
                 if (reportFilter !== 'all') query = query.eq('report_type', reportFilter);
                 if (workerFilter !== 'all') query = query.eq('user_email', workerFilter);
+                if (dateFilter) {
+                    const startIso = `${dateFilter}T00:00:00.000Z`;
+                    const endIso = `${dateFilter}T23:59:59.999Z`;
+                    query = query.gte('created_at', startIso).lte('created_at', endIso);
+                }
 
                 const { data, error } = await query;
                 if (error) {
@@ -2850,6 +2967,179 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 }
                 btn.disabled = false;
                 btn.innerHTML = '<span>💾 Save Username</span>';
+            }
+        }
+
+
+        // ==================== DATE FILTER & DATABASE RESET LOGIC ====================
+        function clearAdminSubDateFilter() {
+            const dateInput = document.getElementById('adminSubDateFilter');
+            if (dateInput) dateInput.value = '';
+            loadAdminSubmissionsData();
+        }
+
+        function downloadDateFilteredExcel() {
+            const dateVal = document.getElementById('adminSubDateFilter')?.value;
+            const activeList = adminSubmissionsCache;
+            if (!activeList || activeList.length === 0) {
+                alert('No submission records found to download for this filter.');
+                return;
+            }
+
+            const exportRows = activeList.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone_number,
+                'Full Name': item.full_name || '-',
+                'Age': item.age || '-',
+                'Report Type': item.report_type || 'general',
+                'Worker Username': item.username || userEmailToNameMap[item.user_email] || '-',
+                'Worker Email': item.user_email,
+                'Date': new Date(item.created_at).toLocaleDateString(),
+                'Time': new Date(item.created_at).toLocaleTimeString()
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            const sheetTitle = dateVal ? `Records_${dateVal}` : 'Date_Records';
+            XLSX.utils.book_append_sheet(wb, ws, sheetTitle.slice(0, 31));
+            const fileName = `Daily_Records_${dateVal || new Date().toISOString().slice(0, 10)}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        function openResetDataModal() {
+            const modal = document.getElementById('resetDataModal');
+            const msg = document.getElementById('resetModalMsg');
+            const wordInput = document.getElementById('confirmDeleteWordInput');
+            if (msg) msg.classList.add('hidden');
+            if (wordInput) wordInput.value = '';
+
+            const dateInput = document.getElementById('targetDeleteDateInput');
+            if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
+            toggleDateInputVisibility();
+
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeResetDataModal() {
+            const modal = document.getElementById('resetDataModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function toggleDateInputVisibility() {
+            const scope = document.querySelector('input[name="deleteScope"]:checked')?.value;
+            const container = document.getElementById('deleteDateSelectContainer');
+            if (container) {
+                if (scope === 'specific_date' || scope === 'before_date') {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+        }
+
+        async function executeDatabaseReset() {
+            const scope = document.querySelector('input[name="deleteScope"]:checked')?.value || 'all';
+            const targetDate = document.getElementById('targetDeleteDateInput')?.value;
+            const confirmWord = document.getElementById('confirmDeleteWordInput')?.value.trim();
+            const autoBackup = document.getElementById('autoBackupBeforeDeleteCheck')?.checked;
+            const clearLogs = document.getElementById('clearUploadLogsTooCheck')?.checked;
+            const msgBox = document.getElementById('resetModalMsg');
+            const btn = document.getElementById('executeResetBtn');
+
+            if (confirmWord !== 'DELETE') {
+                alert('নিশ্চিত করতে বক্সে সঠিকভাবে "DELETE" লিখুন।');
+                return;
+            }
+
+            if ((scope === 'specific_date' || scope === 'before_date') && !targetDate) {
+                alert('দয়া করে একটি তারিখ নির্বাচন করুন।');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>Processing...</span>';
+
+            try {
+                // 1. Auto backup before delete if checked
+                if (autoBackup) {
+                    msgBox.className = 'p-3 rounded-lg text-xs bg-blue-50 text-blue-800 font-semibold block';
+                    msgBox.innerText = 'Creating and downloading dated record backup file...';
+
+                    let bQuery = supabaseClient.from('master_numbers').select('*').order('created_at', { ascending: false });
+                    if (scope === 'specific_date') {
+                        bQuery = bQuery.gte('created_at', `${targetDate}T00:00:00.000Z`).lte('created_at', `${targetDate}T23:59:59.999Z`);
+                    } else if (scope === 'before_date') {
+                        bQuery = bQuery.lt('created_at', `${targetDate}T00:00:00.000Z`);
+                    }
+                    const { data: backupData } = await bQuery;
+                    if (backupData && backupData.length > 0) {
+                        const exportRows = backupData.map((item, idx) => ({
+                            'SL': idx + 1,
+                            'Phone Number': item.phone_number,
+                            'Full Name': item.full_name || '-',
+                            'Age': item.age || '-',
+                            'Report Type': item.report_type || 'general',
+                            'Department': item.department || '-',
+                            'Worker Username': item.username || userEmailToNameMap[item.user_email] || '-',
+                            'Worker Email': item.user_email,
+                            'Date': new Date(item.created_at).toLocaleDateString(),
+                            'Time': new Date(item.created_at).toLocaleTimeString()
+                        }));
+                        const ws = XLSX.utils.json_to_sheet(exportRows);
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, 'Records_Backup');
+                        const backupFilename = `Records_Archive_Backup_${scope}_${targetDate || new Date().toISOString().slice(0, 10)}.xlsx`;
+                        XLSX.writeFile(wb, backupFilename);
+                    }
+                }
+
+                msgBox.className = 'p-3 rounded-lg text-xs bg-amber-50 text-amber-800 font-semibold block';
+                msgBox.innerText = 'Deleting previous records from database...';
+
+                // 2. Try RPC first, fallback to direct delete
+                try {
+                    const { data: rpcRes, error: rpcErr } = await supabaseClient.rpc('admin_clear_master_numbers', {
+                        p_delete_mode: scope,
+                        p_target_date: targetDate ? `${targetDate}T00:00:00.000Z` : null,
+                        p_clear_logs: clearLogs
+                    });
+                    if (rpcErr) throw rpcErr;
+                } catch (rpcFallbackErr) {
+                    let dQuery = supabaseClient.from('master_numbers').delete();
+                    let lQuery = clearLogs ? supabaseClient.from('upload_logs').delete() : null;
+
+                    if (scope === 'all') {
+                        dQuery = dQuery.neq('id', 0);
+                        if (lQuery) lQuery = lQuery.neq('id', 0);
+                    } else if (scope === 'specific_date') {
+                        dQuery = dQuery.gte('created_at', `${targetDate}T00:00:00.000Z`).lte('created_at', `${targetDate}T23:59:59.999Z`);
+                        if (lQuery) lQuery = lQuery.gte('created_at', `${targetDate}T00:00:00.000Z`).lte('created_at', `${targetDate}T23:59:59.999Z`);
+                    } else if (scope === 'before_date') {
+                        dQuery = dQuery.lt('created_at', `${targetDate}T00:00:00.000Z`);
+                        if (lQuery) lQuery = lQuery.lt('created_at', `${targetDate}T00:00:00.000Z`);
+                    }
+
+                    const { error: delErr } = await dQuery;
+                    if (delErr) throw delErr;
+                    if (lQuery) await lQuery;
+                }
+
+                msgBox.className = 'p-3 rounded-lg text-xs bg-emerald-50 text-emerald-800 font-bold block';
+                msgBox.innerText = '✅ পূর্বের ডাটা সফলভাবে মুছে ফেলা হয়েছে এবং ব্যাকআপ সংরক্ষিত হয়েছে! এখন প্রতিদিন নতুন করে ফ্রেশ ডাটা যোগ করা যাবে।';
+
+                await loadAdminDashboard();
+
+                setTimeout(() => {
+                    closeResetDataModal();
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>🗑️ Confirm & Delete Data</span>';
+                }, 1500);
+
+            } catch (err) {
+                msgBox.className = 'p-3 rounded-lg text-xs bg-red-50 text-red-700 font-bold block';
+                msgBox.innerText = 'Failed to reset data: ' + err.message;
+                btn.disabled = false;
+                btn.innerHTML = '<span>🗑️ Confirm & Delete Data</span>';
             }
         }
 
