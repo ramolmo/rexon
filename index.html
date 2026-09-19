@@ -67,32 +67,32 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- Top Sticky Header with Sliding Marquee Notice & Responsive Navigation -->
+    <!-- Top Sticky Header with Sliding Marquee Notice & Professional 2-Tier Navigation -->
     <header class="sticky top-0 z-50 shadow-md">
         <!-- Sliding Marquee Notice Bar in Pure Bengali -->
-        <div class="bg-gradient-to-r from-red-700 via-rose-700 to-amber-600 text-white border-b border-red-800/90 select-none overflow-hidden">
-            <div class="max-w-7xl mx-auto flex items-center h-9 sm:h-10 px-2.5 sm:px-6">
+        <div class="bg-gradient-to-r from-red-700 via-rose-700 to-amber-600 text-white border-b border-red-800/90 select-none overflow-hidden py-2 px-3 sm:px-6 shadow-inner">
+            <div class="max-w-7xl mx-auto flex items-center">
                 <!-- Notice Tag -->
-                <div class="flex items-center space-x-1.5 bg-red-950/90 text-amber-300 border border-amber-400/40 text-[11px] sm:text-xs font-bold px-2.5 py-0.5 sm:py-1 rounded shadow flex-shrink-0 mr-2 sm:mr-3 z-10">
+                <div class="flex items-center space-x-1.5 bg-red-950/90 text-amber-300 border border-amber-400/40 text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded shadow-sm flex-shrink-0 mr-3 z-10 select-none">
                     <span class="animate-pulse text-sm">📢</span>
                     <span class="whitespace-nowrap font-bangla">জরুরি নোটিশ:</span>
                 </div>
                 <!-- Continuous Sliding Track -->
-                <div class="flex-1 overflow-hidden relative cursor-default" title="টাচ করলে বা মাউস ধরলে নোটিশটি থেমে যাবে">
+                <div class="flex-1 overflow-hidden relative cursor-default" title="মাউস রাখলে বা টাচ করলে নোটিশটি থেমে যাবে">
                     <div class="marquee-track flex whitespace-nowrap">
-                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla">
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed">
                             <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
                             <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
                         </div>
-                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla" aria-hidden="true">
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed" aria-hidden="true">
                             <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
                             <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
                         </div>
-                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla" aria-hidden="true">
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed" aria-hidden="true">
                             <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
                             <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
                         </div>
-                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla" aria-hidden="true">
+                        <div class="marquee-item flex items-center pr-12 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed" aria-hidden="true">
                             <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
                             <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
                         </div>
@@ -102,40 +102,55 @@
         </div>
 
         <!-- Main Navigation Bar -->
-        <nav class="bg-indigo-700 text-white">
-            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+        <nav class="bg-indigo-700 text-white shadow-md">
+            <!-- Tier 1: Branding & User Profile (Generous Padding, Zero Overlap) -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-4">
                 <!-- Branding -->
-                <div class="flex items-center justify-between w-full sm:w-auto">
-                    <div class="flex items-center space-x-2.5">
-                        <div class="bg-white text-indigo-700 p-1.5 sm:p-2 rounded-lg font-bold text-base sm:text-xl shadow flex-shrink-0">⚡</div>
-                        <div>
-                            <h1 class="font-bold text-sm sm:text-lg leading-tight">Data Management Portal</h1>
-                            <p class="text-[10px] sm:text-xs text-indigo-200">Daily Work, Verification & Deduplication</p>
-                        </div>
+                <div class="flex items-center space-x-3 flex-shrink-0">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 bg-white text-indigo-700 rounded-xl font-black text-lg sm:text-xl shadow flex items-center justify-center flex-shrink-0 select-none">
+                        ⚡
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base sm:text-lg text-white tracking-tight leading-tight whitespace-nowrap">
+                            Data Management Portal
+                        </h1>
+                        <p class="text-[11px] text-indigo-200 hidden sm:block leading-none mt-1">
+                            Daily Work, Verification & Deduplication
+                        </p>
                     </div>
                 </div>
 
-                <!-- Navigation Buttons & User Info -->
-                <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 sm:space-x-3 w-full sm:w-auto">
-                    <div id="navLinks" class="hidden items-center space-x-1 sm:space-x-2 overflow-x-auto py-0.5 scrollbar-none">
-                        <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition">
-                            📊 Dashboard
-                        </button>
-                        <button id="navBtnGender" onclick="switchToSection('gender_verify')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded transition">
-                            🚻 Gender Verify Tool
-                        </button>
-                        <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded transition">
-                            🔍 Duplicate Check
+                <!-- User Controls -->
+                <div id="userInfo" class="hidden items-center space-x-2 sm:space-x-3 ml-auto flex-shrink-0">
+                    <span id="userBadge" class="text-xs px-2.5 py-1 rounded-full font-bold shadow-sm"></span>
+                    <div class="flex items-center space-x-1.5 bg-indigo-800/80 border border-indigo-500/50 px-2.5 py-1 rounded-lg">
+                        <span class="text-xs">👤</span>
+                        <span id="userEmail" class="text-xs font-bold text-white truncate max-w-[120px] sm:max-w-[220px]"></span>
+                        <button onclick="openUsernameModal()" class="ml-1 text-indigo-300 hover:text-white hover:bg-indigo-700/60 p-0.5 rounded transition" title="Change Username (ইউজারনেম পরিবর্তন করুন)">
+                            ✏️
                         </button>
                     </div>
+                    <button onclick="handleLogout()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
 
-                    <div id="userInfo" class="hidden items-center space-x-2 sm:space-x-3 ml-auto sm:ml-0">
-                        <span id="userBadge" class="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-semibold"></span>
-                        <span id="userEmail" class="hidden md:inline-block text-sm font-medium"></span>
-                        <button onclick="handleLogout()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded transition">
-                            Logout
-                        </button>
-                    </div>
+            <!-- Tier 2: Dedicated Navigation Tabs Bar (Spacious, Beautiful Touch Targets) -->
+            <div id="navLinks" class="hidden bg-indigo-800/90 border-t border-indigo-600/40">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center space-x-2 overflow-x-auto scrollbar-none">
+                    <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40">
+                        <span>📊</span>
+                        <span>Dashboard</span>
+                    </button>
+                    <button id="navBtnGender" onclick="switchToSection('gender_verify')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
+                        <span>🚻</span>
+                        <span>Gender Verify Tool</span>
+                    </button>
+                    <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
+                        <span>🔍</span>
+                        <span>Duplicate Check</span>
+                    </button>
                 </div>
             </div>
         </nav>
@@ -180,6 +195,18 @@
 
                 <!-- Form -->
                 <form id="loginForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <!-- Username Field (Sign Up Only) -->
+                    <div id="usernameContainer" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                            Worker Username (আপনার ইউজারনেম) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">👤</span>
+                            <input type="text" id="signupUsername" placeholder="e.g. rakib_01 বা salma_worker" class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">অ্যাডমিন আপনাকে সহজেই এই নামে চিনতে পারবেন</p>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
                         <input type="email" id="loginEmail" required placeholder="worker@company.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
@@ -217,12 +244,21 @@
 
         <!-- 3. Worker Dashboard View -->
         <div id="userDashboard" class="hidden space-y-8">
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800">Worker Dashboard</h2>
-                    <p class="text-sm text-slate-500">Department: <span id="userDeptTitle" class="font-semibold text-indigo-600 uppercase"></span></p>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Worker Dashboard</h2>
+                        <div class="inline-flex items-center space-x-1.5 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-lg text-xs shadow-sm">
+                            <span class="text-indigo-600 font-bold">👤 Username:</span>
+                            <span id="workerUsernameBadge" class="font-extrabold text-indigo-900"></span>
+                            <button onclick="openUsernameModal()" class="ml-1 text-indigo-600 hover:text-indigo-900 font-bold bg-white px-2 py-0.5 rounded shadow-sm border border-indigo-200 hover:bg-indigo-50 transition" title="Change Username (ইউজারনেম পরিবর্তন করুন)">
+                                ✏️ Edit
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">Department: <span id="userDeptTitle" class="font-semibold text-indigo-600 uppercase"></span></p>
                 </div>
-                <div class="flex items-center space-x-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-2 text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 self-start md:self-auto">
                     <span>📅 Today:</span>
                     <span id="currentDateStr" class="font-semibold text-slate-700"></span>
                 </div>
@@ -498,8 +534,9 @@
                         <table class="w-full text-left text-sm min-w-[680px]">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
                                 <tr>
-                                    <th class="py-3 px-4">Worker Email</th>
-                                    <th class="py-3 px-4">Current Department</th>
+                                    <th class="py-3 px-4">Username</th>
+                                    <th class="py-3 px-4">Email Address</th>
+                                    <th class="py-3 px-4">Department</th>
                                     <th class="py-3 px-4">Change Department</th>
                                     <th class="py-3 px-4 text-right">Today's Added</th>
                                     <th class="py-3 px-4 text-right">Total Contributed</th>
@@ -791,6 +828,45 @@
             </div>
         </div>
 
+        <!-- Modal: Change Username -->
+    <div id="usernameModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">✏️</span>
+                    <h3 class="font-bold text-lg text-slate-800">Change Username</h3>
+                </div>
+                <button onclick="closeUsernameModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">
+                    ✕
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+                কোনো ভুল হলে এখান থেকে আপনার ইউজারনেম ঠিক করে নিন। অ্যাডমিন আপনাকে এই নামেই চিনতে পারবেন।
+            </p>
+            <form onsubmit="handleUsernameUpdate(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+                        New Username (নতুন ইউজারনেম)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">👤</span>
+                        <input type="text" id="newUsernameInput" required placeholder="e.g. rakib_01 বা salma_data" class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-semibold">
+                    </div>
+                </div>
+                <div id="usernameModalError" class="hidden p-3 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-200"></div>
+                <div id="usernameModalSuccess" class="hidden p-3 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium border border-emerald-200"></div>
+                <div class="flex items-center justify-end space-x-3 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeUsernameModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveUsernameBtn" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow transition flex items-center space-x-1.5">
+                        <span>💾 Save Username</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     </main>
 
     <!-- Application JavaScript Logic -->
@@ -806,6 +882,7 @@
         let adminUsersCache = [];
         let adminLogsCache = [];
         let adminSubmissionsCache = [];
+        let userEmailToNameMap = {};
         let currentAuthMode = 'signin';
 
         // Extensive High-Speed Verified Names Dictionary
@@ -933,10 +1010,15 @@
             if (errBox) errBox.classList.add('hidden');
             if (successBox) successBox.classList.add('hidden');
 
+            const usernameContainer = document.getElementById('usernameContainer');
+            const usernameInput = document.getElementById('signupUsername');
+
             if (mode === 'signup') {
                 tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
                 tabSignIn.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
                 deptContainer.classList.remove('hidden');
+                if (usernameContainer) usernameContainer.classList.remove('hidden');
+                if (usernameInput) usernameInput.required = true;
                 title.innerText = 'Create New Account';
                 subtitle.innerText = 'Register your account and select your department';
                 submitBtn.innerHTML = '<span>Create Account</span>';
@@ -946,6 +1028,8 @@
                 tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
                 tabSignUp.className = 'flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
                 deptContainer.classList.add('hidden');
+                if (usernameContainer) usernameContainer.classList.add('hidden');
+                if (usernameInput) usernameInput.required = false;
                 title.innerText = 'Sign In to Your Account';
                 subtitle.innerText = 'Enter your credentials to access your daily workspace';
                 submitBtn.innerHTML = '<span>Sign In</span>';
@@ -963,6 +1047,9 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             const dept = document.getElementById('signupDept') ? document.getElementById('signupDept').value : 'gender_verify';
+            const usernameInput = document.getElementById('signupUsername');
+            const rawUsername = usernameInput ? usernameInput.value.trim() : '';
+            const cleanUsername = rawUsername.replace(/\s+/g, '_') || email.split('@')[0];
             const errBox = document.getElementById('loginError');
             const successBox = document.getElementById('loginSuccessMsg');
             const submitBtn = document.getElementById('loginSubmitBtn');
@@ -981,11 +1068,28 @@
                         password: password,
                         options: {
                             data: {
+                                username: cleanUsername,
                                 department: dept,
                                 role: 'user'
                             }
                         }
                     });
+
+                    if (error) throw error;
+
+                    if (data && data.user) {
+                        try {
+                            await supabaseClient.from('profiles').upsert({
+                                id: data.user.id,
+                                email: email,
+                                username: cleanUsername,
+                                department: dept,
+                                role: 'user'
+                            });
+                        } catch (pErr) {
+                            console.warn('Profile sync:', pErr);
+                        }
+                    }
 
                     if (error) throw error;
 
@@ -1044,9 +1148,14 @@
                 currentProfile = profile || {
                     id: currentUser.id,
                     email: currentUser.email,
+                    username: currentUser.user_metadata?.username || currentUser.email.split('@')[0],
                     role: currentUser.user_metadata?.role || 'user',
                     department: currentUser.user_metadata?.department || 'gender_verify'
                 };
+
+                if (!currentProfile.username) {
+                    currentProfile.username = currentUser.user_metadata?.username || currentProfile.email.split('@')[0];
+                }
 
                 // Master Owner Email is ALWAYS Admin
                 if (currentUser.email === 'ramolmoaran@gmail.com') {
@@ -1056,7 +1165,13 @@
 
                 document.getElementById('userInfo').classList.remove('hidden');
                 document.getElementById('userInfo').classList.add('flex');
-                document.getElementById('userEmail').innerText = currentProfile.email;
+                const emailEl = document.getElementById('userEmail');
+                if (emailEl) {
+                    emailEl.innerText = currentProfile.username;
+                    emailEl.title = `${currentProfile.username} (${currentProfile.email})`;
+                }
+                const workerBadge = document.getElementById('workerUsernameBadge');
+                if (workerBadge) workerBadge.innerText = currentProfile.username;
 
                 const navLinks = document.getElementById('navLinks');
                 if (navLinks) {
@@ -1121,11 +1236,11 @@
             const btnDup = document.getElementById('navBtnDuplicate');
 
             [btnDash, btnGender, btnDup].forEach(b => {
-                if (b) b.className = 'text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-900 text-indigo-100 font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                if (b) b.className = 'text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5';
             });
 
             if (sec === 'dashboard') {
-                if (btnDash) btnDash.className = 'text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                if (btnDash) btnDash.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
                 if (currentProfile && currentProfile.role === 'admin') {
                     showView('adminDashboard');
                     loadAdminDashboard();
@@ -1134,10 +1249,10 @@
                     loadUserDashboard();
                 }
             } else if (sec === 'gender_verify') {
-                if (btnGender) btnGender.className = 'text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                if (btnGender) btnGender.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
                 showView('genderVerifyView');
             } else if (sec === 'duplicate_check') {
-                if (btnDup) btnDup.className = 'text-xs whitespace-nowrap bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-2.5 sm:px-3 py-1.5 rounded transition';
+                if (btnDup) btnDup.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
                 showView('duplicateCheckView');
             }
         }
@@ -1411,67 +1526,86 @@
         async function loadAdminDashboard() {
             if (!supabaseClient) return;
 
-            // Stats across report types
-            const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
-            const { count: maleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report');
-            const { count: femaleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report');
-            const { count: lookupCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report');
+            try {
+                // Stats across report types
+                const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
+                const { count: maleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report');
+                const { count: femaleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report');
+                const { count: lookupCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report');
 
-            const todayStart = new Date();
-            todayStart.setHours(0,0,0,0);
-            const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
+                const todayStart = new Date();
+                todayStart.setHours(0,0,0,0);
+                const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
 
-            document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
-            document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
-            document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
-            document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
-            document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
-
-            // Load profiles & logs
-            const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
-            const { data: logs } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
-            adminLogsCache = logs || [];
-
-            const userMap = {};
-            if (profiles) {
-                profiles.forEach(p => {
-                    userMap[p.id] = {
-                        id: p.id,
-                        email: p.email,
-                        department: p.department,
-                        role: p.role,
-                        todayAdded: 0,
-                        totalContributed: 0
-                    };
-                });
+                document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
+                document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
+                document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
+                document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
+                document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
+            } catch (err) {
+                console.error('Error loading stats:', err);
             }
 
-            if (logs) {
-                const todayIso = todayStart.toISOString();
-                logs.forEach(l => {
-                    if (userMap[l.user_id]) {
-                        userMap[l.user_id].totalContributed += l.new_inserted;
-                        if (l.created_at >= todayIso) {
-                            userMap[l.user_id].todayAdded += l.new_inserted;
+            try {
+                // Load profiles & logs
+                const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                const { data: logs } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
+                adminLogsCache = logs || [];
+
+                const userMap = {};
+                userEmailToNameMap = {};
+                if (profiles) {
+                    profiles.forEach(p => {
+                        const uname = p.username || p.email.split('@')[0];
+                        userEmailToNameMap[p.email] = uname;
+                        userMap[p.id] = {
+                            id: p.id,
+                            email: p.email,
+                            username: uname,
+                            department: p.department,
+                            role: p.role,
+                            todayAdded: 0,
+                            totalContributed: 0
+                        };
+                    });
+                }
+
+                if (logs) {
+                    const todayStart = new Date();
+                    todayStart.setHours(0,0,0,0);
+                    const todayIso = todayStart.toISOString();
+                    logs.forEach(l => {
+                        if (userMap[l.user_id]) {
+                            userMap[l.user_id].totalContributed += l.new_inserted;
+                            if (l.created_at >= todayIso) {
+                                userMap[l.user_id].todayAdded += l.new_inserted;
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
+                adminUsersCache = Object.values(userMap);
+                document.getElementById('userTabCount').innerText = adminUsersCache.length;
+
+                const workerSelect = document.getElementById('adminSubWorkerFilter');
+                if (workerSelect) {
+                    workerSelect.innerHTML = '<option value="all">All Workers</option>';
+                    adminUsersCache.forEach(u => {
+                        workerSelect.innerHTML += `<option value="${u.email}">👤 ${u.username} (${u.email})</option>`;
+                    });
+                }
+
+                renderAdminUserTable();
+                renderAdminLogsTable();
+            } catch (err) {
+                console.error('Error loading profiles or logs:', err);
             }
 
-            adminUsersCache = Object.values(userMap);
-            document.getElementById('userTabCount').innerText = adminUsersCache.length;
-
-            const workerSelect = document.getElementById('adminSubWorkerFilter');
-            if (workerSelect) {
-                workerSelect.innerHTML = '<option value="all">All Workers</option>';
-                adminUsersCache.forEach(u => {
-                    workerSelect.innerHTML += `<option value="${u.email}">${u.email}</option>`;
-                });
+            try {
+                await loadAdminSubmissionsData();
+            } catch (err) {
+                console.error('Error loading submissions:', err);
             }
-
-            renderAdminUserTable();
-            renderAdminLogsTable();
-            loadAdminSubmissionsData();
         }
 
         function renderAdminUserTable() {
@@ -1480,7 +1614,9 @@
             const deptFilter = document.getElementById('adminUserDeptFilter').value;
 
             const filtered = adminUsersCache.filter(u => {
-                const matchSearch = u.email.toLowerCase().includes(search);
+                const uname = (u.username || '').toLowerCase();
+                const uemail = (u.email || '').toLowerCase();
+                const matchSearch = uemail.includes(search) || uname.includes(search);
                 const matchDept = deptFilter === 'all' || u.department === deptFilter;
                 return matchSearch && matchDept;
             });
@@ -1490,9 +1626,20 @@
                     const deptLabel = u.department === 'number_lookup' ? 'Number Lookup' : (u.department === 'gender_verify' ? 'Gender Verify' : 'Admin');
                     return `
                         <tr class="hover:bg-slate-50">
-                            <td class="py-3 px-4 font-semibold text-slate-800">${u.email}</td>
                             <td class="py-3 px-4">
-                                <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${u.department === 'number_lookup' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'}">
+                                <div class="inline-flex items-center space-x-1.5">
+                                    <span class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md text-xs inline-flex items-center space-x-1">
+                                        <span>👤</span>
+                                        <span>${u.username || u.email.split('@')[0]}</span>
+                                    </span>
+                                    <button onclick="openUsernameModal('${u.id}', '${u.username || u.email.split('@')[0]}')" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition" title="Change this worker's username">
+                                        ✏️
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 font-medium text-slate-600 text-xs">${u.email}</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${u.department === 'number_lookup' ? 'bg-blue-100 text-blue-800' : (u.department === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-pink-100 text-pink-800')}">
                                     ${deptLabel}
                                 </span>
                             </td>
@@ -1540,23 +1687,30 @@
             const reportFilter = document.getElementById('adminSubReportFilter').value;
             const workerFilter = document.getElementById('adminSubWorkerFilter').value;
 
-            let query = supabaseClient
-                .from('master_numbers')
-                .select('id, phone_number, full_name, age, report_type, department, user_email, created_at')
-                .order('created_at', { ascending: false })
-                .limit(300);
+            try {
+                let query = supabaseClient
+                    .from('master_numbers')
+                    .select('id, phone_number, full_name, age, report_type, department, user_email, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(300);
 
-            if (reportFilter !== 'all') query = query.eq('report_type', reportFilter);
-            if (workerFilter !== 'all') query = query.eq('user_email', workerFilter);
+                if (reportFilter !== 'all') query = query.eq('report_type', reportFilter);
+                if (workerFilter !== 'all') query = query.eq('user_email', workerFilter);
 
-            const { data, error } = await query;
-            if (error) {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500">Error: ${error.message}</td></tr>`;
-                return;
+                const { data, error } = await query;
+                if (error) {
+                    body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-amber-600 bg-amber-50/50 p-4 rounded-lg">
+                        <div class="font-bold">⚠️ Database Notice: ${error.message}</div>
+                        <div class="text-xs text-slate-500 mt-1">Please ensure you have run the latest SQL patch in your Supabase SQL Editor.</div>
+                    </td></tr>`;
+                    return;
+                }
+
+                adminSubmissionsCache = data || [];
+                filterAdminSubmissionsLocal();
+            } catch (err) {
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500">Error: ${err.message}</td></tr>`;
             }
-
-            adminSubmissionsCache = data || [];
-            filterAdminSubmissionsLocal();
         }
 
         function filterAdminSubmissionsLocal() {
@@ -1565,10 +1719,13 @@
 
             let list = adminSubmissionsCache;
             if (search) {
-                list = list.filter(item => 
-                    (item.phone_number && item.phone_number.includes(search)) ||
-                    (item.full_name && item.full_name.toLowerCase().includes(search))
-                );
+                list = list.filter(item => {
+                    const workerUname = (item.username || userEmailToNameMap[item.user_email] || '').toLowerCase();
+                    const phone = (item.phone_number || '');
+                    const name = (item.full_name || '').toLowerCase();
+                    const email = (item.user_email || '').toLowerCase();
+                    return phone.includes(search) || name.includes(search) || email.includes(search) || workerUname.includes(search);
+                });
             }
 
             if (list.length > 0) {
@@ -1590,7 +1747,13 @@
                             <td class="py-3 px-4 font-bold text-slate-800">${item.full_name || '-'}</td>
                             <td class="py-3 px-4 font-medium text-slate-600">${item.age || '-'}</td>
                             <td class="py-3 px-4">${repBadge}</td>
-                            <td class="py-3 px-4 font-medium text-indigo-700">${item.user_email}</td>
+                            <td class="py-3 px-4">
+                                <div class="flex items-center space-x-1 font-bold text-slate-800 text-xs">
+                                    <span>👤</span>
+                                    <span>${item.username || userEmailToNameMap[item.user_email] || item.user_email.split('@')[0]}</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400 font-mono block mt-0.5">${item.user_email}</span>
+                            </td>
                             <td class="py-3 px-4 text-right text-slate-500">${timeStr}</td>
                         </tr>
                     `;
@@ -1609,7 +1772,13 @@
                     return `
                         <tr class="hover:bg-slate-50 text-xs">
                             <td class="py-3 px-4 font-mono text-slate-500">${timeStr}</td>
-                            <td class="py-3 px-4 font-medium text-slate-700">${l.user_email}</td>
+                            <td class="py-3 px-4">
+                                <div class="font-bold text-slate-800 text-xs flex items-center space-x-1">
+                                    <span>👤</span>
+                                    <span>${l.username || userEmailToNameMap[l.user_email] || l.user_email.split('@')[0]}</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400 font-mono block">${l.user_email}</span>
+                            </td>
                             <td class="py-3 px-4 font-bold">${repLabel}</td>
                             <td class="py-3 px-4 text-slate-600">${l.file_name || 'Upload'}</td>
                             <td class="py-3 px-4 text-right">${l.total_received}</td>
@@ -2586,6 +2755,104 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             XLSX.utils.book_append_sheet(wb, ws, tabName);
             XLSX.writeFile(wb, `${tabName}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
+
+        // ==================== USERNAME EDIT MODAL LOGIC ====================
+        function openUsernameModal(targetUserId, currentName) {
+            const modal = document.getElementById('usernameModal');
+            const input = document.getElementById('newUsernameInput');
+            const errBox = document.getElementById('usernameModalError');
+            const succBox = document.getElementById('usernameModalSuccess');
+
+            if (errBox) errBox.classList.add('hidden');
+            if (succBox) succBox.classList.add('hidden');
+
+            modal.dataset.targetUserId = targetUserId || (currentUser ? currentUser.id : '');
+            input.value = currentName || (currentProfile ? currentProfile.username : '');
+
+            modal.classList.remove('hidden');
+            input.focus();
+        }
+
+        function closeUsernameModal() {
+            const modal = document.getElementById('usernameModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleUsernameUpdate(e) {
+            e.preventDefault();
+            const modal = document.getElementById('usernameModal');
+            const targetUserId = modal.dataset.targetUserId || (currentUser ? currentUser.id : '');
+            const input = document.getElementById('newUsernameInput');
+            const rawVal = input.value.trim();
+            const cleanUsername = rawVal.replace(/\s+/g, '_');
+            const errBox = document.getElementById('usernameModalError');
+            const succBox = document.getElementById('usernameModalSuccess');
+            const btn = document.getElementById('saveUsernameBtn');
+
+            if (!cleanUsername) {
+                if (errBox) {
+                    errBox.innerText = 'Please enter a valid username';
+                    errBox.classList.remove('hidden');
+                }
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>Saving...</span>';
+
+            try {
+                // 1. Update in profiles table
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ username: cleanUsername })
+                    .eq('id', targetUserId);
+
+                if (error) throw error;
+
+                // 2. If user is updating their own profile, update local state
+                if (currentUser && targetUserId === currentUser.id) {
+                    try {
+                        await supabaseClient.auth.updateUser({
+                            data: { username: cleanUsername }
+                        });
+                    } catch (authErr) {
+                        console.warn('Auth metadata update note:', authErr);
+                    }
+
+                    if (currentProfile) currentProfile.username = cleanUsername;
+                    const emailDisplay = document.getElementById('userEmail');
+                    if (emailDisplay && currentProfile) {
+                        emailDisplay.innerText = cleanUsername;
+                        emailDisplay.title = `${cleanUsername} (${currentProfile.email})`;
+                    }
+                    const badge = document.getElementById('workerUsernameBadge');
+                    if (badge) badge.innerText = cleanUsername;
+                }
+
+                succBox.innerText = '✅ Username updated successfully!';
+                succBox.classList.remove('hidden');
+
+                // If admin is viewing, refresh admin tables
+                if (currentProfile && currentProfile.role === 'admin') {
+                    await loadAdminDashboard();
+                }
+
+                setTimeout(() => {
+                    closeUsernameModal();
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>💾 Save Username</span>';
+                }, 1000);
+
+            } catch (err) {
+                if (errBox) {
+                    errBox.innerText = 'Failed to update username: ' + err.message;
+                    errBox.classList.remove('hidden');
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<span>💾 Save Username</span>';
+            }
+        }
+
     </script>
 </body>
 </html>
