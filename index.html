@@ -373,6 +373,21 @@
                 </div>
             </div>
 
+            <!-- Quick Shortcut to Dedicated Stock Sector (Only inside userDashboard) -->
+            <div class="bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-700 rounded-2xl shadow-md p-4 sm:p-5 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-indigo-400/30">
+                <div class="flex items-center space-x-3">
+                    <span class="text-3xl">🎁</span>
+                    <div>
+                        <h4 class="font-extrabold text-sm sm:text-base text-white">কাজের জন্য নতুন ফোন নাম্বার প্রয়োজন?</h4>
+                        <p class="text-xs text-indigo-100 mt-0.5">কোম্পানির আপলোড করা স্টক থেকে সরাসরি কাজের জন্য ফোন নাম্বার সংগ্রহ করুন।</p>
+                    </div>
+                </div>
+                <button type="button" onclick="switchToSection('claim_stock')" class="bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-1.5 flex-shrink-0">
+                    <span>স্টক থেকে নাম্বার নিন ➔</span>
+                </button>
+            </div>
+
+
             <!-- Upload Section with 3 Specific Report Types -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
@@ -2330,6 +2345,11 @@
                 }
 
             } else if (sec === 'claim_stock') {
+                if (!currentUser) {
+                    alert('অনুগ্রহ করে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন। লগইন করা ছাড়া কোনো নাম্বার দেখা বা নেওয়া যাবে না।');
+                    showView('loginView');
+                    return;
+                }
                 if (btnClaim) btnClaim.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
                 showView('claimStockView');
                 loadClaimStockSector();
@@ -6238,7 +6258,8 @@ Remaining Uncertain: ${remainingUnknown.length}`);
 
         async function executeSecClaim() {
             if (!supabaseClient || !currentUser) {
-                alert('অনুগ্রহ করে প্রথমে লগইন করুন।');
+                alert('অনুগ্রহ করে প্রথমে আপনার অ্যাকাউন্টে লগইন করুন। লগইন করা ছাড়া কোনো নাম্বার দেখা বা সংগ্রহ করা যাবে না।');
+                showView('loginView');
                 return;
             }
 
@@ -6854,19 +6875,4 @@ Remaining Uncertain: ${remainingUnknown.length}`);
     </div>
 
 </body>
-</html>            <!-- Quick Shortcut to Dedicated Stock Sector -->
-            <div class="bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-700 rounded-xl shadow-md p-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-indigo-400/30">
-                <div class="flex items-center space-x-3">
-                    <span class="text-2xl">🎁</span>
-                    <div>
-                        <h4 class="font-extrabold text-sm sm:text-base text-white">কাজের জন্য নতুন ফোন নাম্বার প্রয়োজন?</h4>
-                        <p class="text-xs text-indigo-100">কোম্পানির আপলোড করা স্টক থেকে সরাসরি প্রয়োজনীয় নাম্বার সংগ্রহ করুন।</p>
-                    </div>
-                </div>
-                <button type="button" onclick="switchToSection('claim_stock')" class="bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-xs sm:text-sm px-4 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1.5 flex-shrink-0">
-                    <span>স্টক থেকে নাম্বার নিন ➔</span>
-                </button>
-            </div>
-
-
-
+</html>
