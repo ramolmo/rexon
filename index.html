@@ -265,7 +265,96 @@
                 </div>
             </div>
 
-            <!-- Stats Grid -->
+                        <!-- 1B. DAILY TARGET TRACKER (দৈনিক ৩০০ নাম্বার টার্গেট: ২০০ ফিমেল + ১০০ মেল) -->
+            <div id="workerTargetTrackerCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
+                <!-- Header & Overall Status -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-xl font-black shadow-sm">
+                            🎯
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="font-extrabold text-base sm:text-lg text-slate-800">
+                                    দৈনিক কাজের টার্গেট (Daily Target: 300)
+                                </h3>
+                                <span id="targetStatusBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
+                                    ⏳ টার্গেট চলমান
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                Gender Verify ডিপার্টমেন্টের দৈনিক লক্ষ্য: <span class="font-bold text-rose-600">২০০টি Female</span> + <span class="font-bold text-blue-600">১০০টি Male</span> = <span class="font-bold text-indigo-700">মোট ৩০০টি নাম্বার</span>।
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Overall progress counter -->
+                    <div class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-right self-start sm:self-auto">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase block">আজ মোট সম্পন্ন:</span>
+                        <span class="text-lg font-black text-slate-800">
+                            <span id="targetTotalDoneText" class="text-indigo-600">0</span> <span class="text-xs text-slate-400">/ 300 টি</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Female & Male Breakdown Progress Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Female Target Card (200) -->
+                    <div class="bg-rose-50/50 border border-rose-200 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-rose-800 flex items-center space-x-1.5">
+                                <span>👩</span>
+                                <span>Female Report (টার্গেট: ২০০ টি)</span>
+                            </span>
+                            <span id="targetFemaleDiffBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-rose-200 text-rose-900">
+                                বাকি ২০০ টি
+                            </span>
+                        </div>
+                        <div class="flex items-baseline justify-between text-xs">
+                            <span class="font-bold text-slate-700">জমা হয়েছে: <span id="targetFemaleDone" class="text-sm font-black text-rose-600">0</span> টি</span>
+                            <span id="targetFemalePercent" class="text-slate-400 font-semibold">0%</span>
+                        </div>
+                        <div class="w-full bg-rose-100 rounded-full h-2.5 overflow-hidden">
+                            <div id="targetFemaleBar" class="bg-rose-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Male Target Card (100) -->
+                    <div class="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-blue-800 flex items-center space-x-1.5">
+                                <span>👨</span>
+                                <span>Male Report (টার্গেট: ১০০ টি)</span>
+                            </span>
+                            <span id="targetMaleDiffBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-blue-200 text-blue-900">
+                                বাকি ১০০ টি
+                            </span>
+                        </div>
+                        <div class="flex items-baseline justify-between text-xs">
+                            <span class="font-bold text-slate-700">জমা হয়েছে: <span id="targetMaleDone" class="text-sm font-black text-blue-600">0</span> টি</span>
+                            <span id="targetMalePercent" class="text-slate-400 font-semibold">0%</span>
+                        </div>
+                        <div class="w-full bg-blue-100 rounded-full h-2.5 overflow-hidden">
+                            <div id="targetMaleBar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Motivation / Congratulation Banner -->
+                <div id="targetMotivationBanner" class="p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-amber-50 border-amber-300 text-amber-950">
+                    <span id="targetMotivationIcon" class="text-2xl flex-shrink-0">⚠️</span>
+                    <div class="flex-1">
+                        <h4 id="targetMotivationTitle" class="font-extrabold text-sm sm:text-base">
+                            আপনি আপনার টার্গেট পূরণ করুন দ্রুতই!
+                        </h4>
+                        <p id="targetMotivationMessage" class="text-xs sm:text-sm text-amber-800 mt-0.5 leading-relaxed">
+                            আপনার আজকের টার্গেট এখনো বাকি আছে। দ্রুত কাজ সম্পন্ন করে টার্গেট পূরণ করুন।
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+<!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-emerald-500">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Valid Unique</p>
@@ -987,9 +1076,9 @@
                             <p class="text-[11px] text-slate-400">এখনও ডাউনলোড/ব্যবহৃত হয়নি</p>
                         </div>
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
-                            <p class="text-xs font-bold text-slate-500 uppercase">📤 ডাউনলোড করা হয়েছে (Exported)</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase">👥 কর্মীরা নিয়েছে (Claimed by Workers)</p>
                             <p id="recStatExported" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">ইতিমধ্যে উত্তোলন করা নাম্বার</p>
+                            <p class="text-[11px] text-slate-400">কর্মীদের দ্বারা কাজ শুরু করা নাম্বার</p>
                         </div>
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">📅 আজ প্রাপ্ত (Today's Received)</p>
@@ -1138,7 +1227,70 @@
                         <div id="recUploadResultCard" class="hidden p-4 rounded-xl text-xs font-medium"></div>
                     </div>
 
-                    <!-- 3. DATE-WISE RECEIVED STOCK HISTORY TABLE -->
+                    
+                    <!-- Stock Depletion & Re-order Alert Banner -->
+                    <div id="recStockAlertBanner" class="p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50 border-emerald-300 text-emerald-900">
+                        <div class="flex items-center space-x-3">
+                            <span id="recStockAlertIcon" class="text-2xl">🟢</span>
+                            <div>
+                                <h4 id="recStockAlertTitle" class="font-extrabold text-sm sm:text-base">স্টকে পর্যাপ্ত ফোন নাম্বার রয়েছে</h4>
+                                <p id="recStockAlertSub" class="text-xs text-emerald-700">কর্মীরা কাজের জন্য এই স্টক থেকে সরাসরি নাম্বার সংগ্রহ করতে পারছে।</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 self-start sm:self-auto">
+                            <span class="text-xs font-bold">অবশিষ্ট স্টক:</span>
+                            <span id="recStockPercentBadge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-200 text-emerald-900">100%</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. WORKER NUMBER CLAIMS MONITORING TABLE (কর্মীদের নাম্বার গ্রহণের লাইভ হিস্ট্রি) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                            <div>
+                                <h4 class="font-black text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                                    <span>👥 কর্মীদের স্টক নাম্বার গ্রহণের লাইভ হিসাব (Worker Claims Log)</span>
+                                    <span class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-0.5 rounded-full font-bold">Auto-Deducted</span>
+                                </h4>
+                                <p class="text-xs text-slate-500">কোন কর্মী কখন কতগুলো নাম্বার নিয়েছে এবং কতগুলো নাম্বার ফুরিয়েছে তার রিয়েল-টাইম হিস্ট্রি।</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="loadAdminWorkerClaimsLog()" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl border border-slate-300 transition flex items-center space-x-1.5">
+                                    <span>🔄 রিফ্রেশ হিসাব</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Worker Summary Badges -->
+                        <div class="space-y-1">
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">কর্মীভিত্তিক মোট বিতরণ সামারি:</p>
+                            <div id="adminWorkerSummaryBadges" class="flex flex-wrap items-center gap-2">
+                                <span class="text-xs text-slate-400">হিসাব লোড হচ্ছে...</span>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs min-w-[650px]">
+                                <thead class="bg-slate-50 text-slate-600 uppercase font-bold border-b">
+                                    <tr>
+                                        <th class="py-3 px-4"># SL</th>
+                                        <th class="py-3 px-4">কর্মী (Worker)</th>
+                                        <th class="py-3 px-4">ইমেইল (Email)</th>
+                                        <th class="py-3 px-4 text-center">সংগৃহীত সংখ্যা (Claimed)</th>
+                                        <th class="py-3 px-4">তারিখ ও সময় (Date & Time)</th>
+                                        <th class="py-3 px-4 text-center">অ্যাকশন (Action)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminWorkerClaimsTableBody" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td colspan="6" class="py-6 text-center text-slate-400">লোডিং...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+<!-- 3. DATE-WISE RECEIVED STOCK HISTORY TABLE -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-3">
                             <div>
@@ -1431,14 +1583,26 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-t-4 border-t-indigo-600 flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">আজ আপনি নিয়েছেন (Claimed Today)</p>
-                        <p id="secWorkerClaimedToday" class="text-3xl font-black text-indigo-600 mt-1">0</p>
-                        <p class="text-[11px] text-slate-400 mt-0.5">আজ আপনার সংগৃহীত ডাটা</p>
+                <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-t-4 border-t-indigo-600 flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">দৈনিক কোটা লিমিট (Daily Limit: 1,000)</p>
+                            <p class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">
+                                <span id="secWorkerClaimedToday">0</span> <span class="text-xs text-slate-400 font-bold">/ 1,000 টি</span>
+                            </p>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-black">
+                            👤
+                        </div>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-black">
-                        👤
+                    <div class="mt-3">
+                        <div class="flex justify-between text-[11px] font-bold mb-1">
+                            <span class="text-slate-500">বাকি কোটা: <span id="secWorkerQuotaRemaining" class="text-emerald-600 font-extrabold">1,000</span> টি</span>
+                            <span id="secWorkerQuotaPercent" class="text-indigo-600 font-bold">0% ব্যবহৃত</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div id="secWorkerQuotaBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -2197,6 +2361,8 @@
 
             let todayUnique = 0;
             let todayDuplicates = 0;
+            let todayFemaleDone = 0;
+            let todayMaleDone = 0;
             const historyBody = document.getElementById('userUploadHistoryBody');
 
             if (logs && logs.length > 0) {
@@ -2204,6 +2370,11 @@
                 logs.forEach(log => {
                     todayUnique += log.new_inserted;
                     todayDuplicates += log.duplicates_count;
+                    if (log.report_type === 'female_report') {
+                        todayFemaleDone += log.new_inserted;
+                    } else if (log.report_type === 'male_report') {
+                        todayMaleDone += log.new_inserted;
+                    }
                     const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const repLabel = log.report_type === 'male_report' ? '👨 Male Report' : (log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
                     historyBody.innerHTML += `
@@ -2230,6 +2401,35 @@
                 .eq('user_id', currentUser.id);
 
             document.getElementById('statUserAllTime').innerText = (allTimeCount || 0).toLocaleString();
+
+            // Direct count from master_numbers for female & male to guarantee 100% precision
+            try {
+                const { count: directFemale } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', currentUser.id)
+                    .eq('report_type', 'female_report')
+                    .gte('created_at', todayIso);
+
+                const { count: directMale } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', currentUser.id)
+                    .eq('report_type', 'male_report')
+                    .gte('created_at', todayIso);
+
+                if (directFemale !== null && directFemale !== undefined) {
+                    todayFemaleDone = Math.max(todayFemaleDone, directFemale);
+                }
+                if (directMale !== null && directMale !== undefined) {
+                    todayMaleDone = Math.max(todayMaleDone, directMale);
+                }
+            } catch (cntErr) {
+                console.warn('Direct report type count notice:', cntErr);
+            }
+
+            // Update Target Tracker UI
+            updateWorkerTargetTrackerUI(todayFemaleDone, todayMaleDone);
         }
 
         function switchWorkerInputMode(mode) {
@@ -3105,19 +3305,42 @@
             const dateFilter = document.getElementById('recHistoryDateFilter') ? document.getElementById('recHistoryDateFilter').value : 'all';
 
             try {
-                // Fetch stats
-                const { count: totalRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true });
-                const { count: availRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_exported', false);
-                const { count: expRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_exported', true);
+                // Fetch stats: Accurately count available unassigned vs claimed by workers
+                const { count: totalRec } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true });
+
+                const { count: availRec } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_assigned', false);
+
+                const { count: claimedRec } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_assigned', true);
 
                 const todayIso = new Date().toISOString().slice(0, 10);
-                const { count: todayRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('received_date', todayIso);
+                const { count: todayRec } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('received_date', todayIso);
 
-                if (document.getElementById('recStatTotal')) document.getElementById('recStatTotal').innerText = (totalRec || 0).toLocaleString();
-                if (document.getElementById('recStatAvailable')) document.getElementById('recStatAvailable').innerText = (availRec || 0).toLocaleString();
-                if (document.getElementById('recStockAvailableBadge')) document.getElementById('recStockAvailableBadge').innerText = (availRec || 0).toLocaleString();
-                if (document.getElementById('recStatExported')) document.getElementById('recStatExported').innerText = (expRec || 0).toLocaleString();
+                const tCount = totalRec || 0;
+                const aCount = (availRec !== null && availRec !== undefined) ? availRec : 0;
+                const cCount = (claimedRec !== null && claimedRec !== undefined) ? claimedRec : 0;
+
+                if (document.getElementById('recStatTotal')) document.getElementById('recStatTotal').innerText = tCount.toLocaleString();
+                if (document.getElementById('recStatAvailable')) document.getElementById('recStatAvailable').innerText = aCount.toLocaleString();
+                if (document.getElementById('recStockAvailableBadge')) document.getElementById('recStockAvailableBadge').innerText = aCount.toLocaleString();
+                if (document.getElementById('recStatExported')) document.getElementById('recStatExported').innerText = cCount.toLocaleString();
                 if (document.getElementById('recStatToday')) document.getElementById('recStatToday').innerText = (todayRec || 0).toLocaleString();
+
+                // Update Re-stock Alert Banner
+                updateStockDepletionAlert(tCount, aCount, cCount);
+
+                // Load live worker claims log table
+                loadAdminWorkerClaimsLog();
 
                 // Fetch table list
                 let query = supabaseClient
@@ -5721,6 +5944,39 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             btn.disabled = true;
             btn.innerHTML = '<span>⏳ নাম্বার সংগ্রহ করা হচ্ছে...</span>';
 
+            // Strict 1,000 Daily Quota Check per Worker
+            try {
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                const { count: claimedTodayCount } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('assigned_to_user_id', currentUser.id)
+                    .gte('assigned_at', todayStart.toISOString());
+
+                const alreadyClaimed = claimedTodayCount || 0;
+                const maxDailyQuota = 1000;
+                const remainingQuota = Math.max(0, maxDailyQuota - alreadyClaimed);
+
+                if (alreadyClaimed >= maxDailyQuota) {
+                    alert(`❌ আজকের দৈনিক লিমিট পূর্ণ হয়েছে!\n\nএকজন কর্মী দিনে সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারেন। আপনি আজ ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। আগামী কাল আবার নতুন কোটা পাবেন।`);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                    return;
+                }
+
+                if (qty > remainingQuota) {
+                    alert(`⚠️ দৈনিক কোটা সীমা অতিক্রম করেছে!\n\nআপনি আজ ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। দৈনিক ১,০০০ লিমিটের কারণে আজকের জন্য আপনি আর মাত্র ${remainingQuota} টি নাম্বার সংগ্রহ করতে পারবেন।`);
+                    input.value = remainingQuota;
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                    return;
+                }
+            } catch (quotaErr) {
+                console.warn('Quota verification check notice:', quotaErr);
+            }
+
             try {
                 let records = [];
                 // 1. Try atomic RPC first
@@ -5945,7 +6201,35 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                         .gte('assigned_at', todayStart.toISOString());
 
                     const userTodayEl = document.getElementById('secWorkerClaimedToday');
-                    if (userTodayEl) userTodayEl.innerText = userClaimedCount || 0;
+                    const cCount = userClaimedCount || 0;
+                    if (userTodayEl) userTodayEl.innerText = cCount.toLocaleString();
+
+                    const quotaRemEl = document.getElementById('secWorkerQuotaRemaining');
+                    const quotaPctEl = document.getElementById('secWorkerQuotaPercent');
+                    const quotaBarEl = document.getElementById('secWorkerQuotaBar');
+                    const btnClaim = document.getElementById('btnSecClaim');
+
+                    const dailyLimit = 1000;
+                    const remaining = Math.max(0, dailyLimit - cCount);
+                    const pct = Math.min(100, Math.round((cCount / dailyLimit) * 100));
+
+                    if (quotaRemEl) quotaRemEl.innerText = remaining.toLocaleString();
+                    if (quotaPctEl) quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
+                    if (quotaBarEl) {
+                        quotaBarEl.style.width = `${pct}%`;
+                        if (pct >= 100) {
+                            quotaBarEl.className = 'bg-rose-600 h-2 rounded-full transition-all duration-300';
+                            if (btnClaim) {
+                                btnClaim.disabled = true;
+                                btnClaim.className = 'w-full sm:w-auto bg-slate-300 text-slate-500 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2';
+                                btnClaim.innerHTML = '<span>🔒 আজকের ১,০০০ লিমিট পূর্ণ হয়েছে</span>';
+                            }
+                        } else if (pct >= 80) {
+                            quotaBarEl.className = 'bg-amber-500 h-2 rounded-full transition-all duration-300';
+                        } else {
+                            quotaBarEl.className = 'bg-indigo-600 h-2 rounded-full transition-all duration-300';
+                        }
+                    }
                 }
             } catch (err) {
                 console.warn('Error refreshing claim stock data:', err);
@@ -6153,6 +6437,314 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             }
         }
 
+
+        // ==============================================================
+        // ADMIN STOCK MONITOR & WORKER CLAIMS LOG
+        // ==============================================================
+        let adminClaimBatchCache = {};
+
+        function updateStockDepletionAlert(total, available, claimed) {
+            const banner = document.getElementById('recStockAlertBanner');
+            const icon = document.getElementById('recStockAlertIcon');
+            const title = document.getElementById('recStockAlertTitle');
+            const sub = document.getElementById('recStockAlertSub');
+            const percentBadge = document.getElementById('recStockPercentBadge');
+
+            if (!banner) return;
+
+            const percentRemaining = total > 0 ? Math.round((available / total) * 100) : 0;
+            if (percentBadge) percentBadge.innerText = `${percentRemaining}% অবশিষ্ট`;
+
+            if (total === 0 || available === 0) {
+                banner.className = 'p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-rose-50 border-rose-400 text-rose-950 animate-pulse';
+                if (icon) icon.innerText = '🚨';
+                if (title) title.innerText = 'জরুরি সতর্কতা: স্টক সম্পূর্ণ শেষ (০ টি নাম্বার বাকি)!';
+                if (sub) sub.innerText = 'কর্মীরা কাজ করার জন্য আর কোনো নাম্বার নিতে পারছে না। কোম্পানি থেকে অবিলম্বে নতুন স্টক ফাইল আপলোড করুন।';
+                if (percentBadge) percentBadge.className = 'text-xs font-black px-3 py-1 rounded-full bg-rose-600 text-white';
+            } else if (available <= 500) {
+                banner.className = 'p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 border-amber-400 text-amber-950';
+                if (icon) icon.innerText = '⚠️';
+                if (title) title.innerText = `সতর্কতা: স্টক প্রায় শেষ! মাত্র ${available.toLocaleString()} টি নাম্বার বাকি আছে।`;
+                if (sub) sub.innerText = 'কর্মীদের কাজ চালু রাখতে শীঘ্রই কোম্পানি থেকে নতুন নাম্বার আপলোড করার প্রস্তুতি নিন।';
+                if (percentBadge) percentBadge.className = 'text-xs font-extrabold px-3 py-1 rounded-full bg-amber-500 text-white';
+            } else {
+                banner.className = 'p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50 border-emerald-300 text-emerald-950';
+                if (icon) icon.innerText = '🟢';
+                if (title) title.innerText = `স্টকে পর্যাপ্ত ফোন নাম্বার রয়েছে (${available.toLocaleString()} টি বাকি আছে)`;
+                if (sub) sub.innerText = `মোট ${total.toLocaleString()} টির মধ্যে কর্মীরা ইতিমধ্যে ${claimed.toLocaleString()} টি নাম্বার নিয়ে কাজ করছে।`;
+                if (percentBadge) percentBadge.className = 'text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-200 text-emerald-900';
+            }
+        }
+
+        async function loadAdminWorkerClaimsLog() {
+            if (!supabaseClient) return;
+            const tbody = document.getElementById('adminWorkerClaimsTableBody');
+            const summaryDiv = document.getElementById('adminWorkerSummaryBadges');
+            if (!tbody) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('id, phone_number, assigned_to_username, assigned_to_email, assigned_at')
+                    .eq('is_assigned', true)
+                    .order('assigned_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400">এখনো কোনো কর্মী স্টক থেকে নাম্বার সংগ্রহ করেনি।</td></tr>';
+                    if (summaryDiv) summaryDiv.innerHTML = '<span class="text-xs text-slate-400">কোনো বিতরণ ডাটা নেই</span>';
+                    return;
+                }
+
+                // 1. Group by Batch (Worker + Timestamp minute)
+                const batches = {};
+                const workerTotals = {};
+
+                data.forEach(r => {
+                    const uname = r.assigned_to_username || r.assigned_to_email?.split('@')[0] || 'Unknown Worker';
+                    workerTotals[uname] = (workerTotals[uname] || 0) + 1;
+
+                    const timeKey = r.assigned_at ? r.assigned_at.slice(0, 16) : 'unknown';
+                    const batchKey = `${uname}_${timeKey}`;
+
+                    if (!batches[batchKey]) {
+                        batches[batchKey] = {
+                            batchId: batchKey,
+                            username: uname,
+                            email: r.assigned_to_email || '-',
+                            time: r.assigned_at,
+                            phones: []
+                        };
+                    }
+                    batches[batchKey].phones.push(r.phone_number);
+                });
+
+                adminClaimBatchCache = batches;
+
+                // 2. Render Worker Summary Chips
+                if (summaryDiv) {
+                    summaryDiv.innerHTML = '';
+                    Object.keys(workerTotals).forEach(wname => {
+                        const count = workerTotals[wname];
+                        const chip = document.createElement('div');
+                        chip.className = 'inline-flex items-center space-x-1.5 bg-indigo-50 border border-indigo-200 text-indigo-900 px-3 py-1 rounded-xl text-xs font-bold shadow-sm';
+                        chip.innerHTML = `
+                            <span>👤 ${wname}:</span>
+                            <span class="bg-indigo-600 text-white px-2 py-0.5 rounded-md text-[11px] font-black">${count} টি</span>
+                        `;
+                        summaryDiv.appendChild(chip);
+                    });
+                }
+
+                // 3. Render Table Rows
+                tbody.innerHTML = '';
+                const sortedBatches = Object.values(batches).sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+
+                sortedBatches.forEach((batch, idx) => {
+                    const dateObj = batch.time ? new Date(batch.time) : null;
+                    const dateStr = dateObj ? dateObj.toLocaleDateString() : '-';
+                    const timeStr = dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-3 px-4 font-extrabold text-slate-800 flex items-center space-x-1.5">
+                            <span>👤</span>
+                            <span>${batch.username}</span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-500 font-mono text-[11px]">${batch.email}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="inline-block bg-emerald-100 text-emerald-800 font-black px-2.5 py-1 rounded-full text-xs">
+                                ${batch.phones.length} টি
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 font-mono text-slate-600 text-[11px]">
+                            ${dateStr} <span class="text-slate-400 font-normal">${timeStr}</span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button type="button" onclick="openAdminClaimBatchModal('${batch.batchId}')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg border border-indigo-200 transition flex items-center space-x-1 mx-auto">
+                                <span>👁️</span>
+                                <span>নাম্বার দেখুন</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (err) {
+                console.error('Error loading worker claims log:', err);
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-rose-500">লগ লোড করতে সমস্যা: ${err.message}</td></tr>`;
+            }
+        }
+
+        function openAdminClaimBatchModal(batchId) {
+            const batch = adminClaimBatchCache[batchId];
+            if (!batch) return;
+
+            document.getElementById('adminClaimModalTitle').innerText = `কর্মী: ${batch.username} এর সংগৃহীত নাম্বারসমূহ (${batch.phones.length} টি)`;
+            const timeStr = batch.time ? new Date(batch.time).toLocaleString() : '';
+            document.getElementById('adminClaimModalSub').innerText = `গ্রহণের সময়: ${timeStr} | ইমেইল: ${batch.email}`;
+
+            document.getElementById('adminClaimModalTextarea').value = batch.phones.join('\n');
+            document.getElementById('adminViewClaimModal').classList.remove('hidden');
+        }
+
+        function closeAdminViewClaimModal() {
+            document.getElementById('adminViewClaimModal').classList.add('hidden');
+        }
+
+        function copyAdminClaimModalNumbers() {
+            const area = document.getElementById('adminClaimModalTextarea');
+            if (!area || !area.value) return;
+            navigator.clipboard.writeText(area.value).then(() => {
+                alert('✅ সমস্ত নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!');
+            });
+        }
+
+
+        // ==============================================================
+        // GENDER VERIFY WORKER DAILY TARGET SYSTEM (200 Female + 100 Male = 300)
+        // ==============================================================
+        function updateWorkerTargetTrackerUI(femaleDone, maleDone) {
+            const card = document.getElementById('workerTargetTrackerCard');
+            if (!card) return;
+
+            // Only show for Gender Verify workers (or general users)
+            if (currentProfile && currentProfile.department === 'number_lookup') {
+                card.classList.add('hidden');
+                return;
+            } else {
+                card.classList.remove('hidden');
+            }
+
+            const femaleTarget = 200;
+            const maleTarget = 100;
+            const totalTarget = 300;
+
+            const totalDone = femaleDone + maleDone;
+
+            // Female Progress
+            const femaleDoneEl = document.getElementById('targetFemaleDone');
+            const femaleDiffEl = document.getElementById('targetFemaleDiffBadge');
+            const femalePctEl = document.getElementById('targetFemalePercent');
+            const femaleBarEl = document.getElementById('targetFemaleBar');
+
+            if (femaleDoneEl) femaleDoneEl.innerText = femaleDone.toLocaleString();
+            const femalePct = Math.min(100, Math.round((femaleDone / femaleTarget) * 100));
+            if (femalePctEl) femalePctEl.innerText = `${femalePct}%`;
+            if (femaleBarEl) femaleBarEl.style.width = `${femalePct}%`;
+
+            if (femaleDiffEl) {
+                if (femaleDone >= femaleTarget) {
+                    const extra = femaleDone - femaleTarget;
+                    femaleDiffEl.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900';
+                    femaleDiffEl.innerText = extra > 0 ? `✅ পূর্ণ (+${extra} বেশি)` : '✅ টার্গেট পূর্ণ';
+                } else {
+                    const short = femaleTarget - femaleDone;
+                    femaleDiffEl.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-rose-200 text-rose-900';
+                    femaleDiffEl.innerText = `বাকি ${short} টি`;
+                }
+            }
+
+            // Male Progress
+            const maleDoneEl = document.getElementById('targetMaleDone');
+            const maleDiffEl = document.getElementById('targetMaleDiffBadge');
+            const malePctEl = document.getElementById('targetMalePercent');
+            const maleBarEl = document.getElementById('targetMaleBar');
+
+            if (maleDoneEl) maleDoneEl.innerText = maleDone.toLocaleString();
+            const malePct = Math.min(100, Math.round((maleDone / maleTarget) * 100));
+            if (malePctEl) malePctEl.innerText = `${malePct}%`;
+            if (maleBarEl) maleBarEl.style.width = `${malePct}%`;
+
+            if (maleDiffEl) {
+                if (maleDone >= maleTarget) {
+                    const extra = maleDone - maleTarget;
+                    maleDiffEl.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900';
+                    maleDiffEl.innerText = extra > 0 ? `✅ পূর্ণ (+${extra} বেশি)` : '✅ টার্গেট পূর্ণ';
+                } else {
+                    const short = maleTarget - maleDone;
+                    maleDiffEl.className = 'text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-blue-200 text-blue-900';
+                    maleDiffEl.innerText = `বাকি ${short} টি`;
+                }
+            }
+
+            // Total Progress
+            const totalDoneEl = document.getElementById('targetTotalDoneText');
+            if (totalDoneEl) totalDoneEl.innerText = totalDone.toLocaleString();
+
+            // Motivation Banner & Badge
+            const banner = document.getElementById('targetMotivationBanner');
+            const iconEl = document.getElementById('targetMotivationIcon');
+            const titleEl = document.getElementById('targetMotivationTitle');
+            const msgEl = document.getElementById('targetMotivationMessage');
+            const badgeEl = document.getElementById('targetStatusBadge');
+
+            const isFemaleMet = femaleDone >= femaleTarget;
+            const isMaleMet = maleDone >= maleTarget;
+            const isTargetComplete = isFemaleMet && isMaleMet && totalDone >= totalTarget;
+            const isExceeded = isTargetComplete && (totalDone > totalTarget);
+
+            if (isExceeded) {
+                // CASE 3: EXCEEDED TARGET
+                const extraTotal = totalDone - totalTarget;
+                const extraFemale = Math.max(0, femaleDone - femaleTarget);
+                const extraMale = Math.max(0, maleDone - maleTarget);
+
+                banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-purple-50 border-purple-300 text-purple-950 shadow-sm';
+                if (iconEl) iconEl.innerText = '🏆';
+                if (titleEl) titleEl.innerText = 'অসাধারণ পারফরম্যান্স! আপনি টার্গেটের চেয়েও বেশি নাম্বার দিয়েছেন!';
+                if (msgEl) {
+                    msgEl.className = 'text-xs sm:text-sm text-purple-800 mt-0.5 leading-relaxed font-medium';
+                    msgEl.innerText = `আপনি আজকের ৩০০ নাম্বারের টার্গেট পূরণ করার পরও আরও +${extraTotal} টি অতিরিক্ত নাম্বার দিয়েছেন (Female: +${extraFemale}, Male: +${extraMale})! আপনার অসাধারণ বোনাস পারফরম্যান্স ডাটাবেজে রেকর্ড করা হয়েছে। ধন্যবাদ!`;
+                }
+                if (badgeEl) {
+                    badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-black bg-purple-200 text-purple-900 animate-pulse';
+                    badgeEl.innerText = `🌟 বোনাস: +${extraTotal} টি বেশি!`;
+                }
+
+            } else if (isTargetComplete) {
+                // CASE 2: EXACT TARGET REACHED
+                banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm';
+                if (iconEl) iconEl.innerText = '🎉';
+                if (titleEl) titleEl.innerText = 'অভিনন্দন! আপনি আজকের টার্গেট সফলভাবে পূরণ করেছেন!';
+                if (msgEl) {
+                    msgEl.className = 'text-xs sm:text-sm text-emerald-800 mt-0.5 leading-relaxed font-medium';
+                    msgEl.innerText = 'দারুণ কাজ! আপনি আজকের নির্ধারিত ২০০টি Female এবং ১০০টি Male নাম্বার (মোট ৩০০টি) সফলভাবে সম্পন্ন করেছেন। আজকের মতো আপনার দায়িত্ব নিখুঁতভাবে শেষ হয়েছে।';
+                }
+                if (badgeEl) {
+                    badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-extrabold bg-emerald-200 text-emerald-900';
+                    badgeEl.innerText = '✅ টার্গেট সম্পন্ন';
+                }
+
+            } else {
+                // CASE 1: UNDER TARGET (SHORTFALL)
+                const femaleShort = Math.max(0, femaleTarget - femaleDone);
+                const maleShort = Math.max(0, maleTarget - maleDone);
+                const totalShort = Math.max(0, totalTarget - totalDone);
+
+                banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-amber-50 border-amber-300 text-amber-950 shadow-sm';
+                if (iconEl) iconEl.innerText = '⚠️';
+                if (titleEl) titleEl.innerText = 'আপনি আপনার টার্গেট পূরণ করুন দ্রুতই!';
+
+                let shortDetail = [];
+                if (femaleShort > 0) shortDetail.push(`${femaleShort}টি Female`);
+                if (maleShort > 0) shortDetail.push(`${maleShort}টি Male`);
+                const shortText = shortDetail.join(' এবং ');
+
+                if (msgEl) {
+                    msgEl.className = 'text-xs sm:text-sm text-amber-900 mt-0.5 leading-relaxed font-medium';
+                    msgEl.innerText = `আপনার আজকের ৩০০ নাম্বারের টার্গেট এখনো বাকি আছে। আপনার এখনো ${shortText} (মোট ${totalShort}টি) নাম্বার জমা দেওয়া বাকি রয়েছে। অনুগ্রহ করে দ্রুত কাজ সম্পন্ন করে আপনার টার্গেট পূরণ করুন।`;
+                }
+                if (badgeEl) {
+                    badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-200 text-amber-900';
+                    badgeEl.innerText = `⚠️ বাকি ${totalShort} টি`;
+                }
+            }
+        }
+
 </script>
 
     <!-- Modal: Worker Claimed Numbers Result -->
@@ -6223,6 +6815,38 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                     📋 Copy All Numbers
                 </button>
                 <button type="button" onclick="closeWorkerClaimHistoryModal()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal: Admin View Worker Claim Batch Numbers -->
+    <div id="adminViewClaimModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">📱</span>
+                    <div>
+                        <h3 id="adminClaimModalTitle" class="font-bold text-base text-slate-800">কর্মীর সংগৃহীত নাম্বারসমূহ</h3>
+                        <p id="adminClaimModalSub" class="text-xs text-slate-500">Worker Claim Details</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminViewClaimModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">
+                    ✕
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-hidden flex flex-col space-y-2">
+                <textarea id="adminClaimModalTextarea" readonly rows="12" class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none select-all flex-1"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 mt-3 flex items-center justify-between">
+                <button type="button" onclick="copyAdminClaimModalNumbers()" class="px-4 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow transition">
+                    📋 Copy All Numbers
+                </button>
+                <button type="button" onclick="closeAdminViewClaimModal()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
                     Close
                 </button>
             </div>
