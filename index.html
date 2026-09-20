@@ -64,6 +64,7 @@
             scrollbar-width: none;
         }
     </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
@@ -143,10 +144,7 @@
                         <span>📊</span>
                         <span>Dashboard</span>
                     </button>
-                    <button id="navBtnGender" onclick="switchToSection('gender_verify')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
-                        <span>🚻</span>
-                        <span>Gender Verify Tool</span>
-                    </button>
+                    
                     <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
                         <span>🔍</span>
                         <span>Duplicate Check</span>
@@ -327,63 +325,126 @@
                     </div>
                 </div>
 
-                <!-- File Drop Zone -->
-                <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-8 text-center transition cursor-pointer" onclick="document.getElementById('xlsxFileInput').click()">
-                    <input type="file" id="xlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelected(event)">
-                    <div class="space-y-2">
-                        <div class="text-4xl">📊</div>
-                        <p class="text-sm font-semibold text-slate-700">Click to select your Excel file (.xlsx / .csv)</p>
-                        <p class="text-xs text-slate-500">Make sure your file contains Phone Number, Name, and Age columns</p>
+                <!-- Step 2: Upload Excel File or Paste Text -->
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3 border-b border-slate-200 pb-2">
+                        <button type="button" id="workerInputModeFileBtn" onclick="switchWorkerInputMode('file')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition">
+                            📁 Excel / CSV File Upload
+                        </button>
+                        <button type="button" id="workerInputModePasteBtn" onclick="switchWorkerInputMode('paste')" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                            📋 Direct Text Paste (সরাসরি পেস্ট)
+                        </button>
+                    </div>
+
+                    <!-- Mode A: File Dropzone -->
+                    <div id="workerFileModeContainer" class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-8 text-center transition cursor-pointer" onclick="document.getElementById('xlsxFileInput').click()">
+                        <input type="file" id="xlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileSelected(event)">
+                        <div class="space-y-2">
+                            <div class="text-4xl">📊</div>
+                            <p class="text-sm font-bold text-slate-800">Click to select your Excel file (.xlsx / .csv)</p>
+                            <p class="text-xs text-slate-500">ফাইল নির্বাচন করলে স্বয়ংক্রিয়ভাবে ফোন নাম্বার, নাম ও বয়সের কলাম চিনে নিবে</p>
+                        </div>
+                    </div>
+
+                    <!-- Mode B: Direct Text Paste -->
+                    <div id="workerPasteModeContainer" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 uppercase">
+                            প্রতি লাইনে ফোন নাম্বার, নাম ও বয়স পেস্ট করুন:
+                        </label>
+                        <textarea id="workerDirectPasteInput" rows="5" placeholder="15136465609 Zoe Waynawhere 42&#10;15136465610 Yvonne Shields 38&#10;15136465611 Yvette Cedeno 29..." class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <button type="button" onclick="handleWorkerDirectPasteParse()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">
+                            🔍 পেস্ট করা ডাটা যাচাই ও লোড করুন
+                        </button>
                     </div>
                 </div>
 
                 <!-- Preview & Column Selector (Maps Phone, Name, Age) -->
-                <div id="filePreviewCard" class="hidden mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-4">
+                <div id="filePreviewCard" class="hidden mt-6 p-5 bg-slate-50 rounded-2xl border-2 border-indigo-200 space-y-4 shadow-sm">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                        <div>
-                            <span class="text-xs font-bold text-slate-500 uppercase">Selected File:</span>
-                            <span id="previewFileName" class="text-sm font-semibold text-slate-800 ml-2"></span>
-                            <span id="previewRowCount" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded ml-2"></span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">📊</span>
+                            <div>
+                                <span id="previewFileName" class="font-bold text-slate-900 text-sm"></span>
+                                <span class="text-xs text-slate-500 block">কলামগুলো স্বয়ংক্রিয়ভাবে নির্ধারণ করা হয়েছে। নিচের লাইভ প্রিভিউ দেখে নিশ্চিত হয়ে নিন।</span>
+                            </div>
                         </div>
+                        <span id="previewRowCount" class="text-xs bg-indigo-600 text-white font-extrabold px-3 py-1 rounded-full self-start sm:self-auto"></span>
                     </div>
 
-                    <!-- Column Mapping Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Column Mapping Selectors -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-slate-200">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number Column (Required):</label>
-                            <select id="columnPhoneSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                            <label class="block text-xs font-bold text-indigo-900 mb-1 flex items-center space-x-1">
+                                <span>📞</span>
+                                <span>Phone Number Column (ফোন নাম্বার):</span>
+                            </label>
+                            <select id="columnPhoneSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border-2 border-indigo-400 bg-indigo-50/30 font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500"></select>
+                            <span class="text-[11px] text-emerald-600 font-semibold block mt-0.5">✓ নাম্বারের কলামটি সিলেক্ট করুন</span>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name Column (Required):</label>
-                            <select id="columnNameSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                            <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center space-x-1">
+                                <span>👤</span>
+                                <span>Full Name Column (নাম):</span>
+                            </label>
+                            <select id="columnNameSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500"></select>
+                            <span class="text-[11px] text-slate-400 block mt-0.5">ব্যক্তির নামের কলাম</span>
                         </div>
                         <div id="workerColAgeContainer">
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Age Column (Optional):</label>
-                            <select id="columnAgeSelector" class="w-full text-xs px-3 py-2 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500"></select>
+                            <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center space-x-1">
+                                <span>🎂</span>
+                                <span>Age Column (বয়স):</span>
+                            </label>
+                            <select id="columnAgeSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500"></select>
+                            <span class="text-[11px] text-slate-400 block mt-0.5">বয়সের কলাম (যেমন: 25, 42)</span>
                         </div>
                     </div>
 
                     <!-- Auto Extra Columns for Lookup Report (Income & Market Value) -->
-                    <div id="lookupExtraCols" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                    <div id="lookupExtraCols" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 bg-purple-50/50 p-3 rounded-xl border border-purple-200">
                         <div>
-                            <label class="block text-xs font-bold text-purple-800 mb-1">💰 Household Income Column (গৃহস্থালি আয়):</label>
-                            <select id="columnIncomeSelector" class="w-full text-xs px-3 py-2 rounded border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
+                            <label class="block text-xs font-bold text-purple-900 mb-1">💰 Household Income Column (গৃহস্থালি আয়):</label>
+                            <select id="columnIncomeSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-purple-800 mb-1">🏡 Est. Market Value Column (মার্কেট ভ্যালু):</label>
-                            <select id="columnMarketValueSelector" class="w-full text-xs px-3 py-2 rounded border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
+                            <label class="block text-xs font-bold text-purple-900 mb-1">🏡 Est. Market Value Column (মার্কেট ভ্যালু):</label>
+                            <select id="columnMarketValueSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
+                        </div>
+                    </div>
+
+                    <!-- LIVE 5-ROW VISUAL VERIFICATION TABLE -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-3 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700 uppercase flex items-center space-x-1">
+                                <span>👀</span>
+                                <span>প্রথম ৫টি রেকর্ডের লাইভ প্রিভিউ (যাচাই করে নিন):</span>
+                            </span>
+                            <span class="text-[11px] text-slate-400">সাবমিট করার আগে নিশ্চিত হোন ফোন ও নাম ঠিক জায়গায় আছে</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs min-w-[500px] border">
+                                <thead class="bg-slate-100 text-slate-700 uppercase font-bold border-b">
+                                    <tr>
+                                        <th class="py-2 px-3 border-r w-10">#</th>
+                                        <th class="py-2 px-3 border-r bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন)</th>
+                                        <th class="py-2 px-3 border-r">👤 Full Name (নাম)</th>
+                                        <th class="py-2 px-3">🎂 Age (বয়স)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workerLivePreviewBody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
                     <div class="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200">
                         <div class="w-full sm:w-2/3">
                             <div id="uploadProgressBarContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                                <div id="uploadProgressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                <div id="uploadProgressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
                             </div>
-                            <span id="uploadStatusText" class="text-xs text-slate-500 block mt-1"></span>
+                            <span id="uploadStatusText" class="text-xs font-semibold text-slate-600 block mt-1">Ready to process and submit.</span>
                         </div>
-                        <button id="processUploadBtn" onclick="processAndSubmitXlsx()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition">
-                            🚀 Submit Report to Portal
+                        <button type="button" id="processUploadBtn" onclick="processAndSubmitXlsx()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
+                            <span>🚀 Submit Report to Database</span>
                         </button>
                     </div>
                 </div>
@@ -438,53 +499,148 @@
             </div>
 
             <!-- Admin Stats Cards by Report Types -->
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
-                    <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div onclick="filterAdminSubmissionsBy('all')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600 cursor-pointer hover:shadow-md hover:border-indigo-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
+                        <span class="text-[10px] text-indigo-600 font-bold group-hover:underline">View All ➔</span>
+                    </div>
                     <p id="adminStatTotalUnique" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Unique numbers</p>
+                    <p class="text-xs text-slate-400">Unique numbers stored</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Reports</p>
+                <div onclick="filterAdminSubmissionsBy('male_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Reports</p>
+                        <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-blue-100">Day-by-Day ➔</span>
+                    </div>
                     <p id="adminStatMaleReport" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Male verified data</p>
+                    <p class="text-xs text-slate-400">Click to view all male data</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
+                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
+                        <span class="text-[10px] bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-pink-100">Day-by-Day ➔</span>
+                    </div>
                     <p id="adminStatFemaleReport" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Female verified data</p>
+                    <p class="text-xs text-slate-400">Click to view all female data</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Reports</p>
+                <div onclick="filterAdminSubmissionsBy('lookup_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500 cursor-pointer hover:shadow-md hover:border-purple-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Reports</p>
+                        <span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-purple-100">Day-by-Day ➔</span>
+                    </div>
                     <p id="adminStatLookupReport" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Lookup verified data</p>
+                    <p class="text-xs text-slate-400">Income & Market value data</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 lg:col-span-1">
-                    <p class="text-xs font-bold text-slate-500 uppercase">Today's Total</p>
-                    <p id="adminStatToday" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Added across workers</p>
+                <div onclick="filterAdminSubmissionsBy('today')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Today's Total</p>
+                        <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-blue-100">Today ➔</span>
+                    </div>
+                    <p id="adminStatToday" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Added today across workers</p>
+                </div>
+                <div onclick="switchAdminTab('rec_stock')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-600 col-span-2 lg:col-span-1 cursor-pointer hover:shadow-md hover:border-emerald-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">📥 Received Stock</p>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold group-hover:bg-emerald-200">Open ➔</span>
+                    </div>
+                    <p id="adminStatRecStockTop" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">কোম্পানির নাম্বার ও কাস্টম ডাউনলোড 🎯</p>
                 </div>
             </div>
 
             <!-- Admin Tabs -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-                <div class="flex border-b border-slate-200 px-3 sm:px-6 pt-3 sm:pt-4 space-x-3 sm:space-x-6 overflow-x-auto scrollbar-none whitespace-nowrap">
-                    <button id="tabAdminSubmissionsBtn" onclick="switchAdminTab('submissions')" class="pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
-                        📋 Live Submissions Viewer (All Numbers & Data)
-                    </button>
-                    <button id="tabAdminUsersBtn" onclick="switchAdminTab('users')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
-                        👥 Team Members & Departments (<span id="userTabCount">0</span>)
-                    </button>
-                    <button id="tabAdminBatchesBtn" onclick="switchAdminTab('batches')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
-                        📦 Batch File Upload Logs
-                    </button>
-                    <button id="tabAdminCompanyBtn" onclick="switchAdminTab('company')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
-                        🏢 Company Deliveries (কোম্পানিকে দেওয়া ডাটা) (<span id="companyDelivTotalBadge">0</span>)
-                    </button>
+                <div class="p-3 sm:p-4 bg-slate-50 border-b border-slate-200">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+                        <!-- Tab 1: Submissions -->
+                        <button id="tabAdminSubmissionsBtn" onclick="switchAdminTab('submissions')" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/80 text-indigo-950 font-bold ring-2 ring-indigo-500/20 transition shadow-sm text-center cursor-pointer">
+                            <span class="text-xl mb-1">📋</span>
+                            <span class="text-xs font-bold leading-tight">Submissions Viewer</span>
+                            <span class="text-[10px] text-indigo-700 mt-0.5 font-medium">লাইভ ডাটা ভিউ</span>
+                        </button>
+
+                        <!-- Tab 2: Team Members -->
+                        <button id="tabAdminUsersBtn" onclick="switchAdminTab('users')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition shadow-xs text-center cursor-pointer">
+                            <div class="flex items-center space-x-1.5 mb-1">
+                                <span class="text-xl">👥</span>
+                                <span id="userTabCount" class="text-[11px] bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded-full font-bold">0</span>
+                            </div>
+                            <span class="text-xs font-bold leading-tight">Team Members</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5">কর্মী তালিকা ও ডিপার্টমেন্ট</span>
+                        </button>
+
+                        <!-- Tab 3: Batch Logs -->
+                        <button id="tabAdminBatchesBtn" onclick="switchAdminTab('batches')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition shadow-xs text-center cursor-pointer">
+                            <span class="text-xl mb-1">📦</span>
+                            <span class="text-xs font-bold leading-tight">Batch File Logs</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5">আপলোড হিস্ট্রি</span>
+                        </button>
+
+                        <!-- Tab 4: Company Deliveries (Handover) -->
+                        <button id="tabAdminCompanyBtn" onclick="switchAdminTab('company')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition shadow-xs text-center cursor-pointer">
+                            <div class="flex items-center space-x-1.5 mb-1">
+                                <span class="text-xl">🏢</span>
+                                <span id="companyDelivTotalBadge" class="text-[11px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded-full font-bold">0</span>
+                            </div>
+                            <span class="text-xs font-bold leading-tight">Company Deliveries</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5">কোম্পানিকে দেওয়া ডাটা</span>
+                        </button>
+
+                        <!-- Tab 5: Company Received Stock & Custom Dispenser (PROMINENT) -->
+                        <button id="tabAdminRecStockBtn" onclick="switchAdminTab('rec_stock')" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-emerald-400 bg-white text-slate-800 hover:border-emerald-500 hover:bg-emerald-50/50 transition shadow-xs text-center cursor-pointer group">
+                            <div class="flex items-center space-x-1.5 mb-1">
+                                <span class="text-xl">📥</span>
+                                <span id="recStockAvailableBadge" class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-extrabold group-hover:bg-emerald-200">0</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-emerald-950 leading-tight">Received Stock</span>
+                            <span class="text-[10px] text-emerald-700 font-bold mt-0.5">কোম্পানির নাম্বার ও ফাইল 🎯</span>
+                        </button>
+
+                        <!-- Tab 6: Backup & Cloud Storage -->
+                        <button id="tabAdminBackupBtn" onclick="switchAdminTab('backup')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition shadow-xs text-center cursor-pointer">
+                            <span class="text-xl mb-1">💾</span>
+                            <span class="text-xs font-bold leading-tight">Backup & Storage</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5">গুগল ড্রাইভ ও অফলাইন</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Admin Tab 1: Live Submissions Viewer (All Numbers, Names, Ages) -->
                 <div id="adminTabSubmissions" class="p-6 space-y-4">
+                    <!-- Quick Category Selector Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-extrabold text-indigo-950 uppercase mr-1">⚡ দ্রুত দেখুন:</span>
+                            <button type="button" onclick="filterAdminSubmissionsBy('all')" id="qfBtnAll" class="px-3 py-1.5 text-xs font-bold rounded-lg border transition bg-indigo-600 text-white shadow-sm">
+                                🌟 All Data
+                            </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('male_report')" id="qfBtnMale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition">
+                                👨 Male Data (দিন অনুযায়ী)
+                            </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('female_report')" id="qfBtnFemale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200 transition">
+                                👩 Female Data (দিন অনুযায়ী)
+                            </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('lookup_report')" id="qfBtnLookup" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200 transition">
+                                🔍 Lookup Data
+                            </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('today')" id="qfBtnToday" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition">
+                                📅 Today's Only
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-xs font-bold text-slate-700 flex items-center space-x-1.5 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-300 shadow-sm hover:border-indigo-400">
+                                <input type="checkbox" id="adminSubGroupByDateToggle" onchange="filterAdminSubmissionsLocal()" checked class="rounded text-indigo-600 focus:ring-indigo-500">
+                                <span>📅 দিন অনুযায়ী গ্রুপ করুন (Day-by-Day)</span>
+                            </label>
+                            <button type="button" onclick="adminDeleteInvalidRecords()" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition flex items-center space-x-1" title="মুছে ফেলুন যেসব রেকর্ডে ফোন নাম্বারের ঘরে নাম চলে এসেছে">
+                                <span>🧹</span>
+                                <span>ভুল রেকর্ড মুছুন</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                         <div class="flex flex-wrap items-center gap-3">
                             <div>
@@ -806,183 +962,424 @@
                         </div>
                     </div>
                 </div>
+                <!-- Admin Tab 5: Backup & Cloud Storage Hub -->
+                
+                <!-- Admin Tab: Company Received Numbers Stock & Custom On-Demand Dispenser -->
+                <div id="adminTabRecStock" class="hidden p-6 space-y-6">
+                    <!-- Stock Counter Cards -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
+                            <p class="text-xs font-bold text-slate-500 uppercase">মোট প্রাপ্ত নাম্বার (Total Received)</p>
+                            <p id="recStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">কোম্পানি থেকে মোট পাওয়া</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">🟢 তোলার বাকি আছে (Available)</p>
+                            <p id="recStatAvailable" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">এখনও ডাউনলোড/ব্যবহৃত হয়নি</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">📤 ডাউনলোড করা হয়েছে (Exported)</p>
+                            <p id="recStatExported" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">ইতিমধ্যে উত্তোলন করা নাম্বার</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">📅 আজ প্রাপ্ত (Today's Received)</p>
+                            <p id="recStatToday" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">আজকে আপলোড করা হয়েছে</p>
+                        </div>
+                    </div>
+
+                    <!-- 1. CUSTOM ON-DEMAND NUMBER DISPENSER (চাহিদা অনুযায়ী নাম্বার তোলার টুল) -->
+                    <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl shadow-md p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-700/50 pb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl">🎯</span>
+                                <div>
+                                    <h4 class="font-extrabold text-lg text-white">চাহিদামতো নাম্বার ডাউনলোড টুল (Custom Number Dispenser)</h4>
+                                    <p class="text-xs text-indigo-200">আপনি কতগুলো নাম্বার চান তা লিখুন, সিস্টেম স্বয়ংক্রিয়ভাবে স্টক থেকে ফিল্টার করে আপনার পছন্দের .txt বা .xlsx ফরম্যাটে ডাউনলোড করে দেবে।</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dispenser Controls -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                            <!-- Quantity -->
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-indigo-200 uppercase">
+                                    🔢 কতগুলো নাম্বার চান? (Quantity):
+                                </label>
+                                <input type="number" id="dispenseQuantity" min="1" placeholder="e.g. 500 বা 1000" class="w-full px-3 py-2 rounded-lg bg-white/10 border border-indigo-400 text-white font-bold text-sm focus:bg-white focus:text-slate-900 focus:outline-none">
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    <button type="button" onclick="setDispenseQty(100)" class="px-2 py-0.5 text-[11px] bg-indigo-800/80 hover:bg-indigo-700 rounded border border-indigo-500">100</button>
+                                    <button type="button" onclick="setDispenseQty(500)" class="px-2 py-0.5 text-[11px] bg-indigo-800/80 hover:bg-indigo-700 rounded border border-indigo-500">500</button>
+                                    <button type="button" onclick="setDispenseQty(1000)" class="px-2 py-0.5 text-[11px] bg-indigo-800/80 hover:bg-indigo-700 rounded border border-indigo-500">1,000</button>
+                                    <button type="button" onclick="setDispenseQty(2500)" class="px-2 py-0.5 text-[11px] bg-indigo-800/80 hover:bg-indigo-700 rounded border border-indigo-500">2,500</button>
+                                    <button type="button" onclick="setDispenseQty('all')" class="px-2 py-0.5 text-[11px] bg-emerald-700 hover:bg-emerald-600 rounded border border-emerald-400 font-bold">All Available</button>
+                                </div>
+                            </div>
+
+                            <!-- Date Filter -->
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-indigo-200 uppercase">
+                                    📅 কোন তারিখের স্টক থেকে? (Date):
+                                </label>
+                                <select id="dispenseDateFilter" class="w-full px-3 py-2 rounded-lg bg-white text-slate-800 font-semibold text-xs focus:ring-2 focus:ring-indigo-500">
+                                    <option value="all">🌟 All Dates (সব তারিখের স্টক থেকে)</option>
+                                </select>
+                                <p class="text-[11px] text-indigo-300">যেকোনো নির্দিষ্ট দিনের স্টক আলাদা নিতে পারবেন</p>
+                            </div>
+
+                            <!-- Unused vs All -->
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-indigo-200 uppercase">
+                                    ⚙️ স্টক স্ট্যাটাস (Status):
+                                </label>
+                                <select id="dispenseStatusFilter" class="w-full px-3 py-2 rounded-lg bg-white text-slate-800 font-semibold text-xs focus:ring-2 focus:ring-indigo-500">
+                                    <option value="unused">🟢 শুধুমাত্র অব্যবহৃত / ফ্রেশ নাম্বার (Unused Only)</option>
+                                    <option value="all">📦 সব নাম্বার (পূর্বে ডাউনলোড করা সহ)</option>
+                                </select>
+                                <div class="pt-1">
+                                    <label class="inline-flex items-center space-x-1.5 text-[11px] text-indigo-200 cursor-pointer">
+                                        <input type="checkbox" id="dispenseMarkExported" checked class="rounded text-indigo-500">
+                                        <span>ডাউনলোডের পর ব্যবহৃত হিসেবে মার্ক করুন</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Format & Download Button -->
+                            <div class="space-y-2 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-indigo-200 uppercase mb-1">
+                                        📁 ফাইল ফরম্যাট (File Format):
+                                    </label>
+                                    <div class="flex items-center space-x-3 text-xs font-bold">
+                                        <label class="inline-flex items-center space-x-1.5 cursor-pointer bg-white/10 px-3 py-1.5 rounded-lg border border-indigo-400 hover:bg-white/20">
+                                            <input type="radio" name="dispenseFormat" value="txt" checked class="text-indigo-500">
+                                            <span>📄 .TXT (টেক্সট)</span>
+                                        </label>
+                                        <label class="inline-flex items-center space-x-1.5 cursor-pointer bg-white/10 px-3 py-1.5 rounded-lg border border-indigo-400 hover:bg-white/20">
+                                            <input type="radio" name="dispenseFormat" value="xlsx" class="text-indigo-500">
+                                            <span>📊 .XLSX (এক্সেল)</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="btnExecuteDispense" onclick="executeNumberDispense()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs py-2.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-1.5">
+                                    <span>⚡</span>
+                                    <span id="dispenseBtnLabel">Extract & Download Numbers</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="dispenseResultMsg" class="hidden text-xs p-3 rounded-xl bg-white/10 border border-indigo-400 font-medium"></div>
+                    </div>
+
+                    <!-- 2. UPLOAD INCOMING NUMBERS FROM COMPANY (কোম্পানি থেকে পাওয়া নাম্বার সেভ করুন) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xl">📥</span>
+                                <h4 class="font-bold text-base text-slate-800">কোম্পানি থেকে পাওয়া নতুন নাম্বার আপলোড (Upload Received Stock)</h4>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    📅 প্রাপ্তির তারিখ (Received Date):
+                                </label>
+                                <input type="date" id="recInputDate" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    🏷️ ব্যাচ বা সোর্স নাম (Batch / Source Note):
+                                </label>
+                                <input type="text" id="recInputBatchName" placeholder="e.g. Company_Batch_01 বা Daily_Lead_A" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- Dropzone or Paste -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <!-- File Upload Dropzone -->
+                            <div class="border-2 border-dashed border-indigo-200 rounded-xl p-5 bg-indigo-50/30 flex flex-col items-center justify-center text-center">
+                                <span class="text-3xl mb-1">📁</span>
+                                <p class="text-xs font-bold text-indigo-900">Excel / CSV / TXT ফাইল সিলেক্ট করুন</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">ফাইল থেকে স্বয়ংক্রিয়ভাবে ফোন নাম্বার ও তথ্য বের করে নিবে</p>
+                                <input type="file" id="recFileInput" accept=".xlsx, .xls, .csv, .txt" onchange="handleRecFileSelect(event)" class="mt-3 block w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+                            </div>
+
+                            <!-- Direct Paste Textarea -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    📋 অথবা সরাসরি টেক্সট পেস্ট করুন (Paste Numbers directly):
+                                </label>
+                                <textarea id="recTextInput" rows="4" placeholder="15136465609&#10;15136465610&#10;15136465611..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono focus:bg-white focus:ring-2 focus:ring-indigo-500"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Submit Upload Button -->
+                        <div class="flex items-center justify-between pt-2">
+                            <span class="text-xs text-slate-500">⚡ স্বয়ংক্রিয়ভাবে ডুপ্লিকেট নাম্বার বাদ দিয়ে স্টকে সংরক্ষণ হবে।</span>
+                            <button type="button" id="btnSubmitRecStock" onclick="submitCompanyReceivedStock()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-6 rounded-xl shadow-md transition flex items-center space-x-1.5">
+                                <span>📥 Save & Stock Numbers</span>
+                            </button>
+                        </div>
+
+                        <!-- Upload Result Card -->
+                        <div id="recUploadResultCard" class="hidden p-4 rounded-xl text-xs font-medium"></div>
+                    </div>
+
+                    <!-- 3. DATE-WISE RECEIVED STOCK HISTORY TABLE -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-3">
+                            <div>
+                                <h4 class="font-bold text-base text-slate-800">📅 প্রাপ্ত নাম্বারের তারিখভিত্তিক স্টক তালিকা (Date-wise Stock History)</h4>
+                                <p class="text-xs text-slate-500">কোন তারিখে কোম্পানি থেকে কত নাম্বার এসেছে তার বিবরণ।</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <input type="text" id="recHistorySearch" oninput="filterRecStockHistoryLocal()" placeholder="Search phone / batch..." class="px-3 py-1.5 text-xs rounded-lg border border-slate-300">
+                                <select id="recHistoryDateFilter" onchange="loadCompanyReceivedData()" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold">
+                                    <option value="all">All Dates</option>
+                                </select>
+                                <button type="button" onclick="loadCompanyReceivedData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 transition">
+                                    🔄 Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs min-w-[700px]">
+                                <thead class="bg-slate-50 text-slate-500 uppercase border-b">
+                                    <tr>
+                                        <th class="py-3 px-4">#</th>
+                                        <th class="py-3 px-4">Phone Number</th>
+                                        <th class="py-3 px-4">Name</th>
+                                        <th class="py-3 px-4">Received Date</th>
+                                        <th class="py-3 px-4">Batch Name</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recStockTableBody" class="divide-y divide-slate-100">
+                                    <tr><td colspan="7" class="py-6 text-center text-slate-400">Loading received stock records...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="adminTabBackup" class="hidden p-6 space-y-6">
+                    <!-- Status & Storage Monitor -->
+                    <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-6 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <div class="inline-flex items-center space-x-2 bg-indigo-500/30 text-indigo-200 text-xs px-3 py-1 rounded-full font-semibold mb-2">
+                                <span>🟢 Database Status: Healthy & Online</span>
+                            </div>
+                            <h3 class="text-xl font-bold">💾 Central Database Backup & Extra Storage Hub</h3>
+                            <p class="text-xs text-indigo-200 mt-1">আপনার সকল ফোন নাম্বার, কর্মী রিপোর্ট ও ডেলিভারি ডাটা ১০০% নিরাপদ রাখতে অফলাইন ব্যাকআপ ও বিকল্প ক্লাউড সুবিধা।</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-indigo-300 uppercase block font-semibold">Supabase Free Storage Limit</span>
+                            <span class="text-2xl font-extrabold text-emerald-400">500 MB (~10,00,000 Numbers)</span>
+                            <span class="text-[11px] text-indigo-300 block">এখনই আপনার পর্যাপ্ত স্টোরেজ রয়েছে</span>
+                        </div>
+                    </div>
+
+                    <!-- 1-Click Instant Offline Backups -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-base flex items-center space-x-2">
+                                    <span>📥</span>
+                                    <span>১-ক্লিকে সম্পূর্ণ ডাটাবেজ ব্যাকআপ ডাউনলোড (Instant 1-Click Backup)</span>
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-0.5">ডাটাবেজে সংরক্ষিত প্রতিটি ফোন নাম্বার, কর্মীর নাম, বয়স, ইনকাম ও তারিখসহ আপনার কম্পিউটারে বা ড্রাইভে সেভ রাখুন।</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center space-x-2 text-indigo-700 font-bold text-sm mb-1">
+                                        <span>📄</span>
+                                        <span>Full JSON Snapshot Backup</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">সম্পূর্ণ ডাটাবেজের অবিকল কপি। পরবর্তীতে যেকোনো সময় ১-ক্লিকে রিস্টোর বা অন্য ডাটাবেজে ট্রান্সফার করা যাবে।</p>
+                                </div>
+                                <button type="button" onclick="downloadFullDatabaseJsonBackup()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-3 rounded-lg shadow-sm transition flex items-center justify-center space-x-1">
+                                    <span>📥 Download JSON Backup</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center space-x-2 text-emerald-700 font-bold text-sm mb-1">
+                                        <span>📊</span>
+                                        <span>Complete Master Excel (.xlsx)</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">সব ক্যাটাগরি (Male, Female, Lookup) তারিখ ও কর্মীর নামসহ এক্সেল শিট আকারে ডাউনলোড করে ড্রাইভে সেভ রাখুন।</p>
+                                </div>
+                                <button type="button" onclick="downloadMasterExcel()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-3 rounded-lg shadow-sm transition flex items-center justify-center space-x-1">
+                                    <span>📊 Download Master Excel</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center space-x-2 text-purple-700 font-bold text-sm mb-1">
+                                        <span>🏢</span>
+                                        <span>Company Deliveries Excel</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">কোম্পানিকে আজ পর্যন্ত যেসব ইউনিক নাম্বার ডেলিভারি দিয়েছেন তার আলাদা ব্যাকআপ ফাইল।</p>
+                                </div>
+                                <button type="button" onclick="downloadCompanyDeliveriesExcel()" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2.5 px-3 rounded-lg shadow-sm transition flex items-center justify-center space-x-1">
+                                    <span>🏢 Download Company Excel</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                                        <!-- Google Drive Direct Cloud Sync Module -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between border-b pb-3 gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl">📁</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-base">Google Drive Cloud Connect (গুগল ড্রাইভ স্টোরেজ কানেক্ট)</h4>
+                                    <p class="text-xs text-slate-500">আপনার নিজস্ব গুগল অ্যাকাউন্টের ১৫ জিবি (15 GB) ফ্রি ড্রাইভ স্টোরেজ সরাসরি এই পোর্টালের সাথে যুক্ত করুন।</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <a href="https://drive.google.com" target="_blank" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-lg border border-slate-300 transition flex items-center space-x-1">
+                                    <span>📂 Open Google Drive ↗</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Not Connected State -->
+                        <div id="gdriveNotConnected" class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                                    Google OAuth Client ID (গুগল ক্লাউড ক্লায়েন্ট আইডি):
+                                </label>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <input type="text" id="gdriveClientIdInput" value="171403934003-q673l41i2h57c7p9pjob191bnv76d2ge.apps.googleusercontent.com" placeholder="xxxx.apps.googleusercontent.com" class="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white font-mono focus:ring-2 focus:ring-indigo-500">
+                                    <button type="button" onclick="handleConnectGoogleDrive()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center justify-center space-x-1.5 whitespace-nowrap">
+                                        <span>🔗 Connect Google Drive</span>
+                                    </button>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">💡 আপনার গুগল ক্লাউড কনসোল থেকে তৈরি করা Client ID এখানে একবার দিলেই হবে (ব্রাউজারে সেভ থাকবে)।</p>
+                            </div>
+
+                            <!-- Setup Help Accordion -->
+                            <details class="text-xs text-slate-600 bg-white p-3 rounded-lg border border-slate-200">
+                                <summary class="font-bold text-indigo-700 cursor-pointer hover:underline">
+                                    📖 কীভাবে Google Client ID পাবেন? (২ মিনিটের সহজ গাইড)
+                                </summary>
+                                <div class="mt-2 space-y-1.5 text-slate-600 pl-2 leading-relaxed">
+                                    <p>১. <a href="https://console.cloud.google.com" target="_blank" class="text-indigo-600 font-bold underline">Google Cloud Console ↗</a> এ গিয়ে একটি নতুন প্রজেক্ট তৈরি করুন।</p>
+                                    <p>২. <strong>APIs & Services</strong> ➔ <strong>Library</strong> থেকে <strong>Google Drive API</strong> সার্চ করে <strong>Enable</strong> করুন।</p>
+                                    <p>৩. <strong>Credentials</strong> ➔ <strong>Create Credentials</strong> ➔ <strong>OAuth client ID</strong> বেছে নিন (Application type: <em>Web application</em>)।</p>
+                                    <p>৪. <strong>Authorized JavaScript origins</strong>-এ আপনার বর্তমান ওয়েবসাইটের লিংক (যেমন: <code>https://yourname.github.io</code>) যোগ করে <strong>Create</strong> চাপুন।</p>
+                                    <p>৫. তৈরি হওয়া <strong>Client ID</strong> টি কপি করে উপরের বক্সে পেস্ট করে <strong>Connect Google Drive</strong> বাটনে ক্লিক করুন।</p>
+                                </div>
+                            </details>
+                        </div>
+
+                        <!-- Connected State -->
+                        <div id="gdriveConnected" class="hidden space-y-4 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span class="text-xs font-bold text-emerald-900">গুগল অ্যাকাউন্ট সক্রিয়ভাবে যুক্ত আছে:</span>
+                                    <span id="gdriveConnectedEmail" class="text-xs font-mono font-extrabold bg-white border border-emerald-300 px-2 py-0.5 rounded text-emerald-800"></span>
+                                </div>
+                                <button type="button" onclick="handleDisconnectGoogleDrive()" class="text-xs text-red-600 hover:text-red-800 underline font-medium">
+                                    Disconnect
+                                </button>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-3 pt-1">
+                                <button type="button" id="gdriveUploadBtn" onclick="uploadDatabaseBackupToGoogleDrive()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center space-x-1.5">
+                                    <span>☁️</span>
+                                    <span>১-ক্লিকে সরাসরি গুগল ড্রাইভে ডাটাবেজ ব্যাকআপ পাঠান</span>
+                                </button>
+                            </div>
+
+                            <div id="gdriveUploadStatus" class="hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cloud Storage Alternatives Guide -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                        <div class="border-b pb-3">
+                            <h4 class="font-bold text-slate-800 text-base flex items-center space-x-2">
+                                <span>☁️</span>
+                                <span>সুপাবেস ছাড়াও ফ্রিতে আনলিমিটেড / বাড়তি স্টোরেজ পাওয়ার সেরা উপায়সমূহ</span>
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-0.5">যদি ভবিষ্যতে ডাটা অনেক বেশি হয়ে যায় বা ব্যাকআপ হিসেবে আরও বড় স্টোরেজ দরকার হয়, নিচের ৩টি সবচেয়ে সেরা:</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                            <!-- 1. Firebase -->
+                            <div class="border border-amber-200 bg-amber-50/40 rounded-xl p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="text-2xl">🔥</span>
+                                    <div>
+                                        <h5 class="font-bold text-amber-900 text-sm">১. Google Firebase Firestore</h5>
+                                        <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded">1 GB সম্পূর্ণ ফ্রি</span>
+                                    </div>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside mt-2">
+                                    <li>সুপাবেসের দ্বিগুণ (1 GB) ফ্রি ক্লাউড স্টোরেজ।</li>
+                                    <li>কখনো স্লিপ বা পজ (Pause) হয় না।</li>
+                                    <li>গুগলের নিজস্ব নিরাপদ ক্লাউড ডাটাবেজ।</li>
+                                    <li>Firebase Console থেকে ৫ মিনিটে ফ্রি প্রজেক্ট খোলা যায়।</li>
+                                </ul>
+                            </div>
+
+                            <!-- 2. Cloudflare D1 & R2 -->
+                            <div class="border border-orange-200 bg-orange-50/40 rounded-xl p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="text-2xl">⚡</span>
+                                    <div>
+                                        <h5 class="font-bold text-orange-900 text-sm">২. Cloudflare D1 + R2</h5>
+                                        <span class="text-[10px] bg-orange-200 text-orange-900 font-bold px-1.5 py-0.2 rounded">5 GB থেকে 10 GB ফ্রি</span>
+                                    </div>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside mt-2">
+                                    <li>Cloudflare D1-এ ৫ জিবি SQL ডাটাবেজ ফ্রি।</li>
+                                    <li>Cloudflare R2-তে প্রতি মাসে ১০ জিবি ফাইল স্টোরেজ ফ্রি।</li>
+                                    <li>বিশ্বের সবচেয়ে ফাস্ট ক্লাউড নেটওয়ার্ক।</li>
+                                    <li>Cloudflare ড্যাশবোর্ড থেকে সহজেই ব্যবহার করা যায়।</li>
+                                </ul>
+                            </div>
+
+                            <!-- 3. Google Drive Archiving -->
+                            <div class="border border-blue-200 bg-blue-50/40 rounded-xl p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="text-2xl">📁</span>
+                                    <div>
+                                        <h5 class="font-bold text-blue-900 text-sm">৩. Google Drive Cloud Archiving</h5>
+                                        <span class="text-[10px] bg-blue-200 text-blue-900 font-bold px-1.5 py-0.2 rounded">15 GB প্রতি জিমেইলে ফ্রি</span>
+                                    </div>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside mt-2">
+                                    <li>কোনো নতুন অ্যাকাউন্ট খোলা ছাড়াই আপনার জিমেইলে ১৫ জিবি ফ্রি।</li>
+                                    <li>প্রতি মাস শেষে ১-ক্লিকে এক্সেল বা JSON ব্যাকআপ গুগল ড্রাইভে আপলোড করে রাখুন।</li>
+                                    <li>সুপাবেস ডাটাবেজ সব সময় খালি, ফ্রেশ ও ফাস্ট থাকবে।</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <!-- 5. Gender Verification View -->
-        <div id="genderVerifyView" class="hidden space-y-8">
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <span class="bg-pink-100 text-pink-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">High Accuracy Tool</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-1">Accurate Gender Verification & Sector Sorter</h2>
-                    <p class="text-sm text-slate-500">Auto-identifies Male & Female records using Multi-API Waterfall (Local DB, Genderize.io, GenderAPI.io, Gender-API.com). Review, easily move records with 1-click, and submit directly as Male/Female Report!</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                <div class="flex border-b border-slate-200 mb-6">
-                    <button id="tabGvPasteBtn" onclick="switchGvInputMode('paste')" class="pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
-                        📋 Paste Text / Excel Data
-                    </button>
-                    <button id="tabGvFileBtn" onclick="switchGvInputMode('file')" class="pb-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
-                        📁 Upload XLSX File
-                    </button>
-                </div>
-
-                <div id="gvPasteSection" class="space-y-4">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-xs font-bold text-slate-600 uppercase">
-                                Paste Rows of Names, Numbers & Optional Age (One per line)
-                            </label>
-                            <button type="button" onclick="clearGenderVerifyForm()" class="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-md font-bold transition flex items-center space-x-1 border border-rose-200" title="এক ক্লিকে সব লেখা ও রেজাল্ট মুছে নতুন করে শুরু করুন">
-                                <span>🧹</span>
-                                <span>Clear / নতুন শুরু</span>
-                            </button>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">
-                            Copy-paste columns directly from Excel or enter e.g.: <span class="font-mono bg-slate-100 px-1 rounded">15136465609 Khayri Khalimov 52</span>
-                        </p>
-                        <textarea id="gvTextInput" rows="7" placeholder="15136465609 Khayri Khalimov 52&#10;15136466414 Bechara Dahdah 44&#10;15136467474 Robin Hauck 72&#10;15136467519 Eva Carstens 80" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                    </div>
-                </div>
-
-                <div id="gvFileSection" class="hidden space-y-4">
-                    <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-xl p-6 text-center transition cursor-pointer" onclick="document.getElementById('gvXlsxFileInput').click()">
-                        <input type="file" id="gvXlsxFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleGvFileSelected(event)">
-                        <div class="space-y-1">
-                            <div class="text-3xl">📑</div>
-                            <p class="text-sm font-semibold text-slate-700">Select XLSX file to verify genders</p>
-                            <p class="text-xs text-slate-400">Excel files containing Name, Phone Number, and Age</p>
-                        </div>
-                    </div>
-                    <div id="gvFileColumnMap" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Name Column:</label>
-                            <select id="gvColName" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-white"></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Column:</label>
-                            <select id="gvColPhone" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-white"></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Age Column (Optional):</label>
-                            <select id="gvColAge" class="w-full text-xs px-3 py-1.5 rounded border border-slate-300 bg-white"></select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                    <div class="w-full sm:w-1/2">
-                        <div id="gvProgressContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                            <div id="gvProgressBar" class="bg-pink-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                        <span id="gvStatusText" class="text-xs text-slate-500 block mt-1"></span>
-                    </div>
-                    <div class="flex items-center gap-2.5 w-full sm:w-auto">
-                        <button type="button" onclick="clearGenderVerifyForm()" class="w-1/2 sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-lg border border-slate-300 transition flex items-center justify-center space-x-1.5" title="Clear all text and reset results">
-                            <span>🧹 Clear (মুছে ফেলুন)</span>
-                        </button>
-                        <button id="gvStartBtn" onclick="startGenderVerification()" class="w-1/2 sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow transition flex items-center justify-center space-x-2">
-                            <span>⚡ Verify Genders Now</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Results Section -->
-            <div id="gvResultsSection" class="hidden space-y-6">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">Total Checked</p>
-                        <p id="gvStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Detected</p>
-                        <p id="gvStatMale" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Detected</p>
-                        <p id="gvStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">❓ Undetermined</p>
-                        <p id="gvStatUnknown" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-4">
-                        <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                            <button id="btnSectorMale" onclick="switchGvSector('male')" class="px-4 py-2 text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5">
-                                <span>👨 Male Sector Report</span>
-                                <span id="badgeMaleCount" class="bg-white text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-                            </button>
-                            <button id="btnSectorFemale" onclick="switchGvSector('female')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5">
-                                <span>👩 Female Sector Report</span>
-                                <span id="badgeFemaleCount" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-                            </button>
-                            <button id="btnSectorUnknown" onclick="switchGvSector('unknown')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5">
-                                <span>❓ Undetermined</span>
-                                <span id="badgeUnknownCount" class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-                            </button>
-                        </div>
-
-                        <div class="flex flex-wrap items-center gap-3">
-                            <button id="gvDownloadSectorBtn" onclick="downloadCurrentSectorExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
-                                <span>📥 Download Report (.xlsx)</span>
-                            </button>
-                            <!-- 1-Click Submission to Portal as Male or Female Report! -->
-                            <button id="gvSubmitReportBtn" onclick="submitGvSectorAsReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
-                                <span id="gvSubmitBtnText">🚀 Submit Sector Report to Portal</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Bulk Action Bar for Undetermined Sector -->
-                    <div id="undeterminedBulkBar" class="hidden mb-4 p-3 sm:p-4 bg-amber-50 rounded-xl border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-amber-900">⚡ Bulk Actions:</span>
-                            <span class="text-xs bg-white text-amber-800 px-2 py-0.5 rounded border border-amber-300 font-bold">
-                                <span id="selectedUndeterminedCount">0</span> selected
-                            </span>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="autoMoveUndeterminedByPrediction()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
-                                <span>⚡ Auto-Move by Ratio Prediction (>65%)</span>
-                            </button>
-                            <button onclick="bulkMoveUndetermined('male')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
-                                <span>👨 Move Selected to Male</span>
-                            </button>
-                            <button onclick="bulkMoveUndetermined('female')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
-                                <span>👩 Move Selected to Female</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm min-w-[680px]">
-                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
-                                <tr id="gvTableHeaderRow">
-                                    <th class="py-3 px-4">#</th>
-                                    <th class="py-3 px-4">Full Name</th>
-                                    <th class="py-3 px-4">Phone Number</th>
-                                    <th class="py-3 px-4">Age</th>
-                                    <th class="py-3 px-4">Detected Gender</th>
-                                    <th class="py-3 px-4 text-right">Action / Move</th>
-                                </tr>
-                            </thead>
-                            <tbody id="gvSectorTableBody" class="divide-y divide-slate-100">
-                                <tr><td colspan="6" class="py-6 text-center text-slate-400">No records to display.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- 6. Dedicated Duplicate Checker View -->
         <div id="duplicateCheckView" class="hidden space-y-8">
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1236,72 +1633,17 @@
         let userEmailToNameMap = {};
         let currentAuthMode = 'signin';
 
-        // Extensive High-Speed Verified Names Dictionary
-        const MALE_NAMES_DB = new Set([
-            "khayri","bassem","nabil","hussein","farhan","khalid","ismail","ahmad","noori","baker","boutilier","roark","tackett","woods","sahoo","goldston","wassem","golsby","russo","osman","qaid","debasis","muhammad","mohammed","mohamed","keneil","dionta","isaiah","sebastian","lewis","brady","valery","stanislav","vadim","oleg","gleb","anton","roman","maksim","artem","pavel","yuri","mikhail","nikolai","sergei","boris","igor","vladimir","ivan","alexei","dmitri","serge","luc","marcel","alain","pierre","maroun","michel","antoine","charbel","elias","georges","jad","fadi","ziad","rami","sami","latif","mansoor","faisal","samir","rashid","nasser","salim","hamza","bilal","zayd","farooq","ibrahim","yusuf","omar","hassan","mustafa","bechara","glenn","dennis","donavon","jayson","matthew","gregory","afshin","robin",
-            "james","john","robert","michael","william","david","richard","charles","joseph","thomas",
-            "christopher","daniel","paul","mark","donald","george","kenneth","steven","edward","brian",
-            "ronald","anthony","kevin","jason","matthew","gary","timothy","jose","larry","jeffrey",
-            "frank","scott","eric","stephen","andrew","raymond","gregory","joshua","jerry","dennis",
-            "walter","patrick","peter","harold","douglas","henry","carl","arthur","ryan","roger",
-            "joe","juan","jack","albert","jonathan","justin","terry","gerald","keith","samuel",
-            "willie","ralph","lawrence","nicholas","roy","benjamin","bruce","brandon","adam","harry",
-            "fred","wayne","billy","steve","louis","jeremy","aaron","randy","howard","eugene",
-            "carlos","russell","bobby","victor","martin","ernest","phillip","todd","jesse","craig",
-            "alan","shawn","clarence","sean","philip","chris","johnny","earl","jimmy","antonio",
-            "danny","bryan","tony","luis","mike","stanley","leonard","nathan","dale","manuel",
-            "rodney","curtis","norman","allen","marvin","vincent","glenn","travis","jeff","chad",
-            "jacob","lee","melvin","alfred","kyle","francis","bradley","jesus","herbert","frederick",
-            "ray","joel","edwin","don","eddie","ricky","troy","alexander","bernard","marcus",
-            "sam","francisco","clifford","derrick","micheal","warren","darrell","jerome","leo","alvin",
-            "tim","wesley","gordon","dean","greg","jorge","dustin","pedro","corey","herman",
-            "maurice","vernon","roberto","clyde","glen","hector","shane","ricardo","rick","lester",
-            "brent","ramon","charlie","tyler","gilbert","gene","marc","reginald","ruben","brett",
-            "angel","nathaniel","rafael","leslie","edgar","milton","raul","ben","chester","cecil",
-            "duane","franklin","andre","elmer","brad","gabriel","ron","mitchell","roland","arnold",
-            "harvey","jared","adrian","karl","cory","claude","erik","darryl","jamie","neil",
-            "jessie","christian","javier","fernando","clinton","ted","mathew","tyrone","darren",
-            "lonnie","lance","cody","julio","kurt","kirk","alex","ahmed","ali","hasan","hossain",
-            "karim","mahmud","rahim","tanvir","rakib","shakil","rashed","suman","rubel","sohel",
-            "arif","jewel","rasel","mehedi","sabbir","nayeem","alamin","faruk","ripon","shuvo",
-            "monir","momin","imran","nahid","jahid","ashik","asif","jahangir","shahin","shamim",
-            "masud","mamun","tariq","tarek","anwar","babul","dulal","kamal","jamal","rafiq",
-            "shafiq","shahid","rony","kabir","abir","saiful","nazmul","shafiqul","aminul","hasibul",
-            "monirul","habibur","mostafa","kamrul","delowar","zillur","belal","habib","khalil"
-        ]);
+        // Google Drive Client State (Global & Safe)
+        var googleTokenClient = null;
+        var googleAccessToken = localStorage.getItem('gdrive_access_token') || null;
+        var googleUserEmail = localStorage.getItem('gdrive_user_email') || null;
+        var recStockCache = [];
+        var recStockParsedRows = [];
 
-        const FEMALE_NAMES_DB = new Set([
-            "eva","daphne","dakota","daisy","colette","chloe","chelsea","celeste","cecilia","catalina","cassidy","carolina","carly","candace","camryn","camilla","camila","chrislean","valeria","anastasia","daria","marina","yulia","ksenia","polina","oxana","irina","ekaterina","natasha","tatiana","olga","svetlana","elena","daniela","yara","maya","reem","dina","hoda","mona","lina","leila","rana","rim","nour","amina","yasmin","mariam","zainab","fatima","samira","layla","nadia","mary","patricia","linda","barbara","elizabeth","jennifer","maria","susan","margaret","dorothy",
-            "lisa","nancy","karen","betty","helen","sandra","donna","carol","ruth","sharon",
-            "michelle","laura","sarah","kimberly","deborah","jessica","shirley","cynthia","angela","melissa",
-            "brenda","amy","anna","rebecca","virginia","kathleen","pamela","martha","debra","amanda",
-            "stephanie","carolyn","christine","marie","janet","catherine","frances","ann","joyce","diane",
-            "alice","julie","heather","teresa","doris","gloria","evelyn","jean","cheryl","mildred",
-            "katherine","joan","ashley","judith","rose","janice","kelly","nicole","judy","christina",
-            "kathy","theresa","beverly","denise","tammy","irene","jane","lori","rachel","marilyn",
-            "andrea","kathryn","louise","sara","anne","jacqueline","wanda","bonnie","julia","ruby",
-            "lois","tina","phyllis","norma","paula","diana","annie","lillian","emily","robin",
-            "peggy","crystal","gladys","rita","dawn","connie","florence","tracy","edna","tiffany",
-            "carmen","rosa","cindy","grace","wendy","victoria","edith","kim","sherry","sylvia",
-            "josephine","thelma","shannon","sheila","ethel","ellen","elaine","marjorie","carrie","charlotte",
-            "monica","esther","pauline","emma","juanita","anita","rhonda","hazel","amber",
-            "debbie","april","clara","lucille","joanne","eleanor","valerie","danielle","megan","alicia",
-            "suzanne","michele","gail","bertha","darlene","veronica","jill","erin","geraldine","lauren",
-            "cathy","joann","lorraine","lynn","sally","regina","erica","beatrice","dolores","bernice",
-            "audrey","yvonne","annette","june","samantha","marion","dana","stacy","ana","renee",
-            "ida","vivian","roberta","holly","brittany","melanie","loretta","yolanda","jeanette","laurie",
-            "katie","kristen","vanessa","alma","sue","elsie","beth","jeanne","vicki","carla",
-            "tara","rosemary","eileen","terri","gertrude","lucy","tonya","ella","stacey","wilma",
-            "gina","kristin","natalie","agnes","vera","charlene","bessie","delores","melinda","pearl",
-            "arlene","maureen","colleen","allison","tamara","joy","georgia","constance","lillie","claudia",
-            "jackie","marcia","tanya","nellie","minnie","marlene","heidi","glenda","lydia","viola",
-            "courtney","marian","stella","caroline","dora","vickie","mattie","maxine","irma","mabel",
-            "blanche","fatema","ruma","rina","mina","shila","sumi","akter","begum","khatun","sultana",
-            "parvin","nasrin","shirin","sharmin","farhana","sabrina","jannat","mim","bristy","purnima",
-            "puja","riya","priya","mou","munni","tania","sonia","laboni","sadia","nabila","tasnim",
-            "afroza","rehana","salma","bilkis","hasina","khaleda","rokeya","suraiya","shamima","dilruba",
-            "monira","rubina","shahnaz","jahanara","nurjahan","salma","reshma","tahmina","marufa"
-        ]);
+        // Extensive High-Speed Verified Names Dictionary
+        const MALE_NAMES_DB = new Set();
+
+        const FEMALE_NAMES_DB = new Set();
 
         window.addEventListener('DOMContentLoaded', () => {
             initSupabase();
@@ -1337,6 +1679,12 @@
             if (session && session.user) {
                 currentUser = session.user;
                 await loadUserProfile();
+                setupGoogleDriveClient();
+            const recDateInput = document.getElementById('recInputDate');
+            if (recDateInput && !recDateInput.value) {
+                recDateInput.value = new Date().toISOString().slice(0, 10);
+            }
+
             } else {
                 showView('loginView');
             }
@@ -1447,6 +1795,12 @@
                     if (data && data.session) {
                         currentUser = data.user;
                         await loadUserProfile();
+                setupGoogleDriveClient();
+            const recDateInput = document.getElementById('recInputDate');
+            if (recDateInput && !recDateInput.value) {
+                recDateInput.value = new Date().toISOString().slice(0, 10);
+            }
+
                     } else {
                         if (successBox) {
                             successBox.innerText = 'Account created successfully! You can now Sign In.';
@@ -1464,6 +1818,12 @@
                     if (error) throw error;
                     currentUser = data.user;
                     await loadUserProfile();
+                setupGoogleDriveClient();
+            const recDateInput = document.getElementById('recInputDate');
+            if (recDateInput && !recDateInput.value) {
+                recDateInput.value = new Date().toISOString().slice(0, 10);
+            }
+
                 }
             } catch (err) {
                 console.error(err);
@@ -1573,7 +1933,7 @@
         }
 
         function showView(viewId) {
-            ['loginView', 'userDashboard', 'adminDashboard', 'genderVerifyView', 'duplicateCheckView'].forEach(id => {
+            ['loginView', 'userDashboard', 'adminDashboard', 'duplicateCheckView'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
@@ -1599,9 +1959,7 @@
                     showView('userDashboard');
                     loadUserDashboard();
                 }
-            } else if (sec === 'gender_verify') {
-                if (btnGender) btnGender.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
-                showView('genderVerifyView');
+
             } else if (sec === 'duplicate_check') {
                 if (btnDup) btnDup.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
                 showView('duplicateCheckView');
@@ -1661,6 +2019,92 @@
             document.getElementById('statUserAllTime').innerText = (allTimeCount || 0).toLocaleString();
         }
 
+        function switchWorkerInputMode(mode) {
+            const btnFile = document.getElementById('workerInputModeFileBtn');
+            const btnPaste = document.getElementById('workerInputModePasteBtn');
+            const contFile = document.getElementById('workerFileModeContainer');
+            const contPaste = document.getElementById('workerPasteModeContainer');
+
+            if (mode === 'file') {
+                btnFile.className = 'text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition';
+                btnPaste.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+                contFile.classList.remove('hidden');
+                contPaste.classList.add('hidden');
+            } else {
+                btnPaste.className = 'text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition';
+                btnFile.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+                contPaste.classList.remove('hidden');
+                contFile.classList.add('hidden');
+            }
+        }
+
+        function handleWorkerDirectPasteParse() {
+            const rawText = (document.getElementById('workerDirectPasteInput')?.value || '').trim();
+            if (!rawText) {
+                alert('অনুগ্রহ করে বক্সে টেক্সট বা নাম্বার পেস্ট করুন।');
+                return;
+            }
+
+            const lines = rawText.split(/\r?\n/);
+            parsedRows = [];
+
+            lines.forEach(l => {
+                const trimmed = l.trim();
+                if (!trimmed) return;
+
+                // Split by tabs or multiple spaces or commas
+                const tokens = trimmed.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
+                let phone = '';
+                let name = '';
+                let age = '';
+
+                tokens.forEach(tok => {
+                    const cleanNum = tok.replace(/[^0-9]/g, '');
+                    if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
+                        phone = cleanNum;
+                    } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 15 && parseInt(cleanNum) <= 120 && !age) {
+                        age = cleanNum;
+                    } else if (!name && /[a-zA-Z]/.test(tok)) {
+                        name = tok;
+                    }
+                });
+
+                // Fallback word split
+                if (!phone || !name) {
+                    const words = trimmed.split(/\s+/);
+                    const nameParts = [];
+                    words.forEach(w => {
+                        const cleanNum = w.replace(/[^0-9]/g, '');
+                        if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
+                            phone = cleanNum;
+                        } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 15 && parseInt(cleanNum) <= 120 && !age) {
+                            age = cleanNum;
+                        } else {
+                            nameParts.push(w);
+                        }
+                    });
+                    if (nameParts.length > 0) name = nameParts.join(' ');
+                }
+
+                if (phone || name) {
+                    parsedRows.push({
+                        'Phone': phone,
+                        'Full Name': name || 'Unknown',
+                        'Age': age || '-'
+                    });
+                }
+            });
+
+            if (parsedRows.length === 0) {
+                alert('পেস্ট করা টেক্সট থেকে কোনো বৈধ তথ্য পাওয়া যায়নি।');
+                return;
+            }
+
+            selectedFileData = { name: `Direct_Paste_${parsedRows.length}_rows.txt` };
+            document.getElementById('previewFileName').innerText = selectedFileData.name;
+            setupColumnSelectorsAndPreview();
+        }
+
         function handleFileSelected(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1682,54 +2126,150 @@
                         return;
                     }
 
-                    document.getElementById('previewRowCount').innerText = `${parsedRows.length} rows detected`;
-
-                    const sampleRow = parsedRows[0];
-                    const columns = Object.keys(sampleRow);
-                    const phoneSel = document.getElementById('columnPhoneSelector');
-                    const nameSel = document.getElementById('columnNameSelector');
-                    const ageSel = document.getElementById('columnAgeSelector');
-
-                    phoneSel.innerHTML = '';
-                    nameSel.innerHTML = '<option value="">-- None / Auto --</option>';
-                    ageSel.innerHTML = '<option value="">-- None / Auto --</option>';
-
-                    let phoneSelected = false;
-                    let nameSelected = false;
-                    let ageSelected = false;
-
-                    columns.forEach(col => {
-                        const optP = document.createElement('option');
-                        optP.value = col; optP.innerText = col;
-                        const lower = col.toLowerCase();
-                        if (!phoneSelected && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact') || lower.includes('cell'))) {
-                            optP.selected = true; phoneSelected = true;
-                        }
-                        phoneSel.appendChild(optP);
-
-                        const optN = document.createElement('option');
-                        optN.value = col; optN.innerText = col;
-                        if (!nameSelected && (lower.includes('name') || lower.includes('person') || lower.includes('customer'))) {
-                            optN.selected = true; nameSelected = true;
-                        }
-                        nameSel.appendChild(optN);
-
-                        const optA = document.createElement('option');
-                        optA.value = col; optA.innerText = col;
-                        if (!ageSelected && (lower.includes('age') || lower.includes('boyos') || lower.includes('dob'))) {
-                            optA.selected = true; ageSelected = true;
-                        }
-                        ageSel.appendChild(optA);
-                    });
-
-                    document.getElementById('filePreviewCard').classList.remove('hidden');
-                    document.getElementById('uploadStatusText').innerText = 'Ready to process and submit.';
-                    document.getElementById('lastUploadResultCard').classList.add('hidden');
+                    setupColumnSelectorsAndPreview();
                 } catch (err) {
                     alert('Error reading Excel file: ' + err.message);
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // Intelligent Content-Based Column Detector & Live 5-Row Preview
+        function setupColumnSelectorsAndPreview() {
+            document.getElementById('previewRowCount').innerText = `${parsedRows.length.toLocaleString()} rows detected`;
+
+            const sampleRow = parsedRows[0];
+            const columns = Object.keys(sampleRow);
+            const phoneSel = document.getElementById('columnPhoneSelector');
+            const nameSel = document.getElementById('columnNameSelector');
+            const ageSel = document.getElementById('columnAgeSelector');
+
+            phoneSel.innerHTML = '';
+            nameSel.innerHTML = '<option value="">-- None / Empty --</option>';
+            ageSel.innerHTML = '<option value="">-- None / Empty --</option>';
+
+            // Intelligent Content Scorer: Scans first 15 rows
+            const checkRows = parsedRows.slice(0, 15);
+            const colScores = {};
+            columns.forEach(c => { colScores[c] = { phone: 0, name: 0, age: 0 }; });
+
+            checkRows.forEach(row => {
+                columns.forEach(col => {
+                    const val = String(row[col] || '').trim();
+                    const cleanNum = val.replace(/[^0-9]/g, '');
+
+                    // Phone candidate: 7 to 16 digits
+                    if (cleanNum.length >= 7 && cleanNum.length <= 16) {
+                        colScores[col].phone += 3;
+                    }
+                    // Age candidate: 1-3 digits (15 to 120)
+                    if (cleanNum && cleanNum === val && parseInt(cleanNum) >= 15 && parseInt(cleanNum) <= 120) {
+                        colScores[col].age += 4;
+                    }
+                    // Name candidate: has letters, few or no digits
+                    if (/[a-zA-Z]/.test(val) && cleanNum.length <= 2) {
+                        colScores[col].name += 3;
+                    }
+
+                    // Header name bonus
+                    const lowerCol = col.toLowerCase();
+                    if (lowerCol.includes('phone') || lowerCol.includes('number') || lowerCol.includes('mobile') || lowerCol.includes('contact') || lowerCol.includes('cell')) {
+                        colScores[col].phone += 2;
+                    }
+                    if (lowerCol.includes('name') || lowerCol.includes('person') || lowerCol.includes('customer') || lowerCol.includes('naam')) {
+                        colScores[col].name += 2;
+                    }
+                    if (lowerCol.includes('age') || lowerCol.includes('boyos') || lowerCol.includes('dob')) {
+                        colScores[col].age += 2;
+                    }
+                });
+            });
+
+            // Find best columns
+            let bestPhoneCol = columns[0];
+            let maxPhoneScore = -1;
+            columns.forEach(c => {
+                if (colScores[c].phone > maxPhoneScore) {
+                    maxPhoneScore = colScores[c].phone;
+                    bestPhoneCol = c;
+                }
+            });
+
+            let bestNameCol = '';
+            let maxNameScore = -1;
+            columns.forEach(c => {
+                if (c !== bestPhoneCol && colScores[c].name > maxNameScore) {
+                    maxNameScore = colScores[c].name;
+                    bestNameCol = c;
+                }
+            });
+
+            let bestAgeCol = '';
+            let maxAgeScore = -1;
+            columns.forEach(c => {
+                if (c !== bestPhoneCol && c !== bestNameCol && colScores[c].age > maxAgeScore) {
+                    maxAgeScore = colScores[c].age;
+                    bestAgeCol = c;
+                }
+            });
+
+            // Populate options
+            columns.forEach(col => {
+                const optP = document.createElement('option');
+                optP.value = col; optP.innerText = col;
+                if (col === bestPhoneCol) optP.selected = true;
+                phoneSel.appendChild(optP);
+
+                const optN = document.createElement('option');
+                optN.value = col; optN.innerText = col;
+                if (col === bestNameCol) optN.selected = true;
+                nameSel.appendChild(optN);
+
+                const optA = document.createElement('option');
+                optA.value = col; optA.innerText = col;
+                if (col === bestAgeCol) optA.selected = true;
+                ageSel.appendChild(optA);
+            });
+
+            updateLivePreviewTable();
+
+            document.getElementById('filePreviewCard').classList.remove('hidden');
+            document.getElementById('uploadStatusText').innerText = 'Ready to process and submit.';
+            document.getElementById('lastUploadResultCard').classList.add('hidden');
+        }
+
+        // Live 5-Row Preview Table Renderer
+        function updateLivePreviewTable() {
+            const previewTbody = document.getElementById('workerLivePreviewBody');
+            if (!previewTbody || !parsedRows || parsedRows.length === 0) return;
+
+            const phoneCol = document.getElementById('columnPhoneSelector').value;
+            const nameCol = document.getElementById('columnNameSelector').value;
+            const ageCol = document.getElementById('columnAgeSelector').value;
+
+            const sampleRows = parsedRows.slice(0, 5);
+
+            previewTbody.innerHTML = sampleRows.map((row, idx) => {
+                const phoneVal = phoneCol ? String(row[phoneCol] || '').trim() : '-';
+                const nameVal = nameCol ? String(row[nameCol] || '').trim() : '-';
+                const ageVal = ageCol ? String(row[ageCol] || '').trim() : '-';
+
+                // Check if phoneVal contains letters instead of numbers
+                const hasLettersInPhone = /[a-zA-Z]/.test(phoneVal) && phoneVal.replace(/[^0-9]/g, '').length < 6;
+                const phoneClass = hasLettersInPhone ? 'bg-red-50 text-red-700 font-extrabold' : 'text-indigo-900 font-bold';
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-2 px-3 border-r font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-2 px-3 border-r font-mono ${phoneClass}">
+                            ${phoneVal}
+                            ${hasLettersInPhone ? '<span class="block text-[10px] text-red-600 font-sans">⚠️ এটি নাম! ফোন নাম্বার নয়</span>' : ''}
+                        </td>
+                        <td class="py-2 px-3 border-r font-bold text-slate-800">${nameVal}</td>
+                        <td class="py-2 px-3 font-medium text-slate-600">${ageVal}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         async function processAndSubmitXlsx() {
@@ -1740,36 +2280,68 @@
             const chosenAgeCol = document.getElementById('columnAgeSelector').value;
 
             const selectedReportRadio = document.querySelector('input[name="workerReportType"]:checked');
-            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'lookup_report';
+            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'male_report';
 
             const btn = document.getElementById('processUploadBtn');
             const progressContainer = document.getElementById('uploadProgressBarContainer');
             const progressBar = document.getElementById('uploadProgressBar');
             const statusText = document.getElementById('uploadStatusText');
 
+            const chosenIncomeCol = document.getElementById('columnIncomeSelector') ? document.getElementById('columnIncomeSelector').value : '';
+            const chosenMarketValueCol = document.getElementById('columnMarketValueSelector') ? document.getElementById('columnMarketValueSelector').value : '';
+
+            // Check if selected phone column actually has phone numbers
+            const firstRowVal = String(parsedRows[0][chosenPhoneCol] || '').trim();
+            const firstRowDigits = firstRowVal.replace(/[^0-9]/g, '');
+            if (/[a-zA-Z]/.test(firstRowVal) && firstRowDigits.length < 6) {
+                alert('⚠️ আপনি "Phone Number Column" হিসেবে নামের কলাম সিলেক্ট করেছেন!\nঅনুগ্রহ করে ড্রপডাউন থেকে সঠিক ফোন নাম্বার কলামটি বেছে নিন।');
+                return;
+            }
+
             btn.disabled = true;
             progressContainer.classList.remove('hidden');
             progressBar.style.width = '20%';
-            statusText.innerText = 'Extracting and structuring records...';
+            statusText.innerText = 'Extracting and structuring records with Number, Name & Age...';
 
             const records = [];
             parsedRows.forEach(row => {
-                let phoneVal = String(row[chosenPhoneCol] || '').trim();
-                phoneVal = phoneVal.replace(/[\s\-\(\)\.]/g, '');
+                let rawPhone = String(row[chosenPhoneCol] || '').trim();
+                let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+
                 let nameVal = chosenNameCol ? String(row[chosenNameCol] || '').trim() : '';
                 let ageVal = chosenAgeCol ? String(row[chosenAgeCol] || '').trim() : '';
 
-                if (phoneVal && phoneVal.length >= 6) {
+                // Smart Row Auto-Correction: If cleanPhone is invalid, scan other fields in this row
+                if (cleanPhone.length < 6) {
+                    Object.keys(row).forEach(k => {
+                        const val = String(row[k] || '').trim();
+                        const digs = val.replace(/[^0-9]/g, '');
+                        if (digs.length >= 7 && digs.length <= 16 && cleanPhone.length < 6) {
+                            cleanPhone = digs;
+                        } else if (!nameVal && /[a-zA-Z]/.test(val) && digs.length <= 2) {
+                            nameVal = val;
+                        }
+                    });
+                }
+
+                let incomeVal = chosenIncomeCol ? String(row[chosenIncomeCol] || '').trim() : '';
+                let marketVal = chosenMarketValueCol ? String(row[chosenMarketValueCol] || '').trim() : '';
+
+                if (cleanPhone && cleanPhone.length >= 6) {
                     records.push({
-                        phone: phoneVal,
-                        name: nameVal,
-                        age: ageVal
+                        phone: cleanPhone,
+                        name: nameVal || '-',
+                        age: ageVal || '-',
+                        income: incomeVal,
+                        household_income: incomeVal,
+                        market_value: marketVal,
+                        est_market_value: marketVal
                     });
                 }
             });
 
             if (records.length === 0) {
-                alert('No valid phone numbers found in the selected column!');
+                alert('নির্বাচিত কলামে কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি! অনুগ্রহ করে সঠিক ফোন নাম্বার কলামটি সিলেক্ট করুন।');
                 btn.disabled = false;
                 progressContainer.classList.add('hidden');
                 return;
@@ -1852,37 +2424,137 @@
             const btnSubs = document.getElementById('tabAdminSubmissionsBtn');
             const btnBatches = document.getElementById('tabAdminBatchesBtn');
             const btnCompany = document.getElementById('tabAdminCompanyBtn');
+            const btnRecStock = document.getElementById('tabAdminRecStockBtn');
+            const btnBackup = document.getElementById('tabAdminBackupBtn');
 
             const tabUsers = document.getElementById('adminTabUsers');
             const tabSubs = document.getElementById('adminTabSubmissions');
             const tabBatches = document.getElementById('adminTabBatches');
             const tabCompany = document.getElementById('adminTabCompany');
+            const tabRecStock = document.getElementById('adminTabRecStock');
+            const tabBackup = document.getElementById('adminTabBackup');
 
-            [btnUsers, btnSubs, btnBatches, btnCompany].forEach(b => {
-                if (b) b.className = 'pb-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition whitespace-nowrap';
+            const inactiveClass = 'flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition shadow-xs text-center cursor-pointer';
+            const activeClass = 'flex flex-col items-center justify-center p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/80 text-indigo-950 font-bold ring-2 ring-indigo-500/20 transition shadow-sm text-center cursor-pointer';
+            const activeRecStockClass = 'flex flex-col items-center justify-center p-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-emerald-950 font-bold ring-2 ring-emerald-500/30 transition shadow-sm text-center cursor-pointer';
+
+            [btnUsers, btnSubs, btnBatches, btnCompany, btnRecStock, btnBackup].forEach(b => {
+                if (b) b.className = inactiveClass;
             });
-            [tabUsers, tabSubs, tabBatches, tabCompany].forEach(t => {
+            [tabUsers, tabSubs, tabBatches, tabCompany, tabRecStock, tabBackup].forEach(t => {
                 if (t) t.classList.add('hidden');
             });
 
             if (tab === 'submissions') {
-                if (btnSubs) btnSubs.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (btnSubs) btnSubs.className = activeClass;
                 if (tabSubs) tabSubs.classList.remove('hidden');
                 loadAdminSubmissionsData();
             } else if (tab === 'users') {
-                if (btnUsers) btnUsers.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (btnUsers) btnUsers.className = activeClass;
                 if (tabUsers) tabUsers.classList.remove('hidden');
-                renderAdminUserTable();
+                if (adminUsersCache.length === 0) loadAdminDashboard();
+                else renderAdminUserTable();
             } else if (tab === 'batches') {
-                if (btnBatches) btnBatches.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (btnBatches) btnBatches.className = activeClass;
                 if (tabBatches) tabBatches.classList.remove('hidden');
                 renderAdminLogsTable();
             } else if (tab === 'company') {
-                if (btnCompany) btnCompany.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition whitespace-nowrap';
+                if (btnCompany) btnCompany.className = activeClass;
                 if (tabCompany) tabCompany.classList.remove('hidden');
                 loadCompanyDeliveriesData();
+            } else if (tab === 'rec_stock') {
+                if (btnRecStock) btnRecStock.className = activeRecStockClass;
+                if (tabRecStock) tabRecStock.classList.remove('hidden');
+                loadCompanyReceivedData();
+            } else if (tab === 'backup') {
+                if (btnBackup) btnBackup.className = activeClass;
+                if (tabBackup) tabBackup.classList.remove('hidden');
             }
         }
+
+        
+        async function loadAdminDashboard() {
+            if (!supabaseClient) return;
+
+            try {
+                // 1. Stats across report types
+                const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
+                const { count: maleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report');
+                const { count: femaleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report');
+                const { count: lookupCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report');
+
+                const todayStart = new Date();
+                todayStart.setHours(0,0,0,0);
+                const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
+
+                if (document.getElementById('adminStatTotalUnique')) document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
+                if (document.getElementById('adminStatMaleReport')) document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
+                if (document.getElementById('adminStatFemaleReport')) document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
+                if (document.getElementById('adminStatLookupReport')) document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
+                if (document.getElementById('adminStatToday')) document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
+
+                // 2. Load profiles & logs
+                const { data: profiles, error: pErr } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                if (pErr) console.warn('Profiles load notice:', pErr);
+
+                const { data: logs, error: lErr } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
+                if (lErr) console.warn('Logs load notice:', lErr);
+
+                adminLogsCache = logs || [];
+
+                const userMap = {};
+                if (profiles && profiles.length > 0) {
+                    profiles.forEach(p => {
+                        const uname = p.username || (p.email ? p.email.split('@')[0] : 'Worker');
+                        userMap[p.id] = {
+                            id: p.id,
+                            email: p.email,
+                            username: uname,
+                            department: p.department || 'gender_verify',
+                            role: p.role || 'user',
+                            todayAdded: 0,
+                            totalContributed: 0
+                        };
+                        userEmailToNameMap[p.email] = uname;
+                    });
+                }
+
+                if (logs && logs.length > 0) {
+                    const todayIso = todayStart.toISOString();
+                    logs.forEach(l => {
+                        if (userMap[l.user_id]) {
+                            userMap[l.user_id].totalContributed += (l.new_inserted || 0);
+                            if (l.created_at >= todayIso) {
+                                userMap[l.user_id].todayAdded += (l.new_inserted || 0);
+                            }
+                        }
+                    });
+                }
+
+                adminUsersCache = Object.values(userMap);
+                if (document.getElementById('userTabCount')) {
+                    document.getElementById('userTabCount').innerText = adminUsersCache.length;
+                }
+
+                const workerSelect = document.getElementById('adminSubWorkerFilter');
+                if (workerSelect) {
+                    workerSelect.innerHTML = '<option value="all">All Workers</option>';
+                    adminUsersCache.forEach(u => {
+                        workerSelect.innerHTML += `<option value="${u.email}">${u.username} (${u.email})</option>`;
+                    });
+                }
+
+                renderAdminUserTable();
+                renderAdminLogsTable();
+                loadAdminSubmissionsData();
+                if (typeof loadCompanyDeliveriesData === 'function') {
+                    loadCompanyDeliveriesData();
+                }
+            } catch (err) {
+                console.error('loadAdminDashboard error:', err);
+            }
+        }
+
 
         function renderAdminUserTable() {
             const body = document.getElementById('adminUserTableBody');
@@ -1936,7 +2608,7 @@
                     `;
                 }).join('');
             } else {
-                body.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">No worker accounts found.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400"><p class="font-bold text-slate-600">No worker accounts found.</p><p class="text-xs text-amber-600 mt-1">⚠️ If workers have registered, please run the latest SQL patch in your Supabase SQL Editor to allow Admin viewing of all accounts.</p></td></tr>`;
             }
         }
 
@@ -1967,7 +2639,7 @@
             try {
                 let query = supabaseClient
                     .from('master_numbers')
-                    .select('id, phone_number, full_name, age, report_type, department, user_email, username, created_at')
+                    .select('*')
                     .order('created_at', { ascending: false })
                     .limit(500);
 
@@ -1995,9 +2667,747 @@
             }
         }
 
+        
+        // Quick Category Selector & Direct Linking from Top Stat Cards
+        function filterAdminSubmissionsBy(type) {
+            switchAdminTab('submissions');
+            const reportFilter = document.getElementById('adminSubReportFilter');
+            const dateFilter = document.getElementById('adminSubDateFilter');
+
+            if (type === 'male_report') {
+                if (reportFilter) reportFilter.value = 'male_report';
+                if (dateFilter) dateFilter.value = '';
+            } else if (type === 'female_report') {
+                if (reportFilter) reportFilter.value = 'female_report';
+                if (dateFilter) dateFilter.value = '';
+            } else if (type === 'lookup_report') {
+                if (reportFilter) reportFilter.value = 'lookup_report';
+                if (dateFilter) dateFilter.value = '';
+            } else if (type === 'today') {
+                if (reportFilter) reportFilter.value = 'all';
+                if (dateFilter) dateFilter.value = new Date().toISOString().slice(0, 10);
+            } else {
+                if (reportFilter) reportFilter.value = 'all';
+                if (dateFilter) dateFilter.value = '';
+            }
+
+            updateSubmissionsQuickFilterUI(type);
+            loadAdminSubmissionsData();
+        }
+
+        function updateSubmissionsQuickFilterUI(activeType) {
+            const btnMap = {
+                'all': document.getElementById('qfBtnAll'),
+                'male_report': document.getElementById('qfBtnMale'),
+                'female_report': document.getElementById('qfBtnFemale'),
+                'lookup_report': document.getElementById('qfBtnLookup'),
+                'today': document.getElementById('qfBtnToday')
+            };
+
+            Object.keys(btnMap).forEach(k => {
+                const btn = btnMap[k];
+                if (!btn) return;
+                if (k === activeType) {
+                    btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg border transition bg-indigo-600 text-white shadow-sm';
+                } else {
+                    btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition';
+                }
+            });
+        }
+
+        // 1-Click JSON Snapshot Backup of Central Database
+
+        // ==========================================
+        // COMPANY RECEIVED NUMBERS STOCK & ON-DEMAND DISPENSER
+        // ==========================================
+        
+        
+
+        function setDispenseQty(qty) {
+            const input = document.getElementById('dispenseQuantity');
+            if (qty === 'all') {
+                const avail = parseInt(document.getElementById('recStatAvailable').innerText.replace(/,/g, '')) || 0;
+                input.value = avail > 0 ? avail : 1000;
+            } else {
+                input.value = qty;
+            }
+        }
+
+        function handleRecFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                recStockParsedRows = XLSX.utils.sheet_to_json(worksheet);
+                alert(`ফাইল থেকে ${recStockParsedRows.length} টি সারি পাওয়া গেছে। এখন 'Save & Stock Numbers' বাটনে ক্লিক করুন।`);
+            };
+
+            if (file.name.endsWith('.txt')) {
+                const textReader = new FileReader();
+                textReader.onload = function(e) {
+                    const lines = e.target.result.split(/\r?\n/);
+                    recStockParsedRows = [];
+                    lines.forEach(l => {
+                        const cleanNum = l.replace(/[^0-9]/g, '');
+                        if (cleanNum.length >= 6) {
+                            recStockParsedRows.push({ phone: cleanNum });
+                        }
+                    });
+                    alert(`TXT ফাইল থেকে ${recStockParsedRows.length} টি ফোন নাম্বার পাওয়া গেছে।`);
+                };
+                textReader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        async function submitCompanyReceivedStock() {
+            if (!supabaseClient) return;
+
+            const dateInput = document.getElementById('recInputDate');
+            const batchInput = document.getElementById('recInputBatchName');
+            const textInput = document.getElementById('recTextInput');
+            const resultCard = document.getElementById('recUploadResultCard');
+            const btn = document.getElementById('btnSubmitRecStock');
+
+            const recDate = dateInput && dateInput.value ? dateInput.value : new Date().toISOString().slice(0, 10);
+            const batchName = batchInput && batchInput.value.trim() ? batchInput.value.trim() : 'Company_Stock';
+
+            let records = [];
+
+            // From parsed file
+            if (recStockParsedRows && recStockParsedRows.length > 0) {
+                recStockParsedRows.forEach(row => {
+                    let phone = '';
+                    let name = '';
+                    let age = '';
+
+                    Object.keys(row).forEach(k => {
+                        const val = String(row[k] || '').trim();
+                        const cleanNum = val.replace(/[^0-9]/g, '');
+                        if (!phone && cleanNum.length >= 6 && cleanNum.length <= 16) {
+                            phone = cleanNum;
+                        } else if (!name && val.length > 1 && !/^[0-9]+$/.test(val)) {
+                            name = val;
+                        } else if (!age && /^[0-9]{1,3}$/.test(val) && parseInt(val) <= 120) {
+                            age = val;
+                        }
+                    });
+
+                    if (phone) {
+                        records.push({ phone, name, age });
+                    }
+                });
+            }
+
+            // From text paste
+            if (textInput && textInput.value.trim()) {
+                const lines = textInput.value.split(/\r?\n/);
+                lines.forEach(line => {
+                    const cleanNum = line.replace(/[^0-9]/g, '');
+                    if (cleanNum.length >= 6) {
+                        records.push({ phone: cleanNum, name: '', age: '' });
+                    }
+                });
+            }
+
+            if (records.length === 0) {
+                alert('অনুগ্রহ করে একটি এক্সেল/টেক্সট ফাইল আপলোড করুন অথবা বক্সে ফোন নাম্বার পেস্ট করুন।');
+                return;
+            }
+
+            btn.disabled = true;
+            resultCard.classList.remove('hidden');
+            resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-indigo-50 border border-indigo-200 text-indigo-900';
+            resultCard.innerHTML = `⏳ ${records.length} টি নাম্বার স্টকে আপলোড এবং ডুপ্লিকেট পরীক্ষা করা হচ্ছে...`;
+
+            try {
+                // Call RPC
+                const { data, error } = await supabaseClient.rpc('admin_upload_received_numbers', {
+                    p_records: records,
+                    p_received_date: recDate,
+                    p_batch_name: batchName
+                });
+
+                if (error) {
+                    // Fallback to direct table insert if RPC not yet run
+                    console.warn('RPC notice, using direct insert fallback:', error);
+                    let newInserted = 0;
+                    for (let i = 0; i < records.length; i += 500) {
+                        const chunk = records.slice(i, i + 500).map(r => ({
+                            received_date: recDate,
+                            phone_number: r.phone,
+                            full_name: r.name,
+                            age: r.age,
+                            batch_name: batchName,
+                            admin_email: currentUser ? currentUser.email : 'admin'
+                        }));
+                        const { error: insErr } = await supabaseClient
+                            .from('company_received_numbers')
+                            .upsert(chunk, { onConflict: 'phone_number', ignoreDuplicates: true });
+                        if (!insErr) newInserted += chunk.length;
+                    }
+                    resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-900';
+                    resultCard.innerHTML = `✅ স্টকে সফলভাবে সেভ করা হয়েছে! (${records.length} টি প্রসেস করা হয়েছে)`;
+                } else {
+                    resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-900';
+                    resultCard.innerHTML = `
+                        <div class="flex items-center space-x-2 font-bold text-sm mb-1">
+                            <span>✅</span>
+                            <span>স্টকে সফলভাবে সংরক্ষণ করা হয়েছে!</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono">
+                            <div>মোট প্রসেস: <b>${data.total_received}</b></div>
+                            <div>ফাইলে ইউনিক: <b>${data.unique_in_file}</b></div>
+                            <div class="text-emerald-700">নতুন সেভ: <b>+${data.new_inserted}</b></div>
+                            <div class="text-amber-700">ডুপ্লিকেট বাদ: <b>${data.duplicates_count}</b></div>
+                        </div>
+                    `;
+                }
+
+                // Reset form
+                if (textInput) textInput.value = '';
+                document.getElementById('recFileInput').value = '';
+                recStockParsedRows = [];
+                await loadCompanyReceivedData();
+            } catch (err) {
+                resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-800';
+                resultCard.innerHTML = `⚠️ আপলোড ত্রুটি: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function loadCompanyReceivedData() {
+            if (!supabaseClient) return;
+
+            const tbody = document.getElementById('recStockTableBody');
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Loading received stock records...</td></tr>`;
+
+            const dateFilter = document.getElementById('recHistoryDateFilter') ? document.getElementById('recHistoryDateFilter').value : 'all';
+
+            try {
+                // Fetch stats
+                const { count: totalRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true });
+                const { count: availRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_exported', false);
+                const { count: expRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_exported', true);
+
+                const todayIso = new Date().toISOString().slice(0, 10);
+                const { count: todayRec } = await supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('received_date', todayIso);
+
+                if (document.getElementById('recStatTotal')) document.getElementById('recStatTotal').innerText = (totalRec || 0).toLocaleString();
+                if (document.getElementById('recStatAvailable')) document.getElementById('recStatAvailable').innerText = (availRec || 0).toLocaleString();
+                if (document.getElementById('recStockAvailableBadge')) document.getElementById('recStockAvailableBadge').innerText = (availRec || 0).toLocaleString();
+                if (document.getElementById('recStatExported')) document.getElementById('recStatExported').innerText = (expRec || 0).toLocaleString();
+                if (document.getElementById('recStatToday')) document.getElementById('recStatToday').innerText = (todayRec || 0).toLocaleString();
+
+                // Fetch table list
+                let query = supabaseClient
+                    .from('company_received_numbers')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(500);
+
+                if (dateFilter !== 'all') {
+                    query = query.eq('received_date', dateFilter);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                recStockCache = data || [];
+
+                // Populate Dispenser & History Date dropdowns
+                const dateSet = new Set();
+                recStockCache.forEach(r => {
+                    if (r.received_date) dateSet.add(r.received_date);
+                });
+
+                const dispenseDateSelect = document.getElementById('dispenseDateFilter');
+                if (dispenseDateSelect) {
+                    dispenseDateSelect.innerHTML = '<option value="all">🌟 All Dates (সব তারিখের স্টক থেকে)</option>';
+                    dateSet.forEach(d => {
+                        dispenseDateSelect.innerHTML += `<option value="${d}">📅 ${d} এর স্টক</option>`;
+                    });
+                }
+
+                const historyDateSelect = document.getElementById('recHistoryDateFilter');
+                if (historyDateSelect && historyDateSelect.options.length <= 1) {
+                    historyDateSelect.innerHTML = '<option value="all">All Dates</option>';
+                    dateSet.forEach(d => {
+                        historyDateSelect.innerHTML += `<option value="${d}">${d}</option>`;
+                    });
+                }
+
+                filterRecStockHistoryLocal();
+            } catch (err) {
+                console.warn('loadCompanyReceivedData:', err);
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">
+                        <p class="font-bold text-slate-600">কোনো স্টক ডাটা পাওয়া যায়নি।</p>
+                        <p class="text-xs text-amber-600 mt-1">💡 আপনি উপরে ফাইল বা টেক্সট আপলোড করে কোম্পানি থেকে পাওয়া নাম্বার স্টকে জমা রাখতে পারেন।</p>
+                    </td></tr>`;
+                }
+            }
+        }
+
+        function filterRecStockHistoryLocal() {
+            const tbody = document.getElementById('recStockTableBody');
+            if (!tbody) return;
+
+            const search = (document.getElementById('recHistorySearch')?.value || '').trim().toLowerCase();
+
+            let list = recStockCache;
+            if (search) {
+                list = list.filter(r => {
+                    const phone = (r.phone_number || '').toLowerCase();
+                    const batch = (r.batch_name || '').toLowerCase();
+                    const name = (r.full_name || '').toLowerCase();
+                    return phone.includes(search) || batch.includes(search) || name.includes(search);
+                });
+            }
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((r, idx) => {
+                const statusBadge = r.is_exported
+                    ? `<span class="px-2 py-0.5 text-xs rounded bg-amber-100 text-amber-800 font-bold">📤 Exported</span>`
+                    : `<span class="px-2 py-0.5 text-xs rounded bg-emerald-100 text-emerald-800 font-bold">🟢 Available</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50 text-xs">
+                        <td class="py-2.5 px-4 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-2.5 px-4 font-mono font-bold text-slate-800">${r.phone_number}</td>
+                        <td class="py-2.5 px-4 font-medium text-slate-700">${r.full_name || '-'}</td>
+                        <td class="py-2.5 px-4 font-medium text-slate-600">📅 ${r.received_date}</td>
+                        <td class="py-2.5 px-4 text-slate-500">${r.batch_name || '-'}</td>
+                        <td class="py-2.5 px-4">${statusBadge}</td>
+                        <td class="py-2.5 px-4 text-right">
+                            <button onclick="copySingleNumber('${r.phone_number}')" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs p-1 rounded hover:bg-indigo-50" title="Copy Number">
+                                📋 Copy
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function copySingleNumber(phone) {
+            navigator.clipboard.writeText(phone);
+            alert(`Phone number copied: ${phone}`);
+        }
+
+        // ==========================================
+        // 🎯 EXECUTE CUSTOM ON-DEMAND NUMBER DISPENSE
+        // ==========================================
+        async function executeNumberDispense() {
+            if (!supabaseClient) return;
+
+            const qtyInput = document.getElementById('dispenseQuantity');
+            const rawQty = parseInt(qtyInput ? qtyInput.value : 0);
+
+            if (!rawQty || rawQty <= 0) {
+                alert('অনুগ্রহ করে আপনি কতগুলো নাম্বার চান তা লিখুন (যেমন: 500 বা 1000)।');
+                return;
+            }
+
+            const dateFilter = document.getElementById('dispenseDateFilter')?.value || 'all';
+            const statusFilter = document.getElementById('dispenseStatusFilter')?.value || 'unused';
+            const markExported = document.getElementById('dispenseMarkExported')?.checked ?? true;
+            const formatRadio = document.querySelector('input[name="dispenseFormat"]:checked');
+            const chosenFormat = formatRadio ? formatRadio.value : 'txt';
+
+            const btn = document.getElementById('btnExecuteDispense');
+            const msgBox = document.getElementById('dispenseResultMsg');
+
+            btn.disabled = true;
+            msgBox.classList.remove('hidden');
+            msgBox.className = 'text-xs p-3 rounded-xl bg-white/20 text-white font-medium';
+            msgBox.innerHTML = `⏳ স্টক থেকে ${rawQty.toLocaleString()} টি নাম্বার খোঁজা ও তৈরি করা হচ্ছে...`;
+
+            try {
+                // Query numbers
+                let query = supabaseClient
+                    .from('company_received_numbers')
+                    .select('*')
+                    .order('id', { ascending: true })
+                    .limit(rawQty);
+
+                if (statusFilter === 'unused') {
+                    query = query.eq('is_exported', false);
+                }
+                if (dateFilter !== 'all') {
+                    query = query.eq('received_date', dateFilter);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    throw new Error('আপনার ফিল্টারের সাথে মিল রেখে স্টকে কোনো নাম্বার অবশিষ্ট নেই।');
+                }
+
+                const extractedCount = data.length;
+
+                // Mark as exported if checked
+                if (markExported) {
+                    const idsToMark = data.map(d => d.id);
+                    await supabaseClient
+                        .from('company_received_numbers')
+                        .update({ is_exported: true, exported_at: new Date().toISOString() })
+                        .in('id', idsToMark);
+                }
+
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                if (chosenFormat === 'txt') {
+                    // Export as Plain Text (.txt) - 1 number per line
+                    const textLines = data.map(d => d.phone_number).join('\r\n');
+                    const blob = new Blob([textLines], { type: 'text/plain;charset=utf-8' });
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.href = URL.createObjectURL(blob);
+                    downloadAnchor.download = `Company_Numbers_${extractedCount}_Qty_${todayStr}.txt`;
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                } else {
+                    // Export as Excel (.xlsx)
+                    const exportRows = data.map((d, idx) => ({
+                        'SL': idx + 1,
+                        'Phone Number': d.phone_number,
+                        'Full Name': d.full_name || '',
+                        'Age': d.age || '',
+                        'Received Date': d.received_date,
+                        'Batch Name': d.batch_name || 'Company_Received'
+                    }));
+                    const ws = XLSX.utils.json_to_sheet(exportRows);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, `Numbers_${extractedCount}`);
+                    XLSX.writeFile(wb, `Company_Numbers_${extractedCount}_Qty_${todayStr}.xlsx`);
+                }
+
+                msgBox.className = 'text-xs p-3 rounded-xl bg-emerald-500 text-slate-950 font-bold';
+                msgBox.innerHTML = `✅ সফল! ${extractedCount.toLocaleString()} টি নাম্বার সফলভাবে .${chosenFormat.toUpperCase()} ফাইলে ডাউনলোড হয়েছে।${markExported ? ' (স্টকে ব্যবহৃত হিসেবে চিহ্নিত করা হয়েছে)' : ''}`;
+
+                // Refresh stock counters
+                await loadCompanyReceivedData();
+            } catch (err) {
+                msgBox.className = 'text-xs p-3 rounded-xl bg-red-500 text-white font-bold';
+                msgBox.innerHTML = `⚠️ উত্তোলন ত্রুটি: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function setupGoogleDriveClient() {
+            const savedClientId = localStorage.getItem('gdrive_client_id') || '171403934003-q673l41i2h57c7p9pjob191bnv76d2ge.apps.googleusercontent.com';
+            const inputEl = document.getElementById('gdriveClientIdInput');
+            if (inputEl && savedClientId) {
+                inputEl.value = savedClientId;
+            }
+            updateGoogleDriveUI();
+        }
+
+        function updateGoogleDriveUI() {
+            const notConnectedDiv = document.getElementById('gdriveNotConnected');
+            const connectedDiv = document.getElementById('gdriveConnected');
+            const emailBadge = document.getElementById('gdriveConnectedEmail');
+
+            if (googleAccessToken && googleUserEmail) {
+                if (notConnectedDiv) notConnectedDiv.classList.add('hidden');
+                if (connectedDiv) connectedDiv.classList.remove('hidden');
+                if (emailBadge) emailBadge.innerText = googleUserEmail;
+            } else {
+                if (notConnectedDiv) notConnectedDiv.classList.remove('hidden');
+                if (connectedDiv) connectedDiv.classList.add('hidden');
+            }
+        }
+
+        function handleConnectGoogleDrive() {
+            const inputEl = document.getElementById('gdriveClientIdInput');
+            const clientId = inputEl ? inputEl.value.trim() : '';
+
+            if (!clientId) {
+                alert('অনুগ্রহ করে আপনার Google OAuth Client ID দিন। নিচে দেওয়া নির্দেশিকা দেখে Google Cloud থেকে বিনামূল্যে Client ID তৈরি করে নিন।');
+                return;
+            }
+
+            localStorage.setItem('gdrive_client_id', clientId);
+
+            if (!window.google || !google.accounts || !google.accounts.oauth2) {
+                alert('Google Identity Services লোড হচ্ছে, অনুগ্রহ করে কয়েক সেকেন্ড পর আবার চেষ্টা করুন।');
+                return;
+            }
+
+            try {
+                window.googleTokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: clientId,
+                    scope: 'https://www.googleapis.com/auth/drive.file',
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            window.googleAccessToken = tokenResponse.access_token;
+                            localStorage.setItem('gdrive_access_token', window.googleAccessToken);
+
+                            try {
+                                const aboutRes = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
+                                    headers: { Authorization: `Bearer ${window.googleAccessToken}` }
+                                });
+                                const aboutData = await aboutRes.json();
+                                window.googleUserEmail = (aboutData.user && aboutData.user.emailAddress) || 'Connected Google User';
+                                localStorage.setItem('gdrive_user_email', window.googleUserEmail);
+                            } catch (e) {
+                                window.googleUserEmail = 'Google Drive Connected';
+                                localStorage.setItem('gdrive_user_email', window.googleUserEmail);
+                            }
+
+                            updateGoogleDriveUI();
+                            alert(`গুগল ড্রাইভ সফলভাবে কানেক্ট হয়েছে! (${window.googleUserEmail})\nএখন আপনি ১-ক্লিকেই গুগল ড্রাইভে ডাটাবেজ ব্যাকআপ পাঠাতে পারবেন।`);
+                        }
+                    },
+                });
+
+                window.googleTokenClient.requestAccessToken();
+            } catch (err) {
+                alert('Google Drive connection error: ' + err.message);
+            }
+        }
+
+        function handleDisconnectGoogleDrive() {
+            googleAccessToken = null;
+            googleUserEmail = null;
+            localStorage.removeItem('gdrive_access_token');
+            localStorage.removeItem('gdrive_user_email');
+            updateGoogleDriveUI();
+            alert('গুগল ড্রাইভ ডিসকানেক্ট করা হয়েছে।');
+        }
+
+        async function uploadDatabaseBackupToGoogleDrive() {
+            if (!googleAccessToken) {
+                alert('প্রথমে আপনার গুগল অ্যাকাউন্ট কানেক্ট করুন।');
+                return;
+            }
+
+            const btn = document.getElementById('gdriveUploadBtn');
+            const statusBox = document.getElementById('gdriveUploadStatus');
+
+            if (btn) btn.disabled = true;
+            if (statusBox) {
+                statusBox.classList.remove('hidden');
+                statusBox.className = 'text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 p-3 rounded-lg font-medium';
+                statusBox.innerHTML = '⏳ সুপাবেস ডাটাবেজ থেকে সমস্ত রেকর্ড সংগ্রহ করা হচ্ছে...';
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    throw new Error('ডাটাবেজে কোনো রেকর্ড পাওয়া যায়নি।');
+                }
+
+                if (statusBox) statusBox.innerHTML = `⏳ ${data.length.toLocaleString()} টি রেকর্ড সরাসরি গুগল ড্রাইভে আপলোড করা হচ্ছে...`;
+
+                const today = new Date().toISOString().slice(0, 10);
+                const fileName = `Work_Manager_Full_Backup_${today}.json`;
+                const fileContent = JSON.stringify({
+                    backup_date: today,
+                    total_records: data.length,
+                    exported_from: 'Work Manager Portal',
+                    data: data
+                }, null, 2);
+
+                const metadata = {
+                    name: fileName,
+                    mimeType: 'application/json',
+                    description: `Automated Full Central Database Backup with ${data.length} unique phone records.`
+                };
+
+                const boundary = '-------314159265358979323846';
+                const delimiter = "\r\n--" + boundary + "\r\n";
+                const close_delim = "\r\n--" + boundary + "--";
+
+                const multipartRequestBody =
+                    delimiter +
+                    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                    JSON.stringify(metadata) +
+                    delimiter +
+                    'Content-Type: application/json\r\n\r\n' +
+                    fileContent +
+                    close_delim;
+
+                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + googleAccessToken,
+                        'Content-Type': 'multipart/related; boundary=' + boundary
+                    },
+                    body: multipartRequestBody
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        googleAccessToken = null;
+                        localStorage.removeItem('gdrive_access_token');
+                        updateGoogleDriveUI();
+                        throw new Error('গুগল লগইন সেশনের মেয়াদ শেষ হয়ে গেছে। অনুগ্রহ করে আবার "Connect Google Drive" এ ক্লিক করুন।');
+                    }
+                    const errData = await res.json();
+                    throw new Error(errData.error ? errData.error.message : 'Upload failed');
+                }
+
+                const driveFile = await res.json();
+
+                if (statusBox) {
+                    statusBox.className = 'text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 p-3 rounded-lg font-medium';
+                    statusBox.innerHTML = `
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold">✅ সফলভাবে আপনার গুগল ড্রাইভে সেভ হয়েছে!</span>
+                                <div class="text-[11px] text-emerald-700 mt-0.5">ফাইল: ${fileName} (${data.length.toLocaleString()} টি রেকর্ড)</div>
+                            </div>
+                            <a href="https://drive.google.com/file/d/${driveFile.id}/view" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold transition flex items-center space-x-1">
+                                <span>গুগল ড্রাইভে দেখুন ↗</span>
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                if (statusBox) {
+                    statusBox.className = 'text-xs text-red-700 bg-red-50 border border-red-200 p-3 rounded-lg font-medium';
+                    statusBox.innerHTML = `⚠️ আপলোড ব্যর্থ হয়েছে: ${err.message}`;
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function downloadFullDatabaseJsonBackup() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    alert('No records found in database to backup.');
+                    return;
+                }
+
+                const today = new Date().toISOString().slice(0, 10);
+                const backupPayload = {
+                    backup_date: today,
+                    exported_by: currentUser ? currentUser.email : 'admin',
+                    total_records: data.length,
+                    data: data
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `Full_Database_Backup_${today}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+            } catch (err) {
+                alert('Backup download failed: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // ADMIN SUBMISSION MANAGEMENT & RECORD CLEANER
+        // ==========================================
+        async function adminDeleteSingleNumber(id, phone) {
+            if (!confirm(`Are you sure you want to delete this record (${phone})?`)) return;
+            try {
+                const { error } = await supabaseClient.from('master_numbers').delete().eq('id', id);
+                if (error) throw error;
+                alert('Record deleted successfully!');
+                await loadAdminSubmissionsData();
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        async function adminDeleteInvalidRecords() {
+            if (!adminSubmissionsCache || adminSubmissionsCache.length === 0) {
+                alert('কোনো রেকর্ড নেই।');
+                return;
+            }
+
+            const invalidRows = adminSubmissionsCache.filter(r => {
+                const phone = String(r.phone_number || '').trim();
+                const digits = phone.replace(/[^0-9]/g, '');
+                return /[a-zA-Z]/.test(phone) && digits.length < 6;
+            });
+
+            if (invalidRows.length === 0) {
+                alert('কোনো ভুল রেকর্ড পাওয়া যায়নি! সব রেকর্ডে সঠিক ফোন নাম্বার রয়েছে।');
+                return;
+            }
+
+            if (!confirm(`মোট ${invalidRows.length} টি ভুল রেকর্ড পাওয়া গেছে (যেখানে ফোন নাম্বারের জায়গায় নাম চলে এসেছে)।\nআপনি কি এই ${invalidRows.length} টি ভুল রেকর্ড ডাটাবেজ থেকে মুছে ফেলতে চান?`)) {
+                return;
+            }
+
+            try {
+                const ids = invalidRows.map(r => r.id);
+                const { error } = await supabaseClient.from('master_numbers').delete().in('id', ids);
+                if (error) throw error;
+
+                alert(`সফলভাবে ${ids.length} টি ভুল রেকর্ড মুছে ফেলা হয়েছে!`);
+                await loadAdminSubmissionsData();
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('মুছতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        function downloadDateSpecificExcel(targetDate) {
+            if (!adminSubmissionsCache || adminSubmissionsCache.length === 0) return;
+            const dateRows = adminSubmissionsCache.filter(item => (item.created_at || '').slice(0, 10) === targetDate);
+            if (dateRows.length === 0) {
+                alert('No records found for date: ' + targetDate);
+                return;
+            }
+
+            const exportRows = dateRows.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone_number,
+                'Full Name': item.full_name || '',
+                'Age': item.age || '',
+                'Household Income': item.household_income || '',
+                'Est Market Value': item.est_market_value || '',
+                'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                'Submitted By (Worker)': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                'Submission Time': new Date(item.created_at).toLocaleString()
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, `Data_${targetDate}`);
+            XLSX.writeFile(wb, `Report_Data_${targetDate}.xlsx`);
+        }
+
+
         function filterAdminSubmissionsLocal() {
             const body = document.getElementById('adminSubmissionsTableBody');
             const search = document.getElementById('adminSubSearchInput').value.trim().toLowerCase();
+            const groupByDateToggle = document.getElementById('adminSubGroupByDateToggle');
+            const isGroupByDate = groupByDateToggle ? groupByDateToggle.checked : true;
 
             let list = adminSubmissionsCache;
             if (search) {
@@ -2010,38 +3420,113 @@
                 });
             }
 
-            if (list.length > 0) {
-                body.innerHTML = list.map((item, idx) => {
-                    const timeStr = new Date(item.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    let repBadge = '';
-                    if (item.report_type === 'male_report') {
-                        repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Report</span>';
-                    } else if (item.report_type === 'female_report') {
-                        repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Report</span>';
-                    } else {
-                        repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Report</span>';
-                    }
+            if (!list || list.length === 0) {
+                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">
+                    <p class="font-bold text-slate-600">কোনো ডাটা পাওয়া যায়নি।</p>
+                    <p class="text-xs text-slate-400 mt-1">ফিল্টারের সাথে মিল রেখে কোনো সাবমিশন রেকর্ড পাওয়া যায়নি।</p>
+                </td></tr>`;
+                return;
+            }
 
-                    return `
-                        <tr class="hover:bg-slate-50 text-xs">
-                            <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
-                            <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.phone_number}</td>
-                            <td class="py-3 px-4 font-bold text-slate-800">${item.full_name || '-'}</td>
-                            <td class="py-3 px-4 font-medium text-slate-600">${item.age || '-'}</td>
-                            <td class="py-3 px-4">${repBadge}</td>
-                            <td class="py-3 px-4">
-                                <div class="flex items-center space-x-1 font-bold text-slate-800 text-xs">
-                                    <span>👤</span>
-                                    <span>${item.username || userEmailToNameMap[item.user_email] || item.user_email.split('@')[0]}</span>
+            // Function to render a single row
+            function renderItemRow(item, idx) {
+                const timeStr = new Date(item.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                let repBadge = '';
+                if (item.report_type === 'male_report') {
+                    repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Report</span>';
+                } else if (item.report_type === 'female_report') {
+                    repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Report</span>';
+                } else {
+                    repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Report</span>';
+                }
+
+                if (item.household_income || item.est_market_value) {
+                    repBadge += `<div class="text-[10px] text-purple-700 mt-1 flex flex-wrap gap-1 font-sans">
+                        ${item.household_income ? `<span class="bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded">💰 ${item.household_income}</span>` : ''}
+                        ${item.est_market_value ? `<span class="bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded">🏡 ${item.est_market_value}</span>` : ''}
+                    </div>`;
+                }
+
+                const phoneStr = String(item.phone_number || '').trim();
+                const phoneDigits = phoneStr.replace(/[^0-9]/g, '');
+                const isInvalidPhone = /[a-zA-Z]/.test(phoneStr) && phoneDigits.length < 6;
+
+                let phoneHtml = `<span class="font-bold font-mono text-slate-800">${phoneStr}</span>`;
+                if (isInvalidPhone) {
+                    phoneHtml = `<span class="font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded">${phoneStr}</span>
+                        <span class="text-[10px] text-red-500 block mt-0.5 font-sans">⚠️ কলাম উল্টা ছিল (নাম এসেছে)</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50 text-xs">
+                        <td class="py-2.5 px-4 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-2.5 px-4">${phoneHtml}</td>
+                        <td class="py-2.5 px-4 font-bold text-slate-800">${item.full_name || '-'}</td>
+                        <td class="py-2.5 px-4 font-medium text-slate-600">${item.age || '-'}</td>
+                        <td class="py-2.5 px-4">${repBadge}</td>
+                        <td class="py-2.5 px-4">
+                            <div class="flex items-center space-x-1 font-bold text-slate-800 text-xs">
+                                <span>👤</span>
+                                <span>${item.username || userEmailToNameMap[item.user_email] || item.user_email.split('@')[0]}</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 font-mono block mt-0.5">${item.user_email}</span>
+                        </td>
+                        <td class="py-2.5 px-4 text-right text-slate-500">
+                            <div>${timeStr}</div>
+                            <button onclick="adminDeleteSingleNumber('${item.id}', '${phoneStr}')" class="text-[11px] text-red-500 hover:text-red-700 underline font-semibold mt-1" title="Delete this record">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            if (isGroupByDate) {
+                // Group by Day/Date (YYYY-MM-DD)
+                const dateGroups = {};
+                list.forEach(item => {
+                    const dateKey = (item.created_at || '').slice(0, 10) || 'Unknown Date';
+                    if (!dateGroups[dateKey]) dateGroups[dateKey] = [];
+                    dateGroups[dateKey].push(item);
+                });
+
+                // Sort dates descending
+                const sortedDates = Object.keys(dateGroups).sort().reverse();
+                let outputHtml = '';
+                let globalIdx = 0;
+
+                sortedDates.forEach(dateKey => {
+                    const groupRows = dateGroups[dateKey];
+                    const friendlyDate = new Date(dateKey + 'T00:00:00').toLocaleDateString(undefined, {
+                        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+                    });
+
+                    outputHtml += `
+                        <tr class="bg-indigo-50/90 border-t-2 border-indigo-300 font-bold text-indigo-950">
+                            <td colspan="7" class="py-2.5 px-4">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-base">📅</span>
+                                        <span class="text-sm font-extrabold">${friendlyDate}</span>
+                                        <span class="text-xs bg-indigo-200 text-indigo-900 px-2.5 py-0.5 rounded-full font-bold">
+                                            মোট: ${groupRows.length.toLocaleString()} টি ডাটা
+                                        </span>
+                                    </div>
+                                    <button type="button" onclick="downloadDateSpecificExcel('${dateKey}')" class="text-xs text-indigo-800 hover:text-indigo-950 bg-white hover:bg-indigo-50 border border-indigo-200 font-bold px-3 py-1 rounded-md shadow-sm transition flex items-center space-x-1">
+                                        <span>📥</span>
+                                        <span>Export ${dateKey} Excel</span>
+                                    </button>
                                 </div>
-                                <span class="text-[11px] text-slate-400 font-mono block mt-0.5">${item.user_email}</span>
                             </td>
-                            <td class="py-3 px-4 text-right text-slate-500">${timeStr}</td>
                         </tr>
                     `;
-                }).join('');
+
+                    groupRows.forEach(item => {
+                        outputHtml += renderItemRow(item, globalIdx++);
+                    });
+                });
+
+                body.innerHTML = outputHtml;
             } else {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No submissions found matching criteria.</td></tr>`;
+                body.innerHTML = list.map((item, idx) => renderItemRow(item, idx)).join('');
             }
         }
 
@@ -2608,21 +4093,10 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 }
             });
 
-            // Multi-Engine Query for unlisted names
-            if (unknownList.length > 0) {
-                statusText.innerText = `Consulting multi-API engines (Genderize, GenderAPI, etc.) for ${unknownList.length} names...`;
-                for (let i = 0; i < unknownList.length; i++) {
-                    const nameToQuery = unknownList[i];
-                    const res = await querySingleNameMultiAPI(nameToQuery);
-                    if (res && res.gender !== 'unknown') {
-                        lookupResults[nameToQuery] = res;
-                    }
-                    const pct = Math.round(10 + ((i + 1) / unknownList.length) * 80);
-                    progressBar.style.width = `${pct}%`;
-                    statusText.innerText = `Verified ${i + 1} of ${unknownList.length} names with multi-API fallback...`;
-                    await new Promise(r => setTimeout(r, 50));
-                }
-            }
+            // Fast Multi-Stage Resolution: Zero Lag, Instant High-Speed Evaluation!
+            progressBar.style.width = '80%';
+            statusText.innerText = `Applying advanced phonetic & token verification on ${recordsToVerify.length} records...`;
+            await new Promise(r => setTimeout(r, 20)); // Brief paint yield
 
             // Assign to Sectors & calculate ratio for undetermined
             gvMaleList = [];
