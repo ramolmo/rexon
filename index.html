@@ -487,6 +487,19 @@
                         <span id="previewRowCount" class="text-xs bg-indigo-600 text-white font-extrabold px-3 py-1 rounded-full self-start sm:self-auto"></span>
                     </div>
 
+                    <!-- First Row Header Mode Toggle (0 Numbers Lost Guarantee) -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-indigo-50/80 rounded-xl border border-indigo-200">
+                        <label class="inline-flex items-center space-x-2.5 cursor-pointer select-none">
+                            <input type="checkbox" id="toggleFirstRowIsData" onchange="toggleFirstRowDataMode(this.checked)" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+                            <span class="text-xs font-black text-indigo-950">
+                                📌 ফাইলে কোনো হেডার নেই (১ম সারি থেকেই ডাটা শুরু - Don't skip first row)
+                            </span>
+                        </label>
+                        <span class="text-[11px] text-indigo-700 font-medium">
+                            💡 টিক চিহ্ন দেওয়া থাকলে প্রথম সারি বাদ যাবে না, সম্পূর্ণ সংরক্ষিত হবে।
+                        </span>
+                    </div>
+
                     <!-- Column Mapping Selectors -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-slate-200">
                         <div>
@@ -895,11 +908,13 @@
                                 <tr>
                                     <th class="py-3 px-4">Username</th>
                                     <th class="py-3 px-4">Email Address</th>
+                                    <th class="py-3 px-4">Role (পদবী / সুবিধা)</th>
                                     <th class="py-3 px-4">Department</th>
+                                    <th class="py-3 px-4">Status (অবস্থা)</th>
                                     <th class="py-3 px-4">Change Department</th>
                                     <th class="py-3 px-4 text-right">Today's Added</th>
                                     <th class="py-3 px-4 text-right">Total Contributed</th>
-                                    <th class="py-3 px-4 text-right">Action</th>
+                                    <th class="py-3 px-4 text-center">Action (অ্যাকশন)</th>
                                 </tr>
                             </thead>
                             <tbody id="adminUserTableBody" class="divide-y divide-slate-100">
@@ -2344,6 +2359,13 @@
                     currentProfile.username = currentUser.user_metadata?.username || currentProfile.email.split('@')[0];
                 }
 
+                if (currentProfile && currentProfile.is_blocked === true) {
+                    await supabaseClient.auth.signOut();
+                    alert('❌ আপনার অ্যাকাউন্টটি অ্যাডমিন কর্তৃক ব্লক/স্থগিত করা হয়েছে!\n\nআপনি আর এই পোর্টালে কাজ করতে বা প্রবেশ করতে পারবেন না। বিস্তারিত তথ্যের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন।');
+                    showView('loginView');
+                    return;
+                }
+
                 // Master Owner Email is ALWAYS Admin
                 if (currentUser.email === 'ramolmoaran@gmail.com') {
                     currentProfile.role = 'admin';
@@ -2660,58 +2682,39 @@
                         return;
                     }
 
-                    // Check if Row 0 is a header or already a data row
+                    window._currentRawAoA = rawAoA;
+
+                    // Intelligent Header vs Data Row Detector
                     const firstRow = rawAoA[0].map(c => String(c || '').trim());
-                    let isHeader = false;
-                    const headerKeywords = ['phone', 'number', 'mobile', 'contact', 'name', 'full name', 'first name', 'last name', 'age', 'gender', 'income', 'market'];
-
-                    for (const cell of firstRow) {
-                        const lower = cell.toLowerCase();
-                        if (headerKeywords.some(kw => lower === kw || lower.includes(kw))) {
-                            isHeader = true;
-                            break;
-                        }
-                    }
-
-                    // If any cell in first row contains 7+ digits and no letters, it is definitely a phone number (DATA, not header!)
+                    
+                    // 1. Check if first row contains a phone number (6 to 16 digits)
+                    let firstRowHasPhone = false;
                     for (const cell of firstRow) {
                         const digits = cell.replace(/[^0-9]/g, '');
-                        if (digits.length >= 7 && digits.length <= 16 && !/[a-zA-Z]/.test(cell)) {
-                            isHeader = false;
+                        // If cell has 6-16 digits and at most 2 non-digit characters (like +, -, spaces)
+                        if (digits.length >= 6 && digits.length <= 16 && !/[a-zA-Z]/.test(cell)) {
+                            firstRowHasPhone = true;
                             break;
                         }
                     }
 
-                    let headers = [];
-                    let dataRows = [];
-
-                    if (isHeader) {
-                        headers = firstRow.map((h, i) => h || `Col ${i + 1}`);
-                        dataRows = rawAoA.slice(1);
-                    } else {
-                        // All rows are data! Generate synthetic headers Col 1, Col 2, etc. so 0 numbers are lost!
-                        const maxCols = Math.max(...rawAoA.map(r => r.length));
-                        headers = Array.from({ length: maxCols }, (_, i) => `Column ${i + 1}`);
-                        dataRows = rawAoA;
+                    // 2. Check header keywords only if NO phone number in row 0
+                    let detectedIsHeader = false;
+                    if (!firstRowHasPhone) {
+                        const headerKeywords = ['phone', 'number', 'mobile', 'contact', 'cell', 'name', 'full name', 'first name', 'last name', 'age', 'boyos', 'gender', 'income', 'market', 'নাম্বার', 'নাম', 'বয়স'];
+                        detectedIsHeader = firstRow.some(cell => {
+                            const lower = cell.toLowerCase();
+                            return headerKeywords.some(kw => lower === kw || lower.startsWith(kw + ' ') || lower.endsWith(' ' + kw));
+                        });
                     }
 
-                    parsedRows = [];
-                    dataRows.forEach(row => {
-                        if (row && row.some(c => String(c || '').trim().length > 0)) {
-                            const obj = {};
-                            headers.forEach((h, i) => {
-                                obj[h] = row[i] !== undefined ? row[i] : '';
-                            });
-                            parsedRows.push(obj);
-                        }
-                    });
-
-                    if (!parsedRows || parsedRows.length === 0) {
-                        alert('Uploaded sheet contains no data rows.');
-                        return;
+                    // If firstRowHasPhone is true => definitely NO header (first row is data)
+                    const toggleEl = document.getElementById('toggleFirstRowIsData');
+                    if (toggleEl) {
+                        toggleEl.checked = !detectedIsHeader;
                     }
 
-                    setupColumnSelectorsAndPreview();
+                    applyParsedRowsFromRawAoA(!detectedIsHeader);
                 } catch (err) {
                     alert('Error reading Excel file: ' + err.message);
                 }
@@ -2720,7 +2723,51 @@
         }
 
         // Intelligent Content-Based Column Detector & Live 5-Row Preview
-        function setupColumnSelectorsAndPreview() {
+        
+        // Helper to parse rawAoA with or without Row 0 as headers
+        function applyParsedRowsFromRawAoA(firstRowIsData) {
+            const rawAoA = window._currentRawAoA;
+            if (!rawAoA || rawAoA.length === 0) return;
+
+            let headers = [];
+            let dataRows = [];
+
+            if (!firstRowIsData) {
+                // Row 0 is header
+                const firstRow = rawAoA[0].map(c => String(c || '').trim());
+                headers = firstRow.map((h, i) => h || `Col ${i + 1}`);
+                dataRows = rawAoA.slice(1);
+            } else {
+                // Row 0 is DATA! Generate synthetic column headers
+                const maxCols = Math.max(...rawAoA.map(r => r.length));
+                headers = Array.from({ length: maxCols }, (_, i) => `Column ${i + 1}`);
+                dataRows = rawAoA;
+            }
+
+            parsedRows = [];
+            dataRows.forEach(row => {
+                if (row && row.some(c => String(c || '').trim().length > 0)) {
+                    const obj = {};
+                    headers.forEach((h, i) => {
+                        obj[h] = row[i] !== undefined ? row[i] : '';
+                    });
+                    parsedRows.push(obj);
+                }
+            });
+
+            if (!parsedRows || parsedRows.length === 0) {
+                alert('Uploaded sheet contains no data rows.');
+                return;
+            }
+
+            setupColumnSelectorsAndPreview();
+        }
+
+        function toggleFirstRowDataMode(isFirstRowData) {
+            applyParsedRowsFromRawAoA(isFirstRowData);
+        }
+
+function setupColumnSelectorsAndPreview() {
             document.getElementById('previewRowCount').innerText = `${parsedRows.length.toLocaleString()} rows detected`;
 
             const sampleRow = parsedRows[0];
@@ -3062,15 +3109,28 @@
             if (!supabaseClient) return;
 
             try {
-                // 1. Stats across report types
-                const { count: totalUnique } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
-                const { count: maleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report');
-                const { count: femaleCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report');
-                const { count: lookupCount } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report');
-
                 const todayStart = new Date();
                 todayStart.setHours(0,0,0,0);
-                const { count: todayTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString());
+                const todayIso = todayStart.toISOString();
+
+                // High-Speed Concurrent Stats & Profile Fetching (Promise.all)
+                const [
+                    { count: totalUnique },
+                    { count: maleCount },
+                    { count: femaleCount },
+                    { count: lookupCount },
+                    { count: todayTotal },
+                    { data: profiles, error: pErr },
+                    { data: logs, error: lErr }
+                ] = await Promise.all([
+                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report'),
+                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report'),
+                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report'),
+                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
+                    supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }),
+                    supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false }).limit(200)
+                ]);
 
                 if (document.getElementById('adminStatTotalUnique')) document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
                 if (document.getElementById('adminStatMaleReport')) document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
@@ -3078,12 +3138,7 @@
                 if (document.getElementById('adminStatLookupReport')) document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
                 if (document.getElementById('adminStatToday')) document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
 
-                // 2. Load profiles & logs
-                const { data: profiles, error: pErr } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
-                if (pErr) console.warn('Profiles load notice:', pErr);
-
-                const { data: logs, error: lErr } = await supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false });
-                if (lErr) console.warn('Logs load notice:', lErr);
+// Data already loaded concurrently via Promise.all
 
                 adminLogsCache = logs || [];
 
@@ -3097,6 +3152,7 @@
                             username: uname,
                             department: p.department || 'gender_verify',
                             role: p.role || 'user',
+                            is_blocked: p.is_blocked === true,
                             todayAdded: 0,
                             totalContributed: 0
                         };
@@ -3158,11 +3214,11 @@
                 body.innerHTML = filtered.map(u => {
                     const deptLabel = u.department === 'number_lookup' ? 'Number Lookup' : (u.department === 'gender_verify' ? 'Gender Verify' : 'Admin');
                     return `
-                        <tr class="hover:bg-slate-50">
+                        <tr class="hover:bg-slate-50 ${u.is_blocked ? 'bg-rose-50/40' : ''}">
                             <td class="py-3 px-4">
                                 <div class="inline-flex items-center space-x-1.5">
-                                    <span class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md text-xs inline-flex items-center space-x-1">
-                                        <span>👤</span>
+                                    <span class="font-bold ${u.is_blocked ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-indigo-700 bg-indigo-50 border-indigo-200'} border px-2.5 py-1 rounded-md text-xs inline-flex items-center space-x-1">
+                                        <span>${u.is_blocked ? '🚫' : (u.role === 'team_leader' ? '👑' : (u.role === 'admin' ? '⚡' : '👤'))}</span>
                                         <span>${u.username || u.email.split('@')[0]}</span>
                                     </span>
                                     <button onclick="openUsernameModal('${u.id}', '${u.username || u.email.split('@')[0]}')" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition" title="Change this worker's username">
@@ -3172,9 +3228,24 @@
                             </td>
                             <td class="py-3 px-4 font-medium text-slate-600 text-xs">${u.email}</td>
                             <td class="py-3 px-4">
+                                ${u.email === 'ramolmoaran@gmail.com' ? '<span class="px-2.5 py-1 text-xs rounded-full font-black bg-purple-100 text-purple-900 border border-purple-300">⚡ Master Admin</span>' : `
+                                    <select onchange="adminChangeUserRole('${u.id}', this.value, '${u.username || u.email.split('@')[0]}')" class="text-xs px-2.5 py-1.5 rounded-lg border-2 ${u.role === 'team_leader' ? 'border-amber-400 bg-amber-50/70 text-amber-950 font-black' : (u.role === 'admin' ? 'border-purple-400 bg-purple-50 text-purple-950 font-black' : 'border-slate-300 bg-white text-slate-700 font-bold')} shadow-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 সাধারণ কর্মী (Worker - 6h Limit)</option>
+                                        <option value="team_leader" ${u.role === 'team_leader' ? 'selected' : ''}>👑 টিম লিডার (Team Leader - Unlimited)</option>
+                                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>⚡ অ্যাডমিন (Admin - Full Control)</option>
+                                    </select>
+                                `}
+                            </td>
+                            <td class="py-3 px-4">
                                 <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${u.department === 'number_lookup' ? 'bg-blue-100 text-blue-800' : (u.department === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-pink-100 text-pink-800')}">
                                     ${deptLabel}
                                 </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                ${u.is_blocked 
+                                    ? '<span class="px-2.5 py-1 text-xs rounded-full font-bold bg-rose-100 text-rose-800 border border-rose-300">🔴 ব্লকড (Blocked)</span>' 
+                                    : '<span class="px-2.5 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">🟢 সক্রিয় (Active)</span>'
+                                }
                             </td>
                             <td class="py-3 px-4">
                                 <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs px-2.5 py-1 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500">
@@ -3184,10 +3255,26 @@
                             </td>
                             <td class="py-3 px-4 text-right font-bold text-emerald-600">${u.todayAdded.toLocaleString()}</td>
                             <td class="py-3 px-4 text-right font-bold text-indigo-700">${u.totalContributed.toLocaleString()}</td>
-                            <td class="py-3 px-4 text-right">
-                                <button onclick="downloadSingleUserData('${u.email}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-                                    Download Data
-                                </button>
+                            <td class="py-3 px-4 text-center">
+                                <div class="inline-flex items-center space-x-1.5">
+                                    ${u.role !== 'admin' ? `
+                                        ${u.is_blocked ? `
+                                            <button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', false)" class="text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm transition" title="Unblock this account">
+                                                ✅ আনব্লক
+                                            </button>
+                                        ` : `
+                                            <button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', true)" class="text-[11px] bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm transition" title="Block this account from accessing portal">
+                                                🚫 ব্লক
+                                            </button>
+                                        `}
+                                        <button onclick="adminDeleteUserPrompt('${u.id}', '${u.username || u.email}', '${u.email}')" class="text-[11px] bg-rose-600 hover:bg-rose-700 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm transition" title="Permanently delete this account">
+                                            🗑️ ডিলিট
+                                        </button>
+                                    ` : '<span class="text-xs text-purple-700 font-extrabold">Master Admin</span>'}
+                                    <button onclick="downloadSingleUserData('${u.email}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium ml-1 underline">
+                                        Data
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -4138,7 +4225,54 @@
             }
         }
 
-        function renderAdminLogsTable() {
+        
+        // Admin Block / Unblock User Function
+        async function adminToggleUserBlock(userId, username, shouldBlock) {
+            if (!supabaseClient) return;
+            const actionWord = shouldBlock ? 'ব্লক (Block)' : 'আনব্লক (Unblock)';
+            const confirmMsg = shouldBlock 
+                ? `আপনি কি নিশ্চিতভাবে কর্মী "${username}" এর অ্যাকাউন্ট ${actionWord} করতে চান?\n\nব্লক করলে এই কর্মী আর পোর্টালে লগইন করতে বা কোনো ডাটা এক্সেস করতে পারবে না।`
+                : `আপনি কি কর্মী "${username}" এর অ্যাকাউন্ট পুনরায় সচল / ${actionWord} করতে চান?`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const { data, error } = await supabaseClient.rpc('admin_set_user_block_status', {
+                    p_user_id: userId,
+                    p_blocked: shouldBlock,
+                    p_reason: shouldBlock ? 'Blocked by administrator' : ''
+                });
+
+                if (error) throw error;
+
+                alert(`✅ কর্মী "${username}" এর অ্যাকাউন্ট সফলভাবে ${actionWord} করা হয়েছে!`);
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('অ্যাকাউন্ট স্ট্যাটাস পরিবর্তন করতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        // Admin Permanently Delete User Function
+        async function adminDeleteUserPrompt(userId, username, email) {
+            if (!supabaseClient) return;
+            const confirmMsg = `⚠️ সাবধান! আপনি কি নিশ্চিতভাবে "${username}" (${email}) অ্যাকাউন্টটি স্থায়ীভাবে ডিলিট করতে চান?\n\nএই অ্যাকাউন্টটি মুছে ফেলা হলে কর্মী আর কখনোই লগইন করতে পারবে না।\n\nমুছে ফেলতে 'OK' চাপুন।`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const { data, error } = await supabaseClient.rpc('admin_delete_user_account', {
+                    p_user_id: userId
+                });
+
+                if (error) throw error;
+
+                alert(`✅ কর্মী "${username}" এর অ্যাকাউন্ট সম্পূর্ণ মুছে ফেলা হয়েছে!`);
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('অ্যাকাউন্ট ডিলিট করতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+function renderAdminLogsTable() {
             const body = document.getElementById('adminLogsTableBody');
             if (adminLogsCache.length > 0) {
                 body.innerHTML = adminLogsCache.map(l => {
@@ -7056,7 +7190,9 @@ async function loadClaimStockSector() {
 
             try {
                 // Use a separate non-persisting client so Admin is NOT logged out!
-                const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                const spUrl = localStorage.getItem('SP_URL') || DEFAULT_SP_URL;
+                const spKey = localStorage.getItem('SP_KEY') || DEFAULT_SP_KEY;
+                const tempClient = window.supabase.createClient(spUrl, spKey, {
                     auth: {
                         persistSession: false,
                         autoRefreshToken: false
@@ -7115,25 +7251,51 @@ async function loadClaimStockSector() {
             }
         }
 
-        async function adminChangeUserRole(userId, newRole) {
-            if (!confirm(`এই ইউজারের রোল পরিবর্তন করে "${newRole === 'team_leader' ? 'টিম লিডার (আনলিমিটেড)' : 'সাধারণ কর্মী'}" করতে চান?`)) {
+        async function adminChangeUserRole(userId, newRole, username) {
+            const roleLabels = {
+                'team_leader': '👑 টিম লিডার (Team Leader - আনলিমিটেড কোটা)',
+                'user': '👤 সাধারণ কর্মী (General Worker - ৬ ঘণ্টার লিমিট)',
+                'admin': '⚡ অ্যাডমিন (Admin - সম্পূর্ণ নিয়ন্ত্রণ)'
+            };
+            const targetLabel = roleLabels[newRole] || newRole;
+
+            if (!confirm(`আপনি কি নিশ্চিতভাবে কর্মী "${username}" এর রোল পরিবর্তন করে "${targetLabel}" করতে চান?\n\nটিম লিডার নির্বাচন করলে এই কর্মী স্টক থেকে আনলিমিটেড নাম্বার তুলতে পারবেন।`)) {
+                renderAdminUserTable();
                 return;
             }
             try {
-                const isUnlimited = (newRole === 'team_leader');
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({
-                        role: newRole,
-                        is_unlimited_quota: isUnlimited
-                    })
-                    .eq('id', userId);
+                const isUnlimited = (newRole === 'team_leader' || newRole === 'admin');
 
-                if (error) throw error;
-                alert('✅ ইউজারের রোল ও কোটা সুবিধা সফলভাবে আপডেট হয়েছে!');
-                await loadAdminUsers();
+                // Try RPC first
+                let rpcSuccess = false;
+                try {
+                    const { data, error } = await supabaseClient.rpc('admin_set_user_role', {
+                        p_user_id: userId,
+                        p_new_role: newRole
+                    });
+                    if (!error && data && data.success) rpcSuccess = true;
+                } catch(rpcErr) {
+                    console.warn('RPC admin_set_user_role notice:', rpcErr);
+                }
+
+                if (!rpcSuccess) {
+                    // Fallback to direct profiles table update
+                    const { error } = await supabaseClient
+                        .from('profiles')
+                        .update({
+                            role: newRole,
+                            is_unlimited_quota: isUnlimited
+                        })
+                        .eq('id', userId);
+
+                    if (error) throw error;
+                }
+
+                alert(`✅ সফল! কর্মী "${username}" এখন "${targetLabel}" হিসেবে উন্নীত হয়েছেন।`);
+                await loadAdminDashboard();
             } catch (err) {
-                alert('রোল আপডেটে ত্রুটি: ' + err.message);
+                alert('রোল আপডেটে সমস্যা হয়েছে: ' + err.message);
+                renderAdminUserTable();
             }
         }
 
