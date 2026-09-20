@@ -143,6 +143,11 @@
                         <span>Dashboard</span>
                     </button>
                     
+                    <button id="navBtnClaimStock" onclick="switchToSection('claim_stock')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5 border border-transparent">
+                        <span>🎁</span>
+                        <span>Get Work Numbers (নাম্বার নিন)</span>
+                    </button>
+                    
                     <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
                         <span>🔍</span>
                         <span>Duplicate Check</span>
@@ -861,12 +866,17 @@
 
                         <!-- Mode 2: File Upload -->
                         <div id="cdFileSection" class="hidden space-y-3">
-                            <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/30 rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('cdFileInput').click()">
-                                <input type="file" id="cdFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCdFileSelected(event)">
+                            <label for="cdFileInput" class="border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/40 rounded-2xl p-6 text-center cursor-pointer block transition">
+                                <input type="file" id="cdFileInput" accept=".xlsx, .xls, .csv" class="sr-only" onchange="handleCdFileSelected(event)">
                                 <div class="text-3xl">📑</div>
-                                <p class="text-xs sm:text-sm font-bold text-slate-700 mt-1">Select Excel file delivered to company</p>
-                                <p id="cdFileStatus" class="text-xs text-slate-400">XLSX, XLS or CSV</p>
-                            </div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-700 mt-1">Select Excel or CSV file delivered to company</p>
+                                <p id="cdFileStatus" class="text-xs text-indigo-600 font-semibold mt-0.5">XLSX, XLS or CSV</p>
+                                <div class="mt-3">
+                                    <span class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm inline-flex items-center space-x-1.5">
+                                        <span>📂 Browse File / ফাইল সিলেক্ট করুন</span>
+                                    </span>
+                                </div>
+                            </label>
                             <div id="cdColMapGrid" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">Phone Column (Required):</label>
@@ -1379,7 +1389,192 @@
 
         <!-- 5. Gender Verification View -->
         <!-- 6. Dedicated Duplicate Checker View -->
-        <div id="duplicateCheckView" class="hidden space-y-8">
+        
+        <!-- ========================================== -->
+        <!-- 3B. DEDICATED SECTOR: CLAIM WORK NUMBERS   -->
+        <!-- (শুধুমাত্র লগইন করলেই ইউজাররা দেখতে পাবেন) -->
+        <!-- ========================================== -->
+        <div id="claimStockView" class="hidden space-y-6 animate-in fade-in duration-200">
+            <!-- Sector Header Banner -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                            🎁 Self-Service Work Dispenser
+                        </span>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                            🔒 100% Conflict-Free
+                        </span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800">
+                        কোম্পানির স্টক থেকে নাম্বার নিন (Work Number Dispenser)
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 max-w-3xl">
+                        এডমিনের আপলোড করা কোম্পানির স্টক থেকে সরাসরি কাজের জন্য ফোন নাম্বার সংগ্রহ করুন। সংগৃহীত নাম্বার শুধুমাত্র আপনার একাউন্টে লক হয়ে যাবে, অন্য কোনো কর্মী এই নাম্বার পাবে না।
+                    </p>
+                </div>
+                <button type="button" onclick="refreshClaimStockData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl border border-slate-300 transition flex items-center space-x-1.5 self-start md:self-auto flex-shrink-0">
+                    <span>🔄 রিফ্রেশ স্টক</span>
+                </button>
+            </div>
+
+            <!-- Metric Summary Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-t-4 border-t-emerald-500 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">স্টকে বাকি আছে (Available)</p>
+                        <p id="secStockAvailable" class="text-3xl font-black text-emerald-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">সব কর্মীর নেওয়ার জন্য প্রস্তুত</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-black">
+                        📦
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-t-4 border-t-indigo-600 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">আজ আপনি নিয়েছেন (Claimed Today)</p>
+                        <p id="secWorkerClaimedToday" class="text-3xl font-black text-indigo-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">আজ আপনার সংগৃহীত ডাটা</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-black">
+                        👤
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-t-4 border-t-purple-600 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">সুরক্ষিত বিতরণ (Auto-Lock)</p>
+                        <p class="text-base font-extrabold text-purple-700 mt-1">সম্পূর্ণ ডুপ্লিকেট-ফ্রি</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">এক নাম্বার দুইজন কর্মী পাবে না</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl font-black">
+                        🛡️
+                    </div>
+                </div>
+            </div>
+
+            <!-- Number Dispense Action Station -->
+            <div class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 text-white rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-indigo-700/60 pb-4">
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                            <span>১. কতগুলো নাম্বার নিতে চান নির্বাচন করুন</span>
+                            <span class="text-amber-400 text-sm">⚡</span>
+                        </h3>
+                        <p class="text-xs sm:text-sm text-indigo-200 mt-1">
+                            আপনার কাজের সুবিধা অনুযায়ী পছন্দের বাটনটিতে চাপ দিন অথবা নির্দিষ্ট সংখ্যা লিখুন:
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quantity Chips & Custom Input -->
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button type="button" onclick="selectSecQty(50, this)" class="sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition">
+                            50 টি
+                        </button>
+                        <button type="button" onclick="selectSecQty(100, this)" class="sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-500 border border-indigo-300 text-white rounded-xl shadow transition">
+                            100 টি (Default)
+                        </button>
+                        <button type="button" onclick="selectSecQty(200, this)" class="sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition">
+                            200 টি
+                        </button>
+                        <button type="button" onclick="selectSecQty(500, this)" class="sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition">
+                            500 টি
+                        </button>
+                        <button type="button" onclick="selectSecQty(1000, this)" class="sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition">
+                            1,000 টি
+                        </button>
+
+                        <div class="flex items-center space-x-2 bg-black/20 border border-white/25 px-3 py-1.5 rounded-xl ml-auto">
+                            <span class="text-xs font-bold text-indigo-200">কাস্টম সংখ্যা:</span>
+                            <input type="number" id="secClaimQtyInput" value="100" min="1" max="1000" class="w-24 px-2 py-1 text-xs sm:text-sm bg-white text-slate-900 font-extrabold rounded-lg focus:outline-none text-center">
+                        </div>
+                    </div>
+
+                    <!-- Submit Claim Button -->
+                    <div class="pt-2 flex flex-wrap items-center gap-4">
+                        <button type="button" id="btnSecClaim" onclick="executeSecClaim()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-slate-950 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2">
+                            <span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>
+                        </button>
+                        <span class="text-xs text-indigo-200">
+                            💡 বাটন চাপলেই সাথে সাথে নাম্বার ডাউনলোড ও কপি করার অপশন আসবে।
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Output Result Panel (Appears right here after claim) -->
+            <div id="secActiveResultCard" class="hidden bg-white rounded-2xl shadow-sm p-6 border border-emerald-300 space-y-4 animate-in fade-in duration-200">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div class="flex items-center space-x-2.5">
+                        <span class="text-2xl">🎉</span>
+                        <div>
+                            <h4 class="font-extrabold text-base sm:text-lg text-slate-800">
+                                সদ্য সংগৃহীত নাম্বারের তালিকা (<span id="secResultCount">0</span> টি)
+                            </h4>
+                            <p class="text-xs text-emerald-600 font-semibold">
+                                ✅ নাম্বারগুলো আপনার জন্য স্টক থেকে সফলভাবে সংরক্ষিত হয়েছে।
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" onclick="copySecClaimedNumbers()" class="px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow transition flex items-center space-x-1">
+                            <span>📋 Copy All</span>
+                        </button>
+                        <button type="button" onclick="downloadSecClaimedTxt()" class="px-3 py-1.5 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 transition">
+                            📄 .TXT
+                        </button>
+                        <button type="button" onclick="downloadSecClaimedExcel()" class="px-3 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition">
+                            📊 .XLSX
+                        </button>
+                        <button type="button" onclick="sendSecClaimedToDupCheck()" class="px-3.5 py-1.5 text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition">
+                            🔍 ডুপ্লিকেট চেকারে পাঠান ➔
+                        </button>
+                    </div>
+                </div>
+
+                <textarea id="secClaimedTextarea" readonly rows="8" class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none select-all"></textarea>
+            </div>
+
+            <!-- History of Claimed Numbers Today -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <h4 class="font-black text-base text-slate-800 flex items-center space-x-2">
+                            <span>📜 আজ আপনার সংগৃহীত নাম্বারের তালিকা (Today's Assigned Numbers)</span>
+                        </h4>
+                        <p class="text-xs text-slate-500">আজকে আপনি যতবার নাম্বার নিয়েছেন তার সম্পূর্ণ হিসাব এখানে আছে। কোনো কারণে পেজ বন্ধ হয়ে গেলেও ডাটা হারাবে না।</p>
+                    </div>
+                    <button type="button" onclick="loadSecClaimHistory()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+                        🔄 হিস্ট্রি রিফ্রেশ
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-xs min-w-[550px]">
+                        <thead class="bg-slate-50 text-slate-600 uppercase font-bold border-b">
+                            <tr>
+                                <th class="py-3 px-4"># SL</th>
+                                <th class="py-3 px-4">সময় (Time)</th>
+                                <th class="py-3 px-4">ফোন নাম্বার (Phone)</th>
+                                <th class="py-3 px-4">নাম (Name)</th>
+                                <th class="py-3 px-4">বয়স (Age)</th>
+                                <th class="py-3 px-4 text-center">অ্যাকশন (Action)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="secClaimHistoryBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="6" class="py-6 text-center text-slate-400">আজ এখনো কোনো নাম্বার সংগ্রহ করা হয়নি।</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+<div id="duplicateCheckView" class="hidden space-y-8">
             <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center space-x-2">
@@ -1682,6 +1877,10 @@
             if (recDateInput && !recDateInput.value) {
                 recDateInput.value = new Date().toISOString().slice(0, 10);
             }
+            const cdDateInput = document.getElementById('cdInputDate');
+            if (cdDateInput && !cdDateInput.value) {
+                cdDateInput.value = new Date().toISOString().slice(0, 10);
+            }
 
             } else {
                 showView('loginView');
@@ -1798,6 +1997,10 @@
             if (recDateInput && !recDateInput.value) {
                 recDateInput.value = new Date().toISOString().slice(0, 10);
             }
+            const cdDateInput = document.getElementById('cdInputDate');
+            if (cdDateInput && !cdDateInput.value) {
+                cdDateInput.value = new Date().toISOString().slice(0, 10);
+            }
 
                     } else {
                         if (successBox) {
@@ -1820,6 +2023,10 @@
             const recDateInput = document.getElementById('recInputDate');
             if (recDateInput && !recDateInput.value) {
                 recDateInput.value = new Date().toISOString().slice(0, 10);
+            }
+            const cdDateInput = document.getElementById('cdInputDate');
+            if (cdDateInput && !cdDateInput.value) {
+                cdDateInput.value = new Date().toISOString().slice(0, 10);
             }
 
                 }
@@ -1941,11 +2148,11 @@
 
         function switchToSection(sec) {
             const btnDash = document.getElementById('navBtnDashboard');
-            const btnGender = document.getElementById('navBtnGender');
+            const btnClaim = document.getElementById('navBtnClaimStock');
             const btnDup = document.getElementById('navBtnDuplicate');
 
-            [btnDash, btnGender, btnDup].forEach(b => {
-                if (b) b.className = 'text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5';
+            [btnDash, btnClaim, btnDup].forEach(b => {
+                if (b) b.className = 'text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5 border border-transparent';
             });
 
             if (sec === 'dashboard') {
@@ -1957,6 +2164,11 @@
                     showView('userDashboard');
                     loadUserDashboard();
                 }
+
+            } else if (sec === 'claim_stock') {
+                if (btnClaim) btnClaim.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
+                showView('claimStockView');
+                loadClaimStockSector();
 
             } else if (sec === 'duplicate_check') {
                 if (btnDup) btnDup.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
@@ -1972,6 +2184,9 @@
             const todayStart = new Date();
             todayStart.setHours(0,0,0,0);
             const todayIso = todayStart.toISOString();
+
+            // Refresh available stock count for worker
+            loadWorkerClaimStockCount();
 
             const { data: logs } = await supabaseClient
                 .from('upload_logs')
@@ -4916,82 +5131,140 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             if (!file) return;
 
             cdSelectedFile = file;
-            document.getElementById('cdFileStatus').innerText = `Selected: ${file.name}`;
+            const statusEl = document.getElementById('cdFileStatus');
+            const submitBtn = document.getElementById('cdSubmitBtn');
+
+            if (statusEl) {
+                statusEl.innerHTML = `<span class="text-amber-600 font-bold animate-pulse">⏳ ফাইল পড়া হচ্ছে: ${file.name}... অনুগ্রহ করে অপেক্ষা করুন</span>`;
+            }
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>⏳ ফাইল প্রসেস হচ্ছে...</span>';
+            }
 
             const reader = new FileReader();
+            reader.onerror = function() {
+                if (statusEl) {
+                    statusEl.innerHTML = `<span class="text-rose-600 font-bold">❌ ফাইল পড়তে ব্যর্থ: ফাইলটি সম্ভবত এক্সেলে খোলা আছে। অনুগ্রহ করে এক্সেল বন্ধ করে আবার চেষ্টা করুন।</span>`;
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
+                }
+            };
+
             reader.onload = function(evt) {
                 try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    cdParsedRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+                    let rows = [];
+                    const lowerName = file.name.toLowerCase();
 
-                    if (!cdParsedRows || cdParsedRows.length === 0) {
-                        alert('Uploaded sheet contains no data rows.');
+                    if (lowerName.endsWith('.csv') || lowerName.endsWith('.txt')) {
+                        const textData = new TextDecoder('utf-8').decode(evt.target.result);
+                        const lines = textData.split(/\r?\n/).filter(l => l.trim().length > 0);
+                        if (lines.length > 0) {
+                            const header = lines[0].split(/,|\t/).map(h => h.trim().replace(/^["']|["']$/g, ''));
+                            for (let i = 1; i < lines.length; i++) {
+                                const vals = lines[i].split(/,|\t/).map(v => v.trim().replace(/^["']|["']$/g, ''));
+                                const obj = {};
+                                header.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
+                                rows.push(obj);
+                            }
+                        }
+                    } else {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+                    }
+
+                    if (!rows || rows.length === 0) {
+                        if (statusEl) statusEl.innerHTML = `<span class="text-rose-600 font-bold">❌ ফাইলে কোনো ডাটা সারি পাওয়া যায়নি।</span>`;
+                        alert('ফাইলে কোনো ডাটা পাওয়া যায়নি। অনুগ্রহ করে ফাইলটি চেক করুন।');
                         return;
                     }
 
-                    document.getElementById('cdFileStatus').innerText = `${file.name} (${cdParsedRows.length} rows loaded)`;
+                    cdParsedRows = rows;
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✅ সফলভাবে লোড হয়েছে: ${file.name} (${rows.length} টি সারি পাওয়া গেছে)</span>`;
+                    }
 
-                    const columns = Object.keys(cdParsedRows[0]);
+                    const columns = Object.keys(rows[0]);
                     const colPhone = document.getElementById('cdColPhone');
                     const colName = document.getElementById('cdColName');
                     const colAge = document.getElementById('cdColAge');
                     const colIncome = document.getElementById('cdColIncome');
                     const colMarket = document.getElementById('cdColMarket');
 
-                    colPhone.innerHTML = '';
-                    colName.innerHTML = '<option value="">-- None / Empty --</option>';
-                    colAge.innerHTML = '<option value="">-- None / Empty --</option>';
-                    colIncome.innerHTML = '<option value="">-- None / Empty --</option>';
-                    colMarket.innerHTML = '<option value="">-- None / Empty --</option>';
+                    if (colPhone) {
+                        colPhone.innerHTML = '';
+                        if (colName) colName.innerHTML = '<option value="">-- None / Empty --</option>';
+                        if (colAge) colAge.innerHTML = '<option value="">-- None / Empty --</option>';
+                        if (colIncome) colIncome.innerHTML = '<option value="">-- None / Empty --</option>';
+                        if (colMarket) colMarket.innerHTML = '<option value="">-- None / Empty --</option>';
 
-                    let phoneSet = false, nameSet = false, ageSet = false, incSet = false, mktSet = false;
+                        let phoneSet = false, nameSet = false, ageSet = false, incSet = false, mktSet = false;
 
-                    columns.forEach(col => {
-                        const lower = col.toLowerCase();
+                        columns.forEach(col => {
+                            const lower = col.toLowerCase();
 
-                        const optP = document.createElement('option');
-                        optP.value = col; optP.innerText = col;
-                        if (!phoneSet && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact'))) {
-                            optP.selected = true; phoneSet = true;
-                        }
-                        colPhone.appendChild(optP);
+                            const optP = document.createElement('option');
+                            optP.value = col; optP.innerText = col;
+                            if (!phoneSet && (lower.includes('phone') || lower.includes('number') || lower.includes('mobile') || lower.includes('contact'))) {
+                                optP.selected = true; phoneSet = true;
+                            }
+                            colPhone.appendChild(optP);
 
-                        const optN = document.createElement('option');
-                        optN.value = col; optN.innerText = col;
-                        if (!nameSet && (lower.includes('name') || lower.includes('full') || lower.includes('client'))) {
-                            optN.selected = true; nameSet = true;
-                        }
-                        colName.appendChild(optN);
+                            if (colName) {
+                                const optN = document.createElement('option');
+                                optN.value = col; optN.innerText = col;
+                                if (!nameSet && (lower.includes('name') || lower.includes('full') || lower.includes('client'))) {
+                                    optN.selected = true; nameSet = true;
+                                }
+                                colName.appendChild(optN);
+                            }
 
-                        const optA = document.createElement('option');
-                        optA.value = col; optA.innerText = col;
-                        if (!ageSet && (lower.includes('age') || lower.includes('dob') || lower.includes('year'))) {
-                            optA.selected = true; ageSet = true;
-                        }
-                        colAge.appendChild(optA);
+                            if (colAge) {
+                                const optA = document.createElement('option');
+                                optA.value = col; optA.innerText = col;
+                                if (!ageSet && (lower.includes('age') || lower.includes('dob') || lower.includes('year'))) {
+                                    optA.selected = true; ageSet = true;
+                                }
+                                colAge.appendChild(optA);
+                            }
 
-                        const optI = document.createElement('option');
-                        optI.value = col; optI.innerText = col;
-                        if (!incSet && (lower.includes('income') || lower.includes('hhi') || lower.includes('salary'))) {
-                            optI.selected = true; incSet = true;
-                        }
-                        colIncome.appendChild(optI);
+                            if (colIncome) {
+                                const optI = document.createElement('option');
+                                optI.value = col; optI.innerText = col;
+                                if (!incSet && (lower.includes('income') || lower.includes('hhi') || lower.includes('salary'))) {
+                                    optI.selected = true; incSet = true;
+                                }
+                                colIncome.appendChild(optI);
+                            }
 
-                        const optM = document.createElement('option');
-                        optM.value = col; optM.innerText = col;
-                        if (!mktSet && (lower.includes('market') || lower.includes('value') || lower.includes('home') || lower.includes('property'))) {
-                            optM.selected = true; mktSet = true;
-                        }
-                        colMarket.appendChild(optM);
-                    });
+                            if (colMarket) {
+                                const optM = document.createElement('option');
+                                optM.value = col; optM.innerText = col;
+                                if (!mktSet && (lower.includes('market') || lower.includes('value') || lower.includes('home') || lower.includes('property'))) {
+                                    optM.selected = true; mktSet = true;
+                                }
+                                colMarket.appendChild(optM);
+                            }
+                        });
 
-                    document.getElementById('cdColMapGrid').classList.remove('hidden');
-                    onCdCategoryChanged();
+                        const grid = document.getElementById('cdColMapGrid');
+                        if (grid) grid.classList.remove('hidden');
+                        onCdCategoryChanged();
+                    }
 
                 } catch (err) {
+                    console.error('Error reading file:', err);
+                    if (statusEl) statusEl.innerHTML = `<span class="text-rose-600 font-bold">❌ ফাইল পড়তে সমস্যা: ${err.message}</span>`;
                     alert('Error reading Excel file: ' + err.message);
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
+                    }
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -5061,9 +5334,52 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                     }
                 });
             } else {
-                // File upload mode
+                // File upload mode: if cdParsedRows is empty but cdSelectedFile is present, parse immediately
+                if ((!cdParsedRows || cdParsedRows.length === 0) && cdSelectedFile) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span>⏳ ফাইল প্রসেস করা হচ্ছে, অনুগ্রহ করে একটু অপেক্ষা করুন...</span>';
+                    try {
+                        await new Promise((resolve, reject) => {
+                            const r = new FileReader();
+                            r.onload = function(evt) {
+                                try {
+                                    const lowerName = cdSelectedFile.name.toLowerCase();
+                                    let rows = [];
+                                    if (lowerName.endsWith('.csv') || lowerName.endsWith('.txt')) {
+                                        const textData = new TextDecoder('utf-8').decode(evt.target.result);
+                                        const lines = textData.split(/\r?\n/).filter(l => l.trim().length > 0);
+                                        if (lines.length > 0) {
+                                            const header = lines[0].split(/,|\t/).map(h => h.trim().replace(/^["']|["']$/g, ''));
+                                            for (let i = 1; i < lines.length; i++) {
+                                                const vals = lines[i].split(/,|\t/).map(v => v.trim().replace(/^["']|["']$/g, ''));
+                                                const obj = {};
+                                                header.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
+                                                rows.push(obj);
+                                            }
+                                        }
+                                    } else {
+                                        const data = new Uint8Array(evt.target.result);
+                                        const wb = XLSX.read(data, { type: 'array' });
+                                        const ws = wb.Sheets[wb.SheetNames[0]];
+                                        rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+                                    }
+                                    cdParsedRows = rows;
+                                    resolve();
+                                } catch(e) { reject(e); }
+                            };
+                            r.onerror = reject;
+                            r.readAsArrayBuffer(cdSelectedFile);
+                        });
+                    } catch (parseErr) {
+                        alert('ফাইল পড়তে সমস্যা হয়েছে: ' + parseErr.message);
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
+                        return;
+                    }
+                }
+
                 if (!cdParsedRows || cdParsedRows.length === 0) {
-                    alert('Please select an Excel file first.');
+                    alert('অনুগ্রহ করে প্রথমে একটি এক্সেল বা সিএসভি ফাইল সিলেক্ট করুন।');
                     return;
                 }
                 const phoneCol = document.getElementById('cdColPhone')?.value;
@@ -5359,7 +5675,574 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             loadCompanyDeliveriesData();
         }
 
-    </script>
+    
+        // ==========================================
+        // WORKER SELF-SERVICE STOCK CLAIM SYSTEM
+        // ==========================================
+        let currentClaimedRecords = [];
+
+        function setWorkerClaimQty(qty) {
+            const input = document.getElementById('workerClaimQtyInput');
+            if (input) input.value = qty;
+        }
+
+        async function loadWorkerClaimStockCount() {
+            if (!supabaseClient) return;
+            try {
+                const { count, error } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_assigned', false);
+                
+                const stockBadge = document.getElementById('workerStockCount');
+                if (stockBadge) {
+                    stockBadge.innerText = (count !== null && count !== undefined) ? count : 0;
+                }
+            } catch (err) {
+                console.warn('Could not fetch stock count:', err);
+            }
+        }
+
+        async function executeWorkerClaim() {
+            if (!supabaseClient || !currentUser) {
+                alert('অনুগ্রহ করে প্রথমে লগইন করুন।');
+                return;
+            }
+
+            const input = document.getElementById('workerClaimQtyInput');
+            let qty = parseInt(input ? input.value : '100', 10);
+            if (isNaN(qty) || qty <= 0) qty = 100;
+            if (qty > 1000) {
+                alert('একবারে সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
+                return;
+            }
+
+            const btn = document.getElementById('btnWorkerClaim');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ নাম্বার সংগ্রহ করা হচ্ছে...</span>';
+
+            try {
+                let records = [];
+                // 1. Try atomic RPC first
+                try {
+                    const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
+                        p_quantity: qty
+                    });
+                    if (error) throw error;
+
+                    if (data && data.success && data.data && data.data.length > 0) {
+                        records = data.data;
+                    } else if (data && !data.success) {
+                        alert(data.message || 'স্টকে কোনো নতুন নাম্বার খালি নেই!');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                        return;
+                    }
+                } catch (rpcErr) {
+                    console.warn('RPC fallback to direct claim:', rpcErr);
+
+                    // 2. Direct fallback: select unassigned and update
+                    const { data: stockRows, error: fetchErr } = await supabaseClient
+                        .from('company_received_numbers')
+                        .select('id, phone_number, full_name, age')
+                        .eq('is_assigned', false)
+                        .order('id', { ascending: true })
+                        .limit(qty);
+
+                    if (fetchErr) throw fetchErr;
+
+                    if (!stockRows || stockRows.length === 0) {
+                        alert('স্টকে কোনো নতুন নাম্বার খালি নেই! এডমিন কোম্পানি থেকে নতুন নাম্বার আপলোড করলে আবার চেষ্টা করুন।');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                        return;
+                    }
+
+                    const claimIds = stockRows.map(r => r.id);
+                    const username = currentProfile ? currentProfile.username : currentUser.email.split('@')[0];
+
+                    const { error: updateErr } = await supabaseClient
+                        .from('company_received_numbers')
+                        .update({
+                            is_assigned: true,
+                            assigned_to_user_id: currentUser.id,
+                            assigned_to_username: username,
+                            assigned_to_email: currentUser.email,
+                            assigned_at: new Date().toISOString()
+                        })
+                        .in('id', claimIds);
+
+                    if (updateErr) throw updateErr;
+
+                    records = stockRows.map(r => ({
+                        phone: r.phone_number,
+                        name: r.full_name || '',
+                        age: r.age || ''
+                    }));
+                }
+
+                currentClaimedRecords = records;
+
+                // Update UI Modal
+                document.getElementById('workerClaimedCountDisplay').innerText = records.length;
+                document.getElementById('workerClaimModalSubtitle').innerText = `${records.length} টি নাম্বার সফলভাবে আপনার একাউন্টে বরাদ্দ করা হয়েছে।`;
+
+                const phoneListText = records.map(r => r.phone).join('\n');
+                document.getElementById('workerClaimedTextarea').value = phoneListText;
+
+                document.getElementById('workerClaimModal').classList.remove('hidden');
+
+                // Refresh stock count
+                loadWorkerClaimStockCount();
+
+            } catch (err) {
+                console.error('Error claiming numbers:', err);
+                alert('নাম্বার সংগ্রহে সমস্যা হয়েছে: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
+            }
+        }
+
+        function closeWorkerClaimModal() {
+            document.getElementById('workerClaimModal').classList.add('hidden');
+        }
+
+        function copyWorkerClaimedNumbers() {
+            const textarea = document.getElementById('workerClaimedTextarea');
+            if (!textarea || !textarea.value) return;
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                alert('✅ সমস্ত ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!');
+            }).catch(() => {
+                textarea.select();
+                document.execCommand('copy');
+                alert('✅ সমস্ত ফোন নাম্বার কপি করা হয়েছে!');
+            });
+        }
+
+        function downloadWorkerClaimedTxt() {
+            if (!currentClaimedRecords || currentClaimedRecords.length === 0) return;
+            const textContent = currentClaimedRecords.map(r => r.phone).join('\n');
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Work_Numbers_${currentProfile?.username || 'user'}_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadWorkerClaimedExcel() {
+            if (!currentClaimedRecords || currentClaimedRecords.length === 0) return;
+            const exportRows = currentClaimedRecords.map((r, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': r.phone,
+                'Name': r.name || '',
+                'Age': r.age || ''
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Work_Numbers');
+            XLSX.writeFile(wb, `Work_Numbers_${currentProfile?.username || 'user'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function sendWorkerClaimedToDupCheck() {
+            const textarea = document.getElementById('workerClaimedTextarea');
+            if (!textarea || !textarea.value) return;
+            closeWorkerClaimModal();
+            switchToSection('duplicate_check');
+            const dupInput = document.getElementById('dupTextInput');
+            if (dupInput) {
+                dupInput.value = textarea.value;
+                dupInput.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function openClaimHistoryModal() {
+            if (!supabaseClient || !currentUser) return;
+            try {
+                const todayStart = new Date();
+                todayStart.setHours(0,0,0,0);
+
+                const { data, error } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('phone_number, full_name, age, assigned_at')
+                    .eq('assigned_to_user_id', currentUser.id)
+                    .gte('assigned_at', todayStart.toISOString())
+                    .order('assigned_at', { ascending: false });
+
+                if (error) throw error;
+
+                const area = document.getElementById('workerHistoryTextarea');
+                if (data && data.length > 0) {
+                    area.value = data.map(r => r.phone_number).join('\n');
+                } else {
+                    area.value = 'আজ এখনো কোনো নাম্বার সংগ্রহ করা হয়নি।';
+                }
+
+                document.getElementById('workerClaimHistoryModal').classList.remove('hidden');
+            } catch (err) {
+                alert('হিস্ট্রি লোড করতে সমস্যা: ' + err.message);
+            }
+        }
+
+        function closeWorkerClaimHistoryModal() {
+            document.getElementById('workerClaimHistoryModal').classList.add('hidden');
+        }
+
+        function copyWorkerHistoryNumbers() {
+            const textarea = document.getElementById('workerHistoryTextarea');
+            if (!textarea || !textarea.value) return;
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                alert('✅ ক্লিপবোর্ডে কপি করা হয়েছে!');
+            });
+        }
+
+
+        // ==============================================================
+        // DEDICATED SECTOR: CLAIM WORK NUMBERS (FOR LOGGED-IN USERS)
+        // ==============================================================
+        let secCurrentClaimed = [];
+
+        function selectSecQty(qty, btnEl) {
+            const input = document.getElementById('secClaimQtyInput');
+            if (input) input.value = qty;
+
+            document.querySelectorAll('.sec-qty-btn').forEach(btn => {
+                btn.className = 'sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition';
+            });
+            if (btnEl) {
+                btnEl.className = 'sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-500 border border-indigo-300 text-white rounded-xl shadow transition';
+            }
+        }
+
+        async function loadClaimStockSector() {
+            refreshClaimStockData();
+            loadSecClaimHistory();
+        }
+
+        async function refreshClaimStockData() {
+            if (!supabaseClient) return;
+            try {
+                // 1. Available stock count
+                const { count: availCount } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_assigned', false);
+
+                const availEl = document.getElementById('secStockAvailable');
+                if (availEl) availEl.innerText = availCount || 0;
+
+                // 2. User claimed today count
+                if (currentUser) {
+                    const todayStart = new Date();
+                    todayStart.setHours(0, 0, 0, 0);
+
+                    const { count: userClaimedCount } = await supabaseClient
+                        .from('company_received_numbers')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('assigned_to_user_id', currentUser.id)
+                        .gte('assigned_at', todayStart.toISOString());
+
+                    const userTodayEl = document.getElementById('secWorkerClaimedToday');
+                    if (userTodayEl) userTodayEl.innerText = userClaimedCount || 0;
+                }
+            } catch (err) {
+                console.warn('Error refreshing claim stock data:', err);
+            }
+        }
+
+        async function executeSecClaim() {
+            if (!supabaseClient || !currentUser) {
+                alert('অনুগ্রহ করে প্রথমে লগইন করুন।');
+                return;
+            }
+
+            const input = document.getElementById('secClaimQtyInput');
+            let qty = parseInt(input ? input.value : '100', 10);
+            if (isNaN(qty) || qty <= 0) qty = 100;
+            if (qty > 1000) {
+                alert('একবারে সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
+                return;
+            }
+
+            const btn = document.getElementById('btnSecClaim');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ নাম্বার সংগ্রহ করা হচ্ছে...</span>';
+
+            try {
+                let records = [];
+
+                // 1. Try atomic RPC first
+                try {
+                    const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
+                        p_quantity: qty
+                    });
+                    if (error) throw error;
+
+                    if (data && data.success && data.data && data.data.length > 0) {
+                        records = data.data;
+                    } else if (data && !data.success) {
+                        alert(data.message || 'স্টকে কোনো নতুন নাম্বার খালি নেই!');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                        return;
+                    }
+                } catch (rpcErr) {
+                    console.warn('RPC fallback to direct claim query:', rpcErr);
+
+                    // 2. Direct fallback query
+                    const { data: stockRows, error: fetchErr } = await supabaseClient
+                        .from('company_received_numbers')
+                        .select('id, phone_number, full_name, age')
+                        .eq('is_assigned', false)
+                        .order('id', { ascending: true })
+                        .limit(qty);
+
+                    if (fetchErr) throw fetchErr;
+
+                    if (!stockRows || stockRows.length === 0) {
+                        alert('স্টকে কোনো নতুন নাম্বার খালি নেই! এডমিন নতুন স্টক আপলোড করলে আবার চেষ্টা করুন।');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                        return;
+                    }
+
+                    const claimIds = stockRows.map(r => r.id);
+                    const username = currentProfile ? currentProfile.username : currentUser.email.split('@')[0];
+
+                    const { error: updateErr } = await supabaseClient
+                        .from('company_received_numbers')
+                        .update({
+                            is_assigned: true,
+                            assigned_to_user_id: currentUser.id,
+                            assigned_to_username: username,
+                            assigned_to_email: currentUser.email,
+                            assigned_at: new Date().toISOString()
+                        })
+                        .in('id', claimIds);
+
+                    if (updateErr) throw updateErr;
+
+                    records = stockRows.map(r => ({
+                        phone: r.phone_number,
+                        name: r.full_name || '',
+                        age: r.age || ''
+                    }));
+                }
+
+                secCurrentClaimed = records;
+
+                // Render in Sector Active Output Panel
+                document.getElementById('secResultCount').innerText = records.length;
+                const phoneText = records.map(r => r.phone).join('\n');
+                document.getElementById('secClaimedTextarea').value = phoneText;
+                document.getElementById('secActiveResultCard').classList.remove('hidden');
+                document.getElementById('secActiveResultCard').scrollIntoView({ behavior: 'smooth' });
+
+                // Refresh metrics & history
+                refreshClaimStockData();
+                loadSecClaimHistory();
+
+                alert(`🎉 অভিনন্দন! সফলভাবে ${records.length}টি ফোন নাম্বার আপনার জন্য সংরক্ষিত করা হয়েছে।`);
+
+            } catch (err) {
+                console.error('Claim error:', err);
+                alert('নাম্বার সংগ্রহে ত্রুটি: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+            }
+        }
+
+        function copySecClaimedNumbers() {
+            const area = document.getElementById('secClaimedTextarea');
+            if (!area || !area.value) return;
+            navigator.clipboard.writeText(area.value).then(() => {
+                alert('✅ সমস্ত সংগৃহীত ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!');
+            }).catch(() => {
+                area.select();
+                document.execCommand('copy');
+                alert('✅ সমস্ত সংগৃহীত ফোন নাম্বার কপি করা হয়েছে!');
+            });
+        }
+
+        function downloadSecClaimedTxt() {
+            if (!secCurrentClaimed || secCurrentClaimed.length === 0) return;
+            const textContent = secCurrentClaimed.map(r => r.phone).join('\n');
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Work_Stock_${currentProfile?.username || 'user'}_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadSecClaimedExcel() {
+            if (!secCurrentClaimed || secCurrentClaimed.length === 0) return;
+            const exportRows = secCurrentClaimed.map((r, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': r.phone,
+                'Full Name': r.name || '',
+                'Age': r.age || ''
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Claimed_Numbers');
+            XLSX.writeFile(wb, `Work_Stock_${currentProfile?.username || 'user'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function sendSecClaimedToDupCheck() {
+            const area = document.getElementById('secClaimedTextarea');
+            if (!area || !area.value) return;
+            switchToSection('duplicate_check');
+            const dupInput = document.getElementById('dupTextInput');
+            if (dupInput) {
+                dupInput.value = area.value;
+                dupInput.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function loadSecClaimHistory() {
+            if (!supabaseClient || !currentUser) return;
+            const tbody = document.getElementById('secClaimHistoryBody');
+            if (!tbody) return;
+
+            try {
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                const { data, error } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('id, phone_number, full_name, age, assigned_at')
+                    .eq('assigned_to_user_id', currentUser.id)
+                    .gte('assigned_at', todayStart.toISOString())
+                    .order('assigned_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400">আজ এখনো কোনো নাম্বার সংগ্রহ করা হয়নি। উপরের বাটন চাপ দিয়ে নাম্বার নিন।</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                data.forEach((row, idx) => {
+                    const timeStr = row.assigned_at ? new Date(row.assigned_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-3 px-4 font-mono text-slate-600">${timeStr}</td>
+                        <td class="py-3 px-4 font-bold font-mono text-slate-800">${row.phone_number}</td>
+                        <td class="py-3 px-4 text-slate-600">${row.full_name || '-'}</td>
+                        <td class="py-3 px-4 text-slate-600">${row.age || '-'}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="navigator.clipboard.writeText('${row.phone_number}').then(() => alert('কপি করা হয়েছে: ${row.phone_number}'))" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition">
+                                📋 Copy
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (err) {
+                console.error('History load error:', err);
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-rose-500">হিস্ট্রি লোড করতে সমস্যা: ${err.message}</td></tr>`;
+            }
+        }
+
+</script>
+
+    <!-- Modal: Worker Claimed Numbers Result -->
+    <div id="workerClaimModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🎉</span>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg text-slate-800">নাম্বার সংগ্রহ সফল হয়েছে!</h3>
+                        <p id="workerClaimModalSubtitle" class="text-xs text-slate-500">আপনার জন্য নাম্বারগুলো স্টক থেকে লক করা হয়েছে।</p>
+                    </div>
+                </div>
+                <button onclick="closeWorkerClaimModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">
+                    ✕
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-hidden flex flex-col space-y-3">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-600">
+                    <span>সংগৃহীত নাম্বারের তালিকা (<span id="workerClaimedCountDisplay">0</span> টি):</span>
+                    <span class="text-[11px] text-emerald-600 font-semibold">🔒 অন্য কেউ এই নাম্বার পাবে না</span>
+                </div>
+                <textarea id="workerClaimedTextarea" readonly rows="10" class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none select-all flex-1"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 mt-3 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="copyWorkerClaimedNumbers()" class="px-4 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow transition flex items-center space-x-1.5">
+                        <span>📋 Copy All (সব কপি করুন)</span>
+                    </button>
+                    <button type="button" onclick="downloadWorkerClaimedTxt()" class="px-3 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 transition">
+                        📄 .TXT
+                    </button>
+                    <button type="button" onclick="downloadWorkerClaimedExcel()" class="px-3 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition">
+                        📊 .XLSX
+                    </button>
+                </div>
+                <button type="button" onclick="sendWorkerClaimedToDupCheck()" class="px-4 py-2 text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition flex items-center space-x-1">
+                    <span>🔍 ডুপ্লিকেট টুলে নিয়ে যান ➔</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Worker Claim History Today -->
+    <div id="workerClaimHistoryModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">📜</span>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg text-slate-800">আজকে সংগৃহীত নাম্বার হিস্ট্রি</h3>
+                        <p class="text-xs text-slate-500">আজ আপনি স্টক থেকে যত নাম্বার নিয়েছেন তা এখানে সংরক্ষিত আছে।</p>
+                    </div>
+                </div>
+                <button onclick="closeWorkerClaimHistoryModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">
+                    ✕
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-3">
+                <textarea id="workerHistoryTextarea" readonly rows="12" class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none select-all"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 mt-3 flex items-center justify-between">
+                <button type="button" onclick="copyWorkerHistoryNumbers()" class="px-4 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow transition">
+                    📋 Copy All Numbers
+                </button>
+                <button type="button" onclick="closeWorkerClaimHistoryModal()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
-</html>
+</html>            <!-- Quick Shortcut to Dedicated Stock Sector -->
+            <div class="bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-700 rounded-xl shadow-md p-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-indigo-400/30">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🎁</span>
+                    <div>
+                        <h4 class="font-extrabold text-sm sm:text-base text-white">কাজের জন্য নতুন ফোন নাম্বার প্রয়োজন?</h4>
+                        <p class="text-xs text-indigo-100">কোম্পানির আপলোড করা স্টক থেকে সরাসরি প্রয়োজনীয় নাম্বার সংগ্রহ করুন।</p>
+                    </div>
+                </div>
+                <button type="button" onclick="switchToSection('claim_stock')" class="bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-xs sm:text-sm px-4 py-2 rounded-lg shadow transition flex items-center justify-center space-x-1.5 flex-shrink-0">
+                    <span>স্টক থেকে নাম্বার নিন ➔</span>
+                </button>
+            </div>
+
+
 
