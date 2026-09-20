@@ -179,14 +179,13 @@
         <!-- 2. Login & Sign Up View -->
         <div id="loginView" class="max-w-md mx-auto mt-12">
             <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
-                <!-- Toggle Tabs -->
-                <div class="flex border-b border-slate-200 mb-6">
-                    <button id="tabSignInBtn" onclick="switchAuthMode('signin')" class="flex-1 pb-3 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
-                        Sign In
-                    </button>
-                    <button id="tabSignUpBtn" onclick="switchAuthMode('signup')" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">
-                        Create Account
-                    </button>
+                <!-- Login Header (Public Registration Disabled) -->
+                <div class="text-center mb-6 pb-4 border-b border-slate-100">
+                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-2 shadow-sm font-black">
+                        ⚡
+                    </div>
+                    <h2 id="authTitle" class="text-2xl font-black text-slate-800">Team Portal Login</h2>
+                    <p id="authSubtitle" class="text-xs text-slate-500 mt-1">আপনার ইউজারনেম ও পাসওয়ার্ড দিয়ে লগইন করুন</p>
                 </div>
 
                 <div class="text-center mb-6">
@@ -233,6 +232,16 @@
                         <span>Sign In</span>
                     </button>
                 </form>
+                <!-- Notice: Accounts are created by Admin only -->
+                <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1.5">
+                    <div class="flex items-center space-x-1.5 font-bold text-slate-800">
+                        <span>🔒</span>
+                        <span>অ্যাকাউন্ট খোলার নিয়ম (Notice):</span>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed text-[11px]">
+                        নিরাপত্তার স্বার্থে কর্মীরা নিজে নিজে অ্যাকাউন্ট রেজিস্টার করতে পারবেন না। আপনার টিম অ্যাকাউন্ট এবং পাসওয়ার্ড অ্যাডমিন প্যানেল থেকে অ্যাডমিন তৈরি করে দেবেন। অ্যাডমিনের সাথে যোগাযোগ করে আপনার লগইন তথ্য সংগ্রহ করুন।
+                    </p>
+                </div>
 
                 <div class="mt-4 text-center text-xs text-slate-500">
                     <span id="authTogglePrompt">Don't have an account?</span>
@@ -572,6 +581,7 @@
                                 <th class="py-3 px-4">Total in File</th>
                                 <th class="py-3 px-4 text-emerald-600 font-semibold">New Unique</th>
                                 <th class="py-3 px-4 text-amber-600 font-semibold">Duplicates Removed</th>
+                                <th class="py-3 px-4 text-center">অ্যাকশন / ভুল সংশোধন</th>
                             </tr>
                         </thead>
                         <tbody id="userUploadHistoryBody" class="divide-y divide-slate-100">
@@ -811,6 +821,60 @@
 
                 <!-- Admin Tab 2: User Management -->
                 <div id="adminTabUsers" class="hidden p-6 space-y-4">
+
+                    <!-- CREATE NEW TEAM MEMBER / TEAM LEADER ACCOUNT FORM -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                            <div class="flex items-center space-x-2.5">
+                                <span class="text-2xl">➕</span>
+                                <div>
+                                    <h4 class="font-black text-base text-slate-800">নতুন কর্মী বা টিম লিডার অ্যাকাউন্ট তৈরি করুন</h4>
+                                    <p class="text-xs text-slate-500">যেহেতু পাবলিক সাইন-আপ বন্ধ, আপনি এখান থেকে কর্মীদের ইউজারনেম ও পাসওয়ার্ড বানিয়ে দেবেন।</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form onsubmit="handleAdminCreateUser(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">কর্মী / ইউজারনেম (Username):</label>
+                                    <input type="text" id="newMemberUsername" required placeholder="e.g. rohim_leader" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-bold focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">ইমেইল (Login Email):</label>
+                                    <input type="email" id="newMemberEmail" required placeholder="e.g. rohim@portal.com" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-medium focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">পাসওয়ার্ড (Password):</label>
+                                    <input type="password" id="newMemberPassword" required placeholder="Minimum 6 characters" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-medium focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">অ্যাকাউন্ট টাইপ (Role):</label>
+                                    <select id="newMemberRole" class="w-full px-3 py-2 text-xs rounded-lg border border-indigo-300 bg-indigo-50/50 font-black text-indigo-900 focus:ring-2 focus:ring-indigo-500">
+                                        <option value="user">👤 সাধারণ কর্মী (General Worker - প্রতি ৬ ঘণ্টায় ১,০০০ লিমিট)</option>
+                                        <option value="team_leader">👑 টিম লিডার (Team Leader - আনলিমিটেড নাম্বার!)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                                <div class="flex items-center space-x-2">
+                                    <label class="text-xs font-bold text-slate-700">ডিপার্টমেন্ট:</label>
+                                    <select id="newMemberDept" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold">
+                                        <option value="gender_verify">Gender Verify</option>
+                                        <option value="number_lookup">Number Lookup</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" id="btnAdminCreateUser" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl shadow transition flex items-center space-x-1.5">
+                                    <span>✨ Create Account & Activate</span>
+                                </button>
+                            </div>
+
+                            <div id="adminCreateUserMsg" class="hidden p-3 rounded-lg text-xs font-bold"></div>
+                        </form>
+                    </div>
+
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="flex items-center space-x-3">
                             <input type="text" id="adminUserSearchInput" oninput="renderAdminUserTable()" placeholder="Search worker email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
@@ -1569,7 +1633,7 @@
                         <span class="bg-indigo-100 text-indigo-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
                             🎁 Self-Service Work Dispenser
                         </span>
-                        <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                        <span id="rolePrivilegeBadge" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">
                             🔒 100% Conflict-Free
                         </span>
                     </div>
@@ -1577,12 +1641,40 @@
                         কোম্পানির স্টক থেকে নাম্বার নিন (Work Number Dispenser)
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-500 max-w-3xl">
-                        এডমিনের আপলোড করা কোম্পানির স্টক থেকে সরাসরি কাজের জন্য ফোন নাম্বার সংগ্রহ করুন। সংগৃহীত নাম্বার শুধুমাত্র আপনার একাউন্টে লক হয়ে যাবে, অন্য কোনো কর্মী এই নাম্বার পাবে না।
+                        এডমিনের আপলোড করা কোম্পানির স্টক থেকে কাজের ধরণ অনুযায়ী সরাসরি ফোন নাম্বার সংগ্রহ করুন।
                     </p>
                 </div>
                 <button type="button" onclick="refreshClaimStockData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl border border-slate-300 transition flex items-center space-x-1.5 self-start md:self-auto flex-shrink-0">
                     <span>🔄 রিফ্রেশ স্টক</span>
                 </button>
+            </div>
+
+            <!-- Team Leader Unlimited Numbers Privilege Notification Banner -->
+            <div id="teamLeaderPrivilegeBanner" class="hidden p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-indigo-500/15 border border-amber-300 text-amber-950 flex items-center justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">👑</span>
+                    <div>
+                        <h4 class="font-black text-sm sm:text-base text-amber-900">টিম লিডার সুবিধা: আনলিমিটেড নাম্বার কোটা সক্রিয়!</h4>
+                        <p class="text-xs text-amber-800 mt-0.5">আপনার অ্যাকাউন্টে কোনো ৬ ঘণ্টার ১,০০০ লিমিট নেই। আপনি কাজের প্রয়োজনে যেকোনো পরিমাণ নাম্বার সংগ্রহ করতে পারবেন।</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 bg-amber-400 text-slate-950 font-black text-xs rounded-full uppercase tracking-wider flex-shrink-0">Unlimited Quota</span>
+            </div>
+
+            <!-- Stock Category Switcher Tabs: Gender Verify vs Lookup Numbers -->
+            <div class="bg-white rounded-2xl shadow-sm p-3 border border-slate-200">
+                <div class="flex flex-col sm:flex-row items-center gap-2">
+                    <button type="button" id="tabClaimCatGv" onclick="switchClaimCategory('gender_verify')" class="w-full sm:flex-1 py-3 px-5 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-2 transition bg-indigo-600 text-white shadow-md">
+                        <span>🚻</span>
+                        <span>জেন্ডার ভেরিফাই স্টক (Gender Verify)</span>
+                        <span id="badgeGvStockAvail" class="ml-2 px-2 py-0.5 text-[11px] bg-white/20 rounded-full font-black">0 টি বাকি</span>
+                    </button>
+                    <button type="button" id="tabClaimCatLookup" onclick="switchClaimCategory('lookup')" class="w-full sm:flex-1 py-3 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100">
+                        <span>🔍</span>
+                        <span>লুকআপ নাম্বার স্টক (Lookup Numbers)</span>
+                        <span id="badgeLookupStockAvail" class="ml-2 px-2 py-0.5 text-[11px] bg-indigo-200 text-indigo-900 rounded-full font-black">0 টি বাকি</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Metric Summary Grid -->
@@ -1601,7 +1693,7 @@
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 border-t-4 border-t-indigo-600 flex flex-col justify-between">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">দৈনিক কোটা লিমিট (Daily Limit: 1,000)</p>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">৬ ঘণ্টার কোটা লিমিট (Limit: 1,000 / 6 Hours)</p>
                             <p class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">
                                 <span id="secWorkerClaimedToday">0</span> <span class="text-xs text-slate-400 font-bold">/ 1,000 টি</span>
                             </p>
@@ -2398,13 +2490,21 @@
                     const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const repLabel = log.report_type === 'male_report' ? '👨 Male Report' : (log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
                     historyBody.innerHTML += `
-                        <tr class="hover:bg-slate-50">
+                        <tr class="hover:bg-slate-50 transition">
                             <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
                             <td class="py-3 px-4 font-bold text-xs">${repLabel}</td>
                             <td class="py-3 px-4 font-medium text-slate-700">${log.file_name || 'Upload'}</td>
-                            <td class="py-3 px-4">${log.total_received}</td>
-                            <td class="py-3 px-4 font-bold text-emerald-600">+${log.new_inserted}</td>
-                            <td class="py-3 px-4 text-amber-600">${log.duplicates_count}</td>
+                            <td class="py-3 px-4 font-mono">${log.total_received}</td>
+                            <td class="py-3 px-4 font-bold font-mono text-emerald-600">+${log.new_inserted}</td>
+                            <td class="py-3 px-4 font-mono text-amber-600">${log.duplicates_count}</td>
+                            <td class="py-3 px-4 text-center space-x-1.5">
+                                <button type="button" onclick="openCategoryCorrectionModal('${log.id}', '${log.report_type}', '${log.file_name || 'Upload'}', ${log.new_inserted})" class="text-[11px] font-extrabold text-indigo-700 hover:text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition" title="ভুল ক্যাটাগরি পরিবর্তন করুন">
+                                    🔄 ক্যাটাগরি বদলান
+                                </button>
+                                <button type="button" onclick="cancelMistakenSubmissionBatch('${log.id}', ${log.new_inserted})" class="text-[11px] font-bold text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2.5 py-1 rounded-lg transition" title="ভুল সাবমিশন সম্পূর্ণ বাতিল করে নতুন করে দিন">
+                                    🗑️ বাতিল
+                                </button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -2552,7 +2652,59 @@
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    parsedRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+                    
+                    // Smart Array-of-Arrays Parser to prevent losing Row 1 if there is no header row
+                    const rawAoA = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                    if (!rawAoA || rawAoA.length === 0) {
+                        alert('Uploaded sheet contains no data rows.');
+                        return;
+                    }
+
+                    // Check if Row 0 is a header or already a data row
+                    const firstRow = rawAoA[0].map(c => String(c || '').trim());
+                    let isHeader = false;
+                    const headerKeywords = ['phone', 'number', 'mobile', 'contact', 'name', 'full name', 'first name', 'last name', 'age', 'gender', 'income', 'market'];
+
+                    for (const cell of firstRow) {
+                        const lower = cell.toLowerCase();
+                        if (headerKeywords.some(kw => lower === kw || lower.includes(kw))) {
+                            isHeader = true;
+                            break;
+                        }
+                    }
+
+                    // If any cell in first row contains 7+ digits and no letters, it is definitely a phone number (DATA, not header!)
+                    for (const cell of firstRow) {
+                        const digits = cell.replace(/[^0-9]/g, '');
+                        if (digits.length >= 7 && digits.length <= 16 && !/[a-zA-Z]/.test(cell)) {
+                            isHeader = false;
+                            break;
+                        }
+                    }
+
+                    let headers = [];
+                    let dataRows = [];
+
+                    if (isHeader) {
+                        headers = firstRow.map((h, i) => h || `Col ${i + 1}`);
+                        dataRows = rawAoA.slice(1);
+                    } else {
+                        // All rows are data! Generate synthetic headers Col 1, Col 2, etc. so 0 numbers are lost!
+                        const maxCols = Math.max(...rawAoA.map(r => r.length));
+                        headers = Array.from({ length: maxCols }, (_, i) => `Column ${i + 1}`);
+                        dataRows = rawAoA;
+                    }
+
+                    parsedRows = [];
+                    dataRows.forEach(row => {
+                        if (row && row.some(c => String(c || '').trim().length > 0)) {
+                            const obj = {};
+                            headers.forEach((h, i) => {
+                                obj[h] = row[i] !== undefined ? row[i] : '';
+                            });
+                            parsedRows.push(obj);
+                        }
+                    });
 
                     if (!parsedRows || parsedRows.length === 0) {
                         alert('Uploaded sheet contains no data rows.');
@@ -4865,19 +5017,26 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 dupCleanList.push({ phone: num, count: counts[num], status: 'Unique' });
             });
 
+            let dupCompanyDeliveredList = [];
+            window.dupCompanyDeliveredList = dupCompanyDeliveredList;
+
             if (checkDb && supabaseClient) {
                 try {
                     const chunkSize = 200;
                     const existingDbSet = new Set();
+                    const companyDeliveredSet = new Set();
+
                     for (let i = 0; i < inputOrder.length; i += chunkSize) {
                         const chunk = inputOrder.slice(i, i + chunkSize);
-                        const { data } = await supabaseClient
+
+                        // 1. Cross-check against master_numbers (Central Database)
+                        const { data: dbData } = await supabaseClient
                             .from('master_numbers')
                             .select('phone_number, user_email, full_name')
                             .in('phone_number', chunk);
 
-                        if (data) {
-                            data.forEach(row => {
+                        if (dbData) {
+                            dbData.forEach(row => {
                                 existingDbSet.add(row.phone_number);
                                 dupDbMatchesList.push({
                                     phone: row.phone_number,
@@ -4886,9 +5045,35 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                                 });
                             });
                         }
+
+                        // 2. Cross-check against company_deliveries (কোম্পানিকে ইতিমধ্যে ডেলিভারি দেওয়া ডাটা)
+                        try {
+                            const { data: compData } = await supabaseClient
+                                .from('company_deliveries')
+                                .select('phone_number, delivery_date, company_name, category')
+                                .in('phone_number', chunk);
+
+                            if (compData) {
+                                compData.forEach(row => {
+                                    companyDeliveredSet.add(row.phone_number);
+                                    dupCompanyDeliveredList.push({
+                                        phone: row.phone_number,
+                                        count: 1,
+                                        status: `⚠️ কোম্পানিকে পূর্বে ডেলিভারি দেওয়া হয়েছে (${row.company_name || 'Company'} - ${row.delivery_date})`
+                                    });
+                                });
+                            }
+                        } catch (compErr) {
+                            console.warn('Company deliveries cross-check notice:', compErr);
+                        }
                     }
 
-                    dupCleanList = dupCleanList.filter(item => !existingDbSet.has(item.phone));
+                    // Strictly remove any numbers that already exist in DB OR were given to company
+                    dupCleanList = dupCleanList.filter(item => !existingDbSet.has(item.phone) && !companyDeliveredSet.has(item.phone));
+
+                    const compDupsEl = document.getElementById('dupStatCompanyDups');
+                    if (compDupsEl) compDupsEl.innerText = companyDeliveredSet.size.toLocaleString();
+
                 } catch (dbErr) {
                     console.error('DB duplicate cross-check error:', dbErr);
                 }
@@ -5964,34 +6149,37 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             btn.disabled = true;
             btn.innerHTML = '<span>⏳ নাম্বার সংগ্রহ করা হচ্ছে...</span>';
 
-            // Strict 1,000 Daily Quota Check per Worker
+            // Strict 1,000 Quota Check per Worker (6-Hour Window)
             try {
-                const todayStart = new Date();
-                todayStart.setHours(0, 0, 0, 0);
+                const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
                 const { count: claimedTodayCount } = await supabaseClient
                     .from('company_received_numbers')
                     .select('*', { count: 'exact', head: true })
                     .eq('assigned_to_user_id', currentUser.id)
-                    .gte('assigned_at', todayStart.toISOString());
+                    .gte('assigned_at', sixHoursAgo.toISOString());
 
-                const alreadyClaimed = claimedTodayCount || 0;
-                const maxDailyQuota = 1000;
-                const remainingQuota = Math.max(0, maxDailyQuota - alreadyClaimed);
+                const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
 
-                if (alreadyClaimed >= maxDailyQuota) {
-                    alert(`❌ আজকের দৈনিক লিমিট পূর্ণ হয়েছে!\n\nএকজন কর্মী দিনে সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারেন। আপনি আজ ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। আগামী কাল আবার নতুন কোটা পাবেন।`);
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
-                    return;
-                }
+                if (!isLeader) {
+                    const alreadyClaimed = claimedTodayCount || 0;
+                    const maxDailyQuota = 1000;
+                    const remainingQuota = Math.max(0, maxDailyQuota - alreadyClaimed);
 
-                if (qty > remainingQuota) {
-                    alert(`⚠️ দৈনিক কোটা সীমা অতিক্রম করেছে!\n\nআপনি আজ ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। দৈনিক ১,০০০ লিমিটের কারণে আজকের জন্য আপনি আর মাত্র ${remainingQuota} টি নাম্বার সংগ্রহ করতে পারবেন।`);
-                    input.value = remainingQuota;
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
-                    return;
+                    if (alreadyClaimed >= maxDailyQuota) {
+                        alert(`❌ আপনার গত ৬ ঘণ্টার লিমিট (১,০০০ টি) পূর্ণ হয়েছে!\n\nসাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারেন। আপনি গত ৬ ঘণ্টায় ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। ৬ ঘণ্টা পূর্ণ হলে আবার নতুন কোটা পাবেন।\n\n💡 আনলিমিটেড কোটার প্রয়োজন হলে অ্যাডমিনের সাথে যোগাযোগ করুন।`);
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                        return;
+                    }
+
+                    if (qty > remainingQuota) {
+                        alert(`⚠️ ৬ ঘণ্টার কোটা সীমা অতিক্রম করেছে!\n\nআপনি গত ৬ ঘণ্টায় ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। প্রতি ৬ ঘণ্টায় ১,০০০ লিমিট থাকায় এই মুহূর্তে আপনি আর মাত্র ${remainingQuota} টি নাম্বার সংগ্রহ করতে পারবেন।`);
+                        input.value = remainingQuota;
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                        return;
+                    }
                 }
             } catch (quotaErr) {
                 console.warn('Quota verification check notice:', quotaErr);
@@ -6002,7 +6190,8 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 // 1. Try atomic RPC first
                 try {
                     const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
-                        p_quantity: qty
+                        p_quantity: qty,
+                        p_stock_type: activeClaimStockCategory
                     });
                     if (error) throw error;
 
@@ -6018,10 +6207,18 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                     console.warn('RPC fallback to direct claim:', rpcErr);
 
                     // 2. Direct fallback: select unassigned and update
-                    const { data: stockRows, error: fetchErr } = await supabaseClient
+                    let fbQuery = supabaseClient
                         .from('company_received_numbers')
                         .select('id, phone_number, full_name, age')
-                        .eq('is_assigned', false)
+                        .eq('is_assigned', false);
+
+                    if (activeClaimStockCategory === 'lookup') {
+                        fbQuery = fbQuery.eq('stock_type', 'lookup');
+                    } else {
+                        fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
+                    }
+
+                    const { data: stockRows, error: fetchErr } = await fbQuery
                         .order('id', { ascending: true })
                         .limit(qty);
 
@@ -6192,7 +6389,29 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             }
         }
 
-        async function loadClaimStockSector() {
+        
+        // ==============================================================
+        // DUAL STOCK CATEGORY & TEAM LEADER DISPENSER LOGIC
+        // ==============================================================
+        let activeClaimStockCategory = 'gender_verify';
+
+        function switchClaimCategory(cat) {
+            activeClaimStockCategory = cat;
+            const btnGv = document.getElementById('tabClaimCatGv');
+            const btnLookup = document.getElementById('tabClaimCatLookup');
+
+            if (cat === 'gender_verify') {
+                if (btnGv) btnGv.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-2 transition bg-indigo-600 text-white shadow-md';
+                if (btnLookup) btnLookup.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100';
+            } else {
+                if (btnLookup) btnLookup.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-2 transition bg-indigo-600 text-white shadow-md';
+                if (btnGv) btnGv.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100';
+            }
+
+            refreshClaimStockData();
+        }
+
+async function loadClaimStockSector() {
             refreshClaimStockData();
             loadSecClaimHistory();
         }
@@ -6200,25 +6419,52 @@ Remaining Uncertain: ${remainingUnknown.length}`);
         async function refreshClaimStockData() {
             if (!supabaseClient) return;
             try {
-                // 1. Available stock count
-                const { count: availCount } = await supabaseClient
+                // 1. Dual Stock Categories Counts
+                const { count: gvCount } = await supabaseClient
                     .from('company_received_numbers')
                     .select('*', { count: 'exact', head: true })
-                    .eq('is_assigned', false);
+                    .eq('is_assigned', false)
+                    .or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
 
+                const { count: lookupCount } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_assigned', false)
+                    .eq('stock_type', 'lookup');
+
+                const gvAvail = gvCount || 0;
+                const lookupAvail = lookupCount || 0;
+
+                const badgeGv = document.getElementById('badgeGvStockAvail');
+                if (badgeGv) badgeGv.innerText = `${gvAvail.toLocaleString()} টি বাকি`;
+
+                const badgeLookup = document.getElementById('badgeLookupStockAvail');
+                if (badgeLookup) badgeLookup.innerText = `${lookupAvail.toLocaleString()} টি বাকি`;
+
+                const activeCount = activeClaimStockCategory === 'lookup' ? lookupAvail : gvAvail;
                 const availEl = document.getElementById('secStockAvailable');
-                if (availEl) availEl.innerText = availCount || 0;
+                if (availEl) availEl.innerText = activeCount.toLocaleString();
 
-                // 2. User claimed today count
+                // 2. Team Leader Privilege Check
+                const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
+                const leaderBanner = document.getElementById('teamLeaderPrivilegeBanner');
+                if (leaderBanner) {
+                    if (isLeader) {
+                        leaderBanner.classList.remove('hidden');
+                    } else {
+                        leaderBanner.classList.add('hidden');
+                    }
+                }
+
+                // 2. User claimed in last 6 hours count
                 if (currentUser) {
-                    const todayStart = new Date();
-                    todayStart.setHours(0, 0, 0, 0);
+                    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
                     const { count: userClaimedCount } = await supabaseClient
                         .from('company_received_numbers')
                         .select('*', { count: 'exact', head: true })
                         .eq('assigned_to_user_id', currentUser.id)
-                        .gte('assigned_at', todayStart.toISOString());
+                        .gte('assigned_at', sixHoursAgo.toISOString());
 
                     const userTodayEl = document.getElementById('secWorkerClaimedToday');
                     const cCount = userClaimedCount || 0;
@@ -6229,9 +6475,9 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                     const quotaBarEl = document.getElementById('secWorkerQuotaBar');
                     const btnClaim = document.getElementById('btnSecClaim');
 
-                    const dailyLimit = 1000;
-                    const remaining = Math.max(0, dailyLimit - cCount);
-                    const pct = Math.min(100, Math.round((cCount / dailyLimit) * 100));
+                    const sixHourLimit = 1000;
+                    const remaining = Math.max(0, sixHourLimit - cCount);
+                    const pct = Math.min(100, Math.round((cCount / sixHourLimit) * 100));
 
                     if (quotaRemEl) quotaRemEl.innerText = remaining.toLocaleString();
                     if (quotaPctEl) quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
@@ -6242,7 +6488,7 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                             if (btnClaim) {
                                 btnClaim.disabled = true;
                                 btnClaim.className = 'w-full sm:w-auto bg-slate-300 text-slate-500 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2';
-                                btnClaim.innerHTML = '<span>🔒 আজকের ১,০০০ লিমিট পূর্ণ হয়েছে</span>';
+                                btnClaim.innerHTML = '<span>🔒 ৬ ঘণ্টার ১,০০০ লিমিট পূর্ণ হয়েছে</span>';
                             }
                         } else if (pct >= 80) {
                             quotaBarEl.className = 'bg-amber-500 h-2 rounded-full transition-all duration-300';
@@ -6281,7 +6527,8 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 // 1. Try atomic RPC first
                 try {
                     const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
-                        p_quantity: qty
+                        p_quantity: qty,
+                        p_stock_type: activeClaimStockCategory
                     });
                     if (error) throw error;
 
@@ -6297,10 +6544,18 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                     console.warn('RPC fallback to direct claim query:', rpcErr);
 
                     // 2. Direct fallback query
-                    const { data: stockRows, error: fetchErr } = await supabaseClient
+                    let fbQuery = supabaseClient
                         .from('company_received_numbers')
                         .select('id, phone_number, full_name, age')
-                        .eq('is_assigned', false)
+                        .eq('is_assigned', false);
+
+                    if (activeClaimStockCategory === 'lookup') {
+                        fbQuery = fbQuery.eq('stock_type', 'lookup');
+                    } else {
+                        fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
+                    }
+
+                    const { data: stockRows, error: fetchErr } = await fbQuery
                         .order('id', { ascending: true })
                         .limit(qty);
 
@@ -6766,6 +7021,260 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             }
         }
 
+
+        // ==============================================================
+        // ADMIN TEAM MEMBER & TEAM LEADER ACCOUNT CREATION SYSTEM
+        // ==============================================================
+        async function handleAdminCreateUser(e) {
+            e.preventDefault();
+            if (!supabaseClient || !currentProfile || currentProfile.role !== 'admin') {
+                alert('শুধুমাত্র অ্যাডমিন নতুন অ্যাকাউন্ট তৈরি করতে পারেন।');
+                return;
+            }
+
+            const username = document.getElementById('newMemberUsername').value.trim();
+            const email = document.getElementById('newMemberEmail').value.trim().toLowerCase();
+            const password = document.getElementById('newMemberPassword').value.trim();
+            const role = document.getElementById('newMemberRole').value;
+            const dept = document.getElementById('newMemberDept').value;
+            const msgBox = document.getElementById('adminCreateUserMsg');
+            const btn = document.getElementById('btnAdminCreateUser');
+
+            if (!username || !email || !password) {
+                alert('অনুগ্রহ করে সমস্ত তথ্য সঠিকভাবে পূরণ করুন।');
+                return;
+            }
+            if (password.length < 6) {
+                alert('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ অ্যাকাউন্ট তৈরি হচ্ছে...</span>';
+            msgBox.className = 'p-3 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 block';
+            msgBox.innerText = 'Creating user credentials in Supabase Auth...';
+
+            try {
+                // Use a separate non-persisting client so Admin is NOT logged out!
+                const tempClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: {
+                        persistSession: false,
+                        autoRefreshToken: false
+                    }
+                });
+
+                const isUnlimited = (role === 'team_leader');
+
+                const { data: authData, error: authErr } = await tempClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            username: username,
+                            role: role,
+                            department: dept,
+                            is_unlimited_quota: isUnlimited
+                        }
+                    }
+                });
+
+                if (authErr) throw authErr;
+
+                const newUserId = authData.user?.id;
+                if (newUserId) {
+                    // Ensure public.profiles has the correct role & unlimited quota
+                    await supabaseClient.from('profiles').upsert({
+                        id: newUserId,
+                        email: email,
+                        username: username,
+                        role: role,
+                        department: dept,
+                        is_unlimited_quota: isUnlimited
+                    });
+                }
+
+                msgBox.className = 'p-3 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 block';
+                const roleLabel = role === 'team_leader' ? '👑 টিম লিডার (আনলিমিটেড কোটা)' : '👤 সাধারণ কর্মী';
+                msgBox.innerHTML = `✅ সফল হয়েছে! নতুন অ্যাকাউন্ট তৈরি হয়েছে:<br><b>ইউজার:</b> ${username} | <b>রোল:</b> ${roleLabel}<br><b>ইমেইল:</b> ${email} | <b>পাসওয়ার্ড:</b> ${password}<br><span class="text-[11px] text-slate-500">এই লগইন তথ্য কর্মীকে প্রদান করুন।</span>`;
+
+                // Reset form inputs
+                document.getElementById('newMemberUsername').value = '';
+                document.getElementById('newMemberEmail').value = '';
+                document.getElementById('newMemberPassword').value = '';
+
+                // Reload user list in admin table
+                await loadAdminUsers();
+
+            } catch (err) {
+                console.error('User creation error:', err);
+                msgBox.className = 'p-3 rounded-lg text-xs font-bold bg-rose-50 text-rose-800 border border-rose-300 block';
+                msgBox.innerText = '❌ অ্যাকাউন্ট তৈরিতে সমস্যা: ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>✨ Create Account & Activate</span>';
+            }
+        }
+
+        async function adminChangeUserRole(userId, newRole) {
+            if (!confirm(`এই ইউজারের রোল পরিবর্তন করে "${newRole === 'team_leader' ? 'টিম লিডার (আনলিমিটেড)' : 'সাধারণ কর্মী'}" করতে চান?`)) {
+                return;
+            }
+            try {
+                const isUnlimited = (newRole === 'team_leader');
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({
+                        role: newRole,
+                        is_unlimited_quota: isUnlimited
+                    })
+                    .eq('id', userId);
+
+                if (error) throw error;
+                alert('✅ ইউজারের রোল ও কোটা সুবিধা সফলভাবে আপডেট হয়েছে!');
+                await loadAdminUsers();
+            } catch (err) {
+                alert('রোল আপডেটে ত্রুটি: ' + err.message);
+            }
+        }
+
+        async function adminToggleUnlimitedQuota(userId, currentStatus) {
+            try {
+                const newStatus = !currentStatus;
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ is_unlimited_quota: newStatus })
+                    .eq('id', userId);
+
+                if (error) throw error;
+                alert(`✅ কোটা সুবিধা আপডেট হয়েছে: ${newStatus ? 'আনলিমিটেড সক্রিয়' : 'প্রতি ৬ ঘণ্টায় ১,০০০ লিমিট'}`);
+                await loadAdminUsers();
+            } catch (err) {
+                alert('কোটা আপডেটে ত্রুটি: ' + err.message);
+            }
+        }
+
+
+        // ==============================================================
+        // BATCH MISTAKE CORRECTION & CANCELLATION SYSTEM
+        // ==============================================================
+        let activeCorrLogId = null;
+        let activeCorrCount = 0;
+
+        function openCategoryCorrectionModal(logId, currentType, fileName, uniqueCount) {
+            activeCorrLogId = logId;
+            activeCorrCount = uniqueCount;
+
+            document.getElementById('corrModalFileName').innerText = fileName;
+            document.getElementById('corrModalUniqueCount').innerText = uniqueCount;
+
+            const repLabel = currentType === 'male_report' ? '👨 Male Report' : (currentType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+            document.getElementById('corrModalCurrentType').innerText = repLabel;
+
+            // Pre-select opposite type
+            const radios = document.querySelectorAll('input[name="corrNewType"]');
+            radios.forEach(r => {
+                if (currentType === 'male_report' && r.value === 'female_report') r.checked = true;
+                else if (currentType === 'female_report' && r.value === 'male_report') r.checked = true;
+                else if (currentType === 'lookup_report' && r.value === 'female_report') r.checked = true;
+            });
+
+            document.getElementById('categoryCorrectionModal').classList.remove('hidden');
+        }
+
+        function closeCategoryCorrectionModal() {
+            document.getElementById('categoryCorrectionModal').classList.add('hidden');
+            activeCorrLogId = null;
+        }
+
+        async function confirmCategoryCorrection() {
+            if (!activeCorrLogId || !supabaseClient) return;
+
+            const selectedRadio = document.querySelector('input[name="corrNewType"]:checked');
+            const newType = selectedRadio ? selectedRadio.value : 'female_report';
+            const btn = document.getElementById('btnConfirmCorrection');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ সংশোধন করা হচ্ছে...</span>';
+
+            try {
+                // 1. Try RPC first
+                try {
+                    const { data, error } = await supabaseClient.rpc('worker_correct_submission_category', {
+                        p_log_id: parseInt(activeCorrLogId, 10),
+                        p_new_report_type: newType
+                    });
+                    if (error) throw error;
+                } catch (rpcErr) {
+                    console.warn('RPC fallback to direct update:', rpcErr);
+
+                    // Direct fallback update
+                    await supabaseClient
+                        .from('upload_logs')
+                        .update({ report_type: newType })
+                        .eq('id', activeCorrLogId);
+
+                    await supabaseClient
+                        .from('master_numbers')
+                        .update({ report_type: newType })
+                        .eq('upload_log_id', activeCorrLogId);
+                }
+
+                closeCategoryCorrectionModal();
+                const newTypeLabel = newType === 'male_report' ? 'Male Report' : (newType === 'female_report' ? 'Female Report' : 'Lookup Report');
+                alert(`✅ সফলভাবে ক্যাটাগরি সংশোধন করা হয়েছে!\n\nএই ব্যাচের ${activeCorrCount}টি নাম্বার এখন "${newTypeLabel}" হিসেবে গণ্য হবে এবং আপনার দৈনিক টার্গেটে স্বয়ংক্রিয়ভাবে হিসাব সমন্বয় করা হয়েছে।`);
+
+                // Reload dashboard & target tracker
+                await loadUserDashboard();
+
+            } catch (err) {
+                console.error('Correction error:', err);
+                alert('ক্যাটাগরি সংশোধনে সমস্যা: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🔄 সংশোধন সম্পন্ন করুন</span>';
+            }
+        }
+
+        async function cancelMistakenSubmissionBatch(logId, count) {
+            if (!logId || !supabaseClient) return;
+
+            if (!confirm(`⚠️ নিশ্চিতকরণ:\n\nআপনি কি এই সাবমিশন ব্যাচটি (${count} টি ইউনিক নাম্বার) সম্পূর্ণ বাতিল ও মুছে ফেলতে চান?\n\nবাতিল করলে এই নাম্বারগুলো ডাটাবেজ থেকে মুছে যাবে এবং আপনার আজকের হিসাব থেকে বাদ পড়বে। ফলে আপনি আবার নতুন করে সঠিক ফাইল আপলোড করতে পারবেন।`)) {
+                return;
+            }
+
+            try {
+                // 1. Try RPC first
+                try {
+                    const { data, error } = await supabaseClient.rpc('worker_cancel_submission_batch', {
+                        p_log_id: parseInt(logId, 10)
+                    });
+                    if (error) throw error;
+                } catch (rpcErr) {
+                    console.warn('RPC fallback to direct delete:', rpcErr);
+
+                    // Direct delete fallback
+                    await supabaseClient
+                        .from('master_numbers')
+                        .delete()
+                        .eq('upload_log_id', logId);
+
+                    await supabaseClient
+                        .from('upload_logs')
+                        .delete()
+                        .eq('id', logId);
+                }
+
+                alert(`✅ সাবমিশনটি সফলভাবে বাতিল করা হয়েছে!\n\nডাটাবেজ থেকে পূর্ববর্তী ভুল এন্ট্রি মুছে দেওয়া হয়েছে। এখন আপনি নির্ভয়ে নতুন করে সঠিক ফাইল বা নাম্বার সাবমিট করতে পারবেন।`);
+
+                // Reload user dashboard & recalculate target tracker
+                await loadUserDashboard();
+
+            } catch (err) {
+                console.error('Cancellation error:', err);
+                alert('সাবমিশন বাতিলে সমস্যা: ' + err.message);
+            }
+        }
+
 </script>
 
     <!-- Modal: Worker Claimed Numbers Result -->
@@ -6870,6 +7379,71 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                 <button type="button" onclick="closeAdminViewClaimModal()" class="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
                     Close
                 </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal: Category Mistake Correction Modal -->
+    <div id="categoryCorrectionModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🔄</span>
+                    <div>
+                        <h3 class="font-extrabold text-base text-slate-800">ভুল ক্যাটাগরি সংশোধন</h3>
+                        <p class="text-xs text-slate-500">Correct Mistaken Report Type</p>
+                    </div>
+                </div>
+                <button onclick="closeCategoryCorrectionModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-600">
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                    <p class="font-bold text-slate-800">ফাইল: <span id="corrModalFileName" class="font-mono text-indigo-700">-</span></p>
+                    <p>মোট ইউনিক নাম্বার: <span id="corrModalUniqueCount" class="font-black text-emerald-600">0</span> টি</p>
+                    <p>বর্তমান সাবমিশন টাইপ: <span id="corrModalCurrentType" class="font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">-</span></p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">
+                        নতুন সঠিক ক্যাটাগরি বেছে নিন:
+                    </label>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-rose-400 bg-rose-50/30 cursor-pointer">
+                            <input type="radio" name="corrNewType" value="female_report" class="w-4 h-4 text-rose-600">
+                            <div>
+                                <span class="font-bold text-rose-800 block">👩 Female Report (ফিমেল ডাটা)</span>
+                                <span class="text-[11px] text-slate-500">টার্গেটের ২০০ ফিমেল কোটায় জমা হবে</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-blue-400 bg-blue-50/30 cursor-pointer">
+                            <input type="radio" name="corrNewType" value="male_report" class="w-4 h-4 text-blue-600">
+                            <div>
+                                <span class="font-bold text-blue-800 block">👨 Male Report (মেল ডাটা)</span>
+                                <span class="text-[11px] text-slate-500">টার্গেটের ১০০ মেল কোটায় জমা হবে</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-purple-400 bg-purple-50/30 cursor-pointer">
+                            <input type="radio" name="corrNewType" value="lookup_report" class="w-4 h-4 text-purple-600">
+                            <div>
+                                <span class="font-bold text-purple-800 block">🔍 Lookup Report (ইনকাম ও মার্কেট ভ্যালু)</span>
+                                <span class="text-[11px] text-slate-500">লুকআপ ডাটাবেজে জমা হবে</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end space-x-2 border-t border-slate-100">
+                    <button type="button" onclick="closeCategoryCorrectionModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold">
+                        বাতিল
+                    </button>
+                    <button type="button" id="btnConfirmCorrection" onclick="confirmCategoryCorrection()" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold shadow">
+                        🔄 সংশোধন সম্পন্ন করুন
+                    </button>
+                </div>
             </div>
         </div>
     </div>
