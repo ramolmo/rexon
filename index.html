@@ -902,23 +902,20 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm min-w-[680px]">
-                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-100/90 text-slate-700 text-[11px] font-extrabold uppercase tracking-wider border-b border-slate-200 select-none">
                                 <tr>
-                                    <th class="py-3 px-4">Username</th>
-                                    <th class="py-3 px-4">Email Address</th>
-                                    <th class="py-3 px-4">Role (পদবী / সুবিধা)</th>
-                                    <th class="py-3 px-4">Department</th>
-                                    <th class="py-3 px-4">Status (অবস্থা)</th>
-                                    <th class="py-3 px-4">Change Department</th>
-                                    <th class="py-3 px-4 text-right">Today's Added</th>
-                                    <th class="py-3 px-4 text-right">Total Contributed</th>
-                                    <th class="py-3 px-4 text-center">Action (অ্যাকশন)</th>
+                                    <th class="py-3 px-3">👤 কর্মী ও ইমেইল (Worker)</th>
+                                    <th class="py-3 px-2.5">👑 পদবী (Role)</th>
+                                    <th class="py-3 px-2.5">📂 ডিপার্টমেন্ট (Dept)</th>
+                                    <th class="py-3 px-2 text-center">অবস্থা</th>
+                                    <th class="py-3 px-2.5 text-center">📊 কাজ (Total / Today)</th>
+                                    <th class="py-3 px-3 text-center">⚡ অ্যাকশন</th>
                                 </tr>
                             </thead>
                             <tbody id="adminUserTableBody" class="divide-y divide-slate-100">
-                                <tr><td colspan="6" class="py-6 text-center text-slate-400">Loading worker accounts...</td></tr>
+                                <tr><td colspan="6" class="py-6 text-center text-slate-400 font-medium">Loading worker accounts...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1877,18 +1874,56 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 space-y-4">
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="block text-xs font-bold text-slate-600 uppercase">
-                            Paste Phone Numbers or Upload Sheet
-                        </label>
-                        <button type="button" onclick="clearDuplicateCheckForm()" class="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2.5 py-1 rounded-md font-bold transition flex items-center space-x-1 border border-rose-200" title="এক ক্লিকে সব নাম্বার ও রেজাল্ট মুছে নতুন করে শুরু করুন">
-                            <span>🧹</span>
-                            <span>Clear / নতুন শুরু</span>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 space-y-5">
+                <!-- Input Mode Tabs: Paste vs Excel File -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <button type="button" id="btnDupModePaste" onclick="switchDupInputMode('paste')" class="px-4 py-2 text-xs sm:text-sm font-black rounded-xl bg-indigo-600 text-white shadow-sm transition">
+                            📋 Paste Text / Data
+                        </button>
+                        <button type="button" id="btnDupModeFile" onclick="switchDupInputMode('file')" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                            📁 Upload Excel / CSV (.xlsx)
                         </button>
                     </div>
-                    <textarea id="dupTextInput" rows="6" placeholder="+1234567890&#10;+1987654321&#10;1234567890" class="w-full px-4 py-3 rounded-lg border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    <button type="button" onclick="clearDuplicateCheckForm()" class="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-3 py-1.5 rounded-lg font-bold transition flex items-center space-x-1 border border-rose-200">
+                        <span>🧹</span>
+                        <span>Clear / রিসেট</span>
+                    </button>
+                </div>
+
+                <!-- Mode 1: Paste Text -->
+                <div id="dupSectionPaste" class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-700 uppercase">
+                        প্রতি লাইনে ফোন নাম্বার বা তথ্য পেস্ট করুন (নাম্বার, নাম, বয়স একসাথে দিলেও সমস্যা নেই):
+                    </label>
+                    <textarea id="dupTextInput" rows="6" placeholder="15136465609 Zoe 42&#10;15136465610 Yvonne 38&#10;15136465611..." class="w-full px-4 py-3 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                </div>
+
+                <!-- Mode 2: Excel File Upload -->
+                <div id="dupSectionFile" class="hidden space-y-3">
+                    <div onclick="document.getElementById('dupFileInput').click()" class="border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/40 rounded-2xl p-6 text-center cursor-pointer transition">
+                        <input type="file" id="dupFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleDupFileSelected(event)">
+                        <div class="text-3xl">📑</div>
+                        <p class="text-xs sm:text-sm font-bold text-slate-700 mt-1">যে এক্সেল ফাইলটি কোম্পানিকে দিতে চান তা নির্বাচন করুন</p>
+                        <p id="dupFileStatus" class="text-xs text-indigo-600 font-semibold mt-0.5">.xlsx, .xls বা .csv ফাইল সাপোর্ট করে</p>
+                    </div>
+                </div>
+
+                <!-- Quality Control Options -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <label class="flex items-center space-x-2.5 text-xs font-bold text-slate-800 cursor-pointer select-none">
+                        <input type="checkbox" id="dupCheckCompanyDeliveries" checked class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                        <span class="text-emerald-950 font-black">
+                            🏢 কোম্পানিকে পূর্বে দেওয়া ডাটার সাথে ক্রস-চেক করুন (Filter Out Already Delivered Numbers)
+                        </span>
+                    </label>
+                    <p class="text-[11px] text-slate-500 ml-6.5">
+                        💡 পূর্বে কোম্পানিকে যেসব নাম্বার দেওয়া হয়েছিল তা চিহ্নিত করে স্বয়ংক্রিয়ভাবে বাদ দেওয়া হবে, যাতে কোম্পানি ১০০% নতুন ও ফ্রেশ ডাটা পায়।
+                    </p>
+                    <label class="flex items-center space-x-2.5 text-xs font-bold text-slate-700 cursor-pointer select-none pt-1">
+                        <input type="checkbox" id="dupCheckDbCrossCheck" checked class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                        <span>সেন্ট্রাল ডাটাবেজের সাথে ক্রস-চেক করুন (Check Master Database)</span>
+                    </label>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
@@ -1910,40 +1945,67 @@
             </div>
 
             <!-- Duplicate Results Section -->
-            <div id="dupResultsCard" class="hidden space-y-6">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">Total Input</p>
-                        <p id="dupStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
+            <div id="dupResultsCard" class="hidden space-y-6 animate-in fade-in duration-200">
+                <!-- 5 Smart Stat Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Checked</p>
+                        <p id="dupStatTotal" class="text-2xl sm:text-3xl font-black text-indigo-700 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">মোট যাচাই করা রেকর্ড</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">🟢 Fresh Unique</p>
-                        <p id="dupStatUnique" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 bg-emerald-50/20">
+                        <p class="text-xs font-bold text-emerald-800 uppercase">🟢 Fresh for Company</p>
+                        <p id="dupStatUnique" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
+                        <p class="text-[11px] text-emerald-700 font-bold mt-0.5">কোম্পানিকে দেওয়ার মতো ফ্রেশ ডাটা</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">🔁 File Duplicates</p>
-                        <p id="dupStatFileDups" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-rose-300 border-t-4 border-t-rose-500 bg-rose-50/30">
+                        <p class="text-xs font-bold text-rose-800 uppercase">🏢 Company Delivered</p>
+                        <p id="dupStatCompanyDups" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
+                        <p class="text-[11px] text-rose-700 font-bold mt-0.5">পূর্বে দেওয়া (বাদ পড়েছে ⚠️)</p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-red-500">
-                        <p class="text-xs font-bold text-slate-500 uppercase">🔴 In Database</p>
-                        <p id="dupStatDbDups" class="text-2xl font-extrabold text-red-600 mt-1">0</p>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
+                        <p class="text-xs font-bold text-amber-800 uppercase">🔁 File Duplicates</p>
+                        <p id="dupStatFileDups" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">একই ফাইলে রিপিট হয়েছে</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                        <p class="text-xs font-bold text-slate-500 uppercase">🔴 In Master DB</p>
+                        <p id="dupStatDbDups" class="text-2xl sm:text-3xl font-black text-blue-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">ডাটাবেজে পূর্বে জমা দেওয়া</p>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-4">
+                <!-- Success Banner for Company Data Quality -->
+                <div id="dupCompanyQualityBanner" class="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 border border-emerald-300 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl flex-shrink-0">🛡️</span>
+                        <div>
+                            <h4 class="font-black text-xs sm:text-sm text-emerald-900">কোম্পানি ডাটা কোয়ালিটি ফিল্টার সক্রিয়!</h4>
+                            <p class="text-xs text-emerald-800 mt-0.5">পূর্বে কোম্পানিকে যেসব নাম্বার ডেলিভারি দেওয়া হয়েছিল তা স্বয়ংক্রিয়ভাবে বাদ দেওয়া হয়েছে। নিচের সবুজ বাটনে ক্লিক করে ১০০% ফ্রেশ ফাইল ডাউনলোড করুন।</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="downloadCleanCompanyExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2 flex-shrink-0">
+                        <span>📥 Download Fresh Company Sheet (.xlsx)</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-3">
                         <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                            <button id="tabDupCleanBtn" onclick="switchDupTab('clean')" class="px-4 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white shadow transition">
-                                🟢 Clean Unique Numbers (<span id="dupCountClean">0</span>)
+                            <button id="tabDupCleanBtn" onclick="switchDupTab('clean')" class="px-3.5 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-emerald-600 text-white shadow transition whitespace-nowrap">
+                                🟢 Clean for Company (<span id="dupCountClean">0</span>)
                             </button>
-                            <button id="tabDupFileBtn" onclick="switchDupTab('duplicates')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
-                                🔁 Repeated in File (<span id="dupCountRepeated">0</span>)
+                            <button id="tabDupCompanyBtn" onclick="switchDupTab('company')" class="px-3.5 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-800 transition whitespace-nowrap">
+                                🏢 কোম্পানিকে পূর্বে দেওয়া (<span id="dupCountCompany">0</span>)
                             </button>
-                            <button id="tabDupDbBtn" onclick="switchDupTab('db')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
-                                🔴 Already in Database (<span id="dupCountDb">0</span>)
+                            <button id="tabDupFileBtn" onclick="switchDupTab('duplicates')" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition whitespace-nowrap">
+                                🔁 ফাইলের ডুপ্লিকেট (<span id="dupCountRepeated">0</span>)
+                            </button>
+                            <button id="tabDupDbBtn" onclick="switchDupTab('db')" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition whitespace-nowrap">
+                                🔴 ডাটাবেজের ডুপ্লিকেট (<span id="dupCountDb">0</span>)
                             </button>
                         </div>
-                        <button onclick="downloadDupTabExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition">
+                        <button onclick="downloadDupTabExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow flex items-center space-x-1.5 transition">
                             <span>📥 Download Current Tab (.xlsx)</span>
                         </button>
                     </div>
@@ -3228,8 +3290,8 @@ function setupColumnSelectorsAndPreview() {
 
         function renderAdminUserTable() {
             const body = document.getElementById('adminUserTableBody');
-            const search = document.getElementById('adminUserSearchInput').value.toLowerCase();
-            const deptFilter = document.getElementById('adminUserDeptFilter').value;
+            const search = (document.getElementById('adminUserSearchInput')?.value || '').toLowerCase().trim();
+            const deptFilter = document.getElementById('adminUserDeptFilter')?.value || 'all';
 
             const filtered = adminUsersCache.filter(u => {
                 const uname = (u.username || '').toLowerCase();
@@ -3241,67 +3303,88 @@ function setupColumnSelectorsAndPreview() {
 
             if (filtered.length > 0) {
                 body.innerHTML = filtered.map(u => {
-                    const deptLabel = u.department === 'number_lookup' ? 'Number Lookup' : (u.department === 'gender_verify' ? 'Gender Verify' : 'Admin');
+                    const isMaster = (u.email === 'ramolmoaran@gmail.com');
                     return `
-                        <tr class="hover:bg-slate-50 ${u.is_blocked ? 'bg-rose-50/40' : ''}">
-                            <td class="py-3 px-4">
-                                <div class="inline-flex items-center space-x-1.5">
-                                    <span class="font-bold ${u.is_blocked ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-indigo-700 bg-indigo-50 border-indigo-200'} border px-2.5 py-1 rounded-md text-xs inline-flex items-center space-x-1">
-                                        <span>${u.is_blocked ? '🚫' : (u.role === 'team_leader' ? '👑' : (u.role === 'admin' ? '⚡' : '👤'))}</span>
-                                        <span>${u.username || u.email.split('@')[0]}</span>
+                        <tr class="hover:bg-slate-50/80 transition-colors ${u.is_blocked ? 'bg-rose-50/50' : ''}">
+                            <!-- 1. Worker Identity (Username + Email in 1 column) -->
+                            <td class="py-2.5 px-3">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-base flex-shrink-0" title="${u.role}">
+                                        ${u.is_blocked ? '🚫' : (u.role === 'team_leader' ? '👑' : (isMaster || u.role === 'admin' ? '⚡' : '👤'))}
                                     </span>
-                                    <button onclick="openUsernameModal('${u.id}', '${u.username || u.email.split('@')[0]}')" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition" title="Change this worker's username">
-                                        ✏️
-                                    </button>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center space-x-1">
+                                            <span class="font-extrabold text-xs text-slate-900 truncate max-w-[140px] sm:max-w-[180px]">
+                                                ${u.username || u.email.split('@')[0]}
+                                            </span>
+                                            <button onclick="openUsernameModal('${u.id}', '${u.username || u.email.split('@')[0]}')" class="text-slate-400 hover:text-indigo-600 p-0.5 rounded transition" title="Change Username">
+                                                ✏️
+                                            </button>
+                                        </div>
+                                        <span class="text-[11px] text-slate-500 font-mono block truncate max-w-[140px] sm:max-w-[180px]">
+                                            ${u.email}
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
-                            <td class="py-3 px-4 font-medium text-slate-600 text-xs">${u.email}</td>
-                            <td class="py-3 px-4">
-                                ${u.email === 'ramolmoaran@gmail.com' ? '<span class="px-2.5 py-1 text-xs rounded-full font-black bg-purple-100 text-purple-900 border border-purple-300">⚡ Master Admin</span>' : `
-                                    <select onchange="adminChangeUserRole('${u.id}', this.value, '${u.username || u.email.split('@')[0]}')" class="text-xs px-2.5 py-1.5 rounded-lg border-2 ${u.role === 'team_leader' ? 'border-amber-400 bg-amber-50/70 text-amber-950 font-black' : (u.role === 'admin' ? 'border-purple-400 bg-purple-50 text-purple-950 font-black' : 'border-slate-300 bg-white text-slate-700 font-bold')} shadow-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 সাধারণ কর্মী (Worker - 6h Limit)</option>
-                                        <option value="team_leader" ${u.role === 'team_leader' ? 'selected' : ''}>👑 টিম লিডার (Team Leader - Unlimited)</option>
-                                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>⚡ অ্যাডমিন (Admin - Full Control)</option>
+
+                            <!-- 2. Role Selector (Compact) -->
+                            <td class="py-2.5 px-2.5">
+                                ${isMaster ? '<span class="px-2 py-0.5 text-[11px] rounded-md font-black bg-purple-100 text-purple-900 border border-purple-300 whitespace-nowrap">⚡ Master</span>' : `
+                                    <select onchange="adminChangeUserRole('${u.id}', this.value, '${u.username || u.email.split('@')[0]}')" class="text-xs py-1 px-2 rounded-lg border font-bold transition cursor-pointer ${u.role === 'team_leader' ? 'border-amber-400 bg-amber-50 text-amber-950 font-black shadow-sm' : (u.role === 'admin' ? 'border-purple-300 bg-purple-50 text-purple-900' : 'border-slate-300 bg-white text-slate-700')}">
+                                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 কর্মী (6h Limit)</option>
+                                        <option value="team_leader" ${u.role === 'team_leader' ? 'selected' : ''}>👑 টিম লিডার (Unlimited)</option>
+                                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>⚡ অ্যাডমিন (Admin)</option>
                                     </select>
                                 `}
                             </td>
-                            <td class="py-3 px-4">
-                                <span class="px-2.5 py-1 text-xs rounded-full font-semibold ${u.department === 'number_lookup' ? 'bg-blue-100 text-blue-800' : (u.department === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-pink-100 text-pink-800')}">
-                                    ${deptLabel}
-                                </span>
-                            </td>
-                            <td class="py-3 px-4">
-                                ${u.is_blocked 
-                                    ? '<span class="px-2.5 py-1 text-xs rounded-full font-bold bg-rose-100 text-rose-800 border border-rose-300">🔴 ব্লকড (Blocked)</span>' 
-                                    : '<span class="px-2.5 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">🟢 সক্রিয় (Active)</span>'
-                                }
-                            </td>
-                            <td class="py-3 px-4">
-                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs px-2.5 py-1 rounded border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-indigo-500">
-                                    <option value="gender_verify" ${u.department === 'gender_verify' ? 'selected' : ''}>👤 Gender Verify</option>
-                                    <option value="number_lookup" ${u.department === 'number_lookup' ? 'selected' : ''}>📞 Number Lookup</option>
+
+                            <!-- 3. Department Selector (Single Combined Dropdown) -->
+                            <td class="py-2.5 px-2.5">
+                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs py-1 px-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                                    <option value="gender_verify" ${u.department === 'gender_verify' ? 'selected' : ''}>🚻 Gender Verify</option>
+                                    <option value="number_lookup" ${u.department === 'number_lookup' ? 'selected' : ''}>🔍 Lookup</option>
                                 </select>
                             </td>
-                            <td class="py-3 px-4 text-right font-bold text-emerald-600">${u.todayAdded.toLocaleString()}</td>
-                            <td class="py-3 px-4 text-right font-bold text-indigo-700">${u.totalContributed.toLocaleString()}</td>
-                            <td class="py-3 px-4 text-center">
-                                <div class="inline-flex items-center space-x-1.5">
-                                    ${u.role !== 'admin' ? `
+
+                            <!-- 4. Status Badge (Clickable Toggle) -->
+                            <td class="py-2.5 px-2 text-center">
+                                ${u.is_blocked 
+                                    ? `<button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', false)" title="ক্লিক করে আনব্লক করুন" class="px-2 py-0.5 text-[11px] rounded-full font-bold bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200 transition whitespace-nowrap">🔴 ব্লকড</button>`
+                                    : `<button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', true)" title="ক্লিক করে ব্লক করুন" class="px-2 py-0.5 text-[11px] rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 transition whitespace-nowrap">🟢 সক্রিয়</button>`
+                                }
+                            </td>
+
+                            <!-- 5. Combined Activity Stats (Total & Today in 1 cell) -->
+                            <td class="py-2.5 px-2.5 text-center">
+                                <div class="text-xs font-black text-indigo-700 leading-tight">
+                                    ${u.totalContributed.toLocaleString()}
+                                </div>
+                                <div class="text-[10px] text-emerald-600 font-extrabold mt-0.5">
+                                    আজ: +${u.todayAdded.toLocaleString()}
+                                </div>
+                            </td>
+
+                            <!-- 6. Compact Modern Actions -->
+                            <td class="py-2.5 px-3 text-center">
+                                <div class="inline-flex items-center space-x-1">
+                                    ${!isMaster ? `
                                         ${u.is_blocked ? `
-                                            <button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', false)" class="text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm transition" title="Unblock this account">
-                                                ✅ আনব্লক
+                                            <button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', false)" class="p-1 px-1.5 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 rounded-md font-bold transition" title="আনব্লক করুন">
+                                                ✅
                                             </button>
                                         ` : `
-                                            <button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', true)" class="text-[11px] bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm transition" title="Block this account from accessing portal">
-                                                🚫 ব্লক
+                                            <button onclick="adminToggleUserBlock('${u.id}', '${u.username || u.email}', true)" class="p-1 px-1.5 text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-md font-bold transition" title="ব্লক করুন">
+                                                🚫
                                             </button>
                                         `}
-                                        <button onclick="adminDeleteUserPrompt('${u.id}', '${u.username || u.email}', '${u.email}')" class="text-[11px] bg-rose-600 hover:bg-rose-700 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm transition" title="Permanently delete this account">
-                                            🗑️ ডিলিট
+                                        <button onclick="adminDeleteUserPrompt('${u.id}', '${u.username || u.email}', '${u.email}')" class="p-1 px-1.5 text-xs bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 rounded-md font-bold transition" title="স্থায়ীভাবে অ্যাকাউন্ট ডিলিট করুন">
+                                            🗑️
                                         </button>
-                                    ` : '<span class="text-xs text-purple-700 font-extrabold">Master Admin</span>'}
-                                    <button onclick="downloadSingleUserData('${u.email}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium ml-1 underline">
-                                        Data
+                                    ` : ''}
+                                    <button onclick="downloadSingleUserData('${u.email}')" class="p-1 px-2 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md font-bold transition flex items-center space-x-1" title="এই কর্মীর ডাটা এক্সেল ডাউনলোড">
+                                        <span>📥</span>
+                                        <span class="text-[10px]">Data</span>
                                     </button>
                                 </div>
                             </td>
@@ -3309,7 +3392,7 @@ function setupColumnSelectorsAndPreview() {
                     `;
                 }).join('');
             } else {
-                body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400"><p class="font-bold text-slate-600">No worker accounts found.</p><p class="text-xs text-amber-600 mt-1">⚠️ If workers have registered, please run the latest SQL patch in your Supabase SQL Editor to allow Admin viewing of all accounts.</p></td></tr>`;
+                body.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">কোনো কর্মী অ্যাকাউন্ট পাওয়া যায়নি।</td></tr>`;
             }
         }
 
@@ -5141,49 +5224,163 @@ Remaining Uncertain: ${remainingUnknown.length}`);
         let dupDbMatchesList = [];
         let currentDupTab = 'clean';
 
-        async function runDuplicateCheck() {
+        
+        let activeDupInputMode = 'paste';
+        let dupUploadedFileRows = [];
+
+        function switchDupInputMode(mode) {
+            activeDupInputMode = mode;
+            const btnPaste = document.getElementById('btnDupModePaste');
+            const btnFile = document.getElementById('btnDupModeFile');
+            const secPaste = document.getElementById('dupSectionPaste');
+            const secFile = document.getElementById('dupSectionFile');
+
+            if (mode === 'paste') {
+                btnPaste.className = 'px-4 py-2 text-xs sm:text-sm font-black rounded-xl bg-indigo-600 text-white shadow-sm transition';
+                btnFile.className = 'px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition';
+                secPaste.classList.remove('hidden');
+                secFile.classList.add('hidden');
+            } else {
+                btnFile.className = 'px-4 py-2 text-xs sm:text-sm font-black rounded-xl bg-indigo-600 text-white shadow-sm transition';
+                btnPaste.className = 'px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition';
+                secFile.classList.remove('hidden');
+                secPaste.classList.add('hidden');
+            }
+        }
+
+        function handleDupFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const statusEl = document.getElementById('dupFileStatus');
+            if (statusEl) statusEl.innerText = `⏳ ফাইল পড়া হচ্ছে: ${file.name}...`;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rawAoA = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+
+                    if (!rawAoA || rawAoA.length === 0) {
+                        alert('ফাইলে কোনো ডাটা পাওয়া যায়নি।');
+                        return;
+                    }
+
+                    // Convert to string lines or parsed rows
+                    const lines = [];
+                    rawAoA.forEach(row => {
+                        if (row && row.some(c => String(c || '').trim().length > 0)) {
+                            lines.push(row.map(c => String(c || '').trim()).join('\t'));
+                        }
+                    });
+
+                    document.getElementById('dupTextInput').value = lines.join('\n');
+                    if (statusEl) statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✅ ${lines.length.toLocaleString()} টি সারি সফলভাবে লোড হয়েছে! এখন নিচে 'Run Duplicate Check' বাটনে ক্লিক করুন।</span>`;
+                    alert(`✅ ফাইল থেকে ${lines.length} টি সারি পাওয়া গেছে। এখন 'Run Duplicate Check' বাটনে ক্লিক করে ডুপ্লিকেট ফিল্টার করুন।`);
+                } catch(err) {
+                    alert('ফাইল পড়তে সমস্যা হয়েছে: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+async function runDuplicateCheck() {
             const rawText = document.getElementById('dupTextInput').value.trim();
             if (!rawText) {
                 alert('Please paste phone numbers to check.');
                 return;
             }
 
-            const checkDb = document.getElementById('dupCheckDbCrossCheck').checked;
+            const checkCompany = document.getElementById('dupCheckCompanyDeliveries')?.checked ?? true;
+            const checkDb = document.getElementById('dupCheckDbCrossCheck')?.checked ?? true;
             const lines = rawText.split(/\r?\n/);
+            
             const counts = {};
+            const inputRecords = {};
             const inputOrder = [];
 
             lines.forEach(line => {
-                let clean = line.replace(/[\s\-\(\)\.]/g, '');
-                if (clean && clean.length >= 6) {
-                    if (!counts[clean]) {
-                        counts[clean] = 0;
-                        inputOrder.push(clean);
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                // Smart extraction: find phone number (6 to 16 digits)
+                let phone = '';
+                let name = '';
+                let age = '';
+
+                const tokens = trimmed.split(/[\t,;]+|\s{2,}/);
+                for (const tok of tokens) {
+                    const digs = tok.replace(/[^0-9]/g, '');
+                    if (digs.length >= 7 && digs.length <= 16 && !phone) {
+                        phone = digs;
+                    } else if (digs.length <= 3 && parseInt(digs) >= 15 && parseInt(digs) <= 120 && !age) {
+                        age = digs;
+                    } else if (!name && /[a-zA-Z]/.test(tok) && digs.length <= 2) {
+                        name = tok.trim();
                     }
-                    counts[clean]++;
+                }
+
+                // Fallback: regex search for phone digits
+                if (!phone) {
+                    const match = trimmed.match(/\b\d{7,16}\b/);
+                    if (match) phone = match[0];
+                }
+                if (!phone) {
+                    const justDigs = trimmed.replace(/[^0-9]/g, '');
+                    if (justDigs.length >= 6 && justDigs.length <= 16) phone = justDigs;
+                }
+
+                if (phone) {
+                    if (!counts[phone]) {
+                        counts[phone] = 0;
+                        inputOrder.push(phone);
+                        inputRecords[phone] = {
+                            phone: phone,
+                            name: name || '-',
+                            age: age || '-',
+                            originalLine: trimmed
+                        };
+                    }
+                    counts[phone]++;
                 }
             });
 
             if (inputOrder.length === 0) {
-                alert('No valid phone numbers found.');
+                alert('কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি। অনুগ্রহ করে নাম্বার পেস্ট বা ফাইল আপলোড করুন।');
                 return;
             }
 
             dupCleanList = [];
             dupRepeatedList = [];
             dupDbMatchesList = [];
-
-            inputOrder.forEach(num => {
-                if (counts[num] > 1) {
-                    dupRepeatedList.push({ phone: num, count: counts[num], status: 'Repeated in file' });
-                }
-                dupCleanList.push({ phone: num, count: counts[num], status: 'Unique' });
-            });
-
             let dupCompanyDeliveredList = [];
             window.dupCompanyDeliveredList = dupCompanyDeliveredList;
 
-            if (checkDb && supabaseClient) {
+            // 1. Check intra-file duplicates
+            inputOrder.forEach(num => {
+                const rec = inputRecords[num];
+                if (counts[num] > 1) {
+                    dupRepeatedList.push({
+                        phone: num,
+                        name: rec.name,
+                        age: rec.age,
+                        count: counts[num],
+                        status: `🔁 একই ফাইলে ${counts[num]} বার ডুপ্লিকেট রয়েছে`
+                    });
+                }
+                dupCleanList.push({
+                    phone: num,
+                    name: rec.name,
+                    age: rec.age,
+                    count: 1,
+                    status: '🟢 Fresh (কোম্পানিকে দেওয়ার মতো ফ্রেশ)'
+                });
+            });
+
+            // 2. Cross-check against database & company deliveries
+            if (supabaseClient) {
                 try {
                     const chunkSize = 200;
                     const existingDbSet = new Set();
@@ -5192,64 +5389,80 @@ Remaining Uncertain: ${remainingUnknown.length}`);
                     for (let i = 0; i < inputOrder.length; i += chunkSize) {
                         const chunk = inputOrder.slice(i, i + chunkSize);
 
-                        // 1. Cross-check against master_numbers (Central Database)
-                        const { data: dbData } = await supabaseClient
-                            .from('master_numbers')
-                            .select('phone_number, user_email, full_name')
-                            .in('phone_number', chunk);
+                        // A. Check against company_deliveries (Company duplicates)
+                        if (checkCompany) {
+                            try {
+                                const { data: compData } = await supabaseClient
+                                    .from('company_deliveries')
+                                    .select('phone_number, delivery_date, company_name, category, full_name, age')
+                                    .in('phone_number', chunk);
 
-                        if (dbData) {
-                            dbData.forEach(row => {
-                                existingDbSet.add(row.phone_number);
-                                dupDbMatchesList.push({
-                                    phone: row.phone_number,
-                                    count: 1,
-                                    status: `Already submitted by ${row.user_email} (${row.full_name || 'No Name'})`
-                                });
-                            });
+                                if (compData && compData.length > 0) {
+                                    compData.forEach(row => {
+                                        companyDeliveredSet.add(row.phone_number);
+                                        const rec = inputRecords[row.phone_number] || {};
+                                        dupCompanyDeliveredList.push({
+                                            phone: row.phone_number,
+                                            name: row.full_name || rec.name || '-',
+                                            age: row.age || rec.age || '-',
+                                            count: 1,
+                                            delivery_date: row.delivery_date || 'পূর্বের তারিখ',
+                                            company_name: row.company_name || 'Company',
+                                            status: `⚠️ পূর্বে ${row.delivery_date || ''} তারিখে কোম্পানিকে ডেলিভারি দেওয়া হয়েছে (${row.company_name || 'Client'})`
+                                        });
+                                    });
+                                }
+                            } catch (compErr) {
+                                console.warn('Company deliveries cross check notice:', compErr);
+                            }
                         }
 
-                        // 2. Cross-check against company_deliveries (কোম্পানিকে ইতিমধ্যে ডেলিভারি দেওয়া ডাটা)
-                        try {
-                            const { data: compData } = await supabaseClient
-                                .from('company_deliveries')
-                                .select('phone_number, delivery_date, company_name, category')
-                                .in('phone_number', chunk);
+                        // B. Check against master_numbers (Central Database)
+                        if (checkDb) {
+                            try {
+                                const { data: dbData } = await supabaseClient
+                                    .from('master_numbers')
+                                    .select('phone_number, user_email, full_name, age')
+                                    .in('phone_number', chunk);
 
-                            if (compData) {
-                                compData.forEach(row => {
-                                    companyDeliveredSet.add(row.phone_number);
-                                    dupCompanyDeliveredList.push({
-                                        phone: row.phone_number,
-                                        count: 1,
-                                        status: `⚠️ কোম্পানিকে পূর্বে ডেলিভারি দেওয়া হয়েছে (${row.company_name || 'Company'} - ${row.delivery_date})`
+                                if (dbData && dbData.length > 0) {
+                                    dbData.forEach(row => {
+                                        existingDbSet.add(row.phone_number);
+                                        const rec = inputRecords[row.phone_number] || {};
+                                        dupDbMatchesList.push({
+                                            phone: row.phone_number,
+                                            name: row.full_name || rec.name || '-',
+                                            age: row.age || rec.age || '-',
+                                            count: 1,
+                                            status: `ডাটাবেজে পূর্বে জমা দেওয়া (${row.user_email || 'Worker'})`
+                                        });
                                     });
-                                });
+                                }
+                            } catch(dbErr) {
+                                console.warn('Master numbers cross check notice:', dbErr);
                             }
-                        } catch (compErr) {
-                            console.warn('Company deliveries cross-check notice:', compErr);
                         }
                     }
 
-                    // Strictly remove any numbers that already exist in DB OR were given to company
-                    dupCleanList = dupCleanList.filter(item => !existingDbSet.has(item.phone) && !companyDeliveredSet.has(item.phone));
+                    // STRICT QUALITY CONTROL: Exclude company delivered numbers and DB numbers from clean list!
+                    dupCleanList = dupCleanList.filter(item => !companyDeliveredSet.has(item.phone) && !existingDbSet.has(item.phone));
 
-                    const compDupsEl = document.getElementById('dupStatCompanyDups');
-                    if (compDupsEl) compDupsEl.innerText = companyDeliveredSet.size.toLocaleString();
-
-                } catch (dbErr) {
-                    console.error('DB duplicate cross-check error:', dbErr);
+                } catch (err) {
+                    console.error('Cross-check error:', err);
                 }
             }
 
-            document.getElementById('dupStatTotal').innerText = lines.length.toLocaleString();
+            // Update Metric Counts
+            document.getElementById('dupStatTotal').innerText = inputOrder.length.toLocaleString();
             document.getElementById('dupStatUnique').innerText = dupCleanList.length.toLocaleString();
+            document.getElementById('dupStatCompanyDups').innerText = dupCompanyDeliveredList.length.toLocaleString();
             document.getElementById('dupStatFileDups').innerText = dupRepeatedList.length.toLocaleString();
             document.getElementById('dupStatDbDups').innerText = dupDbMatchesList.length.toLocaleString();
 
-            document.getElementById('dupCountClean').innerText = dupCleanList.length;
-            document.getElementById('dupCountRepeated').innerText = dupRepeatedList.length;
-            document.getElementById('dupCountDb').innerText = dupDbMatchesList.length;
+            document.getElementById('dupCountClean').innerText = dupCleanList.length.toLocaleString();
+            document.getElementById('dupCountCompany').innerText = dupCompanyDeliveredList.length.toLocaleString();
+            document.getElementById('dupCountRepeated').innerText = dupRepeatedList.length.toLocaleString();
+            document.getElementById('dupCountDb').innerText = dupDbMatchesList.length.toLocaleString();
 
             document.getElementById('dupResultsCard').classList.remove('hidden');
             switchDupTab('clean');
@@ -5258,40 +5471,75 @@ Remaining Uncertain: ${remainingUnknown.length}`);
         function switchDupTab(tab) {
             currentDupTab = tab;
             const btnClean = document.getElementById('tabDupCleanBtn');
+            const btnCompany = document.getElementById('tabDupCompanyBtn');
             const btnFile = document.getElementById('tabDupFileBtn');
             const btnDb = document.getElementById('tabDupDbBtn');
             const body = document.getElementById('dupTableBody');
 
-            [btnClean, btnFile, btnDb].forEach(b => {
-                b.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition whitespace-nowrap';
+            [btnClean, btnCompany, btnFile, btnDb].forEach(b => {
+                if (b) b.className = 'px-3.5 py-2 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition whitespace-nowrap';
             });
 
             let activeList = [];
             if (tab === 'clean') {
-                btnClean.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-emerald-600 text-white shadow transition whitespace-nowrap';
+                if (btnClean) btnClean.className = 'px-3.5 py-2 text-xs sm:text-sm font-black rounded-xl bg-emerald-600 text-white shadow transition whitespace-nowrap';
                 activeList = dupCleanList;
+            } else if (tab === 'company') {
+                if (btnCompany) btnCompany.className = 'px-3.5 py-2 text-xs sm:text-sm font-black rounded-xl bg-rose-600 text-white shadow transition whitespace-nowrap';
+                activeList = window.dupCompanyDeliveredList || [];
             } else if (tab === 'duplicates') {
-                btnFile.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-amber-600 text-white shadow transition whitespace-nowrap';
+                if (btnFile) btnFile.className = 'px-3.5 py-2 text-xs sm:text-sm font-black rounded-xl bg-amber-500 text-white shadow transition whitespace-nowrap';
                 activeList = dupRepeatedList;
             } else {
-                btnDb.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-red-600 text-white shadow transition whitespace-nowrap';
+                if (btnDb) btnDb.className = 'px-3.5 py-2 text-xs sm:text-sm font-black rounded-xl bg-blue-600 text-white shadow transition whitespace-nowrap';
                 activeList = dupDbMatchesList;
             }
 
             if (activeList.length > 0) {
-                body.innerHTML = activeList.map((item, idx) => `
-                    <tr class="hover:bg-slate-50 text-xs">
-                        <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
-                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${item.phone}</td>
-                        <td class="py-3 px-4">${item.count}</td>
-                        <td class="py-3 px-4 font-semibold ${tab === 'clean' ? 'text-emerald-600' : (tab === 'duplicates' ? 'text-amber-600' : 'text-red-600')}">
-                            ${item.status}
-                        </td>
-                    </tr>
-                `).join('');
+                body.innerHTML = activeList.map((item, idx) => {
+                    const isComp = (tab === 'company');
+                    const isClean = (tab === 'clean');
+                    const rowBg = isComp ? 'bg-rose-50/60 hover:bg-rose-100/60' : (isClean ? 'hover:bg-emerald-50/40' : 'hover:bg-slate-50');
+                    const numColor = isComp ? 'text-rose-700 font-black' : (isClean ? 'text-emerald-700 font-bold' : 'text-slate-800 font-bold');
+                    const statusColor = isComp ? 'text-rose-800 font-extrabold bg-rose-100/80 px-2 py-0.5 rounded' : (isClean ? 'text-emerald-700 font-bold' : 'text-slate-600 font-medium');
+
+                    return `
+                        <tr class="${rowBg} text-xs transition">
+                            <td class="py-2.5 px-3 font-mono text-slate-400">${idx + 1}</td>
+                            <td class="py-2.5 px-3 font-mono ${numColor}">${item.phone}</td>
+                            <td class="py-2.5 px-3 font-semibold text-slate-700">${item.name || '-'}</td>
+                            <td class="py-2.5 px-3 text-slate-500">${item.age || '-'}</td>
+                            <td class="py-2.5 px-3 ${statusColor}">
+                                ${item.status}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
             } else {
-                body.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">No records in this category.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 font-medium">এই ক্যাটাগরিতে কোনো রেকর্ড পাওয়া যায়নি।</td></tr>`;
             }
+        }
+
+        // 1-Click Clean Sheet Download directly for Company
+        function downloadCleanCompanyExcel() {
+            if (!dupCleanList || dupCleanList.length === 0) {
+                alert('কোম্পানিকে দেওয়ার মতো কোনো ফ্রেশ ডাটা নেই!');
+                return;
+            }
+
+            const exportData = dupCleanList.map((item, idx) => ({
+                'SL': idx + 1,
+                'Phone Number': item.phone,
+                'Full Name': item.name || '',
+                'Age': item.age || '',
+                'Status': 'Verified Clean (Not Previously Delivered)'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Fresh_Company_Data');
+            const today = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `Clean_Company_Delivery_${today}.xlsx`);
         }
 
         function downloadDupTabExcel() {
