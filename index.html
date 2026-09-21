@@ -1772,6 +1772,12 @@
                         <button type="button" onclick="selectSecQty(1000, this)" class="sec-qty-btn px-4 py-2 text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition">
                             1,000 টি
                         </button>
+                        <button type="button" onclick="selectSecQty(2500, this)" class="sec-qty-btn px-3.5 py-2 text-xs sm:text-sm font-bold bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/40 rounded-xl transition">
+                            👑 2,500 টি
+                        </button>
+                        <button type="button" onclick="selectSecQty(5000, this)" class="sec-qty-btn px-3.5 py-2 text-xs sm:text-sm font-bold bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/40 rounded-xl transition">
+                            👑 5,000 টি
+                        </button>
 
                         <div class="flex items-center space-x-2 bg-black/20 border border-white/25 px-3 py-1.5 rounded-xl ml-auto">
                             <span class="text-xs font-bold text-indigo-200">কাস্টম সংখ্যা:</span>
@@ -2367,9 +2373,23 @@
                 }
 
                 // Master Owner Email is ALWAYS Admin
-                if (currentUser.email === 'ramolmoaran@gmail.com') {
+                if (currentUser.email && currentUser.email.toLowerCase().trim() === 'ramolmoaran@gmail.com') {
                     currentProfile.role = 'admin';
                     currentProfile.department = 'admin';
+                    currentProfile.is_unlimited_quota = true;
+                    // Auto-sync in database table so RPCs never complain
+                    try {
+                        await supabaseClient.from('profiles').upsert({
+                            id: currentUser.id,
+                            email: currentUser.email,
+                            username: currentProfile.username || 'Admin',
+                            role: 'admin',
+                            department: 'admin',
+                            is_unlimited_quota: true
+                        });
+                    } catch(syncErr) {
+                        console.warn('Admin profile sync notice:', syncErr);
+                    }
                 }
 
                 document.getElementById('userInfo').classList.remove('hidden');
@@ -2389,9 +2409,18 @@
                 }
 
                 const badge = document.getElementById('userBadge');
+                const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
+                
                 if (currentProfile.role === 'admin') {
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-purple-200 text-purple-900';
                     badge.innerText = 'Admin';
+                    switchToSection('dashboard');
+                } else if (isLeader) {
+                    badge.className = 'text-xs px-2.5 py-1 rounded-full font-black bg-amber-400 text-slate-950 shadow-sm border border-amber-300';
+                    badge.innerText = '👑 Team Leader (আনলিমিটেড)';
+                    const deptName = currentProfile.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify';
+                    document.getElementById('userDeptTitle').innerText = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
+                    setupWorkerReportOptions(currentProfile.department);
                     switchToSection('dashboard');
                 } else {
                     const deptLabel = currentProfile.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify';
@@ -6274,8 +6303,10 @@ Remaining Uncertain: ${remainingUnknown.length}`);
             const input = document.getElementById('workerClaimQtyInput');
             let qty = parseInt(input ? input.value : '100', 10);
             if (isNaN(qty) || qty <= 0) qty = 100;
-            if (qty > 1000) {
-                alert('একবারে সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
+
+            const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
+            if (!isLeader && qty > 1000) {
+                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
                 return;
             }
 
@@ -6546,6 +6577,23 @@ Remaining Uncertain: ${remainingUnknown.length}`);
         }
 
 async function loadClaimStockSector() {
+            if (supabaseClient && currentUser) {
+                try {
+                    const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+                    if (p) {
+                        currentProfile = p;
+                        if (currentProfile.role === 'team_leader' || currentProfile.is_unlimited_quota === true) {
+                            const badge = document.getElementById('userBadge');
+                            if (badge && currentProfile.role !== 'admin') {
+                                badge.className = 'text-xs px-2.5 py-1 rounded-full font-black bg-amber-400 text-slate-950 shadow-sm border border-amber-300';
+                                badge.innerText = '👑 Team Leader (আনলিমিটেড)';
+                            }
+                        }
+                    }
+                } catch(pErr) {
+                    console.warn('Could not refresh profile on claim sector load:', pErr);
+                }
+            }
             refreshClaimStockData();
             loadSecClaimHistory();
         }
@@ -6608,26 +6656,48 @@ async function loadClaimStockSector() {
                     const quotaPctEl = document.getElementById('secWorkerQuotaPercent');
                     const quotaBarEl = document.getElementById('secWorkerQuotaBar');
                     const btnClaim = document.getElementById('btnSecClaim');
+                    const qtyInput = document.getElementById('secClaimQtyInput');
 
-                    const sixHourLimit = 1000;
-                    const remaining = Math.max(0, sixHourLimit - cCount);
-                    const pct = Math.min(100, Math.round((cCount / sixHourLimit) * 100));
+                    if (isLeader) {
+                        // Team Leader: 100% UNLIMITED - NEVER LOCK!
+                        if (qtyInput) {
+                            qtyInput.removeAttribute('max');
+                            qtyInput.placeholder = "e.g. 1000 বা 5000";
+                        }
+                        if (quotaRemEl) quotaRemEl.innerHTML = '<span class="text-emerald-600 font-black text-sm sm:text-base">∞ (আনলিমিটেড)</span>';
+                        if (quotaPctEl) quotaPctEl.innerHTML = '<span class="text-amber-600 font-black">👑 টিম লিডার সুবিধা সক্রিয়</span>';
+                        if (quotaBarEl) {
+                            quotaBarEl.style.width = '100%';
+                            quotaBarEl.className = 'bg-emerald-500 h-2 rounded-full transition-all duration-300';
+                        }
+                        if (btnClaim) {
+                            btnClaim.disabled = false;
+                            btnClaim.className = 'w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-slate-950 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2';
+                            btnClaim.innerHTML = '<span>⚡ Claim & Take Numbers (আনলিমিটেড সংগ্রহ করুন)</span>';
+                        }
+                    } else {
+                        // General Worker: Strict 1,000 per 6 Hours
+                        if (qtyInput) qtyInput.max = "1000";
+                        const sixHourLimit = 1000;
+                        const remaining = Math.max(0, sixHourLimit - cCount);
+                        const pct = Math.min(100, Math.round((cCount / sixHourLimit) * 100));
 
-                    if (quotaRemEl) quotaRemEl.innerText = remaining.toLocaleString();
-                    if (quotaPctEl) quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
-                    if (quotaBarEl) {
-                        quotaBarEl.style.width = `${pct}%`;
-                        if (pct >= 100) {
-                            quotaBarEl.className = 'bg-rose-600 h-2 rounded-full transition-all duration-300';
-                            if (btnClaim) {
-                                btnClaim.disabled = true;
-                                btnClaim.className = 'w-full sm:w-auto bg-slate-300 text-slate-500 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2';
-                                btnClaim.innerHTML = '<span>🔒 ৬ ঘণ্টার ১,০০০ লিমিট পূর্ণ হয়েছে</span>';
+                        if (quotaRemEl) quotaRemEl.innerText = remaining.toLocaleString();
+                        if (quotaPctEl) quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
+                        if (quotaBarEl) {
+                            quotaBarEl.style.width = `${pct}%`;
+                            if (pct >= 100) {
+                                quotaBarEl.className = 'bg-rose-600 h-2 rounded-full transition-all duration-300';
+                                if (btnClaim) {
+                                    btnClaim.disabled = true;
+                                    btnClaim.className = 'w-full sm:w-auto bg-slate-300 text-slate-500 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2';
+                                    btnClaim.innerHTML = '<span>🔒 ৬ ঘণ্টার ১,০০০ লিমিট পূর্ণ হয়েছে</span>';
+                                }
+                            } else if (pct >= 80) {
+                                quotaBarEl.className = 'bg-amber-500 h-2 rounded-full transition-all duration-300';
+                            } else {
+                                quotaBarEl.className = 'bg-indigo-600 h-2 rounded-full transition-all duration-300';
                             }
-                        } else if (pct >= 80) {
-                            quotaBarEl.className = 'bg-amber-500 h-2 rounded-full transition-all duration-300';
-                        } else {
-                            quotaBarEl.className = 'bg-indigo-600 h-2 rounded-full transition-all duration-300';
                         }
                     }
                 }
@@ -6646,8 +6716,10 @@ async function loadClaimStockSector() {
             const input = document.getElementById('secClaimQtyInput');
             let qty = parseInt(input ? input.value : '100', 10);
             if (isNaN(qty) || qty <= 0) qty = 100;
-            if (qty > 1000) {
-                alert('একবারে সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
+
+            const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
+            if (!isLeader && qty > 1000) {
+                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল সক্রিয় করুন।');
                 return;
             }
 
