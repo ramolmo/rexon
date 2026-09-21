@@ -414,7 +414,7 @@
                     <div id="workerReportTypeOptions" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <!-- Option 1: Male Report -->
                         <label id="optMaleReport" class="flex items-center space-x-3 p-3 bg-white rounded-lg border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition">
-                            <input type="radio" name="workerReportType" value="male_report" class="w-4 h-4 text-blue-600">
+                            <input type="radio" name="workerReportType" value="male_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-blue-600">
                             <div>
                                 <span class="font-bold text-sm text-slate-800 block">👨 1. Male Report</span>
                                 <span class="text-xs text-slate-500">Male verified data (Number, Name, Age)</span>
@@ -423,7 +423,7 @@
 
                         <!-- Option 2: Female Report -->
                         <label id="optFemaleReport" class="flex items-center space-x-3 p-3 bg-white rounded-lg border-2 border-slate-200 hover:border-pink-500 cursor-pointer transition">
-                            <input type="radio" name="workerReportType" value="female_report" class="w-4 h-4 text-pink-600">
+                            <input type="radio" name="workerReportType" value="female_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-pink-600">
                             <div>
                                 <span class="font-bold text-sm text-slate-800 block">👩 2. Female Report</span>
                                 <span class="text-xs text-slate-500">Female verified data (Number, Name, Age)</span>
@@ -432,12 +432,43 @@
 
                         <!-- Option 3: Lookup Report -->
                         <label id="optLookupReport" class="flex items-center space-x-3 p-3 bg-white rounded-lg border-2 border-slate-200 hover:border-indigo-500 cursor-pointer transition">
-                            <input type="radio" name="workerReportType" value="lookup_report" class="w-4 h-4 text-indigo-600">
+                            <input type="radio" name="workerReportType" value="lookup_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-indigo-600">
                             <div>
                                 <span class="font-bold text-sm text-slate-800 block">🔍 3. Lookup Report</span>
-                                <span class="text-xs text-slate-500">Number lookup verified data</span>
+                                <span class="text-xs text-slate-500">Number lookup verified data (Isolated Sector)</span>
                             </div>
                         </label>
+                    </div>
+
+                    <!-- Dedicated Lookup Delivery Sub-Options (Valid Number vs No Information) -->
+                    <div id="lookupSubTypeCard" class="hidden mt-3 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-300 space-y-3 shadow-xs">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-black text-purple-950 uppercase tracking-wider flex items-center space-x-1.5">
+                                <span>🔍</span>
+                                <span>লুকআপ ডাটা ডেলিভারি অপশন নির্বাচন করুন:</span>
+                            </label>
+                            <span class="text-[11px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full">🔒 আইসোলেটেড সেক্টর (সেন্ট্রাল ডাটাবেজের সাথে ডুপ্লিকেট ধরবে না)</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Option A: Valid Number (Income & Market Value) -->
+                            <label id="lblLookupValid" class="flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-emerald-500 shadow-sm cursor-pointer transition">
+                                <input type="radio" name="lookupDeliveryType" value="valid" checked onchange="handleLookupDeliveryTypeChange('valid')" class="mt-1 w-4 h-4 text-emerald-600">
+                                <div>
+                                    <span class="font-black text-sm text-emerald-950 block">🟢 1. Valid Number (বৈধ লুকআপ ডাটা)</span>
+                                    <span class="text-xs text-slate-600 block mt-0.5">কলাম ১: ফোন নাম্বার | কলাম ২: গৃহস্থালি আয় (Income) | কলাম ৩: মার্কেট ভ্যালু</span>
+                                </div>
+                            </label>
+
+                            <!-- Option B: No Information Number -->
+                            <label id="lblLookupNoInfo" class="flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-slate-200 hover:border-purple-300 cursor-pointer transition">
+                                <input type="radio" name="lookupDeliveryType" value="no_info" onchange="handleLookupDeliveryTypeChange('no_info')" class="mt-1 w-4 h-4 text-purple-600">
+                                <div>
+                                    <span class="font-black text-sm text-slate-900 block">⚪ 2. No Information Number (তথ্যহীন)</span>
+                                    <span class="text-xs text-slate-600 block mt-0.5">লুকআপ করে যেসব নাম্বারের কোনো তথ্য পাওয়া যায়নি (Not Found / No Data)</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -734,11 +765,148 @@
                             <span class="text-xs font-bold leading-tight">Backup & Storage</span>
                             <span class="text-[10px] text-slate-500 mt-0.5">গুগল ড্রাইভ ও অফলাইন</span>
                         </button>
+
+                        <!-- Tab 7: Lookup Daily Reports -->
+                        <button id="tabAdminLookupReportsBtn" onclick="switchAdminTab('lookup_reports')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-purple-200 bg-purple-50/50 text-purple-900 hover:border-purple-300 hover:bg-purple-100 transition shadow-xs text-center cursor-pointer col-span-2 sm:col-span-1">
+                            <span class="text-xl mb-1">🔍</span>
+                            <span class="text-xs font-bold leading-tight">Lookup Daily Reports</span>
+                            <span class="text-[10px] text-purple-700 mt-0.5 font-bold">১-ক্লিকে এক্সেল ও টেক্সট ডাউনলোড</span>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Admin Tab 1: Live Submissions Viewer (All Numbers, Names, Ages) -->
-                <div id="adminTabSubmissions" class="p-6 space-y-4">
+                <div id="adminTabSubmissions" class="p-6 space-y-5">
+                    <!-- UNIVERSAL NUMBER AUDIT & INSPECTION TOOL (যেকোনো নাম্বার দিয়ে কর্মী, ক্যাটাগরি ও তারিখ বের করার টুল) -->
+                    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 text-white p-5 sm:p-6 rounded-2xl shadow-md border border-indigo-500/30 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-800/60 pb-3">
+                            <div class="flex items-center space-x-2.5">
+                                <span class="text-2xl">🔍</span>
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-black text-white">Universal Number Audit (নাম্বার অনুসন্ধান ও কর্মী নিরীক্ষা)</h3>
+                                    <p class="text-xs text-indigo-200 mt-0.5">
+                                        যেকোনো একটি ফোন নাম্বার লিখলে সাথে সাথে দেখতে পাবেন—কে এই নাম্বারটি দিয়েছে, কবে দিয়েছে, এটি Male নাকি Female ছিল এবং প্রয়োজনে এক ক্লিকে ভুল সংশোধন করুন।
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-indigo-500/30 border border-indigo-400/40 px-3 py-1 rounded-full font-bold text-indigo-200 self-start sm:self-auto flex items-center space-x-1">
+                                <span>⚡</span>
+                                <span>সরাসরি ডাটাবেজ অনুসন্ধান</span>
+                            </span>
+                        </div>
+
+                        <!-- Search Form -->
+                        <form onsubmit="handleUniversalNumberSearch(event)" class="flex flex-col sm:flex-row gap-2.5">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 text-base">📞</span>
+                                <input type="text" id="universalSearchInput" placeholder="যেকোনো ফোন নাম্বার লিখুন (যেমন: 15136465609 বা 6465609)..." class="w-full pl-10 pr-4 py-3 bg-white text-slate-900 rounded-xl font-mono text-xs sm:text-sm font-bold border-2 border-indigo-400 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                            </div>
+                            <button type="submit" id="btnUniversalSearch" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 flex-shrink-0">
+                                <span>🔍 গভীর অনুসন্ধান (Search)</span>
+                            </button>
+                            <button type="button" onclick="clearUniversalNumberSearch()" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-4 py-3 rounded-xl border border-white/20 transition flex items-center justify-center space-x-1 flex-shrink-0">
+                                <span>🧹 রিসেট</span>
+                            </button>
+                        </form>
+
+                        <!-- Inspection Result Panel -->
+                        <div id="universalSearchResultCard" class="hidden p-4 rounded-xl bg-white/10 border border-indigo-400/40 space-y-3 animate-in fade-in duration-200">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-lg">📋</span>
+                                    <h4 id="universalResultTitle" class="font-extrabold text-sm text-amber-300">অনুসন্ধান ফলাফল</h4>
+                                </div>
+                                <span id="universalResultCountBadge" class="text-xs bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded-full">0 টি রেকর্ড</span>
+                            </div>
+
+                            <div id="universalResultList" class="space-y-3">
+                                <!-- Results populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1-CLICK INSTANT FULL DATA DOWNLOADER (সম্পূর্ণ ডাটা সহজে ১-ক্লিকে ডাউনলোডের টুল) -->
+                    <div class="bg-white rounded-2xl shadow-sm border-2 border-emerald-400 p-5 sm:p-6 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl font-black shadow-xs">
+                                    📥
+                                </div>
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-black text-slate-900">
+                                        ১-ক্লিকে সম্পূর্ণ ডাটা ডাউনলোড (Instant Full Data Downloader)
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        কোনো ১,০০০ বা ৫০০ এর লিমিট ছাড়া আজকের বা যেকোনো দিনের সম্পূর্ণ ডাটা (১০০% সব রেকর্ড) সহজে ডাউনলোড করুন।
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-emerald-100 text-emerald-900 font-extrabold px-3 py-1 rounded-full border border-emerald-300 self-start sm:self-auto flex items-center space-x-1">
+                                <span>⚡</span>
+                                <span>আনলিমিটেড পেজিনেশন ইঞ্জিন</span>
+                            </span>
+                        </div>
+
+                        <!-- Controls Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                            <!-- Date Scope Selector -->
+                            <div>
+                                <label class="block font-bold text-slate-700 uppercase mb-1">📅 তারিখ নির্বাচন করুন:</label>
+                                <select id="quickExportDateScope" onchange="handleQuickExportScopeChange()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+                                    <option value="today">📅 আজকের দিন (Today)</option>
+                                    <option value="yesterday">📅 গতকালের দিন (Yesterday)</option>
+                                    <option value="custom">📆 নির্দিষ্ট একটি তারিখ (Select Date)</option>
+                                    <option value="all">🌟 সম্পূর্ণ ডাটাবেজের সব ডাটা (All Time)</option>
+                                </select>
+                            </div>
+
+                            <!-- Custom Date Input -->
+                            <div id="quickExportCustomDateContainer" class="hidden">
+                                <label class="block font-bold text-slate-700 uppercase mb-1">📆 নির্দিষ্ট তারিখ দিন:</label>
+                                <input type="date" id="quickExportCustomDate" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500">
+                            </div>
+
+                            <!-- Category Selector -->
+                            <div>
+                                <label class="block font-bold text-slate-700 uppercase mb-1">📂 ক্যাটাগরি (রিপোর্ট টাইপ):</label>
+                                <select id="quickExportCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+                                    <option value="all">🌟 সব ডাটা একসাথে (Male + Female + Lookup)</option>
+                                    <option value="female_report">👩 শুধুমাত্র ফিমেল রিপোর্ট (Female Only)</option>
+                                    <option value="male_report">👨 শুধুমাত্র মেল রিপোর্ট (Male Only)</option>
+                                    <option value="lookup_report">🔍 শুধুমাত্র লুকআপ রিপোর্ট (Lookup Only)</option>
+                                </select>
+                            </div>
+
+                            <!-- Worker Filter -->
+                            <div>
+                                <label class="block font-bold text-slate-700 uppercase mb-1">👤 নির্দিষ্ট কর্মী (ঐচ্ছিক):</label>
+                                <select id="quickExportWorker" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+                                    <option value="all">👥 সব কর্মী (All Workers)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Live Status / Progress Bar -->
+                        <div id="quickExportStatusBox" class="hidden p-3 rounded-xl text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-900 flex items-center justify-between animate-in fade-in duration-150">
+                            <span id="quickExportStatusText">⏳ ডাটাবেজ থেকে সম্পূর্ণ ডাটা সংগ্রহ করা হচ্ছে...</span>
+                            <span id="quickExportCountBadge" class="bg-indigo-600 text-white px-2.5 py-0.5 rounded-md text-[11px] font-black">0 টি</span>
+                        </div>
+
+                        <!-- Action Download Buttons -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                            <div class="text-xs text-slate-500">
+                                💡 আপনি যে অপশনই বেছে নেন না কেন, এটি স্বয়ংক্রিয়ভাবে ডাটাবেজ থেকে ১,০০০, ৩,০০০ বা ১০,০০০ সম্পূর্ণ ডাটা একসাথে নামিয়ে দেবে।
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button type="button" id="btnQuickExportExcel" onclick="executeQuickExport('xlsx')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-2">
+                                    <span>📊 সম্পূর্ণ এক্সেল ডাউনলোড (.xlsx)</span>
+                                </button>
+                                <button type="button" id="btnQuickExportTxt" onclick="executeQuickExport('txt')" class="bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-2">
+                                    <span>📄 প্লেইন টেক্সট ডাউনলোড (.txt)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Quick Category Selector Bar -->
                     <div class="flex flex-wrap items-center justify-between gap-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
                         <div class="flex flex-wrap items-center gap-2">
@@ -1421,7 +1589,126 @@
                 </div>
 
 
-                <div id="adminTabBackup" class="hidden p-6 space-y-6">
+                
+                <!-- TAB 7: LOOKUP DAILY SUBMISSION REPORTS (1-Click Excel & TXT Download) -->
+                <div id="adminTabLookupReports" class="hidden p-6 space-y-6">
+                    <!-- Top Header Card -->
+                    <div class="p-6 rounded-2xl bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-purple-500/30 text-purple-200 border border-purple-400 text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">Lookup Department Portal</span>
+                                <span class="bg-emerald-500/30 text-emerald-200 border border-emerald-400 text-xs px-2.5 py-0.5 rounded-full font-black">Isolated Sector</span>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-black mt-1.5">লুকআপ কর্মীদের দৈনিক রিপোর্ট ও ১-ক্লিক ডাউনলোড</h3>
+                            <p class="text-xs text-purple-200 mt-0.5 max-w-2xl">
+                                কর্মীরা প্রতিদিন যেসব Valid Number (Household Income, Market Value) ও No Information Number জমা দেয়, তা তারিখ অনুযায়ী ১-ক্লিকেই .xlsx বা .txt ফাইলে ডাউনলোড করুন।
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="loadAdminLookupReports()" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-white/20 transition flex items-center space-x-1">
+                                <span>🔄 রিফ্রেশ</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Date Picker & Filter Bar -->
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <div class="flex items-center space-x-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+                                <button type="button" onclick="changeLookupReportDate(-1)" class="p-1.5 hover:bg-white rounded-lg text-xs font-bold text-slate-700 transition" title="Previous Day">◀️</button>
+                                <input type="date" id="adminLookupReportDate" onchange="loadAdminLookupReports()" class="px-3 py-1 bg-white rounded-lg border border-slate-300 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-purple-500">
+                                <button type="button" onclick="changeLookupReportDate(1)" class="p-1.5 hover:bg-white rounded-lg text-xs font-bold text-slate-700 transition" title="Next Day">▶️</button>
+                            </div>
+                            <button type="button" onclick="setLookupReportDateToday()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                                📅 আজকের রিপোর্ট
+                            </button>
+                            <select id="adminLookupWorkerFilter" onchange="renderAdminLookupTable()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-700">
+                                <option value="all">👥 সব কর্মী (All Workers)</option>
+                            </select>
+                            <select id="adminLookupCategoryFilter" onchange="renderAdminLookupTable()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-700">
+                                <option value="all">📂 সব ক্যাটাগরি</option>
+                                <option value="valid">🟢 Valid Numbers Only (Income & Market Value)</option>
+                                <option value="no_info">⚪ No Information Only</option>
+                            </select>
+                        </div>
+
+                        <!-- 1-Click Downloads Dropdown / Action Buttons -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="downloadAdminLookupExcel('valid')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                                <span>📥 Valid Numbers (.xlsx)</span>
+                            </button>
+                            <button type="button" onclick="downloadAdminLookupTxt('valid')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                                <span>📄 Valid (.txt)</span>
+                            </button>
+                            <button type="button" onclick="downloadAdminLookupExcel('no_info')" class="bg-slate-700 hover:bg-slate-800 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                                <span>📥 No Info (.xlsx)</span>
+                            </button>
+                            <button type="button" onclick="downloadAdminLookupTxt('no_info')" class="bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                                <span>📄 No Info (.txt)</span>
+                            </button>
+                            <button type="button" onclick="downloadAdminLookupCombinedExcel()" class="bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                                <span>📦 অল-ইন-ওয়ান (.xlsx)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metric Cards for Selected Date -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500">
+                            <p class="text-xs font-bold text-emerald-800 uppercase">🟢 Valid Numbers (Today)</p>
+                            <p id="lookupMetricValid" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">গৃহস্থালি আয় ও মার্কেট ভ্যালু প্রাপ্ত</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-slate-500">
+                            <p class="text-xs font-bold text-slate-600 uppercase">⚪ No Information</p>
+                            <p id="lookupMetricNoInfo" class="text-2xl sm:text-3xl font-black text-slate-700 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">তথ্য পাওয়া যায়নি</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
+                            <p class="text-xs font-bold text-purple-800 uppercase">👥 Contributing Workers</p>
+                            <p id="lookupMetricWorkers" class="text-2xl sm:text-3xl font-black text-purple-700 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">আজকের কাজে অংশগ্রহণকারী কর্মী</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
+                            <p class="text-xs font-bold text-indigo-800 uppercase">📦 Total Submissions</p>
+                            <p id="lookupMetricTotal" class="text-2xl sm:text-3xl font-black text-indigo-700 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">নির্বাচিত দিনের মোট রেকর্ড</p>
+                        </div>
+                    </div>
+
+                    <!-- Live Submissions Table -->
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-black text-slate-800 text-sm">📋 জমা দেওয়া ডাটার বিস্তারিত তালিকা</h4>
+                                <span id="lookupTableCountBadge" class="text-xs bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">0 Records</span>
+                            </div>
+                            <input type="text" id="lookupTableSearchInput" oninput="renderAdminLookupTable()" placeholder="Search phone number or worker..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs w-64">
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs min-w-[760px]">
+                                <thead class="bg-slate-100 text-slate-700 uppercase font-black text-[11px]">
+                                    <tr>
+                                        <th class="py-3 px-3">#</th>
+                                        <th class="py-3 px-3">Phone Number</th>
+                                        <th class="py-3 px-3">Household Income</th>
+                                        <th class="py-3 px-3">Est. Market Value</th>
+                                        <th class="py-3 px-3">Name / Age</th>
+                                        <th class="py-3 px-3">ক্যাটাগরি</th>
+                                        <th class="py-3 px-3">জমা দেওয়া কর্মী</th>
+                                        <th class="py-3 px-3">সময়</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminLookupTableBody" class="divide-y divide-slate-100">
+                                    <tr><td colspan="8" class="py-8 text-center text-slate-400 font-medium">কোনো রেকর্ড পাওয়া যায়নি।</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+<div id="adminTabBackup" class="hidden p-6 space-y-6">
                     <!-- Status & Storage Monitor -->
                     <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-6 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-4">
                         <div>
@@ -2858,6 +3145,56 @@
             applyParsedRowsFromRawAoA(isFirstRowData);
         }
 
+
+        // =========================================================
+        // LOOKUP ISOLATED SECTOR LOGIC (Worker Submission & Admin)
+        // =========================================================
+        let currentLookupDeliveryType = 'valid'; // 'valid' or 'no_info'
+        let adminLookupDataCache = [];
+
+        function handleWorkerReportTypeChanged() {
+            const selectedReportRadio = document.querySelector('input[name="workerReportType"]:checked');
+            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'male_report';
+            const subCard = document.getElementById('lookupSubTypeCard');
+            const extraCols = document.getElementById('lookupExtraCols');
+
+            if (chosenReportType === 'lookup_report') {
+                if (subCard) subCard.classList.remove('hidden');
+                if (extraCols) {
+                    if (currentLookupDeliveryType === 'valid') extraCols.classList.remove('hidden');
+                    else extraCols.classList.add('hidden');
+                }
+            } else {
+                if (subCard) subCard.classList.add('hidden');
+                if (extraCols) extraCols.classList.add('hidden');
+            }
+
+            if (typeof parsedRows !== 'undefined' && parsedRows.length > 0) {
+                setupColumnSelectorsAndPreview();
+            }
+        }
+
+        function handleLookupDeliveryTypeChange(type) {
+            currentLookupDeliveryType = type;
+            const lblValid = document.getElementById('lblLookupValid');
+            const lblNoInfo = document.getElementById('lblLookupNoInfo');
+            const extraCols = document.getElementById('lookupExtraCols');
+
+            if (type === 'valid') {
+                if (lblValid) lblValid.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-emerald-500 shadow-sm cursor-pointer transition';
+                if (lblNoInfo) lblNoInfo.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-slate-200 hover:border-purple-300 cursor-pointer transition';
+                if (extraCols) extraCols.classList.remove('hidden');
+            } else {
+                if (lblNoInfo) lblNoInfo.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-purple-600 shadow-sm cursor-pointer transition';
+                if (lblValid) lblValid.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-slate-200 hover:border-purple-300 cursor-pointer transition';
+                if (extraCols) extraCols.classList.add('hidden');
+            }
+
+            if (typeof parsedRows !== 'undefined' && parsedRows.length > 0) {
+                setupColumnSelectorsAndPreview();
+            }
+        }
+
 function setupColumnSelectorsAndPreview() {
             document.getElementById('previewRowCount').innerText = `${parsedRows.length.toLocaleString()} rows detected`;
 
@@ -2936,6 +3273,29 @@ function setupColumnSelectorsAndPreview() {
                 }
             });
 
+            // If Lookup Report and Valid Number: First cell = Phone, 2nd cell = Income, 3rd cell = Market Value
+            const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value;
+            const incomeSel = document.getElementById('columnIncomeSelector');
+            const marketSel = document.getElementById('columnMarketValueSelector');
+
+            if (incomeSel) incomeSel.innerHTML = '<option value="">-- None / খালি --</option>';
+            if (marketSel) marketSel.innerHTML = '<option value="">-- None / খালি --</option>';
+
+            let bestIncomeCol = '';
+            let bestMarketCol = '';
+
+            if (selectedRep === 'lookup_report' && currentLookupDeliveryType === 'valid') {
+                if (columns.length >= 1) bestPhoneCol = columns[0];
+                if (columns.length >= 2) bestIncomeCol = columns[1];
+                if (columns.length >= 3) bestMarketCol = columns[2];
+            } else {
+                columns.forEach(c => {
+                    const lc = c.toLowerCase();
+                    if (lc.includes('income') || lc.includes('salary') || lc.includes('ai') || lc.includes('আয়')) bestIncomeCol = c;
+                    if (lc.includes('market') || lc.includes('value') || lc.includes('val') || lc.includes('ভ্যালু')) bestMarketCol = c;
+                });
+            }
+
             // Populate options
             columns.forEach(col => {
                 const optP = document.createElement('option');
@@ -2952,6 +3312,20 @@ function setupColumnSelectorsAndPreview() {
                 optA.value = col; optA.innerText = col;
                 if (col === bestAgeCol) optA.selected = true;
                 ageSel.appendChild(optA);
+
+                if (incomeSel) {
+                    const optI = document.createElement('option');
+                    optI.value = col; optI.innerText = col;
+                    if (col === bestIncomeCol) optI.selected = true;
+                    incomeSel.appendChild(optI);
+                }
+
+                if (marketSel) {
+                    const optM = document.createElement('option');
+                    optM.value = col; optM.innerText = col;
+                    if (col === bestMarketCol) optM.selected = true;
+                    marketSel.appendChild(optM);
+                }
             });
 
             updateLivePreviewTable();
@@ -2961,33 +3335,73 @@ function setupColumnSelectorsAndPreview() {
             document.getElementById('lastUploadResultCard').classList.add('hidden');
         }
 
-        // Live 5-Row Preview Table Renderer
-        function updateLivePreviewTable() {
+        // Live 5-Row Preview Table Renderer with Smart Lookup Duplicate Pre-Check
+        async function updateLivePreviewTable() {
             const previewTbody = document.getElementById('workerLivePreviewBody');
             if (!previewTbody || !parsedRows || parsedRows.length === 0) return;
 
-            const phoneCol = document.getElementById('columnPhoneSelector').value;
-            const nameCol = document.getElementById('columnNameSelector').value;
-            const ageCol = document.getElementById('columnAgeSelector').value;
+            const phoneCol = document.getElementById('columnPhoneSelector')?.value || '';
+            const nameCol = document.getElementById('columnNameSelector')?.value || '';
+            const ageCol = document.getElementById('columnAgeSelector')?.value || '';
+            const incomeCol = document.getElementById('columnIncomeSelector')?.value || '';
+            const marketCol = document.getElementById('columnMarketValueSelector')?.value || '';
+
+            const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value;
+            const isLookup = (selectedRep === 'lookup_report');
 
             const sampleRows = parsedRows.slice(0, 5);
+            const samplePhones = sampleRows.map(r => String(r[phoneCol] || '').replace(/[^0-9]/g, '')).filter(p => p.length >= 6);
+
+            // Cross check duplicates for preview if lookup
+            const dupMap = {};
+            if (isLookup && samplePhones.length > 0 && supabaseClient) {
+                try {
+                    const [resValid, resNoInfo] = await Promise.all([
+                        supabaseClient.from('lookup_records').select('phone_number, worker_username, submission_date').in('phone_number', samplePhones),
+                        supabaseClient.from('lookup_no_info_records').select('phone_number, worker_username, submission_date').in('phone_number', samplePhones)
+                    ]);
+                    if (resValid.data) {
+                        resValid.data.forEach(d => { dupMap[d.phone_number] = `⚠️ পূর্বে জমা দেওয়া হয়েছে (${d.worker_username || 'Worker'} - ${d.submission_date})`; });
+                    }
+                    if (resNoInfo.data) {
+                        resNoInfo.data.forEach(d => { dupMap[d.phone_number] = `⚠️ পূর্বে No-Info হিসেবে জমা (${d.worker_username || 'Worker'} - ${d.submission_date})`; });
+                    }
+                } catch(e) {
+                    console.warn('Lookup preview check notice:', e);
+                }
+            }
 
             previewTbody.innerHTML = sampleRows.map((row, idx) => {
                 const phoneVal = phoneCol ? String(row[phoneCol] || '').trim() : '-';
                 const nameVal = nameCol ? String(row[nameCol] || '').trim() : '-';
                 const ageVal = ageCol ? String(row[ageCol] || '').trim() : '-';
+                const cleanPhone = phoneVal.replace(/[^0-9]/g, '');
 
-                // Check if phoneVal contains letters instead of numbers
-                const hasLettersInPhone = /[a-zA-Z]/.test(phoneVal) && phoneVal.replace(/[^0-9]/g, '').length < 6;
-                const phoneClass = hasLettersInPhone ? 'bg-red-50 text-red-700 font-extrabold' : 'text-indigo-900 font-bold';
+                const hasLettersInPhone = /[a-zA-Z]/.test(phoneVal) && cleanPhone.length < 6;
+                const isDup = dupMap[cleanPhone];
+
+                let rowBg = isDup ? 'bg-rose-50/80 border-rose-200' : 'hover:bg-slate-50';
+                let phoneClass = hasLettersInPhone ? 'bg-red-50 text-red-700 font-extrabold' : (isDup ? 'text-rose-700 font-black' : 'text-indigo-900 font-bold');
+
+                let extraCells = '';
+                if (isLookup && currentLookupDeliveryType === 'valid') {
+                    const inc = incomeCol ? String(row[incomeCol] || '').trim() : '-';
+                    const mkt = marketCol ? String(row[marketCol] || '').trim() : '-';
+                    extraCells = `
+                        <td class="py-2 px-3 border-r font-semibold text-purple-900">${inc}</td>
+                        <td class="py-2 px-3 border-r font-semibold text-purple-900">${mkt}</td>
+                    `;
+                }
 
                 return `
-                    <tr class="hover:bg-slate-50">
+                    <tr class="${rowBg} text-xs transition">
                         <td class="py-2 px-3 border-r font-mono text-slate-400">${idx + 1}</td>
                         <td class="py-2 px-3 border-r font-mono ${phoneClass}">
                             ${phoneVal}
                             ${hasLettersInPhone ? '<span class="block text-[10px] text-red-600 font-sans">⚠️ এটি নাম! ফোন নাম্বার নয়</span>' : ''}
+                            ${isDup ? `<span class="block text-[10px] text-rose-600 font-sans font-bold">${isDup}</span>` : ''}
                         </td>
+                        ${extraCells}
                         <td class="py-2 px-3 border-r font-bold text-slate-800">${nameVal}</td>
                         <td class="py-2 px-3 font-medium text-slate-600">${ageVal}</td>
                     </tr>
@@ -3074,12 +3488,28 @@ function setupColumnSelectorsAndPreview() {
             statusText.innerText = `Submitting ${records.length} records to database with full details...`;
 
             try {
-                // Call submit_full_work_batch RPC in Supabase
-                const { data, error } = await supabaseClient.rpc('submit_full_work_batch', {
-                    p_records: records,
-                    p_report_type: chosenReportType,
-                    p_file_name: selectedFileData ? selectedFileData.name : 'upload.xlsx'
-                });
+                let data, error;
+                const fileName = selectedFileData ? selectedFileData.name : 'upload.xlsx';
+
+                // ROUTE TO ISOLATED LOOKUP SECTOR RPC IF LOOKUP REPORT
+                if (chosenReportType === 'lookup_report') {
+                    const res = await supabaseClient.rpc('submit_lookup_work_batch', {
+                        p_lookup_type: currentLookupDeliveryType,
+                        p_records: records,
+                        p_file_name: fileName
+                    });
+                    data = res.data;
+                    error = res.error;
+                } else {
+                    // Standard Gender Verify / Central Master Database RPC
+                    const res = await supabaseClient.rpc('submit_full_work_batch', {
+                        p_records: records,
+                        p_report_type: chosenReportType,
+                        p_file_name: fileName
+                    });
+                    data = res.data;
+                    error = res.error;
+                }
 
                 if (error) throw error;
 
@@ -3168,7 +3598,16 @@ function setupColumnSelectorsAndPreview() {
                 if (t) t.classList.add('hidden');
             });
 
-            if (tab === 'submissions') {
+            const btnLookupReports = document.getElementById('tabAdminLookupReportsBtn');
+            const tabLookupReports = document.getElementById('adminTabLookupReports');
+            if (btnLookupReports) btnLookupReports.className = inactiveClass;
+            if (tabLookupReports) tabLookupReports.classList.add('hidden');
+
+            if (tab === 'lookup_reports') {
+                if (btnLookupReports) btnLookupReports.className = activeClass;
+                if (tabLookupReports) tabLookupReports.classList.remove('hidden');
+                loadAdminLookupReports();
+            } else if (tab === 'submissions') {
                 if (btnSubs) btnSubs.className = activeClass;
                 if (tabSubs) tabSubs.classList.remove('hidden');
                 loadAdminSubmissionsData();
@@ -3269,18 +3708,32 @@ function setupColumnSelectorsAndPreview() {
                 }
 
                 const workerSelect = document.getElementById('adminSubWorkerFilter');
+                const quickWorkerSelect = document.getElementById('quickExportWorker');
                 if (workerSelect) {
                     workerSelect.innerHTML = '<option value="all">All Workers</option>';
                     adminUsersCache.forEach(u => {
                         workerSelect.innerHTML += `<option value="${u.email}">${u.username} (${u.email})</option>`;
                     });
                 }
+                if (quickWorkerSelect) {
+                    quickWorkerSelect.innerHTML = '<option value="all">👥 সব কর্মী (All Workers)</option>';
+                    adminUsersCache.forEach(u => {
+                        quickWorkerSelect.innerHTML += `<option value="${u.email}">👤 ${u.username} (${u.email})</option>`;
+                    });
+                }
 
                 renderAdminUserTable();
                 renderAdminLogsTable();
-                loadAdminSubmissionsData();
-                if (typeof loadCompanyDeliveriesData === 'function') {
-                    loadCompanyDeliveriesData();
+
+                // Blazing Fast Tab-Selective Loading (Loads ONLY the active tab!)
+                if (currentAdminTab === 'submissions') {
+                    loadAdminSubmissionsData();
+                } else if (currentAdminTab === 'company') {
+                    if (typeof loadCompanyDeliveriesData === 'function') loadCompanyDeliveriesData();
+                } else if (currentAdminTab === 'rec_stock') {
+                    if (typeof loadCompanyReceivedData === 'function') loadCompanyReceivedData();
+                } else if (currentAdminTab === 'lookup_reports') {
+                    if (typeof loadAdminLookupReports === 'function') loadAdminLookupReports();
                 }
             } catch (err) {
                 console.error('loadAdminDashboard error:', err);
@@ -3425,7 +3878,7 @@ function setupColumnSelectorsAndPreview() {
                     .from('master_numbers')
                     .select('*')
                     .order('created_at', { ascending: false })
-                    .limit(500);
+                    .limit(1000);
 
                 if (reportFilter !== 'all') query = query.eq('report_type', reportFilter);
                 if (workerFilter !== 'all') query = query.eq('user_email', workerFilter);
@@ -4183,30 +4636,37 @@ function setupColumnSelectorsAndPreview() {
             }
         }
 
-        function downloadDateSpecificExcel(targetDate) {
-            if (!adminSubmissionsCache || adminSubmissionsCache.length === 0) return;
-            const dateRows = adminSubmissionsCache.filter(item => (item.created_at || '').slice(0, 10) === targetDate);
-            if (dateRows.length === 0) {
-                alert('No records found for date: ' + targetDate);
-                return;
+        async function downloadDateSpecificExcel(targetDate) {
+            if (!supabaseClient) return;
+            try {
+                // Fetch 100% of records for targetDate with auto-pagination (Zero Data Loss!)
+                const allRows = await fetchAllSubmissions({ date: targetDate });
+                if (!allRows || allRows.length === 0) {
+                    alert('No records found for date: ' + targetDate);
+                    return;
+                }
+
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '',
+                    'Age': item.age || '',
+                    'Household Income': item.household_income || '',
+                    'Est Market Value': item.est_market_value || '',
+                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Department': item.department || '-',
+                    'Submitted By (Worker)': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                    'Submission Time': new Date(item.created_at).toLocaleString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, `Data_${targetDate}`);
+                XLSX.writeFile(wb, `Report_Data_${targetDate}_Total_${exportRows.length}.xlsx`);
+            } catch(err) {
+                console.error('downloadDateSpecificExcel error:', err);
+                alert('Export failed: ' + err.message);
             }
-
-            const exportRows = dateRows.map((item, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': item.phone_number,
-                'Full Name': item.full_name || '',
-                'Age': item.age || '',
-                'Household Income': item.household_income || '',
-                'Est Market Value': item.est_market_value || '',
-                'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
-                'Submitted By (Worker)': item.username || userEmailToNameMap[item.user_email] || item.user_email,
-                'Submission Time': new Date(item.created_at).toLocaleString()
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, `Data_${targetDate}`);
-            XLSX.writeFile(wb, `Report_Data_${targetDate}.xlsx`);
         }
 
 
@@ -4419,86 +4879,109 @@ function renderAdminLogsTable() {
 
         async function downloadMasterExcel() {
             if (!supabaseClient) return;
-            const { data, error } = await supabaseClient
-                .from('master_numbers')
-                .select('phone_number, full_name, age, report_type, department, user_email, created_at')
-                .order('created_at', { ascending: false });
+            try {
+                // Fetch 100% of all master database records (bypasses 1000 limit)
+                const allRows = await fetchAllSubmissions({});
+                if (!allRows || allRows.length === 0) {
+                    alert('No records found in database to export.');
+                    return;
+                }
 
-            if (error || !data || data.length === 0) {
-                alert('No records found to export.');
-                return;
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '',
+                    'Age': item.age || '',
+                    'Household Income': item.household_income || '',
+                    'Est Market Value': item.est_market_value || '',
+                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Department': item.department || '-',
+                    'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                    'Submission Date': new Date(item.created_at).toLocaleString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Master Data All");
+                const today = new Date().toISOString().slice(0, 10);
+                XLSX.writeFile(wb, `Master_Database_Full_${today}_Total_${exportRows.length}.xlsx`);
+            } catch(err) {
+                alert('Master export failed: ' + err.message);
             }
-
-            const exportRows = data.map((item, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': item.phone_number,
-                'Full Name': item.full_name || '',
-                'Age': item.age || '',
-                'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
-                'Department': item.department,
-                'Submitted By': item.user_email,
-                'Submission Date': new Date(item.created_at).toLocaleString()
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Master Data All");
-            const today = new Date().toISOString().slice(0, 10);
-            XLSX.writeFile(wb, `Master_Database_Full_${today}.xlsx`);
         }
 
         async function downloadFilteredSubmissionsExcel() {
-            if (!adminSubmissionsCache || adminSubmissionsCache.length === 0) {
-                alert('No records loaded in viewer to export.');
-                return;
+            if (!supabaseClient) return;
+            const dateVal = document.getElementById('adminSubDateFilter')?.value;
+            const reportFilter = document.getElementById('adminSubReportFilter')?.value || 'all';
+            const workerFilter = document.getElementById('adminSubWorkerFilter')?.value || 'all';
+
+            try {
+                // Fetch 100% of all filtered records with auto-pagination (bypasses 500 limit!)
+                const allRows = await fetchAllSubmissions({
+                    date: dateVal || null,
+                    report_type: reportFilter,
+                    user_email: workerFilter
+                });
+
+                if (!allRows || allRows.length === 0) {
+                    alert('No records found to export for current filter.');
+                    return;
+                }
+
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '',
+                    'Age': item.age || '',
+                    'Household Income': item.household_income || '',
+                    'Est Market Value': item.est_market_value || '',
+                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Department': item.department || '-',
+                    'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                    'Submission Date': new Date(item.created_at).toLocaleString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Submissions");
+                XLSX.writeFile(wb, `Submissions_Export_${new Date().toISOString().slice(0,10)}_Total_${exportRows.length}.xlsx`);
+            } catch(err) {
+                alert('Export failed: ' + err.message);
             }
-
-            const exportRows = adminSubmissionsCache.map((item, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': item.phone_number,
-                'Full Name': item.full_name || '',
-                'Age': item.age || '',
-                'Report Type': item.report_type,
-                'Department': item.department,
-                'Submitted By': item.user_email,
-                'Submission Date': new Date(item.created_at).toLocaleString()
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Submissions");
-            XLSX.writeFile(wb, `Submissions_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
         async function downloadSingleUserData(userEmail) {
             if (!supabaseClient) return;
-            const { data, error } = await supabaseClient
-                .from('master_numbers')
-                .select('phone_number, full_name, age, report_type, department, user_email, created_at')
-                .eq('user_email', userEmail)
-                .order('created_at', { ascending: false });
+            try {
+                // Fetch 100% of records for this worker with auto-pagination
+                const allRows = await fetchAllSubmissions({ user_email: userEmail });
+                if (!allRows || allRows.length === 0) {
+                    alert(`No numbers found for ${userEmail}`);
+                    return;
+                }
 
-            if (error || !data || data.length === 0) {
-                alert(`No numbers found for ${userEmail}`);
-                return;
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '',
+                    'Age': item.age || '',
+                    'Household Income': item.household_income || '',
+                    'Est Market Value': item.est_market_value || '',
+                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Department': item.department || '-',
+                    'Submitted By': item.username || item.user_email,
+                    'Submission Date': new Date(item.created_at).toLocaleString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Worker Data");
+                const safeEmail = userEmail.replace(/[@.]/g, '_');
+                XLSX.writeFile(wb, `Submissions_${safeEmail}_Total_${exportRows.length}.xlsx`);
+            } catch(err) {
+                alert('Worker export error: ' + err.message);
             }
-
-            const exportRows = data.map((item, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': item.phone_number,
-                'Full Name': item.full_name || '',
-                'Age': item.age || '',
-                'Report Type': item.report_type,
-                'Department': item.department,
-                'Submitted By': item.user_email,
-                'Submission Date': new Date(item.created_at).toLocaleString()
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Worker Data");
-            const safeEmail = userEmail.replace(/[@.]/g, '_');
-            XLSX.writeFile(wb, `Submissions_${safeEmail}.xlsx`);
         }
 
         // ==========================================
@@ -5669,32 +6152,49 @@ async function runDuplicateCheck() {
             loadAdminSubmissionsData();
         }
 
-        function downloadDateFilteredExcel() {
+        async function downloadDateFilteredExcel() {
+            if (!supabaseClient) return;
             const dateVal = document.getElementById('adminSubDateFilter')?.value;
-            const activeList = adminSubmissionsCache;
-            if (!activeList || activeList.length === 0) {
-                alert('No submission records found to download for this filter.');
-                return;
+            const reportFilter = document.getElementById('adminSubReportFilter')?.value || 'all';
+            const workerFilter = document.getElementById('adminSubWorkerFilter')?.value || 'all';
+
+            try {
+                // Fetch 100% of all dated records with auto-pagination (bypasses 500 limit!)
+                const allRows = await fetchAllSubmissions({
+                    date: dateVal || null,
+                    report_type: reportFilter,
+                    user_email: workerFilter
+                });
+
+                if (!allRows || allRows.length === 0) {
+                    alert('নির্বাচিত তারিখ বা ফিল্টারে কোনো ডাটা পাওয়া যায়নি।');
+                    return;
+                }
+
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '-',
+                    'Age': item.age || '-',
+                    'Household Income': item.household_income || '-',
+                    'Est Market Value': item.est_market_value || '-',
+                    'Report Type': item.report_type || 'general',
+                    'Department': item.department || '-',
+                    'Worker Username': item.username || userEmailToNameMap[item.user_email] || '-',
+                    'Worker Email': item.user_email,
+                    'Date': new Date(item.created_at).toLocaleDateString(),
+                    'Time': new Date(item.created_at).toLocaleTimeString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                const sheetTitle = dateVal ? `Records_${dateVal}` : 'Date_Records';
+                XLSX.utils.book_append_sheet(wb, ws, sheetTitle.slice(0, 31));
+                const fileName = `Daily_Records_${dateVal || new Date().toISOString().slice(0, 10)}_Total_${exportRows.length}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+            } catch (err) {
+                alert('Download error: ' + err.message);
             }
-
-            const exportRows = activeList.map((item, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': item.phone_number,
-                'Full Name': item.full_name || '-',
-                'Age': item.age || '-',
-                'Report Type': item.report_type || 'general',
-                'Worker Username': item.username || userEmailToNameMap[item.user_email] || '-',
-                'Worker Email': item.user_email,
-                'Date': new Date(item.created_at).toLocaleDateString(),
-                'Time': new Date(item.created_at).toLocaleTimeString()
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            const sheetTitle = dateVal ? `Records_${dateVal}` : 'Date_Records';
-            XLSX.utils.book_append_sheet(wb, ws, sheetTitle.slice(0, 31));
-            const fileName = `Daily_Records_${dateVal || new Date().toISOString().slice(0, 10)}.xlsx`;
-            XLSX.writeFile(wb, fileName);
         }
 
         function openResetDataModal() {
@@ -6464,31 +6964,55 @@ async function runDuplicateCheck() {
             }
         }
 
-        function downloadCompanyDeliveriesExcel() {
-            const list = cdDeliveriesCache;
-            if (!list || list.length === 0) {
-                alert('No delivery records to download.');
-                return;
+        async function downloadCompanyDeliveriesExcel() {
+            if (!supabaseClient) return;
+            const dateFilter = document.getElementById('cdFilterDate')?.value || '';
+            const catFilter = document.getElementById('cdFilterCategory')?.value || 'all';
+
+            try {
+                // Fetch ALL company deliveries with range pagination (Zero 500 cap!)
+                let allRows = [];
+                let from = 0;
+                const pageSize = 1000;
+                while (from < 50000) {
+                    let query = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).range(from, from + pageSize - 1);
+                    if (dateFilter) query = query.eq('delivery_date', dateFilter);
+                    if (catFilter !== 'all') query = query.eq('category', catFilter);
+
+                    const { data, error } = await query;
+                    if (error) throw error;
+                    if (!data || data.length === 0) break;
+                    allRows.push(...data);
+                    if (data.length < pageSize) break;
+                    from += pageSize;
+                }
+
+                if (!allRows || allRows.length === 0) {
+                    alert('No delivery records found to download.');
+                    return;
+                }
+
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Delivery Date': item.delivery_date,
+                    'Category': item.category === 'male_data' ? 'Male Data' : (item.category === 'female_data' ? 'Female Data' : 'Lookup Data'),
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '-',
+                    'Age': item.age || '-',
+                    'Household Income': item.household_income || '-',
+                    'Est Market Value': item.est_market_value || '-',
+                    'Company': item.company_name || 'Company',
+                    'Recorded Time': new Date(item.created_at).toLocaleString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Company_Deliveries');
+                const dateVal = dateFilter || new Date().toISOString().slice(0, 10);
+                XLSX.writeFile(wb, `Company_Delivery_Export_${dateVal}_Total_${exportRows.length}.xlsx`);
+            } catch(err) {
+                alert('Company export error: ' + err.message);
             }
-
-            const exportRows = list.map((item, idx) => ({
-                'SL': idx + 1,
-                'Delivery Date': item.delivery_date,
-                'Category': item.category === 'male_data' ? 'Male Data' : (item.category === 'female_data' ? 'Female Data' : 'Lookup Data'),
-                'Phone Number': item.phone_number,
-                'Full Name': item.full_name || '-',
-                'Age': item.age || '-',
-                'Household Income': item.household_income || '-',
-                'Est Market Value': item.est_market_value || '-',
-                'Company': item.company_name || 'Company',
-                'Recorded Time': new Date(item.created_at).toLocaleString()
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Company_Deliveries');
-            const dateVal = document.getElementById('cdFilterDate')?.value || new Date().toISOString().slice(0, 10);
-            XLSX.writeFile(wb, `Company_Delivery_Export_${dateVal}.xlsx`);
         }
 
         function clearCdForm() {
@@ -6875,14 +7399,57 @@ async function loadClaimStockSector() {
                 const availEl = document.getElementById('secStockAvailable');
                 if (availEl) availEl.innerText = activeCount.toLocaleString();
 
-                // 2. Team Leader Privilege Check
+                // 2. Team Leader & Lookup Account Privilege Enforcement
                 const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
+                const isLookupAccount = currentProfile && (['lookup', 'number_lookup'].includes(currentProfile.department) || isLeader);
+
                 const leaderBanner = document.getElementById('teamLeaderPrivilegeBanner');
                 if (leaderBanner) {
-                    if (isLeader) {
-                        leaderBanner.classList.remove('hidden');
+                    if (activeClaimStockCategory === 'lookup') {
+                        if (isLookupAccount) {
+                            leaderBanner.className = 'p-4 rounded-2xl bg-gradient-to-r from-purple-500/15 via-indigo-500/15 to-emerald-500/15 border border-purple-300 text-purple-950 flex items-center justify-between gap-3';
+                            leaderBanner.innerHTML = `
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">✨</span>
+                                    <div>
+                                        <h4 class="font-black text-sm sm:text-base text-purple-900">লুকআপ একাউন্ট সুবিধা: আনলিমিটেড নাম্বার কোটা সক্রিয়!</h4>
+                                        <p class="text-xs text-purple-800 mt-0.5">লুকআপ কর্মীদের জন্য নাম্বারের কোনো দৈনিক লিমিট নেই। যত খুশি তত নাম্বার স্টক থেকে তুলতে পারবেন।</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-purple-600 text-white font-black text-xs rounded-full uppercase tracking-wider flex-shrink-0">Unlimited Quota</span>
+                            `;
+                            leaderBanner.classList.remove('hidden');
+                        } else {
+                            leaderBanner.className = 'p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-950 flex items-center justify-between gap-3';
+                            leaderBanner.innerHTML = `
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">🔒</span>
+                                    <div>
+                                        <h4 class="font-black text-sm text-rose-900">এই স্টকটি শুধুমাত্র লুকআপ অ্যাকাউন্টধারীদের জন্য সংরক্ষিত!</h4>
+                                        <p class="text-xs text-rose-800 mt-0.5">আপনার অ্যাকাউন্টে লুকআপ পারমিশন নেই। অ্যাডমিনের সাথে যোগাযোগ করে আপনার ডিপার্টমেন্ট লুকআপে আপডেট করুন।</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-rose-600 text-white font-black text-xs rounded-full uppercase tracking-wider flex-shrink-0">Restricted</span>
+                            `;
+                            leaderBanner.classList.remove('hidden');
+                        }
                     } else {
-                        leaderBanner.classList.add('hidden');
+                        if (isLeader) {
+                            leaderBanner.className = 'p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-indigo-500/15 border border-amber-300 text-amber-950 flex items-center justify-between gap-3';
+                            leaderBanner.innerHTML = `
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">👑</span>
+                                    <div>
+                                        <h4 class="font-black text-sm sm:text-base text-amber-900">টিম লিডার সুবিধা: আনলিমিটেড নাম্বার কোটা সক্রিয়!</h4>
+                                        <p class="text-xs text-amber-800 mt-0.5">আপনার অ্যাকাউন্টে কোনো ৬ ঘণ্টার ১,০০০ লিমিট নেই। আপনি কাজের প্রয়োজনে যেকোনো পরিমাণ নাম্বার সংগ্রহ করতে পারবেন।</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-amber-400 text-slate-950 font-black text-xs rounded-full uppercase tracking-wider flex-shrink-0">Unlimited Quota</span>
+                            `;
+                            leaderBanner.classList.remove('hidden');
+                        } else {
+                            leaderBanner.classList.add('hidden');
+                        }
                     }
                 }
 
@@ -7212,100 +7779,237 @@ async function loadClaimStockSector() {
             const summaryDiv = document.getElementById('adminWorkerSummaryBadges');
             if (!tbody) return;
 
+            tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400 font-medium">⏳ সকল কর্মী ও টিম লিডারের হিসাব লোড হচ্ছে...</td></tr>';
+
             try {
-                const { data, error } = await supabaseClient
-                    .from('company_received_numbers')
-                    .select('id, phone_number, assigned_to_username, assigned_to_email, assigned_at')
-                    .eq('is_assigned', true)
-                    .order('assigned_at', { ascending: false });
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400">এখনো কোনো কর্মী স্টক থেকে নাম্বার সংগ্রহ করেনি।</td></tr>';
-                    if (summaryDiv) summaryDiv.innerHTML = '<span class="text-xs text-slate-400">কোনো বিতরণ ডাটা নেই</span>';
-                    return;
+                // Ensure profiles cache is available to display ALL team members including Team Leaders
+                if (!adminUsersCache || adminUsersCache.length === 0) {
+                    const { data: profs } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                    if (profs) {
+                        adminUsersCache = profs.map(p => ({
+                            id: p.id,
+                            email: p.email,
+                            username: p.username || (p.email ? p.email.split('@')[0] : 'Worker'),
+                            department: p.department || 'gender_verify',
+                            role: p.role || 'user',
+                            is_unlimited: p.role === 'team_leader' || p.role === 'admin' || p.is_unlimited_quota === true
+                        }));
+                    }
                 }
 
-                // 1. Group by Batch (Worker + Timestamp minute)
-                const batches = {};
-                const workerTotals = {};
-
-                data.forEach(r => {
-                    const uname = r.assigned_to_username || r.assigned_to_email?.split('@')[0] || 'Unknown Worker';
-                    workerTotals[uname] = (workerTotals[uname] || 0) + 1;
-
-                    const timeKey = r.assigned_at ? r.assigned_at.slice(0, 16) : 'unknown';
-                    const batchKey = `${uname}_${timeKey}`;
-
-                    if (!batches[batchKey]) {
-                        batches[batchKey] = {
-                            batchId: batchKey,
-                            username: uname,
-                            email: r.assigned_to_email || '-',
-                            time: r.assigned_at,
-                            phones: []
-                        };
-                    }
-                    batches[batchKey].phones.push(r.phone_number);
+                // Map of user profiles by id and email/username for instant lookup
+                const profileByEmail = {};
+                const profileByUname = {};
+                const profileById = {};
+                adminUsersCache.forEach(u => {
+                    if (u.email) profileByEmail[u.email.toLowerCase()] = u;
+                    if (u.username) profileByUname[u.username.toLowerCase()] = u;
+                    if (u.id) profileById[u.id] = u;
                 });
+
+                let batches = {};
+                let userTotals = {};
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                // Initialize all team members in userTotals so EVERYONE shows up!
+                adminUsersCache.forEach(u => {
+                    const key = u.username;
+                    userTotals[key] = {
+                        username: u.username,
+                        email: u.email,
+                        role: u.role,
+                        isLeader: (u.role === 'team_leader' || u.role === 'admin' || u.is_unlimited),
+                        totalClaimed: 0,
+                        todayClaimed: 0
+                    };
+                });
+
+                // 1. Try High-Performance Server-Side RPC First
+                let rpcSuccess = false;
+                try {
+                    const { data: rpcData, error: rpcErr } = await supabaseClient.rpc('get_admin_worker_claims_log');
+                    if (!rpcErr && rpcData && rpcData.batches) {
+                        rpcSuccess = true;
+                        
+                        // Populate batches from RPC
+                        rpcData.batches.forEach(b => {
+                            batches[b.batch_id] = {
+                                batchId: b.batch_id,
+                                username: b.username,
+                                email: b.email,
+                                role: b.role,
+                                isLeader: (b.role === 'team_leader' || b.role === 'admin'),
+                                time: b.time,
+                                phones: b.phones || []
+                            };
+
+                            const uname = b.username;
+                            if (!userTotals[uname]) {
+                                userTotals[uname] = {
+                                    username: uname,
+                                    email: b.email,
+                                    role: b.role,
+                                    isLeader: (b.role === 'team_leader' || b.role === 'admin'),
+                                    totalClaimed: 0,
+                                    todayClaimed: 0
+                                };
+                            }
+                            const qty = (b.phones ? b.phones.length : b.count) || 0;
+                            userTotals[uname].totalClaimed += qty;
+                            if (b.time && b.time.slice(0, 10) === todayStr) {
+                                userTotals[uname].todayClaimed += qty;
+                            }
+                        });
+                    }
+                } catch(e) {
+                    console.warn('RPC get_admin_worker_claims_log notice, using paginated client fetch:', e);
+                }
+
+                // 2. Client-Side Chunked Range Fetch Fallback (Bypasses PostgREST 1,000 row ceiling!)
+                if (!rpcSuccess) {
+                    let allClaimedRows = [];
+                    let from = 0;
+                    const pageSize = 1000;
+                    const maxRowsToFetch = 15000; // supports up to 15,000 records smoothly
+
+                    while (from < maxRowsToFetch) {
+                        const { data: chunk, error: cErr } = await supabaseClient
+                            .from('company_received_numbers')
+                            .select('id, phone_number, assigned_to_user_id, assigned_to_username, assigned_to_email, assigned_at')
+                            .eq('is_assigned', true)
+                            .order('assigned_at', { ascending: false })
+                            .range(from, from + pageSize - 1);
+
+                        if (cErr || !chunk || chunk.length === 0) break;
+                        allClaimedRows.push(...chunk);
+                        if (chunk.length < pageSize) break; // reached the end
+                        from += pageSize;
+                    }
+
+                    allClaimedRows.forEach(r => {
+                        const prof = (r.assigned_to_user_id ? profileById[r.assigned_to_user_id] : null) || 
+                                     (r.assigned_to_email ? profileByEmail[r.assigned_to_email.toLowerCase()] : null) ||
+                                     (r.assigned_to_username ? profileByUname[r.assigned_to_username.toLowerCase()] : null) || {};
+
+                        const uname = prof.username || r.assigned_to_username || (r.assigned_to_email ? r.assigned_to_email.split('@')[0] : 'Worker');
+                        const email = prof.email || r.assigned_to_email || '-';
+                        const role = prof.role || 'user';
+                        const isLeader = (role === 'team_leader' || role === 'admin' || prof.is_unlimited);
+
+                        if (!userTotals[uname]) {
+                            userTotals[uname] = {
+                                username: uname,
+                                email: email,
+                                role: role,
+                                isLeader: isLeader,
+                                totalClaimed: 0,
+                                todayClaimed: 0
+                            };
+                        }
+                        userTotals[uname].totalClaimed++;
+                        if (r.assigned_at && r.assigned_at.slice(0, 10) === todayStr) {
+                            userTotals[uname].todayClaimed++;
+                        }
+
+                        // Group into Batches by user and minute
+                        const timeKey = r.assigned_at ? r.assigned_at.slice(0, 16) : 'unknown';
+                        const batchKey = `${uname}_${timeKey}`;
+
+                        if (!batches[batchKey]) {
+                            batches[batchKey] = {
+                                batchId: batchKey,
+                                username: uname,
+                                email: email,
+                                role: role,
+                                isLeader: isLeader,
+                                time: r.assigned_at,
+                                phones: []
+                            };
+                        }
+                        batches[batchKey].phones.push(r.phone_number);
+                    });
+                }
 
                 adminClaimBatchCache = batches;
 
-                // 2. Render Worker Summary Chips
+                // 2. Render Comprehensive Worker & Team Leader Summary Badges
                 if (summaryDiv) {
                     summaryDiv.innerHTML = '';
-                    Object.keys(workerTotals).forEach(wname => {
-                        const count = workerTotals[wname];
+                    const sortedUsers = Object.values(userTotals).sort((a, b) => {
+                        // Team leaders first, then by total claimed descending
+                        if (a.isLeader && !b.isLeader) return -1;
+                        if (!a.isLeader && b.isLeader) return 1;
+                        return b.totalClaimed - a.totalClaimed;
+                    });
+
+                    sortedUsers.forEach(u => {
                         const chip = document.createElement('div');
-                        chip.className = 'inline-flex items-center space-x-1.5 bg-indigo-50 border border-indigo-200 text-indigo-900 px-3 py-1 rounded-xl text-xs font-bold shadow-sm';
-                        chip.innerHTML = `
-                            <span>👤 ${wname}:</span>
-                            <span class="bg-indigo-600 text-white px-2 py-0.5 rounded-md text-[11px] font-black">${count} টি</span>
-                        `;
+                        if (u.isLeader) {
+                            // Team Leader Badge (Golden Highlighted)
+                            chip.className = 'inline-flex items-center space-x-2 bg-gradient-to-r from-amber-50 to-amber-100 border-2 border-amber-300 text-amber-950 px-3 py-1.5 rounded-xl text-xs font-black shadow-xs';
+                            chip.innerHTML = `
+                                <span>👑 ${u.username}</span>
+                                <span class="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-md text-[11px] font-black">${u.totalClaimed.toLocaleString()} টি</span>
+                                ${u.todayClaimed > 0 ? `<span class="text-[10px] text-amber-900 font-extrabold bg-white/80 px-1.5 py-0.5 rounded">আজ: +${u.todayClaimed}</span>` : ''}
+                            `;
+                        } else {
+                            // General Worker Badge
+                            const hasClaimed = u.totalClaimed > 0;
+                            chip.className = `inline-flex items-center space-x-2 border rounded-xl px-3 py-1.5 text-xs font-bold shadow-xs ${hasClaimed ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-slate-50 border-slate-200 text-slate-500'}`;
+                            chip.innerHTML = `
+                                <span>👤 ${u.username}:</span>
+                                <span class="${hasClaimed ? 'bg-indigo-600 text-white' : 'bg-slate-300 text-slate-700'} px-2 py-0.5 rounded-md text-[11px] font-black">${u.totalClaimed.toLocaleString()} টি</span>
+                                ${u.todayClaimed > 0 ? `<span class="text-[10px] text-emerald-700 font-extrabold bg-emerald-100 px-1.5 py-0.5 rounded">আজ: +${u.todayClaimed}</span>` : ''}
+                            `;
+                        }
                         summaryDiv.appendChild(chip);
                     });
                 }
 
-                // 3. Render Table Rows
-                tbody.innerHTML = '';
+                // 3. Render Table Rows for All Batches Across All Workers
                 const sortedBatches = Object.values(batches).sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
 
-                sortedBatches.forEach((batch, idx) => {
+                if (sortedBatches.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">কোনো কর্মী বা টিম লিডার এখনো স্টক থেকে নাম্বার সংগ্রহ করেননি।</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = sortedBatches.map((batch, idx) => {
                     const dateObj = batch.time ? new Date(batch.time) : null;
                     const dateStr = dateObj ? dateObj.toLocaleDateString() : '-';
                     const timeStr = dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const isLeader = batch.isLeader || (batch.role === 'team_leader' || batch.role === 'admin');
 
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 transition';
-                    tr.innerHTML = `
-                        <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
-                        <td class="py-3 px-4 font-extrabold text-slate-800 flex items-center space-x-1.5">
-                            <span>👤</span>
-                            <span>${batch.username}</span>
-                        </td>
-                        <td class="py-3 px-4 text-slate-500 font-mono text-[11px]">${batch.email}</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="inline-block bg-emerald-100 text-emerald-800 font-black px-2.5 py-1 rounded-full text-xs">
-                                ${batch.phones.length} টি
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 font-mono text-slate-600 text-[11px]">
-                            ${dateStr} <span class="text-slate-400 font-normal">${timeStr}</span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <button type="button" onclick="openAdminClaimBatchModal('${batch.batchId}')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg border border-indigo-200 transition flex items-center space-x-1 mx-auto">
-                                <span>👁️</span>
-                                <span>নাম্বার দেখুন</span>
-                            </button>
-                        </td>
+                    const workerBadge = isLeader 
+                        ? `<span class="flex items-center space-x-1.5"><span class="text-base">👑</span><span class="font-black text-amber-950">${batch.username}</span><span class="text-[10px] bg-amber-200 text-amber-900 border border-amber-300 font-black px-1.5 py-0.2 rounded-md uppercase">Team Leader</span></span>`
+                        : `<span class="flex items-center space-x-1.5"><span class="text-base">👤</span><span class="font-extrabold text-slate-800">${batch.username}</span></span>`;
+
+                    return `
+                        <tr class="hover:bg-slate-50/80 transition text-xs ${isLeader ? 'bg-amber-50/20' : ''}">
+                            <td class="py-3 px-4 font-mono text-slate-400 font-bold">${idx + 1}</td>
+                            <td class="py-3 px-4">${workerBadge}</td>
+                            <td class="py-3 px-4 text-slate-500 font-mono text-[11px]">${batch.email}</td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-block ${isLeader ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'} font-black px-3 py-1 rounded-full text-xs shadow-xs">
+                                    ${batch.phones.length.toLocaleString()} টি
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 font-mono text-slate-700 text-[11px] font-semibold">
+                                ${dateStr} <span class="text-slate-400 font-normal">(${timeStr})</span>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button type="button" onclick="openAdminClaimBatchModal('${batch.batchId}')" class="text-xs font-bold text-indigo-700 hover:text-indigo-950 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl border border-indigo-200 shadow-xs transition flex items-center space-x-1.5 mx-auto">
+                                    <span>👁️</span>
+                                    <span>নাম্বার দেখুন</span>
+                                </button>
+                            </td>
+                        </tr>
                     `;
-                    tbody.appendChild(tr);
-                });
+                }).join('');
 
             } catch (err) {
                 console.error('Error loading worker claims log:', err);
-                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-rose-500">লগ লোড করতে সমস্যা: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-rose-600 font-bold">লগ লোড করতে সমস্যা: ${err.message}</td></tr>`;
             }
         }
 
@@ -7475,6 +8179,13 @@ async function loadClaimStockSector() {
             }
         }
 
+
+                // Reload Admin Users & Dashboard Helper
+        async function loadAdminUsers() {
+            if (typeof loadAdminDashboard === 'function') {
+                await loadAdminDashboard();
+            }
+        }
 
         // ==============================================================
         // ADMIN TEAM MEMBER & TEAM LEADER ACCOUNT CREATION SYSTEM
@@ -7757,6 +8468,677 @@ async function loadClaimStockSector() {
             }
         }
 
+
+        // =========================================================================
+        // ADMIN LOOKUP DAILY REPORTS & 1-CLICK EXCEL / TXT DOWNLOAD ENGINE
+        // =========================================================================
+        let adminLookupValidList = [];
+        let adminLookupNoInfoList = [];
+
+        function setLookupReportDateToday() {
+            const today = new Date().toISOString().slice(0, 10);
+            const dateInput = document.getElementById('adminLookupReportDate');
+            if (dateInput) {
+                dateInput.value = today;
+                loadAdminLookupReports();
+            }
+        }
+
+        function changeLookupReportDate(deltaDays) {
+            const dateInput = document.getElementById('adminLookupReportDate');
+            if (!dateInput) return;
+            const curVal = dateInput.value || new Date().toISOString().slice(0, 10);
+            const d = new Date(curVal);
+            d.setDate(d.getDate() + deltaDays);
+            dateInput.value = d.toISOString().slice(0, 10);
+            loadAdminLookupReports();
+        }
+
+        async function loadAdminLookupReports() {
+            if (!supabaseClient) return;
+            const dateInput = document.getElementById('adminLookupReportDate');
+            if (!dateInput.value) {
+                dateInput.value = new Date().toISOString().slice(0, 10);
+            }
+            const targetDate = dateInput.value;
+
+            try {
+                // Fetch both valid lookup records and no info records for targetDate
+                const [valRes, noInfoRes] = await Promise.all([
+                    supabaseClient
+                        .from('lookup_records')
+                        .select('*')
+                        .eq('submission_date', targetDate)
+                        .order('created_at', { ascending: false }),
+                    supabaseClient
+                        .from('lookup_no_info_records')
+                        .select('*')
+                        .eq('submission_date', targetDate)
+                        .order('created_at', { ascending: false })
+                ]);
+
+                adminLookupValidList = valRes.data || [];
+                adminLookupNoInfoList = noInfoRes.data || [];
+
+                // Metrics
+                const totalValid = adminLookupValidList.length;
+                const totalNoInfo = adminLookupNoInfoList.length;
+                const totalAll = totalValid + totalNoInfo;
+
+                const workerSet = new Set();
+                adminLookupValidList.forEach(r => workerSet.add(r.worker_username || r.worker_email));
+                adminLookupNoInfoList.forEach(r => workerSet.add(r.worker_username || r.worker_email));
+
+                document.getElementById('lookupMetricValid').innerText = totalValid.toLocaleString();
+                document.getElementById('lookupMetricNoInfo').innerText = totalNoInfo.toLocaleString();
+                document.getElementById('lookupMetricWorkers').innerText = workerSet.size.toLocaleString();
+                document.getElementById('lookupMetricTotal').innerText = totalAll.toLocaleString();
+
+                // Populate Worker Filter Dropdown
+                const wFilter = document.getElementById('adminLookupWorkerFilter');
+                if (wFilter) {
+                    const curSelected = wFilter.value;
+                    wFilter.innerHTML = '<option value="all">👥 সব কর্মী (All Workers)</option>';
+                    workerSet.forEach(w => {
+                        if (w) {
+                            const opt = document.createElement('option');
+                            opt.value = w;
+                            opt.innerText = `👤 ${w}`;
+                            if (w === curSelected) opt.selected = true;
+                            wFilter.appendChild(opt);
+                        }
+                    });
+                }
+
+                renderAdminLookupTable();
+
+            } catch (err) {
+                console.error('Error loading admin lookup reports:', err);
+                alert('লুকআপ রিপোর্ট লোড করতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        function renderAdminLookupTable() {
+            const body = document.getElementById('adminLookupTableBody');
+            const search = (document.getElementById('lookupTableSearchInput')?.value || '').toLowerCase().trim();
+            const wFilter = document.getElementById('adminLookupWorkerFilter')?.value || 'all';
+            const catFilter = document.getElementById('adminLookupCategoryFilter')?.value || 'all';
+
+            let combined = [];
+
+            if (catFilter === 'all' || catFilter === 'valid') {
+                adminLookupValidList.forEach(r => {
+                    combined.push({
+                        ...r,
+                        category: 'valid',
+                        catLabel: '🟢 Valid (Household & Market)',
+                        timeStr: new Date(r.created_at).toLocaleTimeString()
+                    });
+                });
+            }
+
+            if (catFilter === 'all' || catFilter === 'no_info') {
+                adminLookupNoInfoList.forEach(r => {
+                    combined.push({
+                        ...r,
+                        household_income: '-',
+                        est_market_value: '-',
+                        category: 'no_info',
+                        catLabel: '⚪ No Information',
+                        timeStr: new Date(r.created_at).toLocaleTimeString()
+                    });
+                });
+            }
+
+            // Apply Filters
+            const filtered = combined.filter(row => {
+                const phone = String(row.phone_number || '');
+                const worker = String(row.worker_username || row.worker_email || '').toLowerCase();
+                const matchSearch = phone.includes(search) || worker.includes(search);
+                const matchWorker = (wFilter === 'all') || (worker === wFilter.toLowerCase());
+                return matchSearch && matchWorker;
+            });
+
+            document.getElementById('lookupTableCountBadge').innerText = `${filtered.length.toLocaleString()} Records`;
+
+            if (filtered.length > 0) {
+                body.innerHTML = filtered.map((row, idx) => {
+                    const isValid = (row.category === 'valid');
+                    const badgeClass = isValid ? 'bg-emerald-100 text-emerald-800 font-black' : 'bg-slate-200 text-slate-700 font-bold';
+                    return `
+                        <tr class="hover:bg-slate-50 transition text-xs">
+                            <td class="py-2.5 px-3 font-mono text-slate-400">${idx + 1}</td>
+                            <td class="py-2.5 px-3 font-mono font-black text-slate-900">${row.phone_number}</td>
+                            <td class="py-2.5 px-3 font-bold text-purple-900">${row.household_income || '-'}</td>
+                            <td class="py-2.5 px-3 font-bold text-purple-900">${row.est_market_value || '-'}</td>
+                            <td class="py-2.5 px-3 text-slate-700">${row.full_name || '-'} ${row.age ? `(${row.age})` : ''}</td>
+                            <td class="py-2.5 px-3">
+                                <span class="px-2 py-0.5 rounded text-[11px] ${badgeClass}">${row.catLabel}</span>
+                            </td>
+                            <td class="py-2.5 px-3 font-bold text-slate-800">
+                                👤 ${row.worker_username || row.worker_email || 'Unknown'}
+                            </td>
+                            <td class="py-2.5 px-3 font-mono text-slate-400 text-[11px]">${row.timeStr}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                body.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-medium">নির্বাচিত ফিল্টারে কোনো ডাটা পাওয়া যায়নি।</td></tr>`;
+            }
+        }
+
+        // Download Valid Numbers as Excel
+        function downloadAdminLookupExcel(type) {
+            const list = (type === 'valid') ? adminLookupValidList : adminLookupNoInfoList;
+            const targetDate = document.getElementById('adminLookupReportDate')?.value || 'Today';
+
+            if (!list || list.length === 0) {
+                alert(`এই তারিখে কোনো ${type === 'valid' ? 'Valid' : 'No Information'} ডাটা নেই!`);
+                return;
+            }
+
+            let exportRows = [];
+            if (type === 'valid') {
+                exportRows = list.map((r, i) => ({
+                    'SL': i + 1,
+                    'Phone Number': r.phone_number,
+                    'Household Income': r.household_income || '',
+                    'Est. Market Value': r.est_market_value || '',
+                    'Full Name': r.full_name || '',
+                    'Age': r.age || '',
+                    'Worker': r.worker_username || r.worker_email || '',
+                    'Date': r.submission_date
+                }));
+            } else {
+                exportRows = list.map((r, i) => ({
+                    'SL': i + 1,
+                    'Phone Number': r.phone_number,
+                    'Full Name': r.full_name || '',
+                    'Age': r.age || '',
+                    'Status': 'No Information Found',
+                    'Worker': r.worker_username || r.worker_email || '',
+                    'Date': r.submission_date
+                }));
+            }
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            const sheetName = (type === 'valid') ? 'Valid_Lookup' : 'No_Information';
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, `Lookup_${sheetName}_${targetDate}.xlsx`);
+        }
+
+        // Download as TXT File (clean plain text format)
+        function downloadAdminLookupTxt(type) {
+            const list = (type === 'valid') ? adminLookupValidList : adminLookupNoInfoList;
+            const targetDate = document.getElementById('adminLookupReportDate')?.value || 'Today';
+
+            if (!list || list.length === 0) {
+                alert(`এই তারিখে কোনো ${type === 'valid' ? 'Valid' : 'No Information'} ডাটা নেই!`);
+                return;
+            }
+
+            let lines = [];
+            if (type === 'valid') {
+                lines = list.map(r => `${r.phone_number}\t${r.household_income || ''}\t${r.est_market_value || ''}`);
+            } else {
+                lines = list.map(r => `${r.phone_number}`);
+            }
+
+            const content = lines.join('\n');
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Lookup_${type === 'valid' ? 'Valid' : 'No_Info'}_${targetDate}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Download Combined Excel Workbook (Valid & No Information in 2 separate sheets)
+        function downloadAdminLookupCombinedExcel() {
+            const targetDate = document.getElementById('adminLookupReportDate')?.value || 'Today';
+            if (adminLookupValidList.length === 0 && adminLookupNoInfoList.length === 0) {
+                alert('এই তারিখে কোনো লুকআপ ডাটা নেই!');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            if (adminLookupValidList.length > 0) {
+                const validRows = adminLookupValidList.map((r, i) => ({
+                    'SL': i + 1,
+                    'Phone Number': r.phone_number,
+                    'Household Income': r.household_income || '',
+                    'Est. Market Value': r.est_market_value || '',
+                    'Full Name': r.full_name || '',
+                    'Age': r.age || '',
+                    'Worker': r.worker_username || r.worker_email || '',
+                    'Date': r.submission_date
+                }));
+                const wsValid = XLSX.utils.json_to_sheet(validRows);
+                XLSX.utils.book_append_sheet(wb, wsValid, 'Valid_Numbers');
+            }
+
+            if (adminLookupNoInfoList.length > 0) {
+                const noInfoRows = adminLookupNoInfoList.map((r, i) => ({
+                    'SL': i + 1,
+                    'Phone Number': r.phone_number,
+                    'Full Name': r.full_name || '',
+                    'Age': r.age || '',
+                    'Worker': r.worker_username || r.worker_email || '',
+                    'Date': r.submission_date
+                }));
+                const wsNoInfo = XLSX.utils.json_to_sheet(noInfoRows);
+                XLSX.utils.book_append_sheet(wb, wsNoInfo, 'No_Information');
+            }
+
+            XLSX.writeFile(wb, `Lookup_Complete_Daily_Report_${targetDate}.xlsx`);
+        }
+
+
+        // =========================================================================
+        // UNIVERSAL NUMBER AUDIT & FORENSIC SEARCH ENGINE
+        // =========================================================================
+        function clearUniversalNumberSearch() {
+            const input = document.getElementById('universalSearchInput');
+            const card = document.getElementById('universalSearchResultCard');
+            const list = document.getElementById('universalResultList');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            if (card) card.classList.add('hidden');
+            if (list) list.innerHTML = '';
+        }
+
+        async function handleUniversalNumberSearch(e) {
+            if (e) e.preventDefault();
+            const rawInput = document.getElementById('universalSearchInput')?.value.trim();
+            if (!rawInput) {
+                alert('অনুগ্রহ করে একটি ফোন নাম্বার লিখুন।');
+                return;
+            }
+
+            const cleanDigits = rawInput.replace(/[^0-9]/g, '');
+            const searchVal = cleanDigits || rawInput;
+
+            const btn = document.getElementById('btnUniversalSearch');
+            const resCard = document.getElementById('universalSearchResultCard');
+            const resList = document.getElementById('universalResultList');
+            const resCount = document.getElementById('universalResultCountBadge');
+            const resTitle = document.getElementById('universalResultTitle');
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ অনুসন্ধান হচ্ছে...</span>';
+            }
+            if (resCard) resCard.classList.remove('hidden');
+            if (resList) resList.innerHTML = '<div class="p-6 text-center text-slate-300 font-medium">⏳ ডাটাবেজের সমস্ত সেক্টরে গভীর অনুসন্ধান করা হচ্ছে...</div>';
+
+            try {
+                // High-Speed Concurrent Cross-Sector Search (Master Numbers, Lookups, Company Deliveries, Stock Claims)
+                const [masterRes, lookupRes, noInfoRes, delivRes, stockRes] = await Promise.all([
+                    supabaseClient.from('master_numbers').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
+                    supabaseClient.from('lookup_records').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
+                    supabaseClient.from('lookup_no_info_records').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
+                    supabaseClient.from('company_deliveries').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
+                    supabaseClient.from('company_received_numbers').select('*').ilike('phone_number', `%${searchVal}%`).limit(20)
+                ]);
+
+                const masterData = masterRes.data || [];
+                const lookupData = lookupRes.data || [];
+                const noInfoData = noInfoRes.data || [];
+                const delivData = delivRes.data || [];
+                const stockData = stockRes.data || [];
+
+                const totalFound = masterData.length + lookupData.length + noInfoData.length;
+
+                if (resCount) resCount.innerText = `${totalFound} টি সাবমিশন রেকর্ড পাওয়া গেছে`;
+                if (resTitle) resTitle.innerText = `"${searchVal}" এর বিস্তারিত বিবরণ ও নিরীক্ষা`;
+
+                if (totalFound === 0 && delivData.length === 0 && stockData.length === 0) {
+                    resList.innerHTML = `
+                        <div class="p-6 bg-white/5 rounded-2xl text-center border border-white/10 space-y-1">
+                            <p class="text-amber-400 font-bold text-sm">❌ ডাটাবেজে এই নাম্বারটি পাওয়া যায়নি!</p>
+                            <p class="text-xs text-slate-300">এই নাম্বারে এখনো কোনো কর্মী ডাটা জমা দেয়নি অথবা নাম্বারটি পূর্বে মুছে ফেলা হয়েছে।</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let htmlContent = '';
+
+                // 1. Render Central Master Submissions (Male, Female, General)
+                masterData.forEach(r => {
+                    const dateObj = r.created_at ? new Date(r.created_at) : null;
+                    const dateStr = dateObj ? dateObj.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : '-';
+                    const timeStr = dateObj ? dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-';
+
+                    const repLabels = {
+                        'male_report': { text: '👨 Male Report (পুরুষ ডাটা)', bg: 'bg-blue-600 text-white' },
+                        'female_report': { text: '👩 Female Report (মহিলা ডাটা)', bg: 'bg-pink-600 text-white' },
+                        'lookup_report': { text: '🔍 Lookup Report (লুকআপ ডাটা)', bg: 'bg-purple-600 text-white' }
+                    };
+                    const repInfo = repLabels[r.report_type] || { text: `📁 ${r.report_type || 'General'}`, bg: 'bg-slate-700 text-white' };
+
+                    const deliveryItem = delivData.find(d => d.phone_number === r.phone_number);
+                    const stockItem = stockData.find(s => s.phone_number === r.phone_number && s.is_assigned);
+
+                    htmlContent += `
+                        <div class="bg-white rounded-2xl p-5 text-slate-900 border-2 border-indigo-300 shadow-md space-y-3.5">
+                            <!-- Header: Phone, Gender Badge & Delivery Status -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                                <div class="flex items-center space-x-2.5">
+                                    <span class="text-xl">📱</span>
+                                    <span class="font-mono text-base sm:text-xl font-black text-indigo-950">${r.phone_number}</span>
+                                    <span class="text-xs font-black px-3 py-1 rounded-xl ${repInfo.bg} shadow-xs">${repInfo.text}</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    ${deliveryItem 
+                                        ? `<span class="text-xs font-bold bg-amber-100 text-amber-950 border border-amber-300 px-3 py-1 rounded-xl">🏢 কোম্পানিকে দেওয়া হয়েছে (${deliveryItem.delivery_date})</span>` 
+                                        : '<span class="text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-xl">🟢 কোম্পানিকে দেওয়া হয়নি (ফ্রেশ)</span>'}
+                                </div>
+                            </div>
+
+                            <!-- 4-Column Detailed Inspection Cards -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">👤 কে জমা দিয়েছে (Worker):</span>
+                                    <span class="font-black text-slate-900 text-sm block">${r.username || userEmailToNameMap[r.user_email] || r.user_email?.split('@')[0] || 'Unknown'}</span>
+                                    <span class="text-[11px] text-slate-500 font-mono block truncate">${r.user_email || '-'}</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">📅 জমা দেওয়ার তারিখ ও সময়:</span>
+                                    <span class="font-bold text-slate-900 text-xs block">🕒 ${dateStr}</span>
+                                    <span class="text-[11px] text-indigo-700 font-semibold block">সময়: ${timeStr} | ডিপার্টমেন্ট: ${r.department || 'gender_verify'}</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">📝 নাম ও বয়স (Name & Age):</span>
+                                    <span class="font-black text-slate-900 text-sm block">${r.full_name || 'নাম নেই'}</span>
+                                    <span class="text-[11px] text-slate-600 block">বয়স: ${r.age ? `${r.age} বছর` : 'উল্লেখ নেই'}</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">🎁 স্টক থেকে নেওয়ার হিস্ট্রি:</span>
+                                    <span class="font-bold text-slate-900 text-xs block">
+                                        ${stockItem ? `👤 ${stockItem.assigned_to_username || stockItem.assigned_to_email}` : 'সরাসরি আপলোড'}
+                                    </span>
+                                    <span class="text-[11px] text-slate-500 block">
+                                        ${stockItem?.assigned_at ? `নেওয়ার তারিখ: ${new Date(stockItem.assigned_at).toLocaleDateString()}` : 'স্টক ছাড়া'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Actions for this Wrong Entry -->
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 bg-slate-50/50 p-3 rounded-xl">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs font-black text-slate-700">ভুল হলে সঠিক ক্যাটাগরি বেছে নিন:</span>
+                                    <select onchange="adminQuickChangeCategory('${r.id}', this.value, '${r.phone_number}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-indigo-300 bg-white text-slate-900 cursor-pointer focus:ring-2 focus:ring-indigo-500">
+                                        <option value="male_report" ${r.report_type === 'male_report' ? 'selected' : ''}>👨 1. Male Report-এ স্থানান্তর করুন</option>
+                                        <option value="female_report" ${r.report_type === 'female_report' ? 'selected' : ''}>👩 2. Female Report-এ স্থানান্তর করুন</option>
+                                        <option value="lookup_report" ${r.report_type === 'lookup_report' ? 'selected' : ''}>🔍 3. Lookup Report-এ স্থানান্তর করুন</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="adminQuickDeleteRecord('${r.id}', '${r.phone_number}')" class="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5">
+                                    <span>🗑️ ভুল রেকর্ডটি মুছে ফেলুন (Delete)</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 2. Render Lookup Sector Records
+                lookupData.forEach(r => {
+                    htmlContent += `
+                        <div class="bg-white rounded-2xl p-5 text-slate-900 border-2 border-purple-300 shadow-md space-y-3">
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xl">🔍</span>
+                                    <span class="font-mono text-lg font-black text-purple-950">${r.phone_number}</span>
+                                    <span class="text-xs font-black px-2.5 py-1 rounded-md bg-purple-600 text-white">Valid Lookup Record</span>
+                                </div>
+                                <span class="text-xs font-bold text-purple-800">📅 জমা দেওয়ার তারিখ: ${r.submission_date}</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                                <div class="p-3 bg-purple-50 rounded-xl">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">কর্মী:</span>
+                                    <span class="font-bold text-slate-900 text-sm">${r.worker_username || r.worker_email}</span>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded-xl">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">গৃহস্থালি আয়:</span>
+                                    <span class="font-black text-purple-900 text-sm">${r.household_income || '-'}</span>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded-xl">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">মার্কেট ভ্যালু:</span>
+                                    <span class="font-black text-purple-900 text-sm">${r.est_market_value || '-'}</span>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded-xl">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">নাম ও বয়স:</span>
+                                    <span class="font-bold text-slate-900">${r.full_name || '-'} (${r.age || '-'})</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                resList.innerHTML = htmlContent;
+
+            } catch (err) {
+                console.error('Universal search error:', err);
+                resList.innerHTML = `<div class="p-4 bg-rose-50 text-rose-800 rounded-xl text-xs font-bold">অনুসন্ধানে সমস্যা হয়েছে: ${err.message}</div>`;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>🔍 গভীর অনুসন্ধান (Search)</span>';
+                }
+            }
+        }
+
+        async function adminQuickChangeCategory(recordId, newType, phone) {
+            const labelMap = {
+                'male_report': '👨 Male Report',
+                'female_report': '👩 Female Report',
+                'lookup_report': '🔍 Lookup Report'
+            };
+            const targetLabel = labelMap[newType] || newType;
+
+            if (!confirm(`আপনি কি নিশ্চিতভাবে এই নাম্বারটি (${phone}) "${targetLabel}" হিসেবে স্থানান্তর করতে চান?`)) {
+                return;
+            }
+            try {
+                const { error } = await supabaseClient
+                    .from('master_numbers')
+                    .update({ report_type: newType })
+                    .eq('id', recordId);
+                if (error) throw error;
+                alert(`✅ সফল! নাম্বারটি (${phone}) সফলভাবে "${targetLabel}" হিসেবে ক্যাটাগরি আপডেট হয়েছে।`);
+                handleUniversalNumberSearch();
+                loadAdminDashboard();
+            } catch(err) {
+                alert('ক্যাটাগরি আপডেটে সমস্যা: ' + err.message);
+            }
+        }
+
+        async function adminQuickDeleteRecord(recordId, phone) {
+            if (!confirm(`⚠️ সতর্কবার্তা:
+
+আপনি কি নিশ্চিতভাবে এই ভুল রেকর্ডটি (${phone}) ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলতে চান?`)) {
+                return;
+            }
+            try {
+                const { error } = await supabaseClient
+                    .from('master_numbers')
+                    .delete()
+                    .eq('id', recordId);
+                if (error) throw error;
+                alert(`✅ সফলভাবে রেকর্ডটি (${phone}) ডাটাবেজ থেকে মুছে ফেলা হয়েছে!`);
+                handleUniversalNumberSearch();
+                loadAdminDashboard();
+            } catch(err) {
+                alert('মুছতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+
+        // =========================================================================
+        // 1-CLICK INSTANT FULL DATA DOWNLOADER ENGINE (UNLIMITED EXPORT)
+        // =========================================================================
+        function handleQuickExportScopeChange() {
+            const scope = document.getElementById('quickExportDateScope')?.value;
+            const container = document.getElementById('quickExportCustomDateContainer');
+            const customDateInput = document.getElementById('quickExportCustomDate');
+            if (scope === 'custom') {
+                if (container) container.classList.remove('hidden');
+                if (customDateInput && !customDateInput.value) {
+                    customDateInput.value = new Date().toISOString().slice(0, 10);
+                }
+            } else {
+                if (container) container.classList.add('hidden');
+            }
+        }
+
+        async function executeQuickExport(format = 'xlsx') {
+            if (!supabaseClient) {
+                alert('ডাটাবেজ কানেকশন নেই।');
+                return;
+            }
+
+            const scope = document.getElementById('quickExportDateScope')?.value || 'today';
+            const category = document.getElementById('quickExportCategory')?.value || 'all';
+            const worker = document.getElementById('quickExportWorker')?.value || 'all';
+
+            let targetDate = null;
+            let dateLabel = 'Today';
+
+            if (scope === 'today') {
+                targetDate = new Date().toISOString().slice(0, 10);
+                dateLabel = targetDate;
+            } else if (scope === 'yesterday') {
+                const y = new Date();
+                y.setDate(y.getDate() - 1);
+                targetDate = y.toISOString().slice(0, 10);
+                dateLabel = targetDate;
+            } else if (scope === 'custom') {
+                targetDate = document.getElementById('quickExportCustomDate')?.value;
+                if (!targetDate) {
+                    alert('অনুগ্রহ করে একটি নির্দিষ্ট তারিখ বেছে নিন।');
+                    return;
+                }
+                dateLabel = targetDate;
+            } else {
+                targetDate = null;
+                dateLabel = 'All_Time_Database';
+            }
+
+            const statusBox = document.getElementById('quickExportStatusBox');
+            const statusText = document.getElementById('quickExportStatusText');
+            const countBadge = document.getElementById('quickExportCountBadge');
+            const btnXlsx = document.getElementById('btnQuickExportExcel');
+            const btnTxt = document.getElementById('btnQuickExportTxt');
+
+            if (btnXlsx) btnXlsx.disabled = true;
+            if (btnTxt) btnTxt.disabled = true;
+            if (statusBox) statusBox.classList.remove('hidden');
+            if (statusText) statusText.innerText = '⏳ ডাটাবেজ থেকে সম্পূর্ণ ডাটা সংগ্রহ করা হচ্ছে...';
+            if (countBadge) countBadge.innerText = '০ টি';
+
+            try {
+                let allRows = [];
+                let from = 0;
+                const pageSize = 1000;
+                const maxSafetyCap = 100000; // supports up to 100,000 records smoothly!
+
+                while (from < maxSafetyCap) {
+                    let query = supabaseClient
+                        .from('master_numbers')
+                        .select('phone_number, full_name, age, household_income, est_market_value, report_type, department, user_email, username, created_at')
+                        .order('created_at', { ascending: false })
+                        .range(from, from + pageSize - 1);
+
+                    if (targetDate) {
+                        query = query.gte('created_at', `${targetDate}T00:00:00.000Z`)
+                                     .lte('created_at', `${targetDate}T23:59:59.999Z`);
+                    }
+                    if (category !== 'all') {
+                        query = query.eq('report_type', category);
+                    }
+                    if (worker !== 'all') {
+                        query = query.eq('user_email', worker);
+                    }
+
+                    const { data: chunk, error } = await query;
+                    if (error) throw error;
+                    if (!chunk || chunk.length === 0) break;
+
+                    allRows.push(...chunk);
+                    if (countBadge) countBadge.innerText = `${allRows.length.toLocaleString()} টি`;
+                    if (statusText) statusText.innerText = `⏳ এখন পর্যন্ত ${allRows.length.toLocaleString()} টি ডাটা সংগ্রহ হয়েছে... আরও খোঁজা হচ্ছে...`;
+
+                    if (chunk.length < pageSize) break; // Reached the end!
+                    from += pageSize;
+                }
+
+                if (allRows.length === 0) {
+                    alert('নির্বাচিত শর্তে কোনো ডাটা পাওয়া যায়নি!');
+                    if (statusBox) statusBox.classList.add('hidden');
+                    return;
+                }
+
+                if (statusText) statusText.innerText = `✅ মোট ${allRows.length.toLocaleString()} টি ডাটা পাওয়া গেছে! ফাইল তৈরি হচ্ছে...`;
+
+                const catName = category === 'all' ? 'All_Reports' : (category === 'female_report' ? 'Female_Only' : (category === 'male_report' ? 'Male_Only' : 'Lookup_Only'));
+
+                if (format === 'xlsx') {
+                    // Export Excel (.xlsx)
+                    const exportRows = allRows.map((item, idx) => ({
+                        'SL': idx + 1,
+                        'Phone Number': item.phone_number,
+                        'Full Name': item.full_name || '',
+                        'Age': item.age || '',
+                        'Household Income': item.household_income || '',
+                        'Est Market Value': item.est_market_value || '',
+                        'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                        'Department': item.department || '-',
+                        'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                        'Submission Date': new Date(item.created_at).toLocaleDateString(),
+                        'Submission Time': new Date(item.created_at).toLocaleTimeString()
+                    }));
+
+                    const ws = XLSX.utils.json_to_sheet(exportRows);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Records");
+                    const fileName = `Full_Report_${catName}_${dateLabel}_Total_${exportRows.length}.xlsx`;
+                    XLSX.writeFile(wb, fileName);
+
+                } else {
+                    // Export Plain Text (.txt) - 1 record per line
+                    const lines = allRows.map(r => `${r.phone_number}\t${r.full_name || ''}\t${r.age || ''}`);
+                    const content = lines.join('\n');
+                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Full_Report_${catName}_${dateLabel}_Total_${allRows.length}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+
+                if (statusText) statusText.innerHTML = `<span class="text-emerald-700">🎉 সফল! মোট <b>${allRows.length.toLocaleString()} টি</b> সম্পূর্ণ ডাটা এক ক্লিকে ডাউনলোড হয়েছে!</span>`;
+
+            } catch(err) {
+                console.error('Quick export error:', err);
+                alert('ডাউনলোডে সমস্যা হয়েছে: ' + err.message);
+                if (statusBox) statusBox.classList.add('hidden');
+            } finally {
+                if (btnXlsx) btnXlsx.disabled = false;
+                if (btnTxt) btnTxt.disabled = false;
+            }
+        }
+
 </script>
 
     <!-- Modal: Worker Claimed Numbers Result -->
@@ -7902,7 +9284,7 @@ async function loadClaimStockSector() {
                             </div>
                         </label>
                         <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-blue-400 bg-blue-50/30 cursor-pointer">
-                            <input type="radio" name="corrNewType" value="male_report" class="w-4 h-4 text-blue-600">
+                            <input type="radio" name="corrNewType" value="male_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-blue-600">
                             <div>
                                 <span class="font-bold text-blue-800 block">👨 Male Report (মেল ডাটা)</span>
                                 <span class="text-[11px] text-slate-500">টার্গেটের ১০০ মেল কোটায় জমা হবে</span>
