@@ -12,6 +12,10 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* CRITICAL FALLBACK FOR HIDDEN ELEMENTS */
+        .hidden {
+            display: none !important;
+        }
         html, body {
             font-family: 'Inter', sans-serif;
             width: 100%;
@@ -151,6 +155,11 @@
                     <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5">
                         <span>🔍</span>
                         <span>Duplicate Check</span>
+                    </button>
+                    
+                    <button id="navBtnQuickSearch" onclick="openQuickSearchModal()" class="text-xs whitespace-nowrap bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-amber-300">
+                        <span class="text-sm">⚡</span>
+                        <span>Quick Search (নাম বা নাম্বার দিয়ে খুঁজুন)</span>
                     </button>
                 </div>
             </div>
@@ -640,6 +649,10 @@
                     <p class="text-sm text-slate-500">All submitted files and numbers (Phone, Name, Age) are stored centrally. View live, manage departments, and export consolidated Excel sheets.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button onclick="openQuickSearchModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow-md flex items-center space-x-1.5 transition" title="নাম বা ফোন নাম্বার দিয়ে দ্রুত ডাটা খুঁজুন">
+                        <span class="text-base">⚡</span>
+                        <span>Quick Search (নাম / নাম্বার)</span>
+                    </button>
                     <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Download all consolidated data across workers">
                         <span>📥 Download Master Excel</span>
                     </button>
@@ -653,7 +666,7 @@
             </div>
 
             <!-- Admin Stats Cards by Report Types -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <div onclick="filterAdminSubmissionsBy('all')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600 cursor-pointer hover:shadow-md hover:border-indigo-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
@@ -662,14 +675,7 @@
                     <p id="adminStatTotalUnique" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
                     <p class="text-xs text-slate-400">Unique numbers stored</p>
                 </div>
-                <div onclick="filterAdminSubmissionsBy('male_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Reports</p>
-                        <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-blue-100">Day-by-Day ➔</span>
-                    </div>
-                    <p id="adminStatMaleReport" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Click to view all male data</p>
-                </div>
+                <!-- Male Report Card Removed -->
                 <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
@@ -791,13 +797,13 @@
                         <!-- Search Form -->
                         <form onsubmit="handleUniversalNumberSearch(event)" class="flex flex-col sm:flex-row gap-2.5">
                             <div class="relative flex-1">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 text-base">📞</span>
-                                <input type="text" id="universalSearchInput" placeholder="যেকোনো ফোন নাম্বার লিখুন (যেমন: 15136465609 বা 6465609)..." class="w-full pl-10 pr-4 py-3 bg-white text-slate-900 rounded-xl font-mono text-xs sm:text-sm font-bold border-2 border-indigo-400 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 text-base">🔍</span>
+                                <input type="text" id="universalSearchInput" placeholder="যেকোনো ফোন নাম্বার অথবা ব্যক্তির নাম লিখুন (যেমন: 15136465609 বা Zoe বা Smith)..." class="w-full pl-10 pr-4 py-3 bg-white text-slate-900 rounded-xl font-medium text-xs sm:text-sm font-bold border-2 border-indigo-400 focus:outline-none focus:ring-2 focus:ring-amber-400 font-sans">
                             </div>
-                            <button type="submit" id="btnUniversalSearch" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 flex-shrink-0">
-                                <span>🔍 গভীর অনুসন্ধান (Search)</span>
+                            <button type="submit" id="btnUniversalSearch" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 flex-shrink-0 cursor-pointer">
+                                <span>⚡ গভীর অনুসন্ধান (Search)</span>
                             </button>
-                            <button type="button" onclick="clearUniversalNumberSearch()" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-4 py-3 rounded-xl border border-white/20 transition flex items-center justify-center space-x-1 flex-shrink-0">
+                            <button type="button" onclick="clearUniversalNumberSearch()" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-4 py-3 rounded-xl border border-white/20 transition flex items-center justify-center space-x-1 flex-shrink-0 cursor-pointer">
                                 <span>🧹 রিসেট</span>
                             </button>
                         </form>
@@ -865,7 +871,7 @@
                                 <select id="quickExportCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500">
                                     <option value="all">🌟 সব ডাটা একসাথে (Male + Female + Lookup)</option>
                                     <option value="female_report">👩 শুধুমাত্র ফিমেল রিপোর্ট (Female Only)</option>
-                                    <option value="male_report">👨 শুধুমাত্র মেল রিপোর্ট (Male Only)</option>
+                                    
                                     <option value="lookup_report">🔍 শুধুমাত্র লুকআপ রিপোর্ট (Lookup Only)</option>
                                 </select>
                             </div>
@@ -907,9 +913,7 @@
                             <button type="button" onclick="filterAdminSubmissionsBy('all')" id="qfBtnAll" class="px-3 py-1.5 text-xs font-bold rounded-lg border transition bg-indigo-600 text-white shadow-sm">
                                 🌟 All Data
                             </button>
-                            <button type="button" onclick="filterAdminSubmissionsBy('male_report')" id="qfBtnMale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition">
-                                👨 Male Data (দিন অনুযায়ী)
-                            </button>
+
                             <button type="button" onclick="filterAdminSubmissionsBy('female_report')" id="qfBtnFemale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200 transition">
                                 👩 Female Data (দিন অনুযায়ী)
                             </button>
@@ -947,7 +951,7 @@
                                 <label class="text-xs font-semibold text-slate-600 block mb-1">Report Type:</label>
                                 <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                     <option value="all">All Report Types</option>
-                                    <option value="male_report">👨 Male Report</option>
+                                    
                                     <option value="female_report">👩 Female Report</option>
                                     <option value="lookup_report">🔍 Lookup Report</option>
                                 </select>
@@ -2438,6 +2442,57 @@
                 <button type="button" id="executeResetBtn" onclick="executeDatabaseReset()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow transition flex items-center space-x-1.5">
                     <span>🗑️ Confirm & Delete Data</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Quick Search & Data Audit (নাম বা ফোন নাম্বার অনুসন্ধান) -->
+    <div id="quickSearchModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-start justify-center p-3 sm:p-6 animate-in fade-in duration-150">
+        <div class="bg-slate-900 text-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-700 p-5 sm:p-7 space-y-5 my-6 sm:my-10">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black text-xl shadow-md flex-shrink-0">
+                        ⚡
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-xl font-black text-white flex items-center space-x-2">
+                            <span>Quick Search & Deep Audit</span>
+                            <span class="text-xs bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 rounded-full font-bold">নাম বা নাম্বার অনুসন্ধান</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                            ফোন নাম্বার অথবা ব্যক্তির নাম দিয়ে খুঁজুন। কে দিয়েছে, কোন ফাইলে দিয়েছে, কবে দিয়েছে এবং কোম্পানিকে কোথায়/কবে ডেলিভারি করা হয়েছে—সব তথ্য একসাথে দেখতে পাবেন।
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeQuickSearchModal()" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition text-xl font-bold" title="বন্ধ করুন">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Search Form -->
+            <form onsubmit="handleQuickModalSearch(event)" class="flex flex-col sm:flex-row gap-2.5">
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 text-lg">🔍</span>
+                    <input type="text" id="quickModalSearchInput" placeholder="যেকোনো ফোন নাম্বার অথবা ব্যক্তির নাম লিখুন (e.g. 15136465609, Zoe, Smith)..." class="w-full pl-10 pr-4 py-3.5 bg-slate-800 text-white rounded-xl font-medium text-xs sm:text-sm border-2 border-slate-700 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/30 font-sans">
+                </div>
+                <button type="submit" id="btnQuickModalSearch" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2 flex-shrink-0 cursor-pointer">
+                    <span>⚡ অনুসন্ধান করুন</span>
+                </button>
+                <button type="button" onclick="clearQuickModalSearch()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-3.5 rounded-xl border border-slate-700 transition flex items-center justify-center flex-shrink-0 cursor-pointer">
+                    <span>🧹 রিসেট</span>
+                </button>
+            </form>
+
+            <!-- Results Card -->
+            <div id="quickModalResultCard" class="hidden space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h4 id="quickModalResultTitle" class="font-extrabold text-sm text-amber-300">অনুসন্ধান ফলাফল</h4>
+                    <span id="quickModalResultCountBadge" class="text-xs bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded-full">0 টি রেকর্ড</span>
+                </div>
+                <div id="quickModalResultList" class="space-y-4 max-h-[62vh] overflow-y-auto pr-1 text-slate-900">
+                    <!-- JavaScript will render cards here -->
+                </div>
             </div>
         </div>
     </div>
@@ -7538,14 +7593,15 @@ async function loadClaimStockSector() {
                 if (currentUser) {
                     const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
-                    const { count: userClaimedCount } = await supabaseClient
+                    const { data: recentClaims } = await supabaseClient
                         .from('company_received_numbers')
-                        .select('*', { count: 'exact', head: true })
+                        .select('assigned_at')
                         .eq('assigned_to_user_id', currentUser.id)
-                        .gte('assigned_at', sixHoursAgo.toISOString());
+                        .gte('assigned_at', sixHoursAgo.toISOString())
+                        .order('assigned_at', { ascending: true });
 
                     const userTodayEl = document.getElementById('secWorkerClaimedToday');
-                    const cCount = userClaimedCount || 0;
+                    const cCount = recentClaims ? recentClaims.length : 0;
                     if (userTodayEl) userTodayEl.innerText = cCount.toLocaleString();
 
                     const quotaRemEl = document.getElementById('secWorkerQuotaRemaining');
@@ -7568,7 +7624,7 @@ async function loadClaimStockSector() {
                         }
                         if (btnClaim) {
                             btnClaim.disabled = false;
-                            btnClaim.className = 'w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-slate-950 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2';
+                            btnClaim.className = 'w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-slate-950 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer';
                             btnClaim.innerHTML = '<span>⚡ Claim & Take Numbers (আনলিমিটেড সংগ্রহ করুন)</span>';
                         }
                     } else {
@@ -7578,8 +7634,27 @@ async function loadClaimStockSector() {
                         const remaining = Math.max(0, sixHourLimit - cCount);
                         const pct = Math.min(100, Math.round((cCount / sixHourLimit) * 100));
 
-                        if (quotaRemEl) quotaRemEl.innerText = remaining.toLocaleString();
-                        if (quotaPctEl) quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
+                        let unlockTimeStr = '';
+                        if (cCount >= sixHourLimit && recentClaims && recentClaims.length > 0) {
+                            const oldestClaimTime = new Date(recentClaims[0].assigned_at).getTime();
+                            const unlockTime = new Date(oldestClaimTime + 6 * 60 * 60 * 1000);
+                            unlockTimeStr = unlockTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
+
+                        if (quotaRemEl) {
+                            if (cCount >= sixHourLimit) {
+                                quotaRemEl.innerHTML = `<span class="text-rose-600 font-bold text-xs sm:text-sm">০ (আনলক: ${unlockTimeStr || 'শীঘ্রই'})</span>`;
+                            } else {
+                                quotaRemEl.innerText = remaining.toLocaleString();
+                            }
+                        }
+                        if (quotaPctEl) {
+                            if (cCount >= sixHourLimit) {
+                                quotaPctEl.innerHTML = `<span class="text-rose-600 font-bold">১০০% ব্যবহৃত (পরবর্তী কোটা: ${unlockTimeStr || 'শীঘ্রই'})</span>`;
+                            } else {
+                                quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
+                            }
+                        }
                         if (quotaBarEl) {
                             quotaBarEl.style.width = `${pct}%`;
                             if (pct >= 100) {
@@ -7587,12 +7662,15 @@ async function loadClaimStockSector() {
                                 if (btnClaim) {
                                     btnClaim.disabled = true;
                                     btnClaim.className = 'w-full sm:w-auto bg-slate-300 text-slate-500 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2';
-                                    btnClaim.innerHTML = '<span>🔒 ৬ ঘণ্টার ১,০০০ লিমিট পূর্ণ হয়েছে</span>';
+                                    btnClaim.innerHTML = `<span>🔒 ৬ ঘণ্টার ১,০০০ লিমিট পূর্ণ (পরবর্তী আনলক: ${unlockTimeStr || '৬ ঘণ্টা পর'})</span>`;
                                 }
-                            } else if (pct >= 80) {
-                                quotaBarEl.className = 'bg-amber-500 h-2 rounded-full transition-all duration-300';
                             } else {
-                                quotaBarEl.className = 'bg-indigo-600 h-2 rounded-full transition-all duration-300';
+                                quotaBarEl.className = pct >= 80 ? 'bg-amber-500 h-2 rounded-full transition-all duration-300' : 'bg-indigo-600 h-2 rounded-full transition-all duration-300';
+                                if (btnClaim) {
+                                    btnClaim.disabled = false;
+                                    btnClaim.className = 'w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer';
+                                    btnClaim.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                                }
                             }
                         }
                     }
@@ -8770,9 +8848,42 @@ async function loadClaimStockSector() {
         }
 
 
+                // =========================================================================
+        // QUICK SEARCH MODAL & COMPREHENSIVE FORENSIC DATA AUDIT ENGINE
         // =========================================================================
-        // UNIVERSAL NUMBER AUDIT & FORENSIC SEARCH ENGINE
-        // =========================================================================
+
+        function openQuickSearchModal(initialQuery = '') {
+            const modal = document.getElementById('quickSearchModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            const input = document.getElementById('quickModalSearchInput');
+            if (input) {
+                if (initialQuery) {
+                    input.value = initialQuery;
+                    handleQuickModalSearch();
+                } else {
+                    input.focus();
+                }
+            }
+        }
+
+        function closeQuickSearchModal() {
+            const modal = document.getElementById('quickSearchModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function clearQuickModalSearch() {
+            const input = document.getElementById('quickModalSearchInput');
+            const card = document.getElementById('quickModalResultCard');
+            const list = document.getElementById('quickModalResultList');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            if (card) card.classList.add('hidden');
+            if (list) list.innerHTML = '';
+        }
+
         function clearUniversalNumberSearch() {
             const input = document.getElementById('universalSearchInput');
             const card = document.getElementById('universalSearchResultCard');
@@ -8785,56 +8896,137 @@ async function loadClaimStockSector() {
             if (list) list.innerHTML = '';
         }
 
+        // Global Keyboard Shortcut: Press Ctrl + K or '/' to open Quick Search
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA')) {
+                e.preventDefault();
+                openQuickSearchModal();
+            } else if (e.key === 'Escape') {
+                closeQuickSearchModal();
+            }
+        });
+
+        async function handleQuickModalSearch(e) {
+            if (e) e.preventDefault();
+            const rawInput = document.getElementById('quickModalSearchInput')?.value.trim();
+            if (!rawInput) {
+                alert('অনুগ্রহ করে একটি ফোন নাম্বার অথবা ব্যক্তির নাম লিখুন।');
+                return;
+            }
+            const resCard = document.getElementById('quickModalResultCard');
+            const resList = document.getElementById('quickModalResultList');
+            const resCount = document.getElementById('quickModalResultCountBadge');
+            const resTitle = document.getElementById('quickModalResultTitle');
+            const btn = document.getElementById('btnQuickModalSearch');
+
+            await executeUniversalAuditSearch(rawInput, resCard, resList, resCount, resTitle, btn);
+        }
+
         async function handleUniversalNumberSearch(e) {
             if (e) e.preventDefault();
             const rawInput = document.getElementById('universalSearchInput')?.value.trim();
             if (!rawInput) {
-                alert('অনুগ্রহ করে একটি ফোন নাম্বার লিখুন।');
+                alert('অনুগ্রহ করে একটি ফোন নাম্বার অথবা ব্যক্তির নাম লিখুন।');
                 return;
             }
-
-            const cleanDigits = rawInput.replace(/[^0-9]/g, '');
-            const searchVal = cleanDigits || rawInput;
-
-            const btn = document.getElementById('btnUniversalSearch');
             const resCard = document.getElementById('universalSearchResultCard');
             const resList = document.getElementById('universalResultList');
             const resCount = document.getElementById('universalResultCountBadge');
             const resTitle = document.getElementById('universalResultTitle');
+            const btn = document.getElementById('btnUniversalSearch');
+
+            await executeUniversalAuditSearch(rawInput, resCard, resList, resCount, resTitle, btn);
+        }
+
+        // Unified High-Speed Multi-Sector Forensic Audit Engine
+        async function executeUniversalAuditSearch(rawQuery, resCard, resList, resCount, resTitle, btn) {
+            if (!rawQuery) return;
+            const term = rawQuery.trim();
+            const cleanDigits = term.replace(/[^0-9]/g, '');
 
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<span>⏳ অনুসন্ধান হচ্ছে...</span>';
+                btn.innerHTML = '<span>⏳ গভীর অনুসন্ধান হচ্ছে...</span>';
             }
             if (resCard) resCard.classList.remove('hidden');
-            if (resList) resList.innerHTML = '<div class="p-6 text-center text-slate-300 font-medium">⏳ ডাটাবেজের সমস্ত সেক্টরে গভীর অনুসন্ধান করা হচ্ছে...</div>';
+            if (resList) resList.innerHTML = '<div class="p-8 text-center text-slate-400 font-semibold"><div class="inline-block animate-spin text-2xl mb-2">⏳</div><br>ডাটাবেজের সমস্ত সেক্টরে (মাস্টার ডাটা, ফাইল লগ, কোম্পানি ডেলিভারি ও স্টক হিস্ট্রি) গভীর অনুসন্ধান করা হচ্ছে...</div>';
 
             try {
-                // High-Speed Concurrent Cross-Sector Search (Master Numbers, Lookups, Company Deliveries, Stock Claims)
+                // Determine search criteria based on whether input has phone digits or is a name
+                let masterQ = supabaseClient.from('master_numbers').select('*');
+                let lookupQ = supabaseClient.from('lookup_records').select('*');
+                let noInfoQ = supabaseClient.from('lookup_no_info_records').select('*');
+                let delivQ = supabaseClient.from('company_deliveries').select('*');
+                let stockQ = supabaseClient.from('company_received_numbers').select('*');
+
+                if (cleanDigits.length >= 4) {
+                    // Search by Phone OR Name
+                    masterQ = masterQ.or(`phone_number.ilike.%${cleanDigits}%,full_name.ilike.%${term}%`);
+                    lookupQ = lookupQ.or(`phone_number.ilike.%${cleanDigits}%,full_name.ilike.%${term}%`);
+                    noInfoQ = noInfoQ.or(`phone_number.ilike.%${cleanDigits}%,full_name.ilike.%${term}%`);
+                    delivQ = delivQ.or(`phone_number.ilike.%${cleanDigits}%,full_name.ilike.%${term}%,company_name.ilike.%${term}%`);
+                    stockQ = stockQ.or(`phone_number.ilike.%${cleanDigits}%,full_name.ilike.%${term}%`);
+                } else {
+                    // Search by Name or Partial text
+                    masterQ = masterQ.or(`full_name.ilike.%${term}%,username.ilike.%${term}%`);
+                    lookupQ = lookupQ.or(`full_name.ilike.%${term}%,worker_username.ilike.%${term}%`);
+                    noInfoQ = noInfoQ.or(`full_name.ilike.%${term}%,worker_username.ilike.%${term}%`);
+                    delivQ = delivQ.or(`full_name.ilike.%${term}%,company_name.ilike.%${term}%`);
+                    stockQ = stockQ.or(`full_name.ilike.%${term}%,assigned_to_username.ilike.%${term}%`);
+                }
+
                 const [masterRes, lookupRes, noInfoRes, delivRes, stockRes] = await Promise.all([
-                    supabaseClient.from('master_numbers').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
-                    supabaseClient.from('lookup_records').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
-                    supabaseClient.from('lookup_no_info_records').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
-                    supabaseClient.from('company_deliveries').select('*').ilike('phone_number', `%${searchVal}%`).limit(20),
-                    supabaseClient.from('company_received_numbers').select('*').ilike('phone_number', `%${searchVal}%`).limit(20)
+                    masterQ.limit(40),
+                    lookupQ.limit(40),
+                    noInfoQ.limit(40),
+                    delivQ.limit(40),
+                    stockQ.limit(40)
                 ]);
 
-                const masterData = masterRes.data || [];
+                let masterData = masterRes.data || [];
                 const lookupData = lookupRes.data || [];
                 const noInfoData = noInfoRes.data || [];
                 const delivData = delivRes.data || [];
                 const stockData = stockRes.data || [];
 
-                const totalFound = masterData.length + lookupData.length + noInfoData.length;
+                // If company deliveries matched a phone that isn't in masterData yet, pull its master record to see who submitted it
+                const extraDelivPhones = delivData.map(d => d.phone_number).filter(p => !masterData.some(m => m.phone_number === p));
+                if (extraDelivPhones.length > 0) {
+                    try {
+                        const { data: extraMasters } = await supabaseClient.from('master_numbers').select('*').in('phone_number', extraDelivPhones);
+                        if (extraMasters && extraMasters.length > 0) {
+                            masterData = [...masterData, ...extraMasters];
+                        }
+                    } catch (e) {
+                        console.warn('Error fetching extra master rows for deliveries:', e);
+                    }
+                }
 
-                if (resCount) resCount.innerText = `${totalFound} টি সাবমিশন রেকর্ড পাওয়া গেছে`;
-                if (resTitle) resTitle.innerText = `"${searchVal}" এর বিস্তারিত বিবরণ ও নিরীক্ষা`;
+                // Fetch upload logs to retrieve EXACT original file names for master batches
+                const uploadLogIds = [...new Set(masterData.map(r => r.upload_log_id).filter(Boolean))];
+                let uploadLogsMap = {};
+                if (uploadLogIds.length > 0) {
+                    try {
+                        const { data: logRows } = await supabaseClient
+                            .from('upload_logs')
+                            .select('id, file_name, report_type, created_at')
+                            .in('id', uploadLogIds);
+                        (logRows || []).forEach(l => { uploadLogsMap[l.id] = l; });
+                    } catch (logErr) {
+                        console.warn('Error fetching upload logs map:', logErr);
+                    }
+                }
 
-                if (totalFound === 0 && delivData.length === 0 && stockData.length === 0) {
+                const totalFound = masterData.length + lookupData.length + noInfoData.length + delivData.length + stockData.length;
+
+                if (resCount) resCount.innerText = `${totalFound} টি সম্পর্কিত রেকর্ড পাওয়া গেছে`;
+                if (resTitle) resTitle.innerText = `"${term}" এর সম্পূর্ণ গতিবিধি ও বিস্তারিত হিস্ট্রি`;
+
+                if (totalFound === 0) {
                     resList.innerHTML = `
-                        <div class="p-6 bg-white/5 rounded-2xl text-center border border-white/10 space-y-1">
-                            <p class="text-amber-400 font-bold text-sm">❌ ডাটাবেজে এই নাম্বারটি পাওয়া যায়নি!</p>
-                            <p class="text-xs text-slate-300">এই নাম্বারে এখনো কোনো কর্মী ডাটা জমা দেয়নি অথবা নাম্বারটি পূর্বে মুছে ফেলা হয়েছে।</p>
+                        <div class="p-8 bg-slate-800/80 rounded-2xl text-center border border-slate-700 space-y-2">
+                            <p class="text-amber-400 font-extrabold text-base">❌ ডাটাবেজে এই নাম বা নাম্বারের কোনো তথ্য পাওয়া যায়নি!</p>
+                            <p class="text-xs text-slate-300">এই নামে বা নাম্বারে এখনো কোনো কর্মী ডাটা জমা দেয়নি এবং কোম্পানি ডেলিভারি বা স্টকেও এটি অনুপস্থিত।</p>
                         </div>
                     `;
                     return;
@@ -8842,77 +9034,131 @@ async function loadClaimStockSector() {
 
                 let htmlContent = '';
 
-                // 1. Render Central Master Submissions (Male, Female, General)
+                // Set of phone numbers rendered in master to prevent duplicate rendering
+                const renderedPhones = new Set();
+
+                // 1. Render Master Numbers (Main Worker Submissions)
                 masterData.forEach(r => {
+                    renderedPhones.add(r.phone_number);
                     const dateObj = r.created_at ? new Date(r.created_at) : null;
                     const dateStr = dateObj ? dateObj.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : '-';
                     const timeStr = dateObj ? dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-';
 
                     const repLabels = {
-                        'male_report': { text: '👨 Male Report (পুরুষ ডাটা)', bg: 'bg-blue-600 text-white' },
                         'female_report': { text: '👩 Female Report (মহিলা ডাটা)', bg: 'bg-pink-600 text-white' },
+                        'male_report': { text: '👨 Male Report (পুরুষ ডাটা)', bg: 'bg-blue-600 text-white' },
                         'lookup_report': { text: '🔍 Lookup Report (লুকআপ ডাটা)', bg: 'bg-purple-600 text-white' }
                     };
                     const repInfo = repLabels[r.report_type] || { text: `📁 ${r.report_type || 'General'}`, bg: 'bg-slate-700 text-white' };
 
+                    // Find corresponding company delivery info
                     const deliveryItem = delivData.find(d => d.phone_number === r.phone_number);
+
+                    // Find corresponding stock claim history
                     const stockItem = stockData.find(s => s.phone_number === r.phone_number && s.is_assigned);
 
+                    // Exact file name from record or upload_logs
+                    const fileName = r.file_name || uploadLogsMap[r.upload_log_id]?.file_name || (r.upload_log_id ? `Batch #${r.upload_log_id}` : 'সরাসরি টেক্সট পেস্ট (Direct Text)');
+                    const workerName = r.username || userEmailToNameMap[r.user_email] || r.user_email?.split('@')[0] || 'Unknown Worker';
+
                     htmlContent += `
-                        <div class="bg-white rounded-2xl p-5 text-slate-900 border-2 border-indigo-300 shadow-md space-y-3.5">
-                            <!-- Header: Phone, Gender Badge & Delivery Status -->
-                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="text-xl">📱</span>
-                                    <span class="font-mono text-base sm:text-xl font-black text-indigo-950">${r.phone_number}</span>
-                                    <span class="text-xs font-black px-3 py-1 rounded-xl ${repInfo.bg} shadow-xs">${repInfo.text}</span>
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 text-slate-900 border-2 border-indigo-300 shadow-lg space-y-4 animate-in fade-in duration-150">
+                            <!-- Header: Phone, Identity, Category & Delivery Status -->
+                            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl font-black shadow-xs flex-shrink-0">
+                                        📱
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-mono text-base sm:text-xl font-black text-indigo-950">${r.phone_number}</span>
+                                            <button type="button" onclick="navigator.clipboard.writeText('${r.phone_number}'); alert('নাম্বার কপি হয়েছে: ${r.phone_number}');" class="text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md transition border border-slate-200 cursor-pointer" title="কপি করুন">
+                                                📋 কপি
+                                            </button>
+                                        </div>
+                                        <div class="text-xs text-slate-600 mt-0.5 flex flex-wrap items-center gap-2">
+                                            <span>ব্যক্তির নাম: <strong class="text-slate-900 font-extrabold">${r.full_name || 'নাম নেই'}</strong></span>
+                                            <span>•</span>
+                                            <span>বয়স: <strong class="text-slate-900 font-extrabold">${r.age ? `${r.age} বছর` : 'উল্লেখ নেই'}</strong></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex items-center space-x-2">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs font-black px-3 py-1 rounded-xl ${repInfo.bg} shadow-xs">${repInfo.text}</span>
                                     ${deliveryItem 
-                                        ? `<span class="text-xs font-bold bg-amber-100 text-amber-950 border border-amber-300 px-3 py-1 rounded-xl">🏢 কোম্পানিকে দেওয়া হয়েছে (${deliveryItem.delivery_date})</span>` 
-                                        : '<span class="text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-xl">🟢 কোম্পানিকে দেওয়া হয়নি (ফ্রেশ)</span>'}
+                                        ? `<span class="text-xs font-black bg-amber-100 text-amber-950 border border-amber-300 px-3 py-1 rounded-xl flex items-center space-x-1"><span>🏢</span><span>কোম্পানিকে হস্তান্তর হয়েছে (${deliveryItem.delivery_date})</span></span>` 
+                                        : '<span class="text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-xl flex items-center space-x-1"><span>🟢</span><span>কোম্পানিকে এখনও দেওয়া হয়নি (ফ্রেশ)</span></span>'}
                                 </div>
                             </div>
 
                             <!-- 4-Column Detailed Inspection Cards -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                                <!-- 1. কে জমা দিয়েছে -->
+                                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                                     <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">👤 কে জমা দিয়েছে (Worker):</span>
-                                    <span class="font-black text-slate-900 text-sm block">${r.username || userEmailToNameMap[r.user_email] || r.user_email?.split('@')[0] || 'Unknown'}</span>
+                                    <span class="font-black text-slate-900 text-sm block truncate">${workerName}</span>
                                     <span class="text-[11px] text-slate-500 font-mono block truncate">${r.user_email || '-'}</span>
+                                    <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-bold inline-block mt-0.5">Dept: ${r.department || 'gender_verify'}</span>
                                 </div>
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+
+                                <!-- 2. কোন ফাইলে দিয়েছে -->
+                                <div class="p-3.5 bg-indigo-50/70 rounded-xl border border-indigo-200 space-y-1">
+                                    <span class="text-indigo-800 font-bold block text-[11px] uppercase tracking-wider">📁 কোন ফাইলে দিয়েছে (File/Batch):</span>
+                                    <span class="font-black text-indigo-950 text-xs sm:text-sm block break-all font-mono leading-tight">📄 ${fileName}</span>
+                                    <span class="text-[10px] text-indigo-600 font-semibold block">লগ আইডি: #${r.upload_log_id || 'Direct'}</span>
+                                </div>
+
+                                <!-- 3. কবে ও কখন দিয়েছে -->
+                                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                                     <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">📅 জমা দেওয়ার তারিখ ও সময়:</span>
                                     <span class="font-bold text-slate-900 text-xs block">🕒 ${dateStr}</span>
-                                    <span class="text-[11px] text-indigo-700 font-semibold block">সময়: ${timeStr} | ডিপার্টমেন্ট: ${r.department || 'gender_verify'}</span>
+                                    <span class="text-[11px] text-indigo-700 font-bold block">সময়: ${timeStr}</span>
+                                    <span class="text-[10px] text-slate-400 block">ডাটাবেজ রেকর্ড আইডি: #${r.id}</span>
                                 </div>
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                                    <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">📝 নাম ও বয়স (Name & Age):</span>
-                                    <span class="font-black text-slate-900 text-sm block">${r.full_name || 'নাম নেই'}</span>
-                                    <span class="text-[11px] text-slate-600 block">বয়স: ${r.age ? `${r.age} বছর` : 'উল্লেখ নেই'}</span>
-                                </div>
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                                    <span class="text-slate-500 font-bold block text-[11px] uppercase tracking-wider">🎁 স্টক থেকে নেওয়ার হিস্ট্রি:</span>
-                                    <span class="font-bold text-slate-900 text-xs block">
-                                        ${stockItem ? `👤 ${stockItem.assigned_to_username || stockItem.assigned_to_email}` : 'সরাসরি আপলোড'}
-                                    </span>
-                                    <span class="text-[11px] text-slate-500 block">
-                                        ${stockItem?.assigned_at ? `নেওয়ার তারিখ: ${new Date(stockItem.assigned_at).toLocaleDateString()}` : 'স্টক ছাড়া'}
-                                    </span>
+
+                                <!-- 4. কোম্পানিকে কোথায় ও কবে দেওয়া হয়েছে -->
+                                <div class="p-3.5 ${deliveryItem ? 'bg-amber-50/90 border-amber-300' : 'bg-emerald-50/90 border-emerald-300'} rounded-xl border space-y-1.5">
+                                    <span class="${deliveryItem ? 'text-amber-900' : 'text-emerald-900'} font-bold block text-[11px] uppercase tracking-wider">🏢 কোম্পানি ডেলিভারি স্ট্যাটাস:</span>
+                                    ${deliveryItem ? `
+                                        <div class="space-y-0.5">
+                                            <span class="font-black text-amber-950 text-xs block">✅ হস্তান্তর সম্পন্ন</span>
+                                            <span class="text-[11px] text-amber-900 font-bold block">তারিখ: ${deliveryItem.delivery_date}</span>
+                                            <span class="text-[11px] text-amber-950 block">কোম্পানি: <strong>${deliveryItem.company_name || 'Company'}</strong></span>
+                                            <span class="text-[10px] text-amber-800 font-mono block truncate">ফাইল/ব্যাচ: ${deliveryItem.batch_name || '-'}</span>
+                                        </div>
+                                    ` : `
+                                        <div class="space-y-0.5">
+                                            <span class="font-black text-emerald-950 text-xs block">🟢 এখনও দেওয়া হয়নি</span>
+                                            <span class="text-[11px] text-emerald-800 block leading-tight">কোম্পানির কাছে হস্তান্তর করা হয়নি (ফ্রেশ মজুদ রয়েছে)।</span>
+                                        </div>
+                                    `}
                                 </div>
                             </div>
 
-                            <!-- Actions for this Wrong Entry -->
+                            <!-- Additional Card: Received Stock History if this number was claimed from company stock -->
+                            ${stockItem ? `
+                                <div class="p-3.5 bg-purple-50/70 rounded-xl border border-purple-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-base">🎁</span>
+                                        <div>
+                                            <span class="font-bold text-purple-950 block">কোম্পানির স্টক থেকে সংগ্রহের হিস্ট্রি:</span>
+                                            <span class="text-[11px] text-purple-800">কর্মী: <strong>${stockItem.assigned_to_username || stockItem.assigned_to_email}</strong> | তোলার সময়: ${stockItem.assigned_at ? new Date(stockItem.assigned_at).toLocaleString() : '-'} | স্টক ব্যাচ: ${stockItem.batch_name || 'Company Stock'}</span>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] bg-purple-200 text-purple-900 font-bold px-2 py-0.5 rounded-md whitespace-nowrap self-start sm:self-auto">স্টক থেকে নেওয়া ডাটা</span>
+                                </div>
+                            ` : ''}
+
+                            <!-- Actions for this Entry -->
                             <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 bg-slate-50/50 p-3 rounded-xl">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-xs font-black text-slate-700">ভুল হলে সঠিক ক্যাটাগরি বেছে নিন:</span>
+                                    <span class="text-xs font-black text-slate-700">ভুল হলে ক্যাটাগরি পরিবর্তন করুন:</span>
                                     <select onchange="adminQuickChangeCategory('${r.id}', this.value, '${r.phone_number}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-indigo-300 bg-white text-slate-900 cursor-pointer focus:ring-2 focus:ring-indigo-500">
-                                        <option value="male_report" ${r.report_type === 'male_report' ? 'selected' : ''}>👨 1. Male Report-এ স্থানান্তর করুন</option>
-                                        <option value="female_report" ${r.report_type === 'female_report' ? 'selected' : ''}>👩 2. Female Report-এ স্থানান্তর করুন</option>
-                                        <option value="lookup_report" ${r.report_type === 'lookup_report' ? 'selected' : ''}>🔍 3. Lookup Report-এ স্থানান্তর করুন</option>
+                                        <option value="female_report" ${r.report_type === 'female_report' ? 'selected' : ''}>👩 1. Female Report-এ স্থানান্তর করুন</option>
+                                        <option value="lookup_report" ${r.report_type === 'lookup_report' ? 'selected' : ''}>🔍 2. Lookup Report-এ স্থানান্তর করুন</option>
                                     </select>
                                 </div>
-                                <button type="button" onclick="adminQuickDeleteRecord('${r.id}', '${r.phone_number}')" class="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5">
+                                <button type="button" onclick="adminQuickDeleteRecord('${r.id}', '${r.phone_number}')" class="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 cursor-pointer">
                                     <span>🗑️ ভুল রেকর্ডটি মুছে ফেলুন (Delete)</span>
                                 </button>
                             </div>
@@ -8920,34 +9166,89 @@ async function loadClaimStockSector() {
                     `;
                 });
 
-                // 2. Render Lookup Sector Records
+                // 2. Render Lookup Sector Records (if not already rendered in master)
                 lookupData.forEach(r => {
+                    if (renderedPhones.has(r.phone_number)) return;
+                    renderedPhones.add(r.phone_number);
+                    const deliveryItem = delivData.find(d => d.phone_number === r.phone_number);
+
                     htmlContent += `
-                        <div class="bg-white rounded-2xl p-5 text-slate-900 border-2 border-purple-300 shadow-md space-y-3">
-                            <div class="flex items-center justify-between border-b pb-2">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-xl">🔍</span>
-                                    <span class="font-mono text-lg font-black text-purple-950">${r.phone_number}</span>
-                                    <span class="text-xs font-black px-2.5 py-1 rounded-md bg-purple-600 text-white">Valid Lookup Record</span>
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 text-slate-900 border-2 border-purple-300 shadow-md space-y-4 animate-in fade-in duration-150">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-purple-100 pb-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">🔍</span>
+                                    <div>
+                                        <span class="font-mono text-lg sm:text-xl font-black text-purple-950">${r.phone_number}</span>
+                                        <div class="text-xs text-slate-600">নাম: <strong class="text-slate-900">${r.full_name || 'নাম নেই'}</strong> | বয়স: <strong class="text-slate-900">${r.age || 'উল্লেখ নেই'}</strong></div>
+                                    </div>
                                 </div>
-                                <span class="text-xs font-bold text-purple-800">📅 জমা দেওয়ার তারিখ: ${r.submission_date}</span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-black px-3 py-1 rounded-xl bg-purple-600 text-white shadow-xs">Valid Lookup Record</span>
+                                    ${deliveryItem 
+                                        ? `<span class="text-xs font-bold bg-amber-100 text-amber-950 border border-amber-300 px-3 py-1 rounded-xl">🏢 কোম্পানিকে দেওয়া হয়েছে (${deliveryItem.delivery_date})</span>` 
+                                        : '<span class="text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-xl">🟢 কোম্পানিকে এখনও দেওয়া হয়নি</span>'}
+                                </div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                                <div class="p-3 bg-purple-50 rounded-xl">
-                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">কর্মী:</span>
-                                    <span class="font-bold text-slate-900 text-sm">${r.worker_username || r.worker_email}</span>
+                                <div class="p-3 bg-purple-50/80 rounded-xl border border-purple-200">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">👤 জমা দিয়েছে (Worker):</span>
+                                    <span class="font-black text-slate-900 text-sm block truncate">${r.worker_username || r.worker_email}</span>
+                                    <span class="text-[11px] text-slate-500 font-mono block truncate">${r.worker_email || '-'}</span>
                                 </div>
-                                <div class="p-3 bg-purple-50 rounded-xl">
-                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">গৃহস্থালি আয়:</span>
-                                    <span class="font-black text-purple-900 text-sm">${r.household_income || '-'}</span>
+                                <div class="p-3 bg-purple-50/80 rounded-xl border border-purple-200">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">💰 গৃহস্থালি আয় (Income):</span>
+                                    <span class="font-black text-purple-900 text-sm block">${r.household_income || '-'}</span>
+                                    <span class="text-[11px] text-slate-500 block">মার্কেট ভ্যালু: ${r.est_market_value || '-'}</span>
                                 </div>
-                                <div class="p-3 bg-purple-50 rounded-xl">
-                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">মার্কেট ভ্যালু:</span>
-                                    <span class="font-black text-purple-900 text-sm">${r.est_market_value || '-'}</span>
+                                <div class="p-3 bg-purple-50/80 rounded-xl border border-purple-200">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">📅 জমা দেওয়ার তারিখ:</span>
+                                    <span class="font-bold text-slate-900 text-xs block">${r.submission_date}</span>
+                                    <span class="text-[11px] text-slate-500 block">তৈরি: ${r.created_at ? new Date(r.created_at).toLocaleTimeString() : '-'}</span>
                                 </div>
-                                <div class="p-3 bg-purple-50 rounded-xl">
-                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">নাম ও বয়স:</span>
-                                    <span class="font-bold text-slate-900">${r.full_name || '-'} (${r.age || '-'})</span>
+                                <div class="p-3 ${deliveryItem ? 'bg-amber-50 border-amber-300' : 'bg-emerald-50 border-emerald-300'} rounded-xl border">
+                                    <span class="${deliveryItem ? 'text-amber-900' : 'text-emerald-900'} font-bold block text-[11px] uppercase">🏢 কোম্পানি ডেলিভারি:</span>
+                                    ${deliveryItem ? `
+                                        <span class="font-bold text-amber-950 block">${deliveryItem.company_name || 'Company'} (${deliveryItem.delivery_date})</span>
+                                        <span class="text-[10px] text-amber-800 font-mono block truncate">ব্যাচ: ${deliveryItem.batch_name || '-'}</span>
+                                    ` : `
+                                        <span class="font-bold text-emerald-900 block">🟢 এখনও হস্তান্তর করা হয়নি</span>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 3. Render Standalone Company Deliveries (if not already rendered in master or lookup)
+                delivData.forEach(d => {
+                    if (renderedPhones.has(d.phone_number)) return;
+                    renderedPhones.add(d.phone_number);
+
+                    htmlContent += `
+                        <div class="bg-white rounded-2xl p-5 sm:p-6 text-slate-900 border-2 border-amber-300 shadow-md space-y-3 animate-in fade-in duration-150">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl">🏢</span>
+                                    <div>
+                                        <span class="font-mono text-lg sm:text-xl font-black text-amber-950">${d.phone_number}</span>
+                                        <span class="text-xs text-slate-600 block">ব্যক্তি: <strong class="text-slate-900">${d.full_name || 'নাম নেই'}</strong> (${d.age ? d.age + ' বছর' : '-'})</span>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-black bg-amber-400 text-slate-950 px-3 py-1 rounded-xl shadow-xs">🏢 ডেলিভারি রেকর্ড (Company Delivery)</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">🏢 কোন কোম্পানিকে দেওয়া হয়েছে:</span>
+                                    <span class="font-black text-amber-950 text-sm block">${d.company_name || 'Company'}</span>
+                                </div>
+                                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">📅 ডেলিভারির তারিখ:</span>
+                                    <span class="font-black text-slate-900 text-sm block">${d.delivery_date}</span>
+                                    <span class="text-[11px] text-amber-800 font-mono block">ফাইল: ${d.batch_name || '-'}</span>
+                                </div>
+                                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                                    <span class="text-slate-500 font-bold block text-[11px] uppercase">🏷️ ক্যাটাগরি:</span>
+                                    <span class="font-bold text-indigo-900 text-xs block">${d.category || 'General'}</span>
                                 </div>
                             </div>
                         </div>
@@ -8957,16 +9258,16 @@ async function loadClaimStockSector() {
                 resList.innerHTML = htmlContent;
 
             } catch (err) {
-                console.error('Universal search error:', err);
+                console.error('Universal forensic search error:', err);
                 resList.innerHTML = `<div class="p-4 bg-rose-50 text-rose-800 rounded-xl text-xs font-bold">অনুসন্ধানে সমস্যা হয়েছে: ${err.message}</div>`;
             } finally {
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = '<span>🔍 গভীর অনুসন্ধান (Search)</span>';
+                    btn.innerHTML = '<span>⚡ গভীর অনুসন্ধান (Search)</span>';
                 }
             }
         }
-
+        
         async function adminQuickChangeCategory(recordId, newType, phone) {
             const labelMap = {
                 'male_report': '👨 Male Report',
