@@ -283,7 +283,42 @@
                 </div>
             </div>
 
-                        <!-- 1B. DAILY TARGET TRACKER (দৈনিক ২৭০ নাম্বার টার্গেট: ২৭০ ফিমেল) -->
+                        <!-- 1A. NEW MONTH GREETING & MOTIVATION BANNER (1st to 3rd of every month) -->
+            <div id="newMonthGreetingBanner" class="hidden bg-gradient-to-r from-purple-800 via-indigo-700 to-pink-700 rounded-2xl shadow-xl p-5 sm:p-6 text-white border-2 border-amber-300 relative overflow-hidden animate-in fade-in duration-300">
+                <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/5 rounded-full pointer-events-none"></div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-3xl animate-bounce">🎉</span>
+                            <h3 class="text-lg sm:text-2xl font-black text-amber-300">
+                                নতুন মাসের আন্তরিক শুভেচ্ছা ও শুভকামনা!
+                            </h3>
+                            <span id="greetingCurMonthBadge" class="text-xs bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded-full shadow-xs">Welcome New Month!</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-indigo-100 font-medium leading-relaxed max-w-3xl">
+                            নতুন মাস শুরু, নতুন উদ্যমে শুরু হোক আপনার নতুন পথচলা! বিগত মাসের ভুল-ভ্রান্তি পেছনে ফেলে নতুন লক্ষ্য নিয়ে কাজ শুরু করুন। প্রতিদিনের ২৭০টি ফিমেল নাম্বারের টার্গেট সময়মতো পূরণ করে সেরা পারফর্মার হিসেবে নিজেকে প্রতিষ্ঠিত করুন!
+                        </p>
+                        <div class="flex flex-wrap items-center gap-2 pt-1">
+                            <div class="text-xs font-semibold bg-white/10 border border-white/20 px-3.5 py-1.5 rounded-xl flex items-center space-x-2">
+                                <span>📊 গত মাসে আপনার মোট কাজ ছিল:</span>
+                                <strong id="greetingLastMonthCount" class="text-amber-300 font-black text-sm">0</strong>
+                                <span>টি ইউনিক নাম্বার</span>
+                            </div>
+                            <span class="text-[11px] text-pink-200 bg-pink-500/30 border border-pink-400/40 px-2.5 py-1 rounded-lg font-bold">
+                                🚀 এই মাসে নতুন রেকর্ড গড়ুন!
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start md:self-auto flex-shrink-0">
+                        <button type="button" onclick="dismissNewMonthBanner()" class="text-xs text-indigo-200 hover:text-white px-3 py-2 rounded-xl hover:bg-white/10 transition border border-white/10 flex items-center space-x-1 cursor-pointer" title="ব্যানারটি আপাতত সরিয়ে রাখুন">
+                            <span>লুকিয়ে রাখুন</span>
+                            <span>✕</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1B. DAILY TARGET TRACKER (দৈনিক ২৭০ নাম্বার টার্গেট: ২৭০ ফিমেল) -->
             <div id="workerTargetTrackerCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
                 <!-- Header & Overall Status -->
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
@@ -349,22 +384,46 @@
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-emerald-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Valid Unique</p>
-                    <p id="statUserTodayUnique" class="text-3xl font-extrabold text-emerald-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Numbers saved to portal</p>
+            <!-- Stats Grid (Current Month 1-30/31, Today's Valid, Duplicates, All-Time) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <!-- 1. This Month's Work (1st to 30/31 of current month) -->
+                <div class="bg-white rounded-2xl shadow-sm p-5 sm:p-6 border border-slate-200 border-t-4 border-t-purple-600 relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-black text-purple-700 uppercase tracking-wider">This Month's Work</p>
+                        <span id="statUserThisMonthBadge" class="text-[10px] font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded-full">চলতি মাস</span>
+                    </div>
+                    <p id="statUserThisMonthUnique" class="text-3xl sm:text-4xl font-black text-purple-700 mt-2">0</p>
+                    <p id="statUserThisMonthRange" class="text-xs text-slate-400 mt-1 font-medium">১ - ৩১ তারিখ সাইকেল</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-amber-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Duplicates Filtered</p>
-                    <p id="statUserTodayDuplicates" class="text-3xl font-extrabold text-amber-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Discarded automatically</p>
+
+                <!-- 2. Today's Valid Unique -->
+                <div class="bg-white rounded-2xl shadow-sm p-5 sm:p-6 border border-slate-200 border-t-4 border-t-emerald-500 relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-black text-emerald-700 uppercase tracking-wider">Today's Valid</p>
+                        <span class="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full">আজকের ইউনিক</span>
+                    </div>
+                    <p id="statUserTodayUnique" class="text-3xl sm:text-4xl font-black text-emerald-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1 font-medium">দৈনিক লক্ষ্য: ২৭০ টি</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 border-t-4 border-t-indigo-500">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Your All-Time Total</p>
-                    <p id="statUserAllTime" class="text-3xl font-extrabold text-indigo-600 mt-2">0</p>
-                    <p class="text-xs text-slate-400 mt-1">Unique records contributed</p>
+
+                <!-- 3. Today's Duplicates Filtered -->
+                <div class="bg-white rounded-2xl shadow-sm p-5 sm:p-6 border border-slate-200 border-t-4 border-t-amber-500 relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-black text-amber-700 uppercase tracking-wider">Today's Duplicates</p>
+                        <span class="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">বাদ পড়েছে</span>
+                    </div>
+                    <p id="statUserTodayDuplicates" class="text-3xl sm:text-4xl font-black text-amber-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1 font-medium">Discarded automatically</p>
+                </div>
+
+                <!-- 4. All-Time Total -->
+                <div class="bg-white rounded-2xl shadow-sm p-5 sm:p-6 border border-slate-200 border-t-4 border-t-indigo-600 relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-black text-indigo-700 uppercase tracking-wider">Your All-Time Total</p>
+                        <span class="text-[10px] font-bold bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded-full">সর্বমোট কাজ</span>
+                    </div>
+                    <p id="statUserAllTime" class="text-3xl sm:text-4xl font-black text-indigo-600 mt-2">0</p>
+                    <p class="text-xs text-slate-400 mt-1 font-medium">Unique records contributed</p>
                 </div>
             </div>
 
@@ -380,6 +439,98 @@
                 <button type="button" onclick="switchToSection('claim_stock')" class="bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-1.5 flex-shrink-0">
                     <span>স্টক থেকে নাম্বার নিন ➔</span>
                 </button>
+            </div>
+
+            <!-- 1C. MONTHLY PERFORMANCE & HISTORY ARCHIVE (পূর্ববর্তী ও চলতি মাসের বিস্তারিত হিসাব) -->
+            <div id="workerMonthlyHistoryCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-black shadow-xs flex-shrink-0">
+                            📅
+                        </div>
+                        <div>
+                            <h3 class="font-black text-base sm:text-lg text-slate-800 flex items-center space-x-2">
+                                <span>মাসভিত্তিক কাজের রিপোর্ট ও আর্কাইভ (Monthly History)</span>
+                                <span class="text-xs bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">১-৩০/৩১ সাইকেল</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                চলতি মাস ও পূর্ববর্তী মাসসমূহে আপনি কতগুলো কাজ করেছেন তার বিস্তারিত হিসাব ও দিনভিত্তিক বিবরণী।
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Month Selector and Export Button -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="workerMonthFilterSelect" onchange="renderWorkerSelectedMonthHistory(this.value)" class="text-xs font-bold bg-slate-50 text-slate-800 border-2 border-purple-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-purple-400 cursor-pointer">
+                            <!-- Dynamically populated with options like: চলতি মাস (October 2026), গত মাস (September 2026)... -->
+                        </select>
+                        <button type="button" onclick="exportWorkerSelectedMonthExcel()" class="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1 cursor-pointer" title="নির্বাচিত মাসের কাজের এক্সেল স্টেটমেন্ট ডাউনলোড করুন">
+                            <span>📥 এক্সেল ডাউনলোড</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Selected Month Summary Stat Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div class="p-3.5 bg-purple-50/70 rounded-xl border border-purple-200">
+                        <span class="text-[11px] font-bold text-purple-900 uppercase block">মোট ইউনিক ডাটা</span>
+                        <span id="mHistTotalUnique" class="text-xl sm:text-2xl font-black text-purple-950 mt-1 block">0</span>
+                        <span class="text-[10px] text-purple-600 block">সফল ভেরিফাইড</span>
+                    </div>
+                    <div class="p-3.5 bg-rose-50/70 rounded-xl border border-rose-200">
+                        <span class="text-[11px] font-bold text-rose-900 uppercase block">ফিমেল ডাটা (৪৩+)</span>
+                        <span id="mHistFemaleCount" class="text-xl sm:text-2xl font-black text-rose-900 mt-1 block">0</span>
+                        <span class="text-[10px] text-rose-600 block">Female Reports</span>
+                    </div>
+                    <div class="p-3.5 bg-indigo-50/70 rounded-xl border border-indigo-200">
+                        <span class="text-[11px] font-bold text-indigo-900 uppercase block">লুকআপ ডাটা</span>
+                        <span id="mHistLookupCount" class="text-xl sm:text-2xl font-black text-indigo-900 mt-1 block">0</span>
+                        <span class="text-[10px] text-indigo-600 block">Lookup Reports</span>
+                    </div>
+                    <div class="p-3.5 bg-amber-50/70 rounded-xl border border-amber-200">
+                        <span class="text-[11px] font-bold text-amber-900 uppercase block">ফিল্টার্ড ডুপ্লিকেট</span>
+                        <span id="mHistDupCount" class="text-xl sm:text-2xl font-black text-amber-900 mt-1 block">0</span>
+                        <span class="text-[10px] text-amber-600 block">বাদ পড়েছে</span>
+                    </div>
+                    <div class="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200">
+                        <span class="text-[11px] font-bold text-emerald-900 uppercase block">সক্রিয় কর্মদিবস</span>
+                        <span id="mHistActiveDays" class="text-xl sm:text-2xl font-black text-emerald-900 mt-1 block">0 দিন</span>
+                        <span class="text-[10px] text-emerald-600 block">কাজের দিন</span>
+                    </div>
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-700 uppercase block">দৈনিক গড় কাজ</span>
+                        <span id="mHistDailyAvg" class="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">0</span>
+                        <span class="text-[10px] text-slate-500 block">প্রতি কর্মদিবসে</span>
+                    </div>
+                </div>
+
+                <!-- Day-by-Day Performance Table for Selected Month -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+                            <span>🗓️ দিনভিত্তিক বিস্তারিত কাজের হিসাব:</span>
+                            <span id="mHistMonthTitle" class="text-purple-700 font-bold lowercase"></span>
+                        </h4>
+                        <span id="mHistDayCountBadge" class="text-[11px] bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded">0 দিন রেকর্ড</span>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-[350px]">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 font-bold uppercase text-[10px] sticky top-0 border-b border-slate-200 z-10">
+                                <tr>
+                                    <th class="py-2.5 px-3">তারিখ (Date)</th>
+                                    <th class="py-2.5 px-3">মোট ফাইল (Files)</th>
+                                    <th class="py-2.5 px-3 text-emerald-600">ইউনিক সফল (Valid)</th>
+                                    <th class="py-2.5 px-3 text-rose-600">ফিমেল (Female 43+)</th>
+                                    <th class="py-2.5 px-3 text-indigo-600">লুকআপ (Lookup)</th>
+                                    <th class="py-2.5 px-3 text-amber-600">ডুপ্লিকেট (Duplicates)</th>
+                                    <th class="py-2.5 px-3 text-center">টার্গেট স্ট্যাটাস</th>
+                                </tr>
+                            </thead>
+                            <tbody id="workerMonthlyDayTableBody" class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <!-- JavaScript dynamically renders day rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
 
@@ -2497,6 +2648,47 @@
         </div>
     </div>
 
+        <!-- Modal: New Month Welcome & Motivation Popup (Days 1 to 3) -->
+    <div id="newMonthWelcomeModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+        <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 text-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-amber-300/80 p-6 sm:p-8 space-y-6 text-center relative overflow-hidden my-6">
+            <div class="absolute -top-12 -left-12 w-36 h-36 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-pink-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-amber-400 to-pink-500 text-slate-950 flex items-center justify-center text-4xl shadow-xl transform rotate-3">
+                🎉
+            </div>
+
+            <div class="space-y-2">
+                <span id="modalWelcomeBadge" class="text-xs font-black bg-amber-400 text-slate-950 px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    New Month Beginning!
+                </span>
+                <h3 class="text-xl sm:text-2xl font-black text-amber-300">
+                    নতুন মাসের আন্তরিক শুভেচ্ছা ও শুভকামনা!
+                </h3>
+                <p class="text-xs sm:text-sm text-indigo-100 leading-relaxed font-medium">
+                    নতুন মাস শুরু, নতুন উদ্যমে শুরু হোক আপনার কাজ! বিগত মাসের ক্লান্তি ও ভুল পেছনে ফেলে এই মাসে নিজেকে নতুনভাবে প্রমাণ করুন। প্রতিদিনের কাজ প্রতিদিন শেষ করে নিজের সেরাটা দিন!
+                </p>
+            </div>
+
+            <div class="bg-white/10 rounded-2xl p-4 border border-white/15 text-xs text-left space-y-2">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                    <span class="text-indigo-200 font-semibold">বিগত মাসে আপনার মোট অবদান:</span>
+                    <strong id="modalLastMonthCount" class="text-amber-300 text-base font-black">0 টি</strong>
+                </div>
+                <p class="text-[11px] text-pink-200 leading-relaxed">
+                    💡 <strong>মাসের ৩টি গোল্ডেন টিপস:</strong><br>
+                    ১. প্রতিদিনের ২৭০টি ফিমেল নাম্বারের টার্গেট সময়মতো পূরণ করুন।<br>
+                    ২. প্রতি ৬ ঘণ্টা পর পর কোম্পানির স্টক থেকে নতুন নাম্বার সংগ্রহ করুন।<br>
+                    ৩. ফিমেল ডাটার বয়স অবশ্যই ৪৩+ হতে হবে (কম বয়সীদের বাদ দিন)।
+                </p>
+            </div>
+
+            <button type="button" onclick="closeNewMonthWelcomeModal()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-sm sm:text-base py-3.5 px-6 rounded-2xl shadow-xl transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+                <span>🚀 চলেন নতুন উদ্যমে শুরু করি!</span>
+            </button>
+        </div>
+    </div>
+
     </main>
 
     <!-- Application JavaScript Logic -->
@@ -2931,74 +3123,234 @@ function setupWorkerReportOptions(dept) {
         // ==========================================
         // WORKER SUBMISSIONS (PHONE, NAME, AGE)
         // ==========================================
+        // Global Cache for Monthly Analytics
+        let workerMonthlyArchive = {};
+        let currentWorkerSelectedMonthKey = '';
+
+        function openNewMonthWelcomeModal(curMonthName, curYear, lastMonthName, lastMonthCount) {
+            const modal = document.getElementById('newMonthWelcomeModal');
+            if (!modal) return;
+            const badge = document.getElementById('modalWelcomeBadge');
+            if (badge) badge.innerText = `Welcome ${curMonthName} ${curYear}!`;
+            const lastCnt = document.getElementById('modalLastMonthCount');
+            if (lastCnt) lastCnt.innerText = `${(lastMonthCount || 0).toLocaleString()} টি`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeNewMonthWelcomeModal() {
+            const modal = document.getElementById('newMonthWelcomeModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function dismissNewMonthBanner() {
+            const banner = document.getElementById('newMonthGreetingBanner');
+            if (banner) banner.classList.add('hidden');
+        }
+
         async function loadUserDashboard() {
             if (!supabaseClient || !currentUser) return;
-            const todayStart = new Date();
-            todayStart.setHours(0,0,0,0);
+
+            const now = new Date();
+            const curYear = now.getFullYear();
+            const curMonth = now.getMonth(); // 0 = Jan ... 8 = Sep, 9 = Oct
+            const dayOfMonth = now.getDate(); // 1 to 31
+
+            const todayStart = new Date(curYear, curMonth, dayOfMonth, 0, 0, 0, 0);
             const todayIso = todayStart.toISOString();
+
+            // Dynamic Month Bounds (1st to 30 or 31)
+            const curMonthStart = new Date(curYear, curMonth, 1, 0, 0, 0, 0);
+            const curMonthEnd = new Date(curYear, curMonth + 1, 0, 23, 59, 59, 999);
+            const curMonthDays = curMonthEnd.getDate(); // 28, 29, 30, or 31
+
+            const lastMonthIndex = (curMonth + 11) % 12;
+            const lastMonthYear = curMonth === 0 ? curYear - 1 : curYear;
+            const lastMonthStart = new Date(lastMonthYear, lastMonthIndex, 1, 0, 0, 0, 0);
+            const lastMonthEnd = new Date(curYear, curMonth, 0, 23, 59, 59, 999);
+            const lastMonthDays = lastMonthEnd.getDate();
+
+            const curMonthStartIso = curMonthStart.toISOString();
+            const curMonthEndIso = curMonthEnd.toISOString();
+            const lastMonthStartIso = lastMonthStart.toISOString();
+            const lastMonthEndIso = lastMonthEnd.toISOString();
+
+            const monthNamesBn = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+            const curMonthNameBn = monthNamesBn[curMonth];
+            const lastMonthNameBn = monthNamesBn[lastMonthIndex];
+
+            const curMonthKey = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+            const lastMonthKey = `${lastMonthYear}-${String(lastMonthIndex + 1).padStart(2, '0')}`;
 
             // Refresh available stock count for worker
             loadWorkerClaimStockCount();
 
+            // Fetch all user upload logs to build monthly performance & historical archive
             const { data: logs } = await supabaseClient
                 .from('upload_logs')
                 .select('*')
                 .eq('user_id', currentUser.id)
-                .gte('created_at', todayIso)
                 .order('created_at', { ascending: false });
 
             let todayUnique = 0;
             let todayDuplicates = 0;
             let todayFemaleDone = 0;
             let todayMaleDone = 0;
+
+            let thisMonthUnique = 0;
+            let thisMonthDuplicates = 0;
+            let lastMonthUnique = 0;
+
+            // Reset monthly archive
+            workerMonthlyArchive = {};
+            workerMonthlyArchive[curMonthKey] = {
+                key: curMonthKey,
+                label: `চলতি মাস: ${curMonthNameBn} ${curYear} (১-${curMonthDays} তারিখ)`,
+                year: curYear,
+                month: curMonth,
+                totalUnique: 0,
+                femaleCount: 0,
+                lookupCount: 0,
+                dupCount: 0,
+                days: {}
+            };
+            workerMonthlyArchive[lastMonthKey] = {
+                key: lastMonthKey,
+                label: `গত মাস: ${lastMonthNameBn} ${lastMonthYear} (১-${lastMonthDays} তারিখ)`,
+                year: lastMonthYear,
+                month: lastMonthIndex,
+                totalUnique: 0,
+                femaleCount: 0,
+                lookupCount: 0,
+                dupCount: 0,
+                days: {}
+            };
+
             const historyBody = document.getElementById('userUploadHistoryBody');
+            if (historyBody) historyBody.innerHTML = '';
+
+            let todayLogsCount = 0;
 
             if (logs && logs.length > 0) {
-                historyBody.innerHTML = '';
                 logs.forEach(log => {
-                    todayUnique += log.new_inserted;
-                    todayDuplicates += log.duplicates_count;
-                    if (log.report_type === 'female_report') {
-                        todayFemaleDone += log.new_inserted;
-                    } else if (log.report_type === 'male_report') {
-                        todayMaleDone += log.new_inserted;
+                    const dt = new Date(log.created_at);
+                    const lYear = dt.getFullYear();
+                    const lMonth = dt.getMonth();
+                    const mKey = `${lYear}-${String(lMonth + 1).padStart(2, '0')}`;
+                    const dKey = dt.toISOString().split('T')[0];
+
+                    if (!workerMonthlyArchive[mKey]) {
+                        const mLabel = `${monthNamesBn[lMonth]} ${lYear}`;
+                        workerMonthlyArchive[mKey] = {
+                            key: mKey,
+                            label: `${mLabel}`,
+                            year: lYear,
+                            month: lMonth,
+                            totalUnique: 0,
+                            femaleCount: 0,
+                            lookupCount: 0,
+                            dupCount: 0,
+                            days: {}
+                        };
                     }
-                    const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const repLabel = log.report_type === 'male_report' ? '👨 Male Report' : (log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
-                    historyBody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
-                            <td class="py-3 px-4 font-bold text-xs">${repLabel}</td>
-                            <td class="py-3 px-4 font-medium text-slate-700">${log.file_name || 'Upload'}</td>
-                            <td class="py-3 px-4 font-mono">${log.total_received}</td>
-                            <td class="py-3 px-4 font-bold font-mono text-emerald-600">+${log.new_inserted}</td>
-                            <td class="py-3 px-4 font-mono text-amber-600">${log.duplicates_count}</td>
-                            <td class="py-3 px-4 text-center space-x-1.5">
-                                <button type="button" onclick="openCategoryCorrectionModal('${log.id}', '${log.report_type}', '${log.file_name || 'Upload'}', ${log.new_inserted})" class="text-[11px] font-extrabold text-indigo-700 hover:text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition" title="ভুল ক্যাটাগরি পরিবর্তন করুন">
-                                    🔄 ক্যাটাগরি বদলান
-                                </button>
-                                <button type="button" onclick="cancelMistakenSubmissionBatch('${log.id}', ${log.new_inserted})" class="text-[11px] font-bold text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2.5 py-1 rounded-lg transition" title="ভুল সাবমিশন সম্পূর্ণ বাতিল করে নতুন করে দিন">
-                                    🗑️ বাতিল
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                    const mObj = workerMonthlyArchive[mKey];
+                    mObj.totalUnique += (log.new_inserted || 0);
+                    mObj.dupCount += (log.duplicates_count || 0);
+                    if (log.report_type === 'female_report') mObj.femaleCount += (log.new_inserted || 0);
+                    else if (log.report_type === 'lookup_report') mObj.lookupCount += (log.new_inserted || 0);
+
+                    if (!mObj.days[dKey]) {
+                        mObj.days[dKey] = {
+                            date: dKey,
+                            filesCount: 0,
+                            totalUnique: 0,
+                            femaleCount: 0,
+                            lookupCount: 0,
+                            dupCount: 0
+                        };
+                    }
+                    const dObj = mObj.days[dKey];
+                    dObj.filesCount += 1;
+                    dObj.totalUnique += (log.new_inserted || 0);
+                    dObj.dupCount += (log.duplicates_count || 0);
+                    if (log.report_type === 'female_report') dObj.femaleCount += (log.new_inserted || 0);
+                    else if (log.report_type === 'lookup_report') dObj.lookupCount += (log.new_inserted || 0);
+
+                    // Today's metrics
+                    if (log.created_at >= todayIso) {
+                        todayLogsCount++;
+                        todayUnique += log.new_inserted;
+                        todayDuplicates += log.duplicates_count;
+                        if (log.report_type === 'female_report') {
+                            todayFemaleDone += log.new_inserted;
+                        } else if (log.report_type === 'male_report') {
+                            todayMaleDone += log.new_inserted;
+                        }
+
+                        if (historyBody) {
+                            const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            const repLabel = log.report_type === 'male_report' ? '👨 Male Report' : (log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+                            historyBody.innerHTML += `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
+                                    <td class="py-3 px-4 font-bold text-xs">${repLabel}</td>
+                                    <td class="py-3 px-4 font-medium text-slate-700">${log.file_name || 'Upload'}</td>
+                                    <td class="py-3 px-4 font-mono">${log.total_received}</td>
+                                    <td class="py-3 px-4 font-bold font-mono text-emerald-600">+${log.new_inserted}</td>
+                                    <td class="py-3 px-4 font-mono text-amber-600">${log.duplicates_count}</td>
+                                    <td class="py-3 px-4 text-center space-x-1.5">
+                                        <button type="button" onclick="openCategoryCorrectionModal('${log.id}', '${log.report_type}', '${log.file_name || 'Upload'}', ${log.new_inserted})" class="text-[11px] font-extrabold text-indigo-700 hover:text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition" title="ভুল ক্যাটাগরি পরিবর্তন করুন">
+                                            🔄 ক্যাটাগরি বদলান
+                                        </button>
+                                        <button type="button" onclick="cancelMistakenSubmissionBatch('${log.id}', ${log.new_inserted})" class="text-[11px] font-bold text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2.5 py-1 rounded-lg transition" title="ভুল সাবমিশন সম্পূর্ণ বাতিল করে নতুন করে দিন">
+                                            🗑️ বাতিল
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    }
+
+                    // This Month metrics (1st to 30/31)
+                    if (log.created_at >= curMonthStartIso && log.created_at <= curMonthEndIso) {
+                        thisMonthUnique += (log.new_inserted || 0);
+                        thisMonthDuplicates += (log.duplicates_count || 0);
+                    }
+
+                    // Last Month metrics (1st to 30/31 of previous month)
+                    if (log.created_at >= lastMonthStartIso && log.created_at <= lastMonthEndIso) {
+                        lastMonthUnique += (log.new_inserted || 0);
+                    }
                 });
-            } else {
-                historyBody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>`;
             }
 
-            document.getElementById('statUserTodayUnique').innerText = todayUnique.toLocaleString();
-            document.getElementById('statUserTodayDuplicates').innerText = todayDuplicates.toLocaleString();
+            if (historyBody && todayLogsCount === 0) {
+                historyBody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-400">No uploads yet today.</td></tr>`;
+            }
 
+            // Update Current Month Stat Card (১ থেকে ৩০/৩১ সাইকেল)
+            const statThisMonthEl = document.getElementById('statUserThisMonthUnique');
+            if (statThisMonthEl) statThisMonthEl.innerText = thisMonthUnique.toLocaleString();
+            const statThisMonthRangeEl = document.getElementById('statUserThisMonthRange');
+            if (statThisMonthRangeEl) statThisMonthRangeEl.innerText = `১ - ${curMonthDays} ${curMonthNameBn} ${curYear}`;
+            const statThisMonthBadgeEl = document.getElementById('statUserThisMonthBadge');
+            if (statThisMonthBadgeEl) statThisMonthBadgeEl.innerText = `${curMonthNameBn} ${curYear}`;
+
+            // Update Today's Stat Cards
+            const statTodayUnqEl = document.getElementById('statUserTodayUnique');
+            if (statTodayUnqEl) statTodayUnqEl.innerText = todayUnique.toLocaleString();
+            const statTodayDupEl = document.getElementById('statUserTodayDuplicates');
+            if (statTodayDupEl) statTodayDupEl.innerText = todayDuplicates.toLocaleString();
+
+            // All-Time Count directly from master_numbers
             const { count: allTimeCount } = await supabaseClient
                 .from('master_numbers')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', currentUser.id);
 
-            document.getElementById('statUserAllTime').innerText = (allTimeCount || 0).toLocaleString();
+            const statAllTimeEl = document.getElementById('statUserAllTime');
+            if (statAllTimeEl) statAllTimeEl.innerText = (allTimeCount || 0).toLocaleString();
 
-            // Direct count from master_numbers for female & male to guarantee 100% precision
+            // Direct count from master_numbers for female to guarantee 100% precision for today
             try {
                 const { count: directFemale } = await supabaseClient
                     .from('master_numbers')
@@ -3007,25 +3359,170 @@ function setupWorkerReportOptions(dept) {
                     .eq('report_type', 'female_report')
                     .gte('created_at', todayIso);
 
-                const { count: directMale } = await supabaseClient
-                    .from('master_numbers')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', currentUser.id)
-                    .eq('report_type', 'male_report')
-                    .gte('created_at', todayIso);
-
                 if (directFemale !== null && directFemale !== undefined) {
                     todayFemaleDone = Math.max(todayFemaleDone, directFemale);
-                }
-                if (directMale !== null && directMale !== undefined) {
-                    todayMaleDone = Math.max(todayMaleDone, directMale);
                 }
             } catch (cntErr) {
                 console.warn('Direct report type count notice:', cntErr);
             }
 
-            // Update Target Tracker UI
+            // Update Target Tracker UI (270 Female target)
             updateWorkerTargetTrackerUI(todayFemaleDone, todayMaleDone);
+
+            // =========================================================================
+            // NEW MONTH GREETING & MOTIVATION BANNER (Days 1 to 3 of every month)
+            // =========================================================================
+            const greetingBanner = document.getElementById('newMonthGreetingBanner');
+            if (dayOfMonth >= 1 && dayOfMonth <= 3) {
+                if (greetingBanner) {
+                    greetingBanner.classList.remove('hidden');
+                    const lastMCountEl = document.getElementById('greetingLastMonthCount');
+                    if (lastMCountEl) lastMCountEl.innerText = lastMonthUnique.toLocaleString();
+                    const curMBadge = document.getElementById('greetingCurMonthBadge');
+                    if (curMBadge) curMBadge.innerText = `Welcome ${curMonthNameBn} ${curYear}!`;
+                }
+                // Automatic Celebration Modal on first visit of the day
+                const greetStorageKey = `new_month_welcome_shown_${curYear}_${curMonth}_${dayOfMonth}`;
+                if (!localStorage.getItem(greetStorageKey)) {
+                    openNewMonthWelcomeModal(curMonthNameBn, curYear, lastMonthNameBn, lastMonthUnique);
+                    localStorage.setItem(greetStorageKey, 'true');
+                }
+            } else {
+                if (greetingBanner) greetingBanner.classList.add('hidden');
+            }
+
+            // =========================================================================
+            // POPULATE MONTHLY PERFORMANCE HISTORY ARCHIVE SELECTOR
+            // =========================================================================
+            populateWorkerMonthSelector(curMonthKey, lastMonthKey);
+        }
+
+        function populateWorkerMonthSelector(curMonthKey, lastMonthKey) {
+            const selectEl = document.getElementById('workerMonthFilterSelect');
+            if (!selectEl) return;
+
+            selectEl.innerHTML = '';
+            const sortedKeys = Object.keys(workerMonthlyArchive).sort().reverse();
+
+            sortedKeys.forEach(k => {
+                const item = workerMonthlyArchive[k];
+                selectEl.innerHTML += `<option value="${k}">${item.label || k}</option>`;
+            });
+
+            // Default to current month, or if current month has no work yet and day <= 3, keep current month selected
+            currentWorkerSelectedMonthKey = sortedKeys.includes(curMonthKey) ? curMonthKey : sortedKeys[0];
+            selectEl.value = currentWorkerSelectedMonthKey;
+            renderWorkerSelectedMonthHistory(currentWorkerSelectedMonthKey);
+        }
+
+        function renderWorkerSelectedMonthHistory(monthKey) {
+            currentWorkerSelectedMonthKey = monthKey;
+            const mObj = workerMonthlyArchive[monthKey] || {
+                totalUnique: 0,
+                femaleCount: 0,
+                lookupCount: 0,
+                dupCount: 0,
+                days: {}
+            };
+
+            const daysArr = Object.values(mObj.days || {}).sort((a, b) => b.date.localeCompare(a.date));
+            const activeDaysCount = daysArr.length;
+            const dailyAvg = activeDaysCount > 0 ? Math.round(mObj.totalUnique / activeDaysCount) : 0;
+
+            const totalEl = document.getElementById('mHistTotalUnique');
+            if (totalEl) totalEl.innerText = mObj.totalUnique.toLocaleString();
+            const femaleEl = document.getElementById('mHistFemaleCount');
+            if (femaleEl) femaleEl.innerText = mObj.femaleCount.toLocaleString();
+            const lookupEl = document.getElementById('mHistLookupCount');
+            if (lookupEl) lookupEl.innerText = mObj.lookupCount.toLocaleString();
+            const dupEl = document.getElementById('mHistDupCount');
+            if (dupEl) dupEl.innerText = mObj.dupCount.toLocaleString();
+            const activeDaysEl = document.getElementById('mHistActiveDays');
+            if (activeDaysEl) activeDaysEl.innerText = `${activeDaysCount} দিন`;
+            const dailyAvgEl = document.getElementById('mHistDailyAvg');
+            if (dailyAvgEl) dailyAvgEl.innerText = dailyAvg.toLocaleString();
+
+            const titleEl = document.getElementById('mHistMonthTitle');
+            if (titleEl) titleEl.innerText = `(${mObj.label || monthKey})`;
+            const badgeEl = document.getElementById('mHistDayCountBadge');
+            if (badgeEl) badgeEl.innerText = `${activeDaysCount} দিন সক্রিয় কাজ`;
+
+            const tbody = document.getElementById('workerMonthlyDayTableBody');
+            if (!tbody) return;
+
+            if (daysArr.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-5 text-center text-slate-400 font-sans text-xs">এই মাসে এখনো কোনো কাজের রেকর্ড জমা হয়নি।</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = daysArr.map(d => {
+                const targetAchieved = d.femaleCount >= 270;
+                let statusBadge = '';
+                if (targetAchieved) {
+                    statusBadge = `<span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">✅ ২৭০+ সম্পন্ন</span>`;
+                } else if (d.femaleCount > 0) {
+                    statusBadge = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">⏳ আংশিক (${d.femaleCount}/270)</span>`;
+                } else {
+                    statusBadge = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">লুকআপ ডাটা</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${d.date}</td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-600">${d.filesCount} টি ফাইল</td>
+                        <td class="py-2.5 px-3 font-bold font-mono text-emerald-600">+${d.totalUnique}</td>
+                        <td class="py-2.5 px-3 font-bold font-mono text-rose-600">${d.femaleCount}</td>
+                        <td class="py-2.5 px-3 font-bold font-mono text-indigo-600">${d.lookupCount}</td>
+                        <td class="py-2.5 px-3 font-mono text-amber-600">${d.dupCount}</td>
+                        <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportWorkerSelectedMonthExcel() {
+            const mObj = workerMonthlyArchive[currentWorkerSelectedMonthKey];
+            if (!mObj || !mObj.days || Object.keys(mObj.days).length === 0) {
+                alert('নির্বাচিত মাসে ডাউনলোড করার মতো কোনো কাজের ডাটা নেই।');
+                return;
+            }
+
+            const daysArr = Object.values(mObj.days).sort((a, b) => a.date.localeCompare(b.date));
+            let csv = '﻿'; // UTF-8 BOM for Excel
+            csv += `"My Monthly Work Report - ${mObj.label || currentWorkerSelectedMonthKey}"
+`;
+            csv += `"Worker Username:","${currentProfile?.username || 'Worker'}"
+`;
+            csv += `"Worker Email:","${currentUser?.email || ''}"
+`;
+            csv += `"Total Valid Unique:","${mObj.totalUnique}"
+`;
+            csv += `"Female (43+):","${mObj.femaleCount}"
+`;
+            csv += `"Lookup Reports:","${mObj.lookupCount}"
+`;
+            csv += `"Duplicates Filtered:","${mObj.dupCount}"
+
+`;
+
+            csv += `"Date","Files Submitted","Valid Unique","Female (43+)","Lookup Data","Duplicates Filtered","Target Status"
+`;
+
+            daysArr.forEach(d => {
+                const status = d.femaleCount >= 270 ? 'Target Met (270+)' : (d.femaleCount > 0 ? `Partial (${d.femaleCount}/270)` : 'Lookup');
+                csv += `"${d.date}","${d.filesCount}","${d.totalUnique}","${d.femaleCount}","${d.lookupCount}","${d.dupCount}","${status}"
+`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Work_Report_${currentWorkerSelectedMonthKey}_${currentProfile?.username || 'Worker'}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function switchWorkerInputMode(mode) {
@@ -3828,11 +4325,30 @@ function setupColumnSelectorsAndPreview() {
 
                 if (logs && logs.length > 0) {
                     const todayIso = todayStart.toISOString();
+                    const nowDt = new Date();
+                    const curY = nowDt.getFullYear();
+                    const curM = nowDt.getMonth();
+
+                    const curMonthStartIso = (new Date(curY, curM, 1, 0, 0, 0, 0)).toISOString();
+                    const curMonthEndIso = (new Date(curY, curM + 1, 0, 23, 59, 59, 999)).toISOString();
+
+                    const lastMonthStartIso = (new Date(curY, curM - 1, 1, 0, 0, 0, 0)).toISOString();
+                    const lastMonthEndIso = (new Date(curY, curM, 0, 23, 59, 59, 999)).toISOString();
+
                     logs.forEach(l => {
                         if (userMap[l.user_id]) {
                             userMap[l.user_id].totalContributed += (l.new_inserted || 0);
+                            if (!userMap[l.user_id].thisMonthAdded) userMap[l.user_id].thisMonthAdded = 0;
+                            if (!userMap[l.user_id].lastMonthAdded) userMap[l.user_id].lastMonthAdded = 0;
+
                             if (l.created_at >= todayIso) {
                                 userMap[l.user_id].todayAdded += (l.new_inserted || 0);
+                            }
+                            if (l.created_at >= curMonthStartIso && l.created_at <= curMonthEndIso) {
+                                userMap[l.user_id].thisMonthAdded += (l.new_inserted || 0);
+                            }
+                            if (l.created_at >= lastMonthStartIso && l.created_at <= lastMonthEndIso) {
+                                userMap[l.user_id].lastMonthAdded += (l.new_inserted || 0);
                             }
                         }
                     });
@@ -3944,14 +4460,18 @@ function setupColumnSelectorsAndPreview() {
                                 }
                             </td>
 
-                            <!-- 5. Combined Activity Stats (Total & Today in 1 cell) -->
+                            <!-- 5. Combined Activity Stats (Total, This Month, Today, Last Month) -->
                             <td class="py-2.5 px-2.5 text-center">
-                                <div class="text-xs font-black text-indigo-700 leading-tight">
-                                    ${u.totalContributed.toLocaleString()}
+                                <div class="text-xs font-black text-indigo-700 leading-tight" title="সর্বমোট ইউনিক ডাটা">
+                                    মোট: ${u.totalContributed.toLocaleString()}
                                 </div>
-                                <div class="text-[10px] text-emerald-600 font-extrabold mt-0.5">
+                                <div class="text-[10px] text-purple-700 font-extrabold mt-0.5" title="চলতি মাসের ১ তারিখ থেকে জমা">
+                                    চলতি মাস: ${(u.thisMonthAdded || 0).toLocaleString()}
+                                </div>
+                                <div class="text-[10px] text-emerald-600 font-bold mt-0.5">
                                     আজ: +${u.todayAdded.toLocaleString()}
                                 </div>
+                                ${(u.lastMonthAdded && u.lastMonthAdded > 0) ? `<div class="text-[9px] text-slate-400 font-medium" title="বিগত মাসের মোট জমা">গত মাস: ${u.lastMonthAdded.toLocaleString()}</div>` : ''}
                             </td>
 
                             <!-- 6. Compact Modern Actions -->
