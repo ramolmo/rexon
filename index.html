@@ -161,6 +161,11 @@
                         <span class="text-sm">⚡</span>
                         <span>Quick Search (নাম বা নাম্বার দিয়ে খুঁজুন)</span>
                     </button>
+
+                    <button id="navBtnLookupChecker" onclick="switchToSection('lookup_checker')" class="text-xs whitespace-nowrap bg-purple-700/80 hover:bg-purple-700 text-white font-black px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-purple-400">
+                        <span>🔍</span>
+                        <span>Lookup Checker (রিপোর্ট ফিল্টার টুল)</span>
+                    </button>
                 </div>
             </div>
         </nav>
@@ -229,7 +234,7 @@
                     <div id="deptSelectContainer" class="hidden">
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Your Department</label>
                         <select id="signupDept" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white font-medium">
-                            <option value="gender_verify">👤 Gender Verify (Male/Female Reports)</option>
+                            <option value="gender_verify">👩 Female Report Verify</option>
                             <option value="number_lookup">📞 Number Lookup (Lookup Reports)</option>
                         </select>
                     </div>
@@ -543,7 +548,7 @@
                     </div>
                 </div>
 
-                <!-- REPORT SUBMIT TYPE SELECTOR (1. Male Report, 2. Female Report, 3. Lookup Report) -->
+                <!-- REPORT SUBMIT TYPE SELECTOR (1. Female Report, 2. Lookup Report) -->
                 <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Step 1: Select Report Type to Submit:
@@ -826,8 +831,7 @@
                     <p id="adminStatTotalUnique" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
                     <p class="text-xs text-slate-400">Unique numbers stored</p>
                 </div>
-                <!-- Male Report Card Removed -->
-                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
+                                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
                         <span class="text-[10px] bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-pink-100">Day-by-Day ➔</span>
@@ -935,7 +939,7 @@
                                 <div>
                                     <h3 class="text-base sm:text-lg font-black text-white">Universal Number Audit (নাম্বার অনুসন্ধান ও কর্মী নিরীক্ষা)</h3>
                                     <p class="text-xs text-indigo-200 mt-0.5">
-                                        যেকোনো একটি ফোন নাম্বার লিখলে সাথে সাথে দেখতে পাবেন—কে এই নাম্বারটি দিয়েছে, কবে দিয়েছে, এটি Male নাকি Female ছিল এবং প্রয়োজনে এক ক্লিকে ভুল সংশোধন করুন।
+                                        যেকোনো একটি ফোন নাম্বার লিখলে সাথে সাথে দেখতে পাবেন—কে এই নাম্বারটি দিয়েছে, কবে দিয়েছে, এটি Female নাকি Lookup রিপোর্ট ছিল এবং প্রয়োজনে এক ক্লিকে ভুল সংশোধন করুন।
                                     </p>
                                 </div>
                             </div>
@@ -1020,7 +1024,7 @@
                             <div>
                                 <label class="block font-bold text-slate-700 uppercase mb-1">📂 ক্যাটাগরি (রিপোর্ট টাইপ):</label>
                                 <select id="quickExportCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500">
-                                    <option value="all">🌟 সব ডাটা একসাথে (Male + Female + Lookup)</option>
+                                    <option value="all">🌟 সব ডাটা একসাথে (Female + Lookup)</option>
                                     <option value="female_report">👩 শুধুমাত্র ফিমেল রিপোর্ট (Female Only)</option>
                                     
                                     <option value="lookup_report">🔍 শুধুমাত্র লুকআপ রিপোর্ট (Lookup Only)</option>
@@ -1270,7 +1274,7 @@
                             </div>
                             <h3 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">Company Delivery Tracker (কোম্পানিকে দেওয়া ডাটা ট্র্যাকার)</h3>
                             <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
-                                প্রতিদিন কোম্পানিকে যেসব নাম্বার দিচ্ছেন তা ৩টি ক্যাটাগরিতে (Male, Female, Lookup) তারিখ অনুযায়ী আপলোড করে রাখুন। ডুপ্লিকেট নাম্বার স্বয়ংক্রিয়ভাবে ফিল্টার হয়ে যাবে।
+                                প্রতিদিন কোম্পানিকে যেসব নাম্বার দিচ্ছেন তা ২টি ক্যাটাগরিতে (Female, Lookup) তারিখ অনুযায়ী আপলোড করে রাখুন। ডুপ্লিকেট নাম্বার স্বয়ংক্রিয়ভাবে ফিল্টার হয়ে যাবে।
                             </p>
                         </div>
                         <button onclick="downloadCompanyDeliveriesExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow transition flex items-center space-x-2 flex-shrink-0 self-start md:self-auto">
@@ -1279,17 +1283,13 @@
                     </div>
 
                     <!-- Stat Cards for Company Deliveries -->
-                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
                             <p class="text-xs font-bold text-slate-500 uppercase">Total Given</p>
                             <p id="cdStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
                             <p class="text-[11px] text-slate-400">Total delivered</p>
                         </div>
-                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
-                            <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Data</p>
-                            <p id="cdStatMale" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">Delivered to company</p>
-                        </div>
+
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Data</p>
                             <p id="cdStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
@@ -1329,8 +1329,7 @@
                                     📂 Data Category (ক্যাটাগরি - ৩টি আলাদা সেক্টর):
                                 </label>
                                 <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
-                                    <option value="male_data">👨 1. Male Data (পুরুষ ডাটা)</option>
-                                    <option value="female_data">👩 2. Female Data (মহিলা ডাটা)</option>
+                                    <option value="female_data">👩 1. Female Data (মহিলা ডাটা)</option>
                                     <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
                                 </select>
                             </div>
@@ -1430,7 +1429,6 @@
                                     <label class="text-xs font-bold text-slate-700 block mb-1">📂 Category:</label>
                                     <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
                                         <option value="all">All Categories (সবগুলো)</option>
-                                        <option value="male_data">👨 Male Data</option>
                                         <option value="female_data">👩 Female Data</option>
                                         <option value="lookup_data">🔍 Lookup Data</option>
                                     </select>
@@ -1905,7 +1903,7 @@
                                         <span>📊</span>
                                         <span>Complete Master Excel (.xlsx)</span>
                                     </div>
-                                    <p class="text-xs text-slate-500">সব ক্যাটাগরি (Male, Female, Lookup) তারিখ ও কর্মীর নামসহ এক্সেল শিট আকারে ডাউনলোড করে ড্রাইভে সেভ রাখুন।</p>
+                                    <p class="text-xs text-slate-500">সব ক্যাটাগরি (Female, Lookup) তারিখ ও কর্মীর নামসহ এক্সেল শিট আকারে ডাউনলোড করে ড্রাইভে সেভ রাখুন।</p>
                                 </div>
                                 <button type="button" onclick="downloadMasterExcel()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-3 rounded-lg shadow-sm transition flex items-center justify-center space-x-1">
                                     <span>📊 Download Master Excel</span>
@@ -2382,7 +2380,7 @@
             <!-- Duplicate Results Section -->
             <div id="dupResultsCard" class="hidden space-y-6 animate-in fade-in duration-200">
                 <!-- 5 Smart Stat Cards -->
-                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-500">
                         <p class="text-xs font-bold text-slate-500 uppercase">Total Checked</p>
                         <p id="dupStatTotal" class="text-2xl sm:text-3xl font-black text-indigo-700 mt-1">0</p>
@@ -2457,6 +2455,277 @@
                             </thead>
                             <tbody id="dupTableBody" class="divide-y divide-slate-100">
                                 <tr><td colspan="4" class="py-6 text-center text-slate-400">Run check to view results.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. LOOKUP REPORT QUALIFICATION & FILTERING TOOL VIEW -->
+        <div id="lookupCheckerView" class="hidden space-y-8 animate-in fade-in duration-200">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 rounded-3xl shadow-xl p-6 sm:p-8 text-white relative overflow-hidden border-2 border-purple-400/40">
+                <div class="absolute -right-10 -bottom-10 w-52 h-52 bg-white/5 rounded-full pointer-events-none"></div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg flex-shrink-0">
+                                🔍
+                            </div>
+                            <div>
+                                <h2 class="text-xl sm:text-3xl font-black text-white flex items-center space-x-2">
+                                    <span>Lookup Report Qualifier & Checker</span>
+                                    <span class="text-xs bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Smart Tool</span>
+                                </h2>
+                                <p class="text-xs sm:text-sm text-purple-200 mt-0.5">
+                                    পারিবারিক বাৎসরিক আয় (Household Income) ও মার্কেট ভ্যালু (Market Value) নিয়মানুযায়ী যাচাই করে গ্রহণযোগ্য (Keep) এবং অযোগ্য (Discarded) ডাটা আলাদা করুন।
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start md:self-auto flex-shrink-0">
+                        <button type="button" onclick="switchToSection('dashboard')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2.5 rounded-xl border border-white/20 transition flex items-center space-x-1.5 cursor-pointer">
+                            <span>⬅️ ড্যাশবোর্ডে ফিরুন</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Qualification Criteria Explainer Card (৩টি মূল শর্ত) -->
+            <div class="bg-white rounded-3xl shadow-sm border-2 border-purple-200 p-5 sm:p-7 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">📜</span>
+                        <h3 class="font-black text-base sm:text-lg text-slate-800">
+                            ফিল্টারিং ও গ্রহণের নিয়মাবলী (Qualification Rules / 筛选保留规则):
+                        </h3>
+                    </div>
+                    <span class="text-xs text-purple-700 font-bold bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
+                        নিচের যেকোনো ১টি শর্ত পূরণ করলেই ডাটা গ্রহণযোগ্য (Keep) হবে
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <!-- Rule 1 -->
+                    <div class="p-4 bg-emerald-50/80 rounded-2xl border-2 border-emerald-300 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-black text-emerald-950 text-sm flex items-center space-x-1.5">
+                                <span>💰</span>
+                                <span>শর্ত ১ (Rule 1)</span>
+                            </span>
+                            <span class="bg-emerald-200 text-emerald-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">保留 / Keep</span>
+                        </div>
+                        <p class="font-extrabold text-emerald-900 text-xs">
+                            বাৎসরিক আয়: $75k - $100k (7.5万-10万美元)
+                        </p>
+                        <p class="text-[11px] text-emerald-800 leading-relaxed font-sans">
+                            যদি কোনো নাম্বারের পারিবারিক বার্ষিক আয় <strong>$75,000 থেকে $100,000</strong> এর মধ্যে হয় (যেমন: $75,000 - $99,999 বা 7.5万-10万), তবে তা <strong>সংরক্ষণযোগ্য / গ্রহণযোগ্য (Keep)</strong>।
+                        </p>
+                    </div>
+
+                    <!-- Rule 2 -->
+                    <div class="p-4 bg-indigo-50/80 rounded-2xl border-2 border-indigo-300 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-black text-indigo-950 text-sm flex items-center space-x-1.5">
+                                <span>🏡</span>
+                                <span>শর্ত ২ (Rule 2)</span>
+                            </span>
+                            <span class="bg-indigo-200 text-indigo-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">保留 / Keep</span>
+                        </div>
+                        <p class="font-extrabold text-indigo-900 text-xs">
+                            মার্কেট ভ্যালু: ≤ $400,000 (Within 40万美元)
+                        </p>
+                        <p class="text-[11px] text-indigo-800 leading-relaxed font-sans">
+                            যদি কোনো নাম্বারের প্রোপার্টি / মার্কেট ভ্যালু <strong>৪০万美元 এর মধ্যে</strong> ($400,000 বা তার কম) হয়, তবে তা <strong>সংরক্ষণযোগ্য / গ্রহণযোগ্য (Keep)</strong>।
+                        </p>
+                    </div>
+
+                    <!-- Rule 3 -->
+                    <div class="p-4 bg-purple-50/80 rounded-2xl border-2 border-purple-300 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-black text-purple-950 text-sm flex items-center space-x-1.5">
+                                <span>🎯</span>
+                                <span>শর্ত ৩ (Rule 3)</span>
+                            </span>
+                            <span class="bg-purple-200 text-purple-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">保留 / Keep</span>
+                        </div>
+                        <p class="font-extrabold text-purple-900 text-xs">
+                            আয় $40k-$50k + মার্কেট ভ্যালু $350k-$400k
+                        </p>
+                        <p class="text-[11px] text-purple-800 leading-relaxed font-sans">
+                            যদি কোনো নাম্বারের আয় <strong>৪万-৫万美元</strong> ($40k-$50k) এবং একই সাথে মার্কেট ভ্যালু <strong>৩৫万-৪০万美元</strong> ($350k-$400k) হয়, তবে তা <strong>সংরক্ষণযোগ্য / গ্রহণযোগ্য (Keep)</strong>।
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 bg-rose-50 rounded-xl border border-rose-200 flex items-center space-x-2 text-rose-900 text-xs">
+                    <span class="text-lg flex-shrink-0">⚠️</span>
+                    <span><strong>বাদ পড়ার নিয়ম (Discarded / 淘汰):</strong> যদি কোনো রেকর্ডের তথ্য উপরের ৩টি শর্তের কোনোটির সাথেই না মেলে, তবে তা <strong>অযোগ্য (Reject)</strong> বলে স্বয়ংক্রিয়ভাবে আলাদা হয়ে যাবে।</span>
+                </div>
+            </div>
+
+            <!-- Input Mode Selector & Upload Area -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-7 space-y-5">
+                <div class="flex items-center space-x-2 border-b border-slate-200 pb-3">
+                    <button type="button" id="btnLookupChkModeFile" onclick="switchLookupChkInputMode('file')" class="px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer">
+                        📁 Excel / CSV ফাইল আপলোড
+                    </button>
+                    <button type="button" id="btnLookupChkModePaste" onclick="switchLookupChkInputMode('paste')" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        📋 সরাসরি টেক্সট পেস্ট (Direct Paste)
+                    </button>
+                </div>
+
+                <!-- 1. File Upload Section -->
+                <div id="lookupChkFileSection" class="space-y-4">
+                    <div class="border-2 border-dashed border-purple-300 hover:border-purple-500 rounded-2xl p-6 sm:p-8 text-center bg-purple-50/30 transition cursor-pointer" onclick="document.getElementById('lookupChkFileInput').click()">
+                        <input type="file" id="lookupChkFileInput" accept=".xlsx, .xls, .csv" onchange="handleLookupChkFile(event)" class="hidden">
+                        <span class="text-4xl block mb-2">📊</span>
+                        <p class="font-extrabold text-sm text-slate-800">লুকআপ এক্সেল বা CSV ফাইল এখানে ড্রপ করুন অথবা ক্লিক করে সিলেক্ট করুন</p>
+                        <p class="text-xs text-slate-500 mt-1">সাপোর্টেড ফরম্যাট: .xlsx, .xls, .csv</p>
+                    </div>
+
+                    <!-- Column Mapping Configuration (Auto-shown after file selected) -->
+                    <div id="lookupChkColumnConfig" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="text-xs font-black text-slate-800 uppercase">কলাম ম্যাপিং নিশ্চিত করুন:</span>
+                            <span id="lookupChkFileRowsCount" class="text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">0 Rows</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">📞 ফোন নাম্বার কলাম:</label>
+                                <select id="lookupChkColPhone" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-bold text-slate-800"></select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">💰 Household Income কলাম:</label>
+                                <select id="lookupChkColIncome" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-bold text-slate-800"></select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">🏡 Property / Market Value কলাম:</label>
+                                <select id="lookupChkColMarket" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-bold text-slate-800"></select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">👤 নাম / ব্যক্তির কলাম (ঐচ্ছিক):</label>
+                                <select id="lookupChkColName" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-bold text-slate-800"></select>
+                            </div>
+                        </div>
+                        <button type="button" id="btnRunLookupFileCheck" onclick="runLookupFileCheck()" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
+                            <span>⚡ কোয়ালিফিকেশন যাচাই ও ফিল্টার করুন</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Direct Paste Section -->
+                <div id="lookupChkPasteSection" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+                            নোটপ্যাড বা এক্সেল থেকে ডাটা কপি করে এখানে পেস্ট করুন:
+                        </label>
+                        <textarea id="lookupChkPasteInput" rows="6" placeholder="উদাহরণস্বরূপ:&#10;15136465609   $75,000 - $99,999   $350,000   Zoe Smith&#10;16145551234   $45,000   $380,000   Sarah Brown&#10;14155559876   $120,000   $650,000   John Doe" class="w-full p-4 bg-slate-50 border-2 border-slate-300 rounded-2xl font-mono text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"></textarea>
+                    </div>
+                    <button type="button" id="btnRunLookupPasteCheck" onclick="runLookupPasteCheck()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
+                        <span>⚡ পেস্ট করা ডাটা যাচাই ও ফিল্টার করুন</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results & Analytics Container -->
+            <div id="lookupChkResultContainer" class="hidden space-y-6">
+                <!-- Analytics Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-600">
+                        <p class="text-[11px] font-bold text-purple-900 uppercase">মোট প্রসেসড</p>
+                        <p id="lchkStatTotal" class="text-2xl sm:text-3xl font-black text-purple-950 mt-1">0</p>
+                        <p class="text-[10px] text-purple-600">Total Checked</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500">
+                        <p class="text-[11px] font-bold text-emerald-900 uppercase">🟢 গ্রহণযোগ্য (Keep)</p>
+                        <p id="lchkStatQualified" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
+                        <p id="lchkStatQualifiedPct" class="text-[10px] text-emerald-600 font-bold">0% সফল</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-rose-500">
+                        <p class="text-[11px] font-bold text-rose-900 uppercase">🔴 অযোগ্য (Discarded)</p>
+                        <p id="lchkStatDiscarded" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
+                        <p id="lchkStatDiscardedPct" class="text-[10px] text-rose-600 font-bold">0% বাদ</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-400">
+                        <p class="text-[11px] font-bold text-emerald-800 uppercase">শর্ত ১ পাস ($75k-$100k)</p>
+                        <p id="lchkStatRule1" class="text-xl sm:text-2xl font-black text-emerald-700 mt-1">0</p>
+                        <p class="text-[10px] text-slate-400">Income 7.5万-10万</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-400">
+                        <p class="text-[11px] font-bold text-indigo-800 uppercase">শর্ত ২ পাস (≤ $400k)</p>
+                        <p id="lchkStatRule2" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</p>
+                        <p class="text-[10px] text-slate-400">Market ≤ 40万</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-400">
+                        <p class="text-[11px] font-bold text-purple-800 uppercase">শর্ত ৩ পাস (Comb)</p>
+                        <p id="lchkStatRule3" class="text-xl sm:text-2xl font-black text-purple-700 mt-1">0</p>
+                        <p class="text-[10px] text-slate-400">Inc 4-5万 + Mkt 35-40万</p>
+                    </div>
+                </div>
+
+                <!-- Action Bar & Filter Switcher -->
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <!-- Filter Tabs -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="btnLchkTabQualified" onclick="switchLookupChkTableTab('qualified')" class="px-4 py-2 text-xs font-black rounded-xl bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5">
+                                <span>🟢 গ্রহণযোগ্য ডাটা (Keep Only):</span>
+                                <span id="lchkTabBadgeQualified" class="bg-emerald-800 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
+                            </button>
+                            <button type="button" id="btnLchkTabDiscarded" onclick="switchLookupChkTableTab('discarded')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer flex items-center space-x-1.5">
+                                <span>🔴 অযোগ্য ডাটা (Discarded):</span>
+                                <span id="lchkTabBadgeDiscarded" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full">0</span>
+                            </button>
+                            <button type="button" id="btnLchkTabAll" onclick="switchLookupChkTableTab('all')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5">
+                                <span>📋 সমস্ত ডাটা (All):</span>
+                                <span id="lchkTabBadgeAll" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full">0</span>
+                            </button>
+                        </div>
+
+                        <!-- 1-Click Export Buttons -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="downloadLookupChkExcel('qualified')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="শুধুমাত্র পাস করা গ্রহণযোগ্য ডাটা এক্সেল শিটে ডাউনলোড করুন">
+                                <span>📥 Download Kept (.xlsx)</span>
+                            </button>
+                            <button type="button" onclick="downloadLookupChkTxt('qualified')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা ফোন নাম্বারগুলো টেক্সট ফাইলে ডাউনলোড করুন">
+                                <span>📄 Kept Phone (.txt)</span>
+                            </button>
+                            <button type="button" onclick="copyLookupChkPhones('qualified')" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা সব ফোন নাম্বার এক ক্লিকে ক্লিপবোর্ডে কপি করুন">
+                                <span>📋 Copy Kept</span>
+                            </button>
+                            <button type="button" onclick="downloadLookupChkExcel('all')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="সব ডাটা স্ট্যাটাস ও কারণসহ ডাউনলোড করুন">
+                                <span>📦 All Analysis (.xlsx)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search within results -->
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
+                        <div class="relative flex-1 max-w-md">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">🔍</span>
+                            <input type="text" id="lchkTableSearchInput" oninput="filterLookupChkTableLocal()" placeholder="Search phone, name, income, market value..." class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-purple-400">
+                        </div>
+                        <span id="lchkTableRenderCount" class="text-xs text-slate-500 font-bold">Showing 0 records</span>
+                    </div>
+
+                    <!-- Live Results Table -->
+                    <div class="overflow-x-auto rounded-2xl border border-slate-200 max-h-[500px]">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] sticky top-0 border-b border-slate-200 z-10">
+                                <tr>
+                                    <th class="py-3 px-3.5">SL</th>
+                                    <th class="py-3 px-3.5">Phone Number</th>
+                                    <th class="py-3 px-3.5">Name / Details</th>
+                                    <th class="py-3 px-3.5 text-emerald-700">Household Income</th>
+                                    <th class="py-3 px-3.5 text-indigo-700">Property / Market Value</th>
+                                    <th class="py-3 px-3.5 text-center">স্ট্যাটাস (Status)</th>
+                                    <th class="py-3 px-3.5">গ্রহণের কারণ / বিবরণ (Match Reason)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lookupChkTableBody" class="divide-y divide-slate-100 font-sans text-slate-800">
+                                <!-- Dynamic rows -->
                             </tbody>
                         </table>
                     </div>
@@ -3077,7 +3346,7 @@ function setupWorkerReportOptions(dept) {
         }
 
         function showView(viewId) {
-            ['loginView', 'userDashboard', 'adminDashboard', 'duplicateCheckView'].forEach(id => {
+            ['loginView', 'userDashboard', 'adminDashboard', 'duplicateCheckView', 'claimStockView', 'lookupCheckerView'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
@@ -3089,8 +3358,9 @@ function setupWorkerReportOptions(dept) {
             const btnDash = document.getElementById('navBtnDashboard');
             const btnClaim = document.getElementById('navBtnClaimStock');
             const btnDup = document.getElementById('navBtnDuplicate');
+            const btnLookupChk = document.getElementById('navBtnLookupChecker');
 
-            [btnDash, btnClaim, btnDup].forEach(b => {
+            [btnDash, btnClaim, btnDup, btnLookupChk].forEach(b => {
                 if (b) b.className = 'text-xs whitespace-nowrap bg-indigo-900/40 hover:bg-indigo-900 text-indigo-100 font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-1.5 border border-transparent';
             });
 
@@ -3117,6 +3387,9 @@ function setupWorkerReportOptions(dept) {
             } else if (sec === 'duplicate_check') {
                 if (btnDup) btnDup.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-indigo-500/40';
                 showView('duplicateCheckView');
+            } else if (sec === 'lookup_checker') {
+                if (btnLookupChk) btnLookupChk.className = 'text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 border border-purple-400';
+                showView('lookupCheckerView');
             }
         }
 
@@ -3288,7 +3561,7 @@ function setupWorkerReportOptions(dept) {
 
                         if (historyBody) {
                             const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            const repLabel = log.report_type === 'male_report' ? '👨 Male Report' : (log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+                            const repLabel = log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
                             historyBody.innerHTML += `
                                 <tr class="hover:bg-slate-50 transition">
                                     <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
@@ -4149,7 +4422,7 @@ function setupColumnSelectorsAndPreview() {
                 progressBar.style.width = '100%';
                 statusText.innerText = 'Report Submitted Successfully!';
 
-                const repTitle = chosenReportType === 'male_report' ? '👨 Male Report' : (chosenReportType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+                const repTitle = chosenReportType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
 
                 const resultCard = document.getElementById('lastUploadResultCard');
                 resultCard.className = 'mt-6 p-5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
@@ -5309,7 +5582,7 @@ function setupColumnSelectorsAndPreview() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By (Worker)': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Time': new Date(item.created_at).toLocaleString()
@@ -5355,9 +5628,7 @@ function setupColumnSelectorsAndPreview() {
             function renderItemRow(item, idx) {
                 const timeStr = new Date(item.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 let repBadge = '';
-                if (item.report_type === 'male_report') {
-                    repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Report</span>';
-                } else if (item.report_type === 'female_report') {
+                if (item.report_type === 'female_report') {
                     repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Report</span>';
                 } else {
                     repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Report</span>';
@@ -5505,7 +5776,7 @@ function renderAdminLogsTable() {
             if (adminLogsCache.length > 0) {
                 body.innerHTML = adminLogsCache.map(l => {
                     const timeStr = new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    const repLabel = l.report_type === 'male_report' ? '👨 Male Report' : (l.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+                    const repLabel = l.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
                     return `
                         <tr class="hover:bg-slate-50 text-xs">
                             <td class="py-3 px-4 font-mono text-slate-500">${timeStr}</td>
@@ -5550,7 +5821,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -5592,7 +5863,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -5624,7 +5895,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By': item.username || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -5640,37 +5911,38 @@ function renderAdminLogsTable() {
             }
         }
 
-        // ==========================================
-        // ENHANCED GENDERIZE.IO & ACCURATE SECTORS
-        // ==========================================
-        let currentGvInputMode = 'paste';
-        let gvFileParsedRows = [];
-        let gvMaleList = [];
-        let gvFemaleList = [];
-        let gvUnknownList = [];
-        let currentGvSector = 'male';
+        // =========================================================================
+        // LOOKUP REPORT QUALIFICATION & FILTERING TOOL ENGINE
+        // =========================================================================
 
-        function switchGvInputMode(mode) {
-            currentGvInputMode = mode;
-            const tabPaste = document.getElementById('tabGvPasteBtn');
-            const tabFile = document.getElementById('tabGvFileBtn');
-            const pasteSec = document.getElementById('gvPasteSection');
-            const fileSec = document.getElementById('gvFileSection');
+        let currentLookupChkMode = 'file';
+        let lookupChkFileRawRows = [];
+        let lookupChkAllRecords = [];
+        let lookupChkQualifiedRecords = [];
+        let lookupChkDiscardedRecords = [];
+        let currentLookupChkTab = 'qualified';
 
-            if (mode === 'paste') {
-                tabPaste.className = 'pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
-                tabFile.className = 'pb-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
-                pasteSec.classList.remove('hidden');
-                fileSec.classList.add('hidden');
+        function switchLookupChkInputMode(mode) {
+            currentLookupChkMode = mode;
+            const btnFile = document.getElementById('btnLookupChkModeFile');
+            const btnPaste = document.getElementById('btnLookupChkModePaste');
+            const secFile = document.getElementById('lookupChkFileSection');
+            const secPaste = document.getElementById('lookupChkPasteSection');
+
+            if (mode === 'file') {
+                if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
+                if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+                if (secFile) secFile.classList.remove('hidden');
+                if (secPaste) secPaste.classList.add('hidden');
             } else {
-                tabFile.className = 'pb-3 px-4 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition';
-                tabPaste.className = 'pb-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
-                fileSec.classList.remove('hidden');
-                pasteSec.classList.add('hidden');
+                if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
+                if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+                if (secPaste) secPaste.classList.remove('hidden');
+                if (secFile) secFile.classList.add('hidden');
             }
         }
 
-        function handleGvFileSelected(e) {
+        function handleLookupChkFile(e) {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -5680,682 +5952,552 @@ function renderAdminLogsTable() {
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    gvFileParsedRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
 
-                    if (!gvFileParsedRows || gvFileParsedRows.length === 0) {
-                        alert('No rows found in Excel sheet.');
+                    if (!rows || rows.length === 0) {
+                        alert('ফাইলের ভেতরে কোনো ডাটা পাওয়া যায়নি!');
                         return;
                     }
 
-                    const sample = gvFileParsedRows[0];
-                    const cols = Object.keys(sample);
+                    lookupChkFileRawRows = rows;
+                    const countEl = document.getElementById('lookupChkFileRowsCount');
+                    if (countEl) countEl.innerText = `${rows.length.toLocaleString()} Rows Found`;
 
-                    const colNameSel = document.getElementById('gvColName');
-                    const colPhoneSel = document.getElementById('gvColPhone');
-                    const colAgeSel = document.getElementById('gvColAge');
+                    const headers = Object.keys(rows[0] || {});
+                    populateLookupChkDropdowns(headers);
 
-                    colNameSel.innerHTML = '';
-                    colPhoneSel.innerHTML = '';
-                    colAgeSel.innerHTML = '<option value="">-- None / Auto --</option>';
+                    const cfg = document.getElementById('lookupChkColumnConfig');
+                    if (cfg) cfg.classList.remove('hidden');
 
-                    cols.forEach(col => {
-                        const opt1 = document.createElement('option');
-                        opt1.value = col; opt1.innerText = col;
-                        if (col.toLowerCase().includes('name')) opt1.selected = true;
-                        colNameSel.appendChild(opt1);
-
-                        const opt2 = document.createElement('option');
-                        opt2.value = col; opt2.innerText = col;
-                        if (col.toLowerCase().includes('phone') || col.toLowerCase().includes('number') || col.toLowerCase().includes('mobile')) opt2.selected = true;
-                        colPhoneSel.appendChild(opt2);
-
-                        const opt3 = document.createElement('option');
-                        opt3.value = col; opt3.innerText = col;
-                        if (col.toLowerCase().includes('age')) opt3.selected = true;
-                        colAgeSel.appendChild(opt3);
-                    });
-
-                    document.getElementById('gvFileColumnMap').classList.remove('hidden');
-                } catch (err) {
-                    alert('Error reading file: ' + err.message);
+                } catch(err) {
+                    console.error('File read error:', err);
+                    alert('ফাইল রিড করতে সমস্যা হয়েছে: ' + err.message);
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        
-        // Multi-API Waterfall Query Engine (Genderize.io -> GenderAPI.io -> Gender-API -> Local DB)
-        async function querySingleNameMultiAPI(firstName) {
-            const cleanName = firstName.toLowerCase();
+        function populateLookupChkDropdowns(headers) {
+            const phoneSel = document.getElementById('lookupChkColPhone');
+            const incSel = document.getElementById('lookupChkColIncome');
+            const mktSel = document.getElementById('lookupChkColMarket');
+            const nameSel = document.getElementById('lookupChkColName');
 
-            // 1. Check Fast Local Database First
-            if (MALE_NAMES_DB.has(cleanName)) {
-                return { gender: 'male', probability: 99, engine: 'Verified Local Database' };
-            }
-            if (FEMALE_NAMES_DB.has(cleanName)) {
-                return { gender: 'female', probability: 99, engine: 'Verified Local Database' };
-            }
+            [phoneSel, incSel, mktSel, nameSel].forEach(s => {
+                if (s) s.innerHTML = '';
+            });
 
-            // 2. Engine 1: Genderize.io API
-            try {
-                const res1 = await fetch(`https://api.genderize.io/?name=${encodeURIComponent(cleanName)}`);
-                if (res1.ok) {
-                    const d1 = await res1.json();
-                    if (d1 && d1.gender && (d1.gender === 'male' || d1.gender === 'female')) {
-                        return {
-                            gender: d1.gender,
-                            probability: d1.probability ? Math.round(d1.probability * 100) : 95,
-                            engine: 'Genderize.io'
-                        };
-                    }
+            if (nameSel) nameSel.innerHTML = '<option value="">-- উল্লেখ নেই (Optional) --</option>';
+
+            headers.forEach(h => {
+                const optP = new Option(h, h);
+                const optI = new Option(h, h);
+                const optM = new Option(h, h);
+                const optN = new Option(h, h);
+
+                const lower = h.toLowerCase().trim();
+
+                // Smart Phone Auto-selection
+                if (lower.includes('phone') || lower.includes('tel') || lower.includes('mobile') || lower.includes('cell') || lower.includes('number')) {
+                    optP.selected = true;
                 }
-            } catch (err1) {
-                console.warn('Genderize.io error, trying next engine:', err1);
-            }
 
-            // 3. Engine 2: GenderAPI.io
-            try {
-                const res2 = await fetch(`https://api.genderapi.io/api/?name=${encodeURIComponent(cleanName)}`);
-                if (res2.ok) {
-                    const d2 = await res2.json();
-                    if (d2 && d2.gender && (d2.gender === 'male' || d2.gender === 'female')) {
-                        return {
-                            gender: d2.gender,
-                            probability: d2.accuracy || d2.probability || 90,
-                            engine: 'GenderAPI.io'
-                        };
-                    }
+                // Smart Income Auto-selection
+                if (lower.includes('income') || lower.includes('salary') || lower.includes('hh_income') || lower.includes('household') || lower.includes('ann') || lower.includes('收入')) {
+                    optI.selected = true;
                 }
-            } catch (err2) {
-                console.warn('GenderAPI.io error, trying next engine:', err2);
-            }
 
-            // 4. Engine 3: Gender-API.com
-            try {
-                const res3 = await fetch(`https://gender-api.com/get?name=${encodeURIComponent(cleanName)}`);
-                if (res3.ok) {
-                    const d3 = await res3.json();
-                    if (d3 && d3.gender && (d3.gender === 'male' || d3.gender === 'female')) {
-                        return {
-                            gender: d3.gender,
-                            probability: d3.accuracy || 90,
-                            engine: 'Gender-API.com'
-                        };
-                    }
+                // Smart Market Value Auto-selection
+                if (lower.includes('market') || lower.includes('property') || lower.includes('home_value') || lower.includes('est') || lower.includes('value') || lower.includes('房产') || lower.includes('价值')) {
+                    optM.selected = true;
                 }
-            } catch (err3) {
-                console.warn('Gender-API.com error:', err3);
-            }
 
-            // If not found in any engine, return unknown (no false guesses!)
-            return { gender: 'unknown', probability: 'Need Review', engine: 'Uncertain' };
+                // Smart Name Auto-selection
+                if (lower.includes('name') || lower.includes('owner') || lower.includes('contact') || lower.includes('full') || lower.includes('姓名')) {
+                    optN.selected = true;
+                }
+
+                if (phoneSel) phoneSel.appendChild(optP);
+                if (incSel) incSel.appendChild(optI);
+                if (mktSel) mktSel.appendChild(optM);
+                if (nameSel) nameSel.appendChild(optN);
+            });
         }
 
-        
-        // Multi-Word Token Detection: checks first name, middle name, or full tokens
-        function detectGenderFromFullTokens(fullName) {
-            if (!fullName) return null;
-            let clean = fullName.replace(/^(mr|mrs|ms|miss|dr|prof|md|sheikh)\.?\s+/i, '');
-            if (clean.includes(',')) clean = clean.split(',')[1].trim();
-            clean = clean.replace(/\s+(jr|sr|ii|iii|iv)\.?$/i, '');
-            const tokens = clean.split(/\s+/).map(w => w.replace(/[^a-zA-Z]/g, '').toLowerCase()).filter(w => w.length >= 2);
+        // Smart monetary range and amount parser
+        function parseMonetaryValueRange(rawVal) {
+            if (!rawVal) return null;
+            let s = String(rawVal).trim().toLowerCase();
+            if (!s || s === '-' || s === 'n/a' || s === 'none' || s === '?' || s === 'null') return null;
 
-            if (tokens.length === 0) return null;
+            // Remove commas
+            s = s.replace(/,/g, '');
 
-            // Check first token
-            if (MALE_NAMES_DB.has(tokens[0])) return { gender: 'male', probability: 99, engine: 'Verified Local Database' };
-            if (FEMALE_NAMES_DB.has(tokens[0])) return { gender: 'female', probability: 99, engine: 'Verified Local Database' };
+            // Convert Chinese '万' (wan = 10,000)
+            s = s.replace(/([0-9.]+)\s*万/g, (match, p1) => {
+                return String(parseFloat(p1) * 10000);
+            });
 
-            // Check subsequent tokens (e.g. "Qaid Ali" -> "Ali", "Mohamed Osman" -> "Osman" / "Mohamed")
-            for (let i = 1; i < tokens.length; i++) {
-                const tok = tokens[i];
-                if (MALE_NAMES_DB.has(tok)) return { gender: 'male', probability: 95, engine: `Verified Name Match (${tok})` };
-                if (FEMALE_NAMES_DB.has(tok)) return { gender: 'female', probability: 95, engine: `Verified Name Match (${tok})` };
-            }
+            // Convert 'k' -> 000
+            s = s.replace(/([0-9.]+)\s*k(?![a-zA-Z])/gi, (match, p1) => {
+                return String(parseFloat(p1) * 1000);
+            });
 
-            return null;
+            // Extract all numbers
+            const matches = s.match(/[0-9]+(?:\.[0-9]+)?/g);
+            if (!matches || matches.length === 0) return null;
+
+            const nums = matches.map(Number).filter(n => !isNaN(n));
+            if (nums.length === 0) return null;
+
+            const minVal = Math.min(...nums);
+            const maxVal = Math.max(...nums);
+            const avgVal = (minVal + maxVal) / 2;
+
+            return { min: minVal, max: maxVal, avg: avgVal };
         }
 
-        // Statistical Likelihood Ratio Calculator for Undetermined Names
-        function calculateGenderRatio(fullName) {
-            const clean = (fullName || '').replace(/[^a-zA-Z\s]/g, '').trim().toLowerCase();
-            const words = clean.split(/\s+/).filter(Boolean);
-            const first = words[0] || '';
+        // Evaluate qualification based on the 3 exact user rules:
+        // Rule 1: Household Annual Income between $75,000 and $100,000 (7.5万-10万美元) -> KEEP
+        // Rule 2: Property / Market Value within $400,000 (40万美元以内) -> KEEP
+        // Rule 3: Income between $40,000 and $50,000 (4万-5万美元) AND Market Value between $350,000 and $400,000 (35万-40万美元) -> KEEP
+        function evaluateLookupRowRules(incomeStr, marketStr) {
+            const inc = parseMonetaryValueRange(incomeStr);
+            const mkt = parseMonetaryValueRange(marketStr);
 
-            let maleScore = 50;
+            const passedRules = [];
 
-            // Strong common linguistic and phonetic endings
-            if (first.endsWith('a') || first.endsWith('i') || first.endsWith('ie') || first.endsWith('ette') || first.endsWith('elle') || first.endsWith('lyn') || first.endsWith('ah') || first.endsWith('ina')) {
-                maleScore = 20;
-            } else if (first.endsWith('o') || first.endsWith('er') || first.endsWith('or') || first.endsWith('on') || first.endsWith('an') || first.endsWith('ed') || first.endsWith('us') || first.endsWith('el') || first.endsWith('is') || first.endsWith('in')) {
-                maleScore = 80;
+            // 1. Rule 1: Income 75k - 100k (7.5万 - 10万美元)
+            let passRule1 = false;
+            if (inc) {
+                if ((inc.min >= 70000 && inc.max <= 105000) ||
+                    (inc.avg >= 74000 && inc.avg <= 105000) ||
+                    (inc.min >= 75000 && inc.min <= 100000)) {
+                    passRule1 = true;
+                    passedRules.push('শর্ত ১: বাৎসরিক আয় ৭.৫万 - ১০万美元 ($75k-$100k)');
+                }
             }
 
-            // Common prefixes
-            if (/^(chris|alex|sam|pat|taylor|jordan|morgan|robin|casey)/.test(first)) {
-                maleScore = 55;
-            } else if (/^(john|will|rob|rich|dave|dan|mike|steve|george|ed|tom|pet|ben|mat|dan|jos|ant|dav|mar|gre)/.test(first)) {
-                maleScore = 90;
-            } else if (/^(mary|mar|ann|kat|eliz|jen|sar|lind|barb|deb|jes|meg|lau|pat|sus|ang)/.test(first)) {
-                maleScore = 10;
+            // 2. Rule 2: Property / Market Value <= 400,000 (40万美元以内)
+            let passRule2 = false;
+            if (mkt) {
+                if (mkt.max <= 400000 && mkt.min > 0) {
+                    passRule2 = true;
+                    passedRules.push(`শর্ত ২: মার্কেট ভ্যালু ৪০万美元 এর মধ্যে ($${Math.round(mkt.max).toLocaleString()} ≤ $400k)`);
+                }
             }
 
-            maleScore = Math.max(10, Math.min(90, maleScore));
-            const femaleScore = 100 - maleScore;
+            // 3. Rule 3: Income 40k-50k (4万-5万美元) AND Market Value 350k-400k (35万-40万美元)
+            let passRule3 = false;
+            let incIn40to50 = false;
+            if (inc) {
+                if ((inc.min >= 38000 && inc.max <= 55000) ||
+                    (inc.avg >= 39000 && inc.avg <= 52000) ||
+                    (inc.min >= 40000 && inc.min <= 50000)) {
+                    incIn40to50 = true;
+                }
+            }
 
+            let mktIn350to400 = false;
+            if (mkt) {
+                if ((mkt.min >= 340000 && mkt.max <= 410000) ||
+                    (mkt.avg >= 340000 && mkt.avg <= 405000) ||
+                    (mkt.min >= 350000 && mkt.min <= 400000)) {
+                    mktIn350to400 = true;
+                }
+            }
+
+            if (incIn40to50 && mktIn350to400) {
+                passRule3 = true;
+                passedRules.push('শর্ত ৩: আয় $40k-$50k এবং মার্কেট ভ্যালু $350k-$400k');
+            }
+
+            const isKept = passRule1 || passRule2 || passRule3;
             return {
-                malePercent: maleScore,
-                femalePercent: femaleScore,
-                prediction: maleScore >= 60 ? 'male' : (femaleScore >= 60 ? 'female' : 'uncertain')
+                isKept: isKept,
+                passRule1: passRule1,
+                passRule2: passRule2,
+                passRule3: passRule3,
+                reasons: isKept ? passedRules : ['কোনো শর্তে মিলেনি (Unqualified / 淘汰)']
             };
         }
 
-        // Bulk Selection Set for Undetermined
-        let selectedUndeterminedIds = new Set();
-
-        function toggleSelectAllUndetermined(checked) {
-            selectedUndeterminedIds.clear();
-            const checkboxes = document.querySelectorAll('.undetermined-row-checkbox');
-            checkboxes.forEach(cb => {
-                cb.checked = checked;
-                if (checked) selectedUndeterminedIds.add(cb.value);
-            });
-            updateSelectedUndeterminedCount();
-        }
-
-        function handleSingleUndeterminedCheck(cb) {
-            if (cb.checked) {
-                selectedUndeterminedIds.add(cb.value);
-            } else {
-                selectedUndeterminedIds.delete(cb.value);
-            }
-            updateSelectedUndeterminedCount();
-        }
-
-        function updateSelectedUndeterminedCount() {
-            const countEl = document.getElementById('selectedUndeterminedCount');
-            if (countEl) countEl.innerText = selectedUndeterminedIds.size;
-        }
-
-        // 1-Click Bulk Move Selected to Male or Female
-        function bulkMoveUndetermined(targetGender) {
-            if (selectedUndeterminedIds.size === 0) {
-                alert('Please select at least one record using the checkboxes.');
+        function runLookupFileCheck() {
+            if (!lookupChkFileRawRows || lookupChkFileRawRows.length === 0) {
+                alert('অনুগ্রহ করে প্রথমে একটি ফাইল নির্বাচন করুন।');
                 return;
             }
 
-            const toList = targetGender === 'male' ? gvMaleList : gvFemaleList;
-            const remainingUnknown = [];
+            const colPhone = document.getElementById('lookupChkColPhone')?.value;
+            const colIncome = document.getElementById('lookupChkColIncome')?.value;
+            const colMarket = document.getElementById('lookupChkColMarket')?.value;
+            const colName = document.getElementById('lookupChkColName')?.value;
 
-            gvUnknownList.forEach(item => {
-                if (selectedUndeterminedIds.has(item.id)) {
-                    item.detectedGender = targetGender;
-                    item.probability = 'Manual/Bulk Classified';
-                    toList.push(item);
-                } else {
-                    remainingUnknown.push(item);
-                }
-            });
-
-            gvUnknownList = remainingUnknown;
-            selectedUndeterminedIds.clear();
-
-            refreshGvCountsAndBadges();
-            switchGvSector('unknown');
-            alert(`Moved records successfully to ${targetGender.toUpperCase()} sector!`);
-        }
-
-        // 1-Click Auto-Move by Ratio Prediction (>65% confidence)
-        function autoMoveUndeterminedByPrediction() {
-            if (gvUnknownList.length === 0) {
-                alert('No undetermined records to process.');
+            if (!colPhone || !colIncome || !colMarket) {
+                alert('অনুগ্রহ করে Phone, Household Income এবং Market Value কলাম নির্বাচন করুন।');
                 return;
             }
 
-            let movedMale = 0;
-            let movedFemale = 0;
-            const remainingUnknown = [];
-
-            gvUnknownList.forEach(item => {
-                const ratio = item.genderRatio || calculateGenderRatio(item.fullName);
-                if (ratio.malePercent >= 65) {
-                    item.detectedGender = 'male';
-                    item.probability = `Likely Male (${ratio.malePercent}%)`;
-                    gvMaleList.push(item);
-                    movedMale++;
-                } else if (ratio.femalePercent >= 65) {
-                    item.detectedGender = 'female';
-                    item.probability = `Likely Female (${ratio.femalePercent}%)`;
-                    gvFemaleList.push(item);
-                    movedFemale++;
-                } else {
-                    remainingUnknown.push(item);
-                }
-            });
-
-            gvUnknownList = remainingUnknown;
-            selectedUndeterminedIds.clear();
-
-            refreshGvCountsAndBadges();
-            switchGvSector('unknown');
-            alert(`⚡ Auto-Move Complete!
-
-Moved to Male: ${movedMale}
-Moved to Female: ${movedFemale}
-Remaining Uncertain: ${remainingUnknown.length}`);
-        }
-
-        function refreshGvCountsAndBadges() {
-            document.getElementById('badgeMaleCount').innerText = gvMaleList.length;
-            document.getElementById('badgeFemaleCount').innerText = gvFemaleList.length;
-            document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
-
-            document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
-            document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
-            document.getElementById('gvStatUnknown').innerText = gvUnknownList.length.toLocaleString();
-        }
-
-        async function startGenderVerification() {
-            let recordsToVerify = [];
-
-            if (currentGvInputMode === 'paste') {
-                const rawText = document.getElementById('gvTextInput').value.trim();
-                if (!rawText) {
-                    alert('Please paste some text/records to verify.');
-                    return;
-                }
-
-                const lines = rawText.split(/\r?\n/);
-                lines.forEach(line => {
-                    const trimmed = line.trim();
-                    if (!trimmed) return;
-
-                    // Parse line: can be "15136465609 Khayri Khalimov 52" or "John, 1234567, 30"
-                    const tokens = trimmed.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
-                    let phone = '';
-                    let age = '';
-                    let name = '';
-
-                    if (tokens.length >= 2) {
-                        tokens.forEach(tok => {
-                            const cleanNum = tok.replace(/[\s\-\(\)\.]/g, '');
-                            if (/^\+?\d{7,15}$/.test(cleanNum)) {
-                                phone = cleanNum;
-                            } else if (/^\d{1,3}$/.test(tok) && parseInt(tok) >= 1 && parseInt(tok) <= 120) {
-                                age = tok;
-                            } else if (!name) {
-                                name = tok;
-                            }
-                        });
-                    }
-
-                    // Fallback word tokenizer if single string
-                    if (!phone || !name) {
-                        const words = trimmed.split(/\s+/);
-                        const nameWords = [];
-                        words.forEach(w => {
-                            const cleanNum = w.replace(/[\s\-\(\)\.]/g, '');
-                            if (/^\+?\d{7,15}$/.test(cleanNum) && !phone) {
-                                phone = cleanNum;
-                            } else if (/^\d{1,3}$/.test(w) && parseInt(w) >= 1 && parseInt(w) <= 120 && !age) {
-                                age = w;
-                            } else {
-                                nameWords.push(w);
-                            }
-                        });
-                        name = nameWords.join(' ');
-                    }
-
-                    if (phone || name) {
-                        recordsToVerify.push({
-                            id: Math.random().toString(36).substring(2, 9),
-                            fullName: name || 'Unknown',
-                            phone: phone || '-',
-                            age: age || '-'
-                        });
-                    }
-                });
-            } else {
-                if (!gvFileParsedRows || gvFileParsedRows.length === 0) {
-                    alert('Please select an Excel file first.');
-                    return;
-                }
-                const nameCol = document.getElementById('gvColName').value;
-                const phoneCol = document.getElementById('gvColPhone').value;
-                const ageCol = document.getElementById('gvColAge').value;
-
-                gvFileParsedRows.forEach(row => {
-                    const name = String(row[nameCol] || '').trim();
-                    let phone = String(row[phoneCol] || '').trim().replace(/[\s\-\(\)\.]/g, '');
-                    const age = ageCol ? String(row[ageCol] || '').trim() : '-';
-
-                    if (name || phone) {
-                        recordsToVerify.push({
-                            id: Math.random().toString(36).substring(2, 9),
-                            fullName: name || 'Unknown',
-                            phone: phone || '-',
-                            age: age || '-'
-                        });
-                    }
-                });
+            const btn = document.getElementById('btnRunLookupFileCheck');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ যাচাই ও ফিল্টার হচ্ছে...</span>';
             }
 
-            if (recordsToVerify.length === 0) {
-                alert('No valid records found.');
-                return;
-            }
-
-            const btn = document.getElementById('gvStartBtn');
-            const progressContainer = document.getElementById('gvProgressContainer');
-            const progressBar = document.getElementById('gvProgressBar');
-            const statusText = document.getElementById('gvStatusText');
-
-            btn.disabled = true;
-            progressContainer.classList.remove('hidden');
-            progressBar.style.width = '10%';
-            statusText.innerText = `Preparing ${recordsToVerify.length} names for gender verification...`;
-
-            // Clean name extraction
-            recordsToVerify.forEach(r => {
-                let clean = r.fullName.replace(/^(mr|mrs|ms|miss|dr|prof|md|sheikh)\.?\s+/i, '');
-                if (clean.includes(',')) {
-                    clean = clean.split(',')[1].trim();
-                }
-                // Strip Jr, Sr, etc.
-                clean = clean.replace(/\s+(jr|sr|ii|iii|iv)\.?$/i, '');
-                const words = clean.split(/\s+/);
-                r.firstName = words[0] ? words[0].replace(/[^a-zA-Z]/g, '').toLowerCase() : '';
-            });
-
-            // Fast local full-token lookup
-            const unknownList = [];
-            const lookupResults = {};
-
-            recordsToVerify.forEach(r => {
-                // 1. Try full token match (first name or middle/last words like Ali, Mohamed)
-                const tokenMatch = detectGenderFromFullTokens(r.fullName);
-                if (tokenMatch) {
-                    r.detectedGender = tokenMatch.gender;
-                    r.probability = `${tokenMatch.probability}%`;
-                    r.detectionSource = tokenMatch.engine;
-                } else {
-                    const fn = r.firstName;
-                    if (fn && !unknownList.includes(fn)) {
-                        unknownList.push(fn);
-                    }
-                }
-            });
-
-            // Fast Multi-Stage Resolution: Zero Lag, Instant High-Speed Evaluation!
-            progressBar.style.width = '80%';
-            statusText.innerText = `Applying advanced phonetic & token verification on ${recordsToVerify.length} records...`;
-            await new Promise(r => setTimeout(r, 20)); // Brief paint yield
-
-            // Assign to Sectors & calculate ratio for undetermined
-            gvMaleList = [];
-            gvFemaleList = [];
-            gvUnknownList = [];
-
-            recordsToVerify.forEach(r => {
-                // If already resolved by full token match
-                if (r.detectedGender === 'male') {
-                    gvMaleList.push(r);
-                    return;
-                } else if (r.detectedGender === 'female') {
-                    gvFemaleList.push(r);
-                    return;
-                }
-
-                // Check API lookup results
-                const lookup = lookupResults[r.firstName];
-                if (lookup && lookup.gender === 'male') {
-                    r.detectedGender = 'male';
-                    r.probability = `${lookup.probability}%`;
-                    gvMaleList.push(r);
-                } else if (lookup && lookup.gender === 'female') {
-                    r.detectedGender = 'female';
-                    r.probability = `${lookup.probability}%`;
-                    gvFemaleList.push(r);
-                } else {
-                    r.detectedGender = 'unknown';
-                    r.genderRatio = calculateGenderRatio(r.fullName);
-                    r.probability = `M: ${r.genderRatio.malePercent}% | F: ${r.genderRatio.femalePercent}%`;
-                    gvUnknownList.push(r);
-                }
-            });
-
-            progressBar.style.width = '100%';
-            statusText.innerText = 'Gender verification complete!';
-
-            document.getElementById('gvStatTotal').innerText = recordsToVerify.length.toLocaleString();
-            document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
-            document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
-            document.getElementById('gvStatUnknown').innerText = gvUnknownList.length.toLocaleString();
-
-            document.getElementById('badgeMaleCount').innerText = gvMaleList.length;
-            document.getElementById('badgeFemaleCount').innerText = gvFemaleList.length;
-            document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
-
-            document.getElementById('gvResultsSection').classList.remove('hidden');
-            switchGvSector(gvMaleList.length > 0 ? 'male' : (gvFemaleList.length > 0 ? 'female' : 'unknown'));
-
-            btn.disabled = false;
             setTimeout(() => {
-                progressContainer.classList.add('hidden');
-                progressBar.style.width = '0%';
-            }, 3000);
+                try {
+                    const parsedRecords = [];
+
+                    lookupChkFileRawRows.forEach(row => {
+                        let rawPhone = String(row[colPhone] || '').trim();
+                        let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+
+                        // Smart fallback check across row if cleanPhone is too short
+                        if (cleanPhone.length < 6) {
+                            Object.keys(row).forEach(k => {
+                                const val = String(row[k] || '').trim();
+                                const digs = val.replace(/[^0-9]/g, '');
+                                if (digs.length >= 7 && digs.length <= 16 && cleanPhone.length < 6) {
+                                    cleanPhone = digs;
+                                }
+                            });
+                        }
+
+                        if (!cleanPhone || cleanPhone.length < 6) return;
+
+                        const incomeVal = String(row[colIncome] || '').trim();
+                        const marketVal = String(row[colMarket] || '').trim();
+                        const nameVal = colName ? String(row[colName] || '').trim() : '';
+
+                        const evalRes = evaluateLookupRowRules(incomeVal, marketVal);
+
+                        parsedRecords.push({
+                            phone: cleanPhone,
+                            name: nameVal || '-',
+                            income: incomeVal || '-',
+                            market: marketVal || '-',
+                            isKept: evalRes.isKept,
+                            passRule1: evalRes.passRule1,
+                            passRule2: evalRes.passRule2,
+                            passRule3: evalRes.passRule3,
+                            reasons: evalRes.reasons
+                        });
+                    });
+
+                    processEvaluatedLookupRecords(parsedRecords);
+
+                } catch(err) {
+                    console.error('File check error:', err);
+                    alert('যাচাই করার সময় ত্রুটি ঘটেছে: ' + err.message);
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ কোয়ালিফিকেশন যাচাই ও ফিল্টার করুন</span>';
+                    }
+                }
+            }, 50);
         }
 
-        function switchGvSector(sec) {
-            currentGvSector = sec;
-            const btnMale = document.getElementById('btnSectorMale');
-            const btnFemale = document.getElementById('btnSectorFemale');
-            const btnUnknown = document.getElementById('btnSectorUnknown');
-            const tableBody = document.getElementById('gvSectorTableBody');
-            const submitText = document.getElementById('gvSubmitBtnText');
+        function runLookupPasteCheck() {
+            const rawText = (document.getElementById('lookupChkPasteInput')?.value || '').trim();
+            if (!rawText) {
+                alert('অনুগ্রহ করে টেক্সট বক্সে ডাটা পেস্ট করুন।');
+                return;
+            }
 
-            [btnMale, btnFemale, btnUnknown].forEach(b => {
-                b.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center space-x-1.5 whitespace-nowrap';
+            const btn = document.getElementById('btnRunLookupPasteCheck');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ পেস্ট করা ডাটা যাচাই হচ্ছে...</span>';
+            }
+
+            setTimeout(() => {
+                try {
+                    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    const parsedRecords = [];
+
+                    lines.forEach(line => {
+                        // Split by tab, multiple spaces, or comma
+                        let parts = [];
+                        if (line.includes('\t')) {
+                            parts = line.split('\t').map(p => p.trim());
+                        } else if (line.includes(',')) {
+                            parts = line.split(',').map(p => p.trim());
+                        } else {
+                            parts = line.split(/\s{2,}/).map(p => p.trim());
+                        }
+
+                        let phone = '';
+                        let income = '';
+                        let market = '';
+                        let name = '';
+
+                        // Identify columns by content
+                        parts.forEach(p => {
+                            const digits = p.replace(/[^0-9]/g, '');
+                            if (!phone && digits.length >= 7 && digits.length <= 15) {
+                                phone = digits;
+                            } else if (p.includes('$') || p.includes('k') || p.includes('万') || digits.length >= 4) {
+                                if (!income) {
+                                    income = p;
+                                } else if (!market) {
+                                    market = p;
+                                }
+                            } else if (!name && /[a-zA-Z]/.test(p)) {
+                                name = p;
+                            }
+                        });
+
+                        // Fallback if parts ordered: phone, income, market, name
+                        if (!phone && parts[0]) phone = parts[0].replace(/[^0-9]/g, '');
+                        if (!income && parts[1]) income = parts[1];
+                        if (!market && parts[2]) market = parts[2];
+                        if (!name && parts[3]) name = parts[3];
+
+                        if (!phone || phone.length < 6) return;
+
+                        const evalRes = evaluateLookupRowRules(income, market);
+
+                        parsedRecords.push({
+                            phone: phone,
+                            name: name || '-',
+                            income: income || '-',
+                            market: market || '-',
+                            isKept: evalRes.isKept,
+                            passRule1: evalRes.passRule1,
+                            passRule2: evalRes.passRule2,
+                            passRule3: evalRes.passRule3,
+                            reasons: evalRes.reasons
+                        });
+                    });
+
+                    processEvaluatedLookupRecords(parsedRecords);
+
+                } catch(err) {
+                    console.error('Paste check error:', err);
+                    alert('ডাটা প্রসেস করতে সমস্যা: ' + err.message);
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>⚡ পেস্ট করা ডাটা যাচাই ও ফিল্টার করুন</span>';
+                    }
+                }
+            }, 50);
+        }
+
+        function processEvaluatedLookupRecords(records) {
+            if (!records || records.length === 0) {
+                alert('কোনো বৈধ ফোন নাম্বার বা রেকর্ড পাওয়া যায়নি!');
+                return;
+            }
+
+            lookupChkAllRecords = records;
+            lookupChkQualifiedRecords = records.filter(r => r.isKept);
+            lookupChkDiscardedRecords = records.filter(r => !r.isKept);
+
+            const total = records.length;
+            const qCount = lookupChkQualifiedRecords.length;
+            const dCount = lookupChkDiscardedRecords.length;
+
+            const r1Count = records.filter(r => r.passRule1).length;
+            const r2Count = records.filter(r => r.passRule2).length;
+            const r3Count = records.filter(r => r.passRule3).length;
+
+            const qPct = total > 0 ? Math.round((qCount / total) * 100) : 0;
+            const dPct = total > 0 ? Math.round((dCount / total) * 100) : 0;
+
+            // Update Statistics Cards
+            const elTotal = document.getElementById('lchkStatTotal');
+            const elQ = document.getElementById('lchkStatQualified');
+            const elQPct = document.getElementById('lchkStatQualifiedPct');
+            const elD = document.getElementById('lchkStatDiscarded');
+            const elDPct = document.getElementById('lchkStatDiscardedPct');
+            const elR1 = document.getElementById('lchkStatRule1');
+            const elR2 = document.getElementById('lchkStatRule2');
+            const elR3 = document.getElementById('lchkStatRule3');
+
+            if (elTotal) elTotal.innerText = total.toLocaleString();
+            if (elQ) elQ.innerText = qCount.toLocaleString();
+            if (elQPct) elQPct.innerText = `${qPct}% গ্রহণযোগ্য (Keep)`;
+            if (elD) elD.innerText = dCount.toLocaleString();
+            if (elDPct) elDPct.innerText = `${dPct}% অযোগ্য (Discarded)`;
+            if (elR1) elR1.innerText = r1Count.toLocaleString();
+            if (elR2) elR2.innerText = r2Count.toLocaleString();
+            if (elR3) elR3.innerText = r3Count.toLocaleString();
+
+            // Update Tab Badges
+            const bQ = document.getElementById('lchkTabBadgeQualified');
+            const bD = document.getElementById('lchkTabBadgeDiscarded');
+            const bA = document.getElementById('lchkTabBadgeAll');
+
+            if (bQ) bQ.innerText = qCount.toLocaleString();
+            if (bD) bD.innerText = dCount.toLocaleString();
+            if (bA) bA.innerText = total.toLocaleString();
+
+            // Show Result Container
+            const resContainer = document.getElementById('lookupChkResultContainer');
+            if (resContainer) resContainer.classList.remove('hidden');
+
+            // Default to qualified tab
+            switchLookupChkTableTab('qualified');
+
+            alert(`✅ কোয়ালিফিকেশন যাচাই সম্পন্ন হয়েছে!\n\n📊 মোট ডাটা: ${total.toLocaleString()} টি\n🟢 গ্রহণযোগ্য (Keep): ${qCount.toLocaleString()} টি (${qPct}%)\n🔴 অযোগ্য (Discarded): ${dCount.toLocaleString()} টি (${dPct}%)\n\nএখন আপনি সরাসরি গ্রহণযোগ্য ডাটা এক ক্লিকে এক্সেল বা টেক্সট আকারে ডাউনলোড করতে পারবেন।`);
+        }
+
+        function switchLookupChkTableTab(tab) {
+            currentLookupChkTab = tab;
+            const btnQ = document.getElementById('btnLchkTabQualified');
+            const btnD = document.getElementById('btnLchkTabDiscarded');
+            const btnA = document.getElementById('btnLchkTabAll');
+
+            [btnQ, btnD, btnA].forEach(b => {
+                if (b) b.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5';
             });
 
+            if (tab === 'qualified') {
+                if (btnQ) btnQ.className = 'px-4 py-2 text-xs font-black rounded-xl bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
+            } else if (tab === 'discarded') {
+                if (btnD) btnD.className = 'px-4 py-2 text-xs font-black rounded-xl bg-rose-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
+            } else {
+                if (btnA) btnA.className = 'px-4 py-2 text-xs font-black rounded-xl bg-purple-700 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
+            }
+
+            filterLookupChkTableLocal();
+        }
+
+        function filterLookupChkTableLocal() {
             let activeList = [];
-            if (sec === 'male') {
-                btnMale.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-blue-600 text-white shadow transition flex items-center space-x-1.5 whitespace-nowrap';
-                activeList = gvMaleList;
-                submitText.innerText = '🚀 Submit All Males as Male Report';
-            } else if (sec === 'female') {
-                btnFemale.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-pink-600 text-white shadow transition flex items-center space-x-1.5 whitespace-nowrap';
-                activeList = gvFemaleList;
-                submitText.innerText = '🚀 Submit All Females as Female Report';
+            if (currentLookupChkTab === 'qualified') {
+                activeList = lookupChkQualifiedRecords;
+            } else if (currentLookupChkTab === 'discarded') {
+                activeList = lookupChkDiscardedRecords;
             } else {
-                btnUnknown.className = 'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg bg-amber-600 text-white shadow transition flex items-center space-x-1.5 whitespace-nowrap';
-                activeList = gvUnknownList;
-                submitText.innerText = '🚀 Submit to Portal';
+                activeList = lookupChkAllRecords;
             }
 
-            // Show or hide Undetermined Bulk Action Bar
-            const bulkBar = document.getElementById('undeterminedBulkBar');
-            if (bulkBar) {
-                if (sec === 'unknown') {
-                    bulkBar.classList.remove('hidden');
-                    updateSelectedUndeterminedCount();
-                } else {
-                    bulkBar.classList.add('hidden');
-                }
+            const search = (document.getElementById('lchkTableSearchInput')?.value || '').toLowerCase().trim();
+            if (search) {
+                activeList = activeList.filter(r => {
+                    const phone = (r.phone || '');
+                    const name = (r.name || '').toLowerCase();
+                    const inc = (r.income || '').toLowerCase();
+                    const mkt = (r.market || '').toLowerCase();
+                    const reason = (r.reasons || []).join(' ').toLowerCase();
+                    return phone.includes(search) || name.includes(search) || inc.includes(search) || mkt.includes(search) || reason.includes(search);
+                });
             }
 
-            // Update Table Headers
-            const tableHeader = document.getElementById('gvTableHeaderRow');
-            if (tableHeader) {
-                if (sec === 'unknown') {
-                    tableHeader.innerHTML = `
-                        <th class="py-3 px-3 w-8"><input type="checkbox" id="selectAllUndeterminedCheck" onchange="toggleSelectAllUndetermined(this.checked)" class="w-4 h-4 text-indigo-600 rounded cursor-pointer"></th>
-                        <th class="py-3 px-3">#</th>
-                        <th class="py-3 px-4">Full Name</th>
-                        <th class="py-3 px-4">Phone Number</th>
-                        <th class="py-3 px-4">Age</th>
-                        <th class="py-3 px-4">Estimated Ratio (% Likelihood)</th>
-                        <th class="py-3 px-4 text-right">Quick Move</th>
-                    `;
-                } else {
-                    tableHeader.innerHTML = `
-                        <th class="py-3 px-4">#</th>
-                        <th class="py-3 px-4">Full Name</th>
-                        <th class="py-3 px-4">Phone Number</th>
-                        <th class="py-3 px-4">Age</th>
-                        <th class="py-3 px-4">Detected Gender</th>
-                        <th class="py-3 px-4 text-right">Action / Move</th>
-                    `;
-                }
-            }
+            const countEl = document.getElementById('lchkTableRenderCount');
+            if (countEl) countEl.innerText = `Showing ${activeList.length.toLocaleString()} records`;
 
-            if (activeList.length > 0) {
-                tableBody.innerHTML = activeList.map((item, idx) => {
-                    if (sec === 'unknown') {
-                        const ratio = item.genderRatio || calculateGenderRatio(item.fullName);
-                        const isChecked = selectedUndeterminedIds.has(item.id) ? 'checked' : '';
-                        return `
-                            <tr class="hover:bg-amber-50/50">
-                                <td class="py-3 px-3">
-                                    <input type="checkbox" value="${item.id}" onchange="handleSingleUndeterminedCheck(this)" ${isChecked} class="undetermined-row-checkbox w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                                </td>
-                                <td class="py-3 px-3 font-mono text-xs text-slate-400">${idx + 1}</td>
-                                <td class="py-3 px-4 font-bold text-slate-800">${item.fullName}</td>
-                                <td class="py-3 px-4 font-mono font-medium text-slate-700">${item.phone}</td>
-                                <td class="py-3 px-4 font-medium text-slate-600">${item.age}</td>
-                                <td class="py-3 px-4">
-                                    <div class="flex items-center space-x-2">
-                                        <div class="w-24 bg-slate-200 rounded-full h-2 overflow-hidden flex">
-                                            <div class="bg-blue-600 h-2" style="width: ${ratio.malePercent}%"></div>
-                                            <div class="bg-pink-500 h-2" style="width: ${ratio.femalePercent}%"></div>
-                                        </div>
-                                        <span class="text-xs font-bold ${ratio.malePercent >= 60 ? 'text-blue-700' : (ratio.femalePercent >= 60 ? 'text-pink-700' : 'text-slate-600')}">
-                                            👨 ${ratio.malePercent}% | 👩 ${ratio.femalePercent}%
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button onclick="moveRecordBetweenSectors('${item.id}', 'unknown', 'male')" class="text-xs text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded font-bold mr-1 transition">Male 👨</button>
-                                    <button onclick="moveRecordBetweenSectors('${item.id}', 'unknown', 'female')" class="text-xs text-pink-700 hover:text-pink-900 bg-pink-50 hover:bg-pink-100 border border-pink-200 px-2.5 py-1 rounded font-bold transition">Female 👩</button>
-                                </td>
-                            </tr>
-                        `;
-                    } else {
-                        let badge = item.detectedGender === 'male' 
-                            ? '<span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">👨 Male</span>'
-                            : '<span class="px-2 py-0.5 text-xs rounded-full bg-pink-100 text-pink-800 font-semibold">👩 Female</span>';
-                        
-                        let moveAction = sec === 'male'
-                            ? `<button onclick="moveRecordBetweenSectors('${item.id}', 'male', 'female')" class="text-xs text-pink-600 hover:text-pink-800 font-semibold bg-pink-50 hover:bg-pink-100 px-2.5 py-1 rounded">Move to Female 👩</button>`
-                            : `<button onclick="moveRecordBetweenSectors('${item.id}', 'female', 'male')" class="text-xs text-blue-600 hover:text-blue-800 font-semibold bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded">Move to Male 👨</button>`;
-
-                        return `
-                            <tr class="hover:bg-slate-50">
-                                <td class="py-3 px-4 font-mono text-xs text-slate-400">${idx + 1}</td>
-                                <td class="py-3 px-4 font-bold text-slate-800">${item.fullName}</td>
-                                <td class="py-3 px-4 font-mono font-medium text-slate-700">${item.phone}</td>
-                                <td class="py-3 px-4 font-medium text-slate-600">${item.age}</td>
-                                <td class="py-3 px-4">${badge}</td>
-                                <td class="py-3 px-4 text-right">${moveAction}</td>
-                            </tr>
-                        `;
-                    }
-                }).join('');
-            } else {
-                tableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No records in this sector.</td></tr>`;
-            }
-        }
-
-        function moveRecordBetweenSectors(recordId, fromSec, toSec) {
-            let fromList = fromSec === 'male' ? gvMaleList : (fromSec === 'female' ? gvFemaleList : gvUnknownList);
-            let toList = toSec === 'male' ? gvMaleList : (toSec === 'female' ? gvFemaleList : gvUnknownList);
-
-            const idx = fromList.findIndex(r => r.id === recordId);
-            if (idx !== -1) {
-                const [item] = fromList.splice(idx, 1);
-                item.detectedGender = toSec;
-                toList.push(item);
-
-                // Update badge counts
-                document.getElementById('badgeMaleCount').innerText = gvMaleList.length;
-                document.getElementById('badgeFemaleCount').innerText = gvFemaleList.length;
-                document.getElementById('badgeUnknownCount').innerText = gvUnknownList.length;
-
-                document.getElementById('gvStatMale').innerText = gvMaleList.length.toLocaleString();
-                document.getElementById('gvStatFemale').innerText = gvFemaleList.length.toLocaleString();
-                document.getElementById('gvStatUnknown').innerText = gvUnknownList.length.toLocaleString();
-
-                switchGvSector(currentGvSector);
-            }
-        }
-
-        function downloadCurrentSectorExcel() {
-            let activeList = currentGvSector === 'male' ? gvMaleList : (currentGvSector === 'female' ? gvFemaleList : gvUnknownList);
-            let sectorTitle = currentGvSector === 'male' ? 'Male_Sector_Report' : (currentGvSector === 'female' ? 'Female_Sector_Report' : 'Undetermined_Gender_Report');
+            const tbody = document.getElementById('lookupChkTableBody');
+            if (!tbody) return;
 
             if (activeList.length === 0) {
-                alert('No records to export in the current sector.');
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 font-sans text-xs">নির্বাচিত তালিকায় কোনো ডাটা নেই।</td></tr>`;
                 return;
             }
 
-            const exportData = activeList.map((item, idx) => ({
+            tbody.innerHTML = activeList.map((r, idx) => {
+                const badge = r.isKept
+                    ? '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300 whitespace-nowrap">✅ KEEP (রাখুন)</span>'
+                    : '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300 whitespace-nowrap">❌ REJECT (বাদ)</span>';
+
+                const reasonsHtml = (r.reasons || []).map(rs => {
+                    return `<span class="inline-block text-[11px] px-2 py-0.5 rounded-md ${r.isKept ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'} font-semibold mr-1 mb-1">${rs}</span>`;
+                }).join('');
+
+                return `
+                    <tr class="hover:bg-slate-50 transition text-xs ${!r.isKept ? 'bg-rose-50/20' : ''}">
+                        <td class="py-3 px-3.5 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-3 px-3.5 font-mono font-black text-slate-900">
+                            <div class="flex items-center space-x-1.5">
+                                <span>${r.phone}</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('${r.phone}'); alert('কপি হয়েছে: ${r.phone}');" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 cursor-pointer" title="কপি করুন">📋</button>
+                            </div>
+                        </td>
+                        <td class="py-3 px-3.5 font-medium text-slate-700">${r.name || '-'}</td>
+                        <td class="py-3 px-3.5 font-bold font-mono text-emerald-700">${r.income || '-'}</td>
+                        <td class="py-3 px-3.5 font-bold font-mono text-indigo-700">${r.market || '-'}</td>
+                        <td class="py-3 px-3.5 text-center">${badge}</td>
+                        <td class="py-3 px-3.5">${reasonsHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function downloadLookupChkExcel(type) {
+            let list = [];
+            let fileName = '';
+
+            if (type === 'qualified') {
+                list = lookupChkQualifiedRecords;
+                fileName = `Lookup_Qualified_Kept_${list.length}_Records`;
+            } else if (type === 'discarded') {
+                list = lookupChkDiscardedRecords;
+                fileName = `Lookup_Discarded_Rejected_${list.length}_Records`;
+            } else {
+                list = lookupChkAllRecords;
+                fileName = `Lookup_All_Analysis_${list.length}_Records`;
+            }
+
+            if (!list || list.length === 0) {
+                alert('ডাউনলোড করার মতো কোনো ডাটা নেই!');
+                return;
+            }
+
+            const exportData = list.map((r, idx) => ({
                 'SL': idx + 1,
-                'Full Name': item.fullName,
-                'Phone Number': item.phone,
-                'Age': item.age,
-                'Detected Gender': item.detectedGender.toUpperCase(),
-                'Verification Date': new Date().toLocaleString()
+                'Phone Number': r.phone,
+                'Name': r.name || '-',
+                'Household Income': r.income || '-',
+                'Property / Market Value': r.market || '-',
+                'Status': r.isKept ? 'KEEP (RETAINED)' : 'REJECT (DISCARDED)',
+                'Match Reasons': (r.reasons || []).join('; ')
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, sectorTitle);
-            const today = new Date().toISOString().slice(0, 10);
-            XLSX.writeFile(wb, `${sectorTitle}_${today}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Lookup Analysis");
+            const todayStr = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `${fileName}_${todayStr}.xlsx`);
         }
 
-        async function submitGvSectorAsReport() {
-            let activeList = currentGvSector === 'male' ? gvMaleList : (currentGvSector === 'female' ? gvFemaleList : gvUnknownList);
-            if (activeList.length === 0) {
-                alert('No records to submit in this sector.');
+        function downloadLookupChkTxt(type) {
+            let list = (type === 'qualified') ? lookupChkQualifiedRecords : (type === 'discarded' ? lookupChkDiscardedRecords : lookupChkAllRecords);
+            if (!list || list.length === 0) {
+                alert('ডাউনলোড করার মতো কোনো নাম্বার নেই!');
                 return;
             }
 
-            const reportType = currentGvSector === 'male' ? 'male_report' : (currentGvSector === 'female' ? 'female_report' : 'lookup_report');
-            const reportName = currentGvSector === 'male' ? 'Male Report' : (currentGvSector === 'female' ? 'Female Report' : 'Lookup Report');
+            const lines = list.map(r => r.phone).join('\n');
+            const blob = new Blob([lines], { type: 'text/plain;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Lookup_${type === 'qualified' ? 'Kept' : 'All'}_Phones_${list.length}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
 
-            if (!confirm(`Submit all ${activeList.length} records as ${reportName} to the portal? Phone, Name, and Age will be recorded.`)) {
+        function copyLookupChkPhones(type) {
+            let list = (type === 'qualified') ? lookupChkQualifiedRecords : (type === 'discarded' ? lookupChkDiscardedRecords : lookupChkAllRecords);
+            if (!list || list.length === 0) {
+                alert('কপি করার মতো কোনো নাম্বার নেই!');
                 return;
             }
 
-            const records = activeList.map(item => ({
-                phone: item.phone,
-                name: item.fullName,
-                age: item.age
-            }));
-
-            const btn = document.getElementById('gvSubmitReportBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span>Submitting to Portal...</span>';
-
-            try {
-                const { data, error } = await supabaseClient.rpc('submit_full_work_batch', {
-                    p_records: records,
-                    p_report_type: reportType,
-                    p_file_name: `Gender_${currentGvSector.toUpperCase()}_Submission.xlsx`
-                });
-
-                if (error) throw error;
-                alert(`Report successfully submitted to Portal!\n\nReport Type: ${reportName}\nTotal Submitted: ${data.total_received}\nNew Unique Saved: +${data.new_inserted}\nDuplicates Filtered: ${data.duplicates_count}`);
-            } catch (err) {
-                alert('Error submitting report: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<span id="gvSubmitBtnText">🚀 Submit All ${currentGvSector === 'male' ? 'Males' : 'Females'} as ${reportName}</span>`;
-            }
+            const lines = list.map(r => r.phone).join('\n');
+            navigator.clipboard.writeText(lines).then(() => {
+                alert(`✅ মোট ${list.length.toLocaleString()} টি গ্রহণযোগ্য ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!`);
+            }).catch(err => {
+                alert('কপি করতে সমস্যা: ' + err.message);
+            });
         }
 
-        // ==========================================
+// ==========================================
         // SMART DUPLICATE CHECKER TOOL
         // ==========================================
         let dupCleanList = [];
@@ -7113,7 +7255,7 @@ async function runDuplicateCheck() {
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
             } else {
-                if (hint) hint.innerHTML = `Enter or paste rows for ${cat === 'male_data' ? 'Male' : 'Female'} Data: <span class="font-mono bg-slate-100 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
+                if (hint) hint.innerHTML = `Enter or paste rows for ${cat === 'female_data' ? 'Female' : 'Lookup'} Data: <span class="font-mono bg-slate-100 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -7308,7 +7450,7 @@ async function runDuplicateCheck() {
                             }
                         }
                     } else {
-                        // Male or female data
+                        // Female or lookup data
                         const parts = cleanLine.split(/\t|,|\s{2,}/);
                         if (parts.length >= 2) {
                             const p = parts[0].replace(/[\s\-\(\)\.]/g, '');
@@ -7452,7 +7594,7 @@ async function runDuplicateCheck() {
                     };
                 }
 
-                const catLabel = category === 'male_data' ? '👨 Male Data' : (category === 'female_data' ? '👩 Female Data' : '🔍 Lookup Data');
+                const catLabel = category === 'female_data' ? '👩 Female Data' : '🔍 Lookup Data';
 
                 resultCard.className = 'p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900 block';
                 resultCard.innerHTML = `
@@ -7577,9 +7719,7 @@ async function runDuplicateCheck() {
                 tableBody.innerHTML = list.map((item, idx) => {
                     const timeStr = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     let catBadge = '';
-                    if (item.category === 'male_data') {
-                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Data</span>';
-                    } else if (item.category === 'female_data') {
+                    if (item.category === 'female_data') {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Data</span>';
                     } else {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Data</span>';
@@ -7651,7 +7791,7 @@ async function runDuplicateCheck() {
                 const exportRows = allRows.map((item, idx) => ({
                     'SL': idx + 1,
                     'Delivery Date': item.delivery_date,
-                    'Category': item.category === 'male_data' ? 'Male Data' : (item.category === 'female_data' ? 'Female Data' : 'Lookup Data'),
+                    'Category': item.category === 'female_data' ? 'Female Data' : 'Lookup Data',
                     'Phone Number': item.phone_number,
                     'Full Name': item.full_name || '-',
                     'Age': item.age || '-',
@@ -8989,7 +9129,7 @@ async function loadClaimStockSector() {
             document.getElementById('corrModalFileName').innerText = fileName;
             document.getElementById('corrModalUniqueCount').innerText = uniqueCount;
 
-            const repLabel = currentType === 'male_report' ? '👨 Male Report' : (currentType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report');
+            const repLabel = currentType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
             document.getElementById('corrModalCurrentType').innerText = repLabel;
 
             // Pre-select opposite type
@@ -9042,7 +9182,7 @@ async function loadClaimStockSector() {
                 }
 
                 closeCategoryCorrectionModal();
-                const newTypeLabel = newType === 'male_report' ? 'Male Report' : (newType === 'female_report' ? 'Female Report' : 'Lookup Report');
+                const newTypeLabel = newType === 'female_report' ? 'Female Report' : 'Lookup Report';
                 alert(`✅ সফলভাবে ক্যাটাগরি সংশোধন করা হয়েছে!\n\nএই ব্যাচের ${activeCorrCount}টি নাম্বার এখন "${newTypeLabel}" হিসেবে গণ্য হবে এবং আপনার দৈনিক টার্গেটে স্বয়ংক্রিয়ভাবে হিসাব সমন্বয় করা হয়েছে।`);
 
                 // Reload dashboard & target tracker
@@ -9566,7 +9706,6 @@ async function loadClaimStockSector() {
 
                     const repLabels = {
                         'female_report': { text: '👩 Female Report (মহিলা ডাটা)', bg: 'bg-pink-600 text-white' },
-                        'male_report': { text: '👨 Male Report (পুরুষ ডাটা)', bg: 'bg-blue-600 text-white' },
                         'lookup_report': { text: '🔍 Lookup Report (লুকআপ ডাটা)', bg: 'bg-purple-600 text-white' }
                     };
                     const repInfo = repLabels[r.report_type] || { text: `📁 ${r.report_type || 'General'}`, bg: 'bg-slate-700 text-white' };
@@ -9790,7 +9929,7 @@ async function loadClaimStockSector() {
         
         async function adminQuickChangeCategory(recordId, newType, phone) {
             const labelMap = {
-                'male_report': '👨 Male Report',
+                
                 'female_report': '👩 Female Report',
                 'lookup_report': '🔍 Lookup Report'
             };
@@ -9951,7 +10090,7 @@ async function loadClaimStockSector() {
                         'Age': item.age || '',
                         'Household Income': item.household_income || '',
                         'Est Market Value': item.est_market_value || '',
-                        'Report Type': item.report_type === 'male_report' ? 'Male Report' : (item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report'),
+                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                         'Department': item.department || '-',
                         'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                         'Submission Date': new Date(item.created_at).toLocaleDateString(),
@@ -10132,16 +10271,10 @@ async function loadClaimStockSector() {
                             <input type="radio" name="corrNewType" value="female_report" class="w-4 h-4 text-rose-600">
                             <div>
                                 <span class="font-bold text-rose-800 block">👩 Female Report (ফিমেল ডাটা)</span>
-                                <span class="text-[11px] text-slate-500">টার্গেটের ২০০ ফিমেল কোটায় জমা হবে</span>
+                                <span class="text-[11px] text-slate-500">টার্গেটের ২৭০ ফিমেল কোটায় জমা হবে (বয়স ৪৩+)</span>
                             </div>
                         </label>
-                        <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-blue-400 bg-blue-50/30 cursor-pointer">
-                            <input type="radio" name="corrNewType" value="male_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-blue-600">
-                            <div>
-                                <span class="font-bold text-blue-800 block">👨 Male Report (মেল ডাটা)</span>
-                                <span class="text-[11px] text-slate-500">টার্গেটের ১০০ মেল কোটায় জমা হবে</span>
-                            </div>
-                        </label>
+
                         <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-purple-400 bg-purple-50/30 cursor-pointer">
                             <input type="radio" name="corrNewType" value="lookup_report" class="w-4 h-4 text-purple-600">
                             <div>
