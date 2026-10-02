@@ -1757,6 +1757,92 @@
                         </div>
                     </div>
 
+                    <!-- 1. UPLOAD & ADD LOOKUP NUMBERS DIRECTLY (লুকআপ নাম্বার আপলোড ও এন্ট্রি সেকশন) -->
+                    <div class="bg-white rounded-3xl shadow-sm border-2 border-purple-200 p-5 sm:p-7 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-black shadow-xs flex-shrink-0">
+                                    📤
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-base text-slate-800 flex items-center space-x-2">
+                                        <span>📤 এডমিন নাম্বার আপলোড: লুকআপ নাম্বার সরাসরি আপলোড করুন (শুধুমাত্র এডমিন প্যানেল)</span>
+                                        <span class="text-[10px] bg-purple-100 text-purple-900 font-extrabold px-2 py-0.5 rounded-full">Admin Only</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        এক্সেল ফাইল (.xlsx, .csv) আপলোড করে অথবা সরাসরি টেক্সট পেস্ট করে লুকআপ ডাটাবেজে এক ক্লিকে নাম্বার যুক্ত করুন।
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Category selector -->
+                            <div class="flex items-center space-x-2 self-start sm:self-auto">
+                                <label class="text-xs font-bold text-slate-700 whitespace-nowrap">ক্যাটাগরি:</label>
+                                <select id="adminLookupUploadType" class="px-3 py-1.5 rounded-xl border-2 border-purple-300 text-xs font-bold bg-purple-50 text-purple-900 focus:bg-white focus:ring-2 focus:ring-purple-500 cursor-pointer">
+                                    <option value="valid">🟢 1. Valid Numbers (Household Income & Market Value)</option>
+                                    <option value="no_info">⚪ 2. No Information Numbers (তথ্য পাওয়া যায়নি)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Mode tabs -->
+                        <div class="flex items-center space-x-2">
+                            <button type="button" id="btnAdminLookupUploadModeFile" onclick="switchAdminLookupUploadMode('file')" class="px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer">
+                                📁 Excel / CSV ফাইল আপলোড
+                            </button>
+                            <button type="button" id="btnAdminLookupUploadModePaste" onclick="switchAdminLookupUploadMode('paste')" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                                📋 সরাসরি টেক্সট পেস্ট (Direct Paste)
+                            </button>
+                        </div>
+
+                        <!-- File Upload Sub-Section -->
+                        <div id="adminLookupUploadFileSec" class="space-y-3">
+                            <div class="border-2 border-dashed border-purple-300 hover:border-purple-500 rounded-2xl p-6 text-center bg-purple-50/20 transition cursor-pointer" onclick="document.getElementById('adminLookupUploadFileInput').click()">
+                                <input type="file" id="adminLookupUploadFileInput" accept=".xlsx, .xls, .csv" onchange="handleAdminLookupUploadFile(event)" class="hidden">
+                                <span class="text-3xl block mb-1">📊</span>
+                                <p class="font-extrabold text-xs sm:text-sm text-slate-800">লুকআপ এক্সেল বা CSV ফাইল নির্বাচন করুন বা এখানে ড্র্যাগ করুন</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">কলাম স্বয়ংক্রিয়ভাবে শনাক্ত হবে (Phone, Income, Market Value, Name, Age)</p>
+                            </div>
+                            <div id="adminLookupUploadColMap" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-xs font-black text-slate-800 uppercase">কলাম ম্যাপিং নিশ্চিত করুন:</span>
+                                    <span id="adminLookupUploadRowsCount" class="text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">0 Rows Found</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                                    <div>
+                                        <label class="block font-bold text-slate-700 mb-1">📞 ফোন নাম্বার কলাম:</label>
+                                        <select id="adminLookupColPhone" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold text-slate-700 mb-1">💰 Household Income:</label>
+                                        <select id="adminLookupColIncome" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold text-slate-700 mb-1">🏡 Market Value:</label>
+                                        <select id="adminLookupColMarket" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-bold text-slate-700 mb-1">👤 নাম (ঐচ্ছিক):</label>
+                                        <select id="adminLookupColName" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
+                                    </div>
+                                </div>
+                                <button type="button" id="btnAdminLookupUploadSubmitFile" onclick="submitAdminLookupUploadFile()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
+                                    <span>📤 ফাইলে থাকা সমস্ত ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Paste Mode Sub-Section -->
+                        <div id="adminLookupUploadPasteSec" class="hidden space-y-3">
+                            <textarea id="adminLookupUploadPasteInput" rows="5" placeholder="ফোন নাম্বার, ইনকাম ও মার্কেট ভ্যালু এখানে পেস্ট করুন (যেমন:&#10;15136465609   $75,000   $350,000   Zoe Smith&#10;16145551234   $10,000   $400,000   Sarah Brown)" class="w-full p-3.5 bg-slate-50 border-2 border-slate-300 rounded-2xl font-mono text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"></textarea>
+                            <button type="button" id="btnAdminLookupUploadSubmitPaste" onclick="submitAdminLookupUploadPaste()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
+                                <span>📤 পেস্ট করা ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>
+                            </button>
+                        </div>
+
+                        <!-- Upload Result Box -->
+                        <div id="adminLookupUploadResultCard" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+                    </div>
+
                     <!-- Date Picker & Filter Bar -->
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-wrap items-center gap-2.5">
@@ -2507,54 +2593,54 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                    <!-- Rule 1 -->
+                    <!-- Rule 1: Income 75k+, Market value whatever or empty -->
                     <div class="p-4 bg-emerald-50/80 rounded-2xl border-2 border-emerald-300 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="font-black text-emerald-950 text-sm flex items-center space-x-1.5">
                                 <span>💰</span>
-                                <span>শর্ত ১ (Rule 1)</span>
+                                <span>শর্ত ১ (আয় $75k+)</span>
                             </span>
-                            <span class="bg-emerald-200 text-emerald-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">保留 / Keep</span>
+                            <span class="bg-emerald-200 text-emerald-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">100% VALID (KEEP)</span>
                         </div>
                         <p class="font-extrabold text-emerald-900 text-xs">
-                            বাৎসরিক আয়: $75k - $100k (7.5万-10万美元)
+                            বাৎসরিক আয়: $75,000+ ($75k / $75k-$100k)
                         </p>
                         <p class="text-[11px] text-emerald-800 leading-relaxed font-sans">
-                            যদি কোনো নাম্বারের পারিবারিক বার্ষিক আয় <strong>$75,000 থেকে $100,000</strong> এর মধ্যে হয় (যেমন: $75,000 - $99,999 বা 7.5万-10万), তবে তা <strong>সংরক্ষণযোগ্য / গ্রহণযোগ্য (Keep)</strong>।
+                            যদি কোনো নাম্বারের পারিবারিক বার্ষিক আয় <strong>$75,000 এর মধ্যে বা বেশি</strong> হয়, তবে <strong>মার্কেট ভ্যালু যাই থাকুক (এমনকি মার্কেট ভ্যালু সম্পূর্ণ খালি বা 0 হলেও)</strong> সেটি ১০০% <strong>বৈধ / গ্রহণযোগ্য (Valid)</strong> নাম্বার হিসেবে গণ্য হবে।
                         </p>
                     </div>
 
-                    <!-- Rule 2 -->
+                    <!-- Rule 2: Low income (<=10k or 0) and Market value 350k+ -->
                     <div class="p-4 bg-indigo-50/80 rounded-2xl border-2 border-indigo-300 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="font-black text-indigo-950 text-sm flex items-center space-x-1.5">
                                 <span>🏡</span>
-                                <span>শর্ত ২ (Rule 2)</span>
+                                <span>শর্ত ২ (মার্কেট $350k+)</span>
                             </span>
-                            <span class="bg-indigo-200 text-indigo-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">保留 / Keep</span>
+                            <span class="bg-indigo-200 text-indigo-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">VALID (KEEP)</span>
                         </div>
                         <p class="font-extrabold text-indigo-900 text-xs">
-                            মার্কেট ভ্যালু: ≤ $400,000 (Within 40万美元)
+                            আয় $10k বা $0 কিন্তু মার্কেট ভ্যালু $350,000+
                         </p>
                         <p class="text-[11px] text-indigo-800 leading-relaxed font-sans">
-                            যদি কোনো নাম্বারের প্রোপার্টি / মার্কেট ভ্যালু <strong>৪০万美元 এর মধ্যে</strong> ($400,000 বা তার কম) হয়, তবে তা <strong>সংরক্ষণযোগ্য / গ্রহণযোগ্য (Keep)</strong>।
+                            যদি কোনো নাম্বারের পারিবারিক আয় মাত্র <strong>$10,000 বা তার কম (এমনকি একবারে $0 বা খালি)</strong> থাকে এবং ঐ নাম্বারের প্রোপার্টি / মার্কেট ভ্যালু <strong>$350,000 বা তার বেশি ($350k+)</strong> হয়, তবে সেটিও <strong>বৈধ (Valid)</strong> হবে।
                         </p>
                     </div>
 
-                    <!-- Rule 3 -->
-                    <div class="p-4 bg-purple-50/80 rounded-2xl border-2 border-purple-300 space-y-2">
+                    <!-- Rule 3: Special Numbers: Market value > 18 Lakhs ($1.8M+) -->
+                    <div class="p-4 bg-amber-50/90 rounded-2xl border-2 border-amber-400 space-y-2">
                         <div class="flex items-center justify-between">
-                            <span class="font-black text-purple-950 text-sm flex items-center space-x-1.5">
-                                <span>🎯</span>
-                                <span>শর্ত ৩ (Rule 3)</span>
+                            <span class="font-black text-amber-950 text-sm flex items-center space-x-1.5">
+                                <span>⭐</span>
+                                <span>স্পেশাল ভিআইপি ডাটা</span>
                             </span>
-                            <span class="bg-purple-200 text-purple-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">保留 / Keep</span>
+                            <span class="bg-amber-300 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">SPECIAL VIP</span>
                         </div>
-                        <p class="font-extrabold text-purple-900 text-xs">
-                            আয় $40k-$50k + মার্কেট ভ্যালু $350k-$400k
+                        <p class="font-extrabold text-amber-900 text-xs">
+                            মার্কেট ভ্যালু: ১৮ লাখ$ এর বেশি (> $1.8M)
                         </p>
-                        <p class="text-[11px] text-purple-800 leading-relaxed font-sans">
-                            যদি কোনো নাম্বারের আয় <strong>৪万-৫万美元</strong> ($40k-$50k) এবং একই সাথে মার্কেট ভ্যালু <strong>৩৫万-৪০万美元</strong> ($350k-$400k) হয়, তবে তা <strong>সংরক্ষণযোগ্য / গ্রহণযোগ্য (Keep)</strong>।
+                        <p class="text-[11px] text-amber-800 leading-relaxed font-sans">
+                            যদি কোনো নাম্বারের মার্কেট ভ্যালু <strong>১৮ লাখ ডলার ($1,800,000 / $1.8M) এর বেশি</strong> হয়, তবে সেই নাম্বারগুলো গোল্ডেন ব্যাজসহ <strong>⭐ SPECIAL NUMBER (স্পেশাল নাম্বার)</strong> হিসেবে প্রদর্শিত হবে।
                         </p>
                     </div>
                 </div>
@@ -2643,25 +2729,28 @@
                         <p id="lchkStatQualified" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
                         <p id="lchkStatQualifiedPct" class="text-[10px] text-emerald-600 font-bold">0% সফল</p>
                     </div>
+                    <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl shadow-sm p-4 border-2 border-amber-400">
+                        <div class="flex items-center justify-between">
+                            <p class="text-[11px] font-black text-amber-950 uppercase">⭐ স্পেশাল নাম্বার</p>
+                            <span class="text-[9px] bg-amber-300 text-slate-950 font-black px-1.5 py-0.2 rounded-full">VIP</span>
+                        </div>
+                        <p id="lchkStatSpecial" class="text-2xl sm:text-3xl font-black text-amber-900 mt-1">0</p>
+                        <p class="text-[10px] text-amber-800 font-bold">মার্কেট ভ্যালু > ১৮ লাখ$</p>
+                    </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-rose-500">
                         <p class="text-[11px] font-bold text-rose-900 uppercase">🔴 অযোগ্য (Discarded)</p>
                         <p id="lchkStatDiscarded" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
                         <p id="lchkStatDiscardedPct" class="text-[10px] text-rose-600 font-bold">0% বাদ</p>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-400">
-                        <p class="text-[11px] font-bold text-emerald-800 uppercase">শর্ত ১ পাস ($75k-$100k)</p>
+                        <p class="text-[11px] font-bold text-emerald-800 uppercase">আয় $75k+ (খালি ভ্যালুসহ)</p>
                         <p id="lchkStatRule1" class="text-xl sm:text-2xl font-black text-emerald-700 mt-1">0</p>
-                        <p class="text-[10px] text-slate-400">Income 7.5万-10万</p>
+                        <p class="text-[10px] text-slate-400">Income 75k+</p>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-400">
-                        <p class="text-[11px] font-bold text-indigo-800 uppercase">শর্ত ২ পাস (≤ $400k)</p>
+                        <p class="text-[11px] font-bold text-indigo-800 uppercase">কম আয়ে মার্কেট $350k+</p>
                         <p id="lchkStatRule2" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</p>
-                        <p class="text-[10px] text-slate-400">Market ≤ 40万</p>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-400">
-                        <p class="text-[11px] font-bold text-purple-800 uppercase">শর্ত ৩ পাস (Comb)</p>
-                        <p id="lchkStatRule3" class="text-xl sm:text-2xl font-black text-purple-700 mt-1">0</p>
-                        <p class="text-[10px] text-slate-400">Inc 4-5万 + Mkt 35-40万</p>
+                        <p class="text-[10px] text-slate-400">Low Inc + Mkt 350k+</p>
                     </div>
                 </div>
 
@@ -2671,32 +2760,42 @@
                         <!-- Filter Tabs -->
                         <div class="flex flex-wrap items-center gap-2">
                             <button type="button" id="btnLchkTabQualified" onclick="switchLookupChkTableTab('qualified')" class="px-4 py-2 text-xs font-black rounded-xl bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5">
-                                <span>🟢 গ্রহণযোগ্য ডাটা (Keep Only):</span>
-                                <span id="lchkTabBadgeQualified" class="bg-emerald-800 text-white text-[10px] px-2 py-0.5 rounded-full">0</span>
+                                <span>🟢 গ্রহণযোগ্য ডাটা (Keep):</span>
+                                <span id="lchkTabBadgeQualified" class="bg-emerald-800 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                            </button>
+                            <button type="button" id="btnLchkTabSpecial" onclick="switchLookupChkTableTab('special')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-950 transition cursor-pointer flex items-center space-x-1.5">
+                                <span>⭐ স্পেশাল ডাটা (>18 Lakhs):</span>
+                                <span id="lchkTabBadgeSpecial" class="bg-amber-300 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full">0</span>
                             </button>
                             <button type="button" id="btnLchkTabDiscarded" onclick="switchLookupChkTableTab('discarded')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>🔴 অযোগ্য ডাটা (Discarded):</span>
-                                <span id="lchkTabBadgeDiscarded" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full">0</span>
+                                <span id="lchkTabBadgeDiscarded" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
                             <button type="button" id="btnLchkTabAll" onclick="switchLookupChkTableTab('all')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>📋 সমস্ত ডাটা (All):</span>
-                                <span id="lchkTabBadgeAll" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full">0</span>
+                                <span id="lchkTabBadgeAll" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
                         </div>
 
-                        <!-- 1-Click Export Buttons -->
+                        <!-- 1-Click Export & Direct Upload to DB Buttons -->
                         <div class="flex flex-wrap items-center gap-2">
-                            <button type="button" onclick="downloadLookupChkExcel('qualified')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="শুধুমাত্র পাস করা গ্রহণযোগ্য ডাটা এক্সেল শিটে ডাউনলোড করুন">
-                                <span>📥 Download Kept (.xlsx)</span>
+                            <button type="button" onclick="submitLookupChkAsWorkReport()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="ফিল্টার করা সমস্ত গ্রহণযোগ্য ডাটা আপনার দৈনিক লুকআপ রিপোর্ট হিসেবে জমা দিন (যেমন ফিমেল ডাটার মতো)">
+                                <span>📤 রিপোর্ট জমা দিন (Submit Report)</span>
                             </button>
-                            <button type="button" onclick="downloadLookupChkTxt('qualified')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা ফোন নাম্বারগুলো টেক্সট ফাইলে ডাউনলোড করুন">
-                                <span>📄 Kept Phone (.txt)</span>
+                            <button type="button" onclick="downloadLookupChkExcel('special')" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="শুধুমাত্র ১৮ লাখ$ এর বেশি মূল্যের স্পেশাল নাম্বার ডাউনলোড করুন">
+                                <span>⭐ Special (.xlsx)</span>
                             </button>
-                            <button type="button" onclick="copyLookupChkPhones('qualified')" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা সব ফোন নাম্বার এক ক্লিকে ক্লিপবোর্ডে কপি করুন">
-                                <span>📋 Copy Kept</span>
+                            <button type="button" onclick="downloadLookupChkExcel('qualified')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="শুধুমাত্র পাস করা গ্রহণযোগ্য ডাটা এক্সেল শিটে ডাউনলোড করুন">
+                                <span>📥 Kept (.xlsx)</span>
+                            </button>
+                            <button type="button" onclick="downloadLookupChkTxt('qualified')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা ফোন নাম্বারগুলো টেক্সট ফাইলে ডাউনলোড করুন">
+                                <span>📄 Kept (.txt)</span>
+                            </button>
+                            <button type="button" onclick="copyLookupChkPhones('qualified')" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা সব ফোন নাম্বার এক ক্লিকে ক্লিপবোর্ডে কপি করুন">
+                                <span>📋 Copy</span>
                             </button>
                             <button type="button" onclick="downloadLookupChkExcel('all')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="সব ডাটা স্ট্যাটাস ও কারণসহ ডাউনলোড করুন">
-                                <span>📦 All Analysis (.xlsx)</span>
+                                <span>📦 All (.xlsx)</span>
                             </button>
                         </div>
                     </div>
@@ -3529,7 +3628,7 @@ function setupWorkerReportOptions(dept) {
                     mObj.totalUnique += (log.new_inserted || 0);
                     mObj.dupCount += (log.duplicates_count || 0);
                     if (log.report_type === 'female_report') mObj.femaleCount += (log.new_inserted || 0);
-                    else if (log.report_type === 'lookup_report') mObj.lookupCount += (log.new_inserted || 0);
+                    else if (log.report_type === 'lookup_report' || log.report_type === 'lookup_valid' || log.report_type === 'lookup_no_info') mObj.lookupCount += (log.new_inserted || 0);
 
                     if (!mObj.days[dKey]) {
                         mObj.days[dKey] = {
@@ -3546,7 +3645,7 @@ function setupWorkerReportOptions(dept) {
                     dObj.totalUnique += (log.new_inserted || 0);
                     dObj.dupCount += (log.duplicates_count || 0);
                     if (log.report_type === 'female_report') dObj.femaleCount += (log.new_inserted || 0);
-                    else if (log.report_type === 'lookup_report') dObj.lookupCount += (log.new_inserted || 0);
+                    else if (log.report_type === 'lookup_report' || log.report_type === 'lookup_valid' || log.report_type === 'lookup_no_info') dObj.lookupCount += (log.new_inserted || 0);
 
                     // Today's metrics
                     if (log.created_at >= todayIso) {
@@ -3561,7 +3660,11 @@ function setupWorkerReportOptions(dept) {
 
                         if (historyBody) {
                             const timeStr = new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            const repLabel = log.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
+                            let repLabel = '📁 Other Report';
+                            if (log.report_type === 'female_report') repLabel = '👩 Female Report';
+                            else if (log.report_type === 'lookup_valid') repLabel = '🔍 Lookup Valid';
+                            else if (log.report_type === 'lookup_no_info') repLabel = '⚪ Lookup No-Info';
+                            else if (log.report_type === 'lookup_report') repLabel = '🔍 Lookup Report';
                             historyBody.innerHTML += `
                                 <tr class="hover:bg-slate-50 transition">
                                     <td class="py-3 px-4 font-mono text-xs">${timeStr}</td>
@@ -4031,18 +4134,27 @@ function setupWorkerReportOptions(dept) {
 
         function handleWorkerReportTypeChanged() {
             const selectedReportRadio = document.querySelector('input[name="workerReportType"]:checked');
-            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'male_report';
+            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'female_report';
             const subCard = document.getElementById('lookupSubTypeCard');
             const extraCols = document.getElementById('lookupExtraCols');
+            const optFemale = document.getElementById('optFemaleReport');
+            const optLookup = document.getElementById('optLookupReport');
+            const femaleAgeBanner = document.getElementById('femaleAgeRuleBanner');
 
             if (chosenReportType === 'lookup_report') {
                 if (subCard) subCard.classList.remove('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-purple-500 shadow-sm cursor-pointer transition';
+                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (extraCols) {
                     if (currentLookupDeliveryType === 'valid') extraCols.classList.remove('hidden');
                     else extraCols.classList.add('hidden');
                 }
             } else {
                 if (subCard) subCard.classList.add('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.remove('hidden');
+                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition';
+                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
                 if (extraCols) extraCols.classList.add('hidden');
             }
 
@@ -4319,6 +4431,7 @@ function setupColumnSelectorsAndPreview() {
 
             const records = [];
             let underageFilteredCount = 0;
+            let unqualifiedLookupCount = 0;
 
             parsedRows.forEach(row => {
                 let rawPhone = String(row[chosenPhoneCol] || '').trim();
@@ -4352,6 +4465,17 @@ function setupColumnSelectorsAndPreview() {
                         return; // Auto remove!
                     }
 
+                    // STRICT LOOKUP REPORT QUALIFICATION FILTER (Just like Female Age Filter):
+                    // Rule 1: Income $75k+ (market value can be empty/any)
+                    // Rule 2: Low Income ($10k or $0) + Market Value $350k+
+                    if (chosenReportType === 'lookup_report' && currentLookupDeliveryType === 'valid') {
+                        const ruleRes = evaluateLookupRowRules(incomeVal, marketVal);
+                        if (!ruleRes.isKept) {
+                            unqualifiedLookupCount++;
+                            return; // Auto remove unqualified rows!
+                        }
+                    }
+
                     records.push({
                         phone: cleanPhone,
                         name: nameVal || '-',
@@ -4379,9 +4503,15 @@ function setupColumnSelectorsAndPreview() {
                 if (underageBanner) underageBanner.classList.add('hidden');
             }
 
+            if (unqualifiedLookupCount > 0) {
+                alert(`⚠️ কিছু অযোগ্য লুকআপ ডাটা বাদ পড়েছে!\n\nশর্ত ১ (আয় $75k+) অথবা শর্ত ২ (কম আয়ে মার্কেট $350k+) পূরণ না করায় মোট ${unqualifiedLookupCount.toLocaleString()} টি নাম্বার বাদ দেওয়া হয়েছে।\n\nবাকি ${records.length.toLocaleString()} টি শর্তপূরণকারী গ্রহণযোগ্য লুকআপ নাম্বার জমা দেওয়া হচ্ছে।`);
+            }
+
             if (records.length === 0) {
                 if (underageFilteredCount > 0) {
                     alert(`❌ আপনি কম বয়সী নাম্বার দিয়েছেন!\n\nআপনার ফাইলের মোট ${underageFilteredCount} টি নাম্বারের বয়স ৪৩ বছরের নিচে থাকায় সবগুলো বাদ পড়েছে। ৪৩ বছরের নিচে কোনো ডাটা জমা নেওয়া যাবে না।\n\nঅনুগ্রহ করে ৪৩ বা তার বেশি বয়সী নাম্বার প্রদান করুন।`);
+                } else if (unqualifiedLookupCount > 0) {
+                    alert(`❌ কোনো গ্রহণযোগ্য লুকআপ ডাটা পাওয়া যায়নি!\n\nআপনার ফাইলের মোট ${unqualifiedLookupCount} টি নাম্বারের কোনোটিই শর্ত ১ (আয় $75k+) বা শর্ত ২ (কম আয়ে মার্কেট $350k+) পূরণ করতে পারেনি।\n\nঅনুগ্রহ করে গ্রহণযোগ্য ডাটা প্রদান করুন।`);
                 } else {
                     alert('নির্বাচিত কলামে কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি! অনুগ্রহ করে সঠিক ফোন নাম্বার কলামটি সিলেক্ট করুন।');
                 }
@@ -5919,6 +6049,7 @@ function renderAdminLogsTable() {
         let lookupChkFileRawRows = [];
         let lookupChkAllRecords = [];
         let lookupChkQualifiedRecords = [];
+        let lookupChkSpecialRecords = [];
         let lookupChkDiscardedRecords = [];
         let currentLookupChkTab = 'qualified';
 
@@ -5998,22 +6129,22 @@ function renderAdminLogsTable() {
                 const lower = h.toLowerCase().trim();
 
                 // Smart Phone Auto-selection
-                if (lower.includes('phone') || lower.includes('tel') || lower.includes('mobile') || lower.includes('cell') || lower.includes('number')) {
+                if (lower.includes('phone') || lower.includes('tel') || lower.includes('mobile') || lower.includes('cell') || lower.includes('number') || lower.includes('ফোন')) {
                     optP.selected = true;
                 }
 
                 // Smart Income Auto-selection
-                if (lower.includes('income') || lower.includes('salary') || lower.includes('hh_income') || lower.includes('household') || lower.includes('ann') || lower.includes('收入')) {
+                if (lower.includes('income') || lower.includes('salary') || lower.includes('hh_income') || lower.includes('household') || lower.includes('ann') || lower.includes('收入') || lower.includes('আয়')) {
                     optI.selected = true;
                 }
 
                 // Smart Market Value Auto-selection
-                if (lower.includes('market') || lower.includes('property') || lower.includes('home_value') || lower.includes('est') || lower.includes('value') || lower.includes('房产') || lower.includes('价值')) {
+                if (lower.includes('market') || lower.includes('property') || lower.includes('home_value') || lower.includes('est') || lower.includes('value') || lower.includes('房产') || lower.includes('价值') || lower.includes('ভ্যালু')) {
                     optM.selected = true;
                 }
 
                 // Smart Name Auto-selection
-                if (lower.includes('name') || lower.includes('owner') || lower.includes('contact') || lower.includes('full') || lower.includes('姓名')) {
+                if (lower.includes('name') || lower.includes('owner') || lower.includes('contact') || lower.includes('full') || lower.includes('姓名') || lower.includes('নাম')) {
                     optN.selected = true;
                 }
 
@@ -6024,7 +6155,7 @@ function renderAdminLogsTable() {
             });
         }
 
-        // Smart monetary range and amount parser
+        // Smart monetary range and amount parser supporting Lakhs, Millions, Wan (万), and k
         function parseMonetaryValueRange(rawVal) {
             if (!rawVal) return null;
             let s = String(rawVal).trim().toLowerCase();
@@ -6033,12 +6164,22 @@ function renderAdminLogsTable() {
             // Remove commas
             s = s.replace(/,/g, '');
 
-            // Convert Chinese '万' (wan = 10,000)
+            // 1. Lakhs (1 lakh = 100,000)
+            s = s.replace(/([0-9.]+)\s*(?:lakhs|lakh|lacs|lac)\b/gi, (match, p1) => {
+                return String(parseFloat(p1) * 100000);
+            });
+
+            // 2. Millions (1m = 1,000,000)
+            s = s.replace(/([0-9.]+)\s*(?:million|m)\b/gi, (match, p1) => {
+                return String(parseFloat(p1) * 1000000);
+            });
+
+            // 3. Wan / 万 (1 wan = 10,000)
             s = s.replace(/([0-9.]+)\s*万/g, (match, p1) => {
                 return String(parseFloat(p1) * 10000);
             });
 
-            // Convert 'k' -> 000
+            // 4. k (1k = 1,000)
             s = s.replace(/([0-9.]+)\s*k(?![a-zA-Z])/gi, (match, p1) => {
                 return String(parseFloat(p1) * 1000);
             });
@@ -6057,68 +6198,73 @@ function renderAdminLogsTable() {
             return { min: minVal, max: maxVal, avg: avgVal };
         }
 
-        // Evaluate qualification based on the 3 exact user rules:
-        // Rule 1: Household Annual Income between $75,000 and $100,000 (7.5万-10万美元) -> KEEP
-        // Rule 2: Property / Market Value within $400,000 (40万美元以内) -> KEEP
-        // Rule 3: Income between $40,000 and $50,000 (4万-5万美元) AND Market Value between $350,000 and $400,000 (35万-40万美元) -> KEEP
+        // Evaluate qualification based on the user's updated rules:
+        // Rule 1: Household income around 75k$ ($75,000 - $100,000 or $75k+) -> Valid even if market value is empty/0/anything
+        // Rule 2: Household income <= 10k$ (or 0$ or low/empty) AND Market Value >= 350k$ ($350,000+) -> Valid
+        // Rule 3: Special Numbers: Market Value > 18 Lakhs ($1,800,000 / $1.8M) -> Special High-Value VIP
+        // Rule 4 (Fallback): Market Value <= 400,000 with positive value -> Valid
         function evaluateLookupRowRules(incomeStr, marketStr) {
             const inc = parseMonetaryValueRange(incomeStr);
             const mkt = parseMonetaryValueRange(marketStr);
 
+            let isSpecial = false;
+            let isKept = false;
             const passedRules = [];
 
-            // 1. Rule 1: Income 75k - 100k (7.5万 - 10万美元)
-            let passRule1 = false;
+            // 1. SPECIAL CHECK: Market Value > 18 Lakhs ($1,800,000 / $1.8M)
+            if (mkt && mkt.max > 1800000) {
+                isSpecial = true;
+                isKept = true;
+                passedRules.push(`⭐ স্পেশাল নাম্বার: মার্কেট ভ্যালু ১৮ লাখ$ এর বেশি ($${Math.round(mkt.max).toLocaleString()} > $1.8M)`);
+            }
+
+            // 2. RULE 1: Household income around 75k$ ($75k - $100k or $75k+)
+            // Market value whatever it is, even if empty/0, it is VALID!
             if (inc) {
                 if ((inc.min >= 70000 && inc.max <= 105000) ||
-                    (inc.avg >= 74000 && inc.avg <= 105000) ||
-                    (inc.min >= 75000 && inc.min <= 100000)) {
-                    passRule1 = true;
-                    passedRules.push('শর্ত ১: বাৎসরিক আয় ৭.৫万 - ১০万美元 ($75k-$100k)');
+                    (inc.avg >= 74000) ||
+                    (74000 <= inc.min && inc.min <= 105000) ||
+                    (inc.max >= 75000)) {
+                    isKept = true;
+                    passedRules.push('শর্ত ১: বাৎসরিক আয় $75k+ (মার্কেট ভ্যালু যাই থাকুক বা খালি থাকলেও Valid)');
                 }
             }
 
-            // 2. Rule 2: Property / Market Value <= 400,000 (40万美元以内)
-            let passRule2 = false;
-            if (mkt) {
-                if (mkt.max <= 400000 && mkt.min > 0) {
-                    passRule2 = true;
-                    passedRules.push(`শর্ত ২: মার্কেট ভ্যালু ৪০万美元 এর মধ্যে ($${Math.round(mkt.max).toLocaleString()} ≤ $400k)`);
+            // 3. RULE 2: Household income <= 10k$ (or 0$ or low/empty) AND Market Value >= 350k$ ($350,000+)
+            if (mkt && mkt.max >= 340000) {
+                let isLowIncome = false;
+                if (!inc || inc.min <= 10000 || inc.max <= 12000 || inc.avg <= 10000) {
+                    isLowIncome = true;
+                }
+
+                if (isLowIncome) {
+                    isKept = true;
+                    passedRules.push(`শর্ত ২: কম আয় ($10k বা $0) হলেও মার্কেট ভ্যালু $350k+ ($${Math.round(mkt.max).toLocaleString()}) থাকায় Valid`);
                 }
             }
 
-            // 3. Rule 3: Income 40k-50k (4万-5万美元) AND Market Value 350k-400k (35万-40万美元)
-            let passRule3 = false;
-            let incIn40to50 = false;
-            if (inc) {
-                if ((inc.min >= 38000 && inc.max <= 55000) ||
-                    (inc.avg >= 39000 && inc.avg <= 52000) ||
-                    (inc.min >= 40000 && inc.min <= 50000)) {
-                    incIn40to50 = true;
+            // 4. RULE 4 (Safe retention fallback): Market Value <= 400k (with positive value)
+            if (mkt && mkt.max <= 400000 && mkt.min > 0) {
+                if (!isKept) {
+                    isKept = true;
+                    passedRules.push(`শর্ত ৪: মার্কেট ভ্যালু ৪০万美元 এর মধ্যে ($${Math.round(mkt.max).toLocaleString()} ≤ $400k)`);
                 }
             }
 
-            let mktIn350to400 = false;
-            if (mkt) {
-                if ((mkt.min >= 340000 && mkt.max <= 410000) ||
-                    (mkt.avg >= 340000 && mkt.avg <= 405000) ||
-                    (mkt.min >= 350000 && mkt.min <= 400000)) {
-                    mktIn350to400 = true;
+            // 5. RULE 5 (Safe retention fallback): Income 40k-50k AND Market Value 350k-400k
+            if (inc && mkt && !isKept) {
+                const inc4050 = (inc.min >= 38000 && inc.max <= 55000) || (inc.avg >= 39000 && inc.avg <= 52000);
+                const mkt3540 = (mkt.min >= 340000 && mkt.max <= 410000);
+                if (inc4050 && mkt3540) {
+                    isKept = true;
+                    passedRules.push('শর্ত ৫: আয় $40k-$50k এবং মার্কেট ভ্যালু $350k-$400k');
                 }
             }
 
-            if (incIn40to50 && mktIn350to400) {
-                passRule3 = true;
-                passedRules.push('শর্ত ৩: আয় $40k-$50k এবং মার্কেট ভ্যালু $350k-$400k');
-            }
-
-            const isKept = passRule1 || passRule2 || passRule3;
             return {
                 isKept: isKept,
-                passRule1: passRule1,
-                passRule2: passRule2,
-                passRule3: passRule3,
-                reasons: isKept ? passedRules : ['কোনো শর্তে মিলেনি (Unqualified / 淘汰)']
+                isSpecial: isSpecial,
+                reasons: isKept ? passedRules : ['কোনো গ্রহণযোগ্য শর্তের আওতায় পড়েনি (Unqualified / বাদ)']
             };
         }
 
@@ -6152,7 +6298,6 @@ function renderAdminLogsTable() {
                         let rawPhone = String(row[colPhone] || '').trim();
                         let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
 
-                        // Smart fallback check across row if cleanPhone is too short
                         if (cleanPhone.length < 6) {
                             Object.keys(row).forEach(k => {
                                 const val = String(row[k] || '').trim();
@@ -6177,9 +6322,7 @@ function renderAdminLogsTable() {
                             income: incomeVal || '-',
                             market: marketVal || '-',
                             isKept: evalRes.isKept,
-                            passRule1: evalRes.passRule1,
-                            passRule2: evalRes.passRule2,
-                            passRule3: evalRes.passRule3,
+                            isSpecial: evalRes.isSpecial,
                             reasons: evalRes.reasons
                         });
                     });
@@ -6217,7 +6360,6 @@ function renderAdminLogsTable() {
                     const parsedRecords = [];
 
                     lines.forEach(line => {
-                        // Split by tab, multiple spaces, or comma
                         let parts = [];
                         if (line.includes('\t')) {
                             parts = line.split('\t').map(p => p.trim());
@@ -6232,12 +6374,11 @@ function renderAdminLogsTable() {
                         let market = '';
                         let name = '';
 
-                        // Identify columns by content
                         parts.forEach(p => {
                             const digits = p.replace(/[^0-9]/g, '');
                             if (!phone && digits.length >= 7 && digits.length <= 15) {
                                 phone = digits;
-                            } else if (p.includes('$') || p.includes('k') || p.includes('万') || digits.length >= 4) {
+                            } else if (p.includes('$') || p.includes('k') || p.includes('万') || p.includes('lakh') || digits.length >= 4) {
                                 if (!income) {
                                     income = p;
                                 } else if (!market) {
@@ -6248,7 +6389,6 @@ function renderAdminLogsTable() {
                             }
                         });
 
-                        // Fallback if parts ordered: phone, income, market, name
                         if (!phone && parts[0]) phone = parts[0].replace(/[^0-9]/g, '');
                         if (!income && parts[1]) income = parts[1];
                         if (!market && parts[2]) market = parts[2];
@@ -6264,9 +6404,7 @@ function renderAdminLogsTable() {
                             income: income || '-',
                             market: market || '-',
                             isKept: evalRes.isKept,
-                            passRule1: evalRes.passRule1,
-                            passRule2: evalRes.passRule2,
-                            passRule3: evalRes.passRule3,
+                            isSpecial: evalRes.isSpecial,
                             reasons: evalRes.reasons
                         });
                     });
@@ -6293,15 +6431,16 @@ function renderAdminLogsTable() {
 
             lookupChkAllRecords = records;
             lookupChkQualifiedRecords = records.filter(r => r.isKept);
+            lookupChkSpecialRecords = records.filter(r => r.isSpecial);
             lookupChkDiscardedRecords = records.filter(r => !r.isKept);
 
             const total = records.length;
             const qCount = lookupChkQualifiedRecords.length;
+            const spCount = lookupChkSpecialRecords.length;
             const dCount = lookupChkDiscardedRecords.length;
 
-            const r1Count = records.filter(r => r.passRule1).length;
-            const r2Count = records.filter(r => r.passRule2).length;
-            const r3Count = records.filter(r => r.passRule3).length;
+            const r1Count = records.filter(r => (r.reasons || []).some(s => s.includes('শর্ত ১'))).length;
+            const r2Count = records.filter(r => (r.reasons || []).some(s => s.includes('শর্ত ২'))).length;
 
             const qPct = total > 0 ? Math.round((qCount / total) * 100) : 0;
             const dPct = total > 0 ? Math.round((dCount / total) * 100) : 0;
@@ -6310,27 +6449,29 @@ function renderAdminLogsTable() {
             const elTotal = document.getElementById('lchkStatTotal');
             const elQ = document.getElementById('lchkStatQualified');
             const elQPct = document.getElementById('lchkStatQualifiedPct');
+            const elSp = document.getElementById('lchkStatSpecial');
             const elD = document.getElementById('lchkStatDiscarded');
             const elDPct = document.getElementById('lchkStatDiscardedPct');
             const elR1 = document.getElementById('lchkStatRule1');
             const elR2 = document.getElementById('lchkStatRule2');
-            const elR3 = document.getElementById('lchkStatRule3');
 
             if (elTotal) elTotal.innerText = total.toLocaleString();
             if (elQ) elQ.innerText = qCount.toLocaleString();
-            if (elQPct) elQPct.innerText = `${qPct}% গ্রহণযোগ্য (Keep)`;
+            if (elQPct) elQPct.innerText = `${qPct}% সফল (Keep)`;
+            if (elSp) elSp.innerText = spCount.toLocaleString();
             if (elD) elD.innerText = dCount.toLocaleString();
-            if (elDPct) elDPct.innerText = `${dPct}% অযোগ্য (Discarded)`;
+            if (elDPct) elDPct.innerText = `${dPct}% বাদ (Discarded)`;
             if (elR1) elR1.innerText = r1Count.toLocaleString();
             if (elR2) elR2.innerText = r2Count.toLocaleString();
-            if (elR3) elR3.innerText = r3Count.toLocaleString();
 
             // Update Tab Badges
             const bQ = document.getElementById('lchkTabBadgeQualified');
+            const bSp = document.getElementById('lchkTabBadgeSpecial');
             const bD = document.getElementById('lchkTabBadgeDiscarded');
             const bA = document.getElementById('lchkTabBadgeAll');
 
             if (bQ) bQ.innerText = qCount.toLocaleString();
+            if (bSp) bSp.innerText = spCount.toLocaleString();
             if (bD) bD.innerText = dCount.toLocaleString();
             if (bA) bA.innerText = total.toLocaleString();
 
@@ -6338,24 +6479,26 @@ function renderAdminLogsTable() {
             const resContainer = document.getElementById('lookupChkResultContainer');
             if (resContainer) resContainer.classList.remove('hidden');
 
-            // Default to qualified tab
-            switchLookupChkTableTab('qualified');
+            switchLookupChkTableTab(spCount > 0 ? 'special' : 'qualified');
 
-            alert(`✅ কোয়ালিফিকেশন যাচাই সম্পন্ন হয়েছে!\n\n📊 মোট ডাটা: ${total.toLocaleString()} টি\n🟢 গ্রহণযোগ্য (Keep): ${qCount.toLocaleString()} টি (${qPct}%)\n🔴 অযোগ্য (Discarded): ${dCount.toLocaleString()} টি (${dPct}%)\n\nএখন আপনি সরাসরি গ্রহণযোগ্য ডাটা এক ক্লিকে এক্সেল বা টেক্সট আকারে ডাউনলোড করতে পারবেন।`);
+            alert(`✅ কোয়ালিফিকেশন যাচাই সম্পন্ন হয়েছে!\n\n📊 মোট ডাটা: ${total.toLocaleString()} টি\n🟢 গ্রহণযোগ্য (Keep): ${qCount.toLocaleString()} টি (${qPct}%)\n⭐ স্পেশাল নাম্বার (>18 Lakhs): ${spCount.toLocaleString()} টি\n🔴 অযোগ্য (Discarded): ${dCount.toLocaleString()} টি (${dPct}%)\n\nএখন আপনি গ্রহণযোগ্য ডাটা এক ক্লিকে ডাউনলোড বা সরাসরি ডাটাবেজে আপলোড করতে পারবেন।`);
         }
 
         function switchLookupChkTableTab(tab) {
             currentLookupChkTab = tab;
             const btnQ = document.getElementById('btnLchkTabQualified');
+            const btnSp = document.getElementById('btnLchkTabSpecial');
             const btnD = document.getElementById('btnLchkTabDiscarded');
             const btnA = document.getElementById('btnLchkTabAll');
 
-            [btnQ, btnD, btnA].forEach(b => {
+            [btnQ, btnSp, btnD, btnA].forEach(b => {
                 if (b) b.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5';
             });
 
             if (tab === 'qualified') {
                 if (btnQ) btnQ.className = 'px-4 py-2 text-xs font-black rounded-xl bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
+            } else if (tab === 'special') {
+                if (btnSp) btnSp.className = 'px-4 py-2 text-xs font-black rounded-xl bg-amber-400 text-slate-950 shadow-sm transition cursor-pointer flex items-center space-x-1.5 border border-amber-500';
             } else if (tab === 'discarded') {
                 if (btnD) btnD.className = 'px-4 py-2 text-xs font-black rounded-xl bg-rose-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else {
@@ -6369,6 +6512,8 @@ function renderAdminLogsTable() {
             let activeList = [];
             if (currentLookupChkTab === 'qualified') {
                 activeList = lookupChkQualifiedRecords;
+            } else if (currentLookupChkTab === 'special') {
+                activeList = lookupChkSpecialRecords;
             } else if (currentLookupChkTab === 'discarded') {
                 activeList = lookupChkDiscardedRecords;
             } else {
@@ -6399,16 +6544,25 @@ function renderAdminLogsTable() {
             }
 
             tbody.innerHTML = activeList.map((r, idx) => {
-                const badge = r.isKept
-                    ? '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300 whitespace-nowrap">✅ KEEP (রাখুন)</span>'
-                    : '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300 whitespace-nowrap">❌ REJECT (বাদ)</span>';
+                let badge = '';
+                if (r.isSpecial) {
+                    badge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border border-amber-400 shadow-xs whitespace-nowrap flex items-center space-x-1 inline-flex"><span>⭐</span><span>SPECIAL ($1.8M+)</span></span>';
+                } else if (r.isKept) {
+                    badge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300 whitespace-nowrap">✅ KEEP (বৈধ)</span>';
+                } else {
+                    badge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300 whitespace-nowrap">❌ REJECT (বাদ)</span>';
+                }
 
                 const reasonsHtml = (r.reasons || []).map(rs => {
-                    return `<span class="inline-block text-[11px] px-2 py-0.5 rounded-md ${r.isKept ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'} font-semibold mr-1 mb-1">${rs}</span>`;
+                    const isSp = rs.includes('স্পেশাল') || rs.includes('1.8M');
+                    const cls = isSp ? 'bg-amber-100 text-amber-950 border border-amber-300 font-black' : (r.isKept ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200');
+                    return `<span class="inline-block text-[11px] px-2 py-0.5 rounded-md ${cls} font-semibold mr-1 mb-1">${rs}</span>`;
                 }).join('');
 
+                const rowBg = r.isSpecial ? 'bg-amber-50/50 hover:bg-amber-50 border-l-4 border-l-amber-500' : (!r.isKept ? 'bg-rose-50/20 hover:bg-rose-50/30' : 'hover:bg-slate-50');
+
                 return `
-                    <tr class="hover:bg-slate-50 transition text-xs ${!r.isKept ? 'bg-rose-50/20' : ''}">
+                    <tr class="transition text-xs ${rowBg}">
                         <td class="py-3 px-3.5 font-mono text-slate-400">${idx + 1}</td>
                         <td class="py-3 px-3.5 font-mono font-black text-slate-900">
                             <div class="flex items-center space-x-1.5">
@@ -6418,7 +6572,10 @@ function renderAdminLogsTable() {
                         </td>
                         <td class="py-3 px-3.5 font-medium text-slate-700">${r.name || '-'}</td>
                         <td class="py-3 px-3.5 font-bold font-mono text-emerald-700">${r.income || '-'}</td>
-                        <td class="py-3 px-3.5 font-bold font-mono text-indigo-700">${r.market || '-'}</td>
+                        <td class="py-3 px-3.5 font-bold font-mono ${r.isSpecial ? 'text-amber-800 text-sm' : 'text-indigo-700'}">
+                            ${r.market || '-'}
+                            ${r.isSpecial ? '<span class="text-[10px] ml-1 text-amber-600 font-bold">(>18 Lakhs)</span>' : ''}
+                        </td>
                         <td class="py-3 px-3.5 text-center">${badge}</td>
                         <td class="py-3 px-3.5">${reasonsHtml}</td>
                     </tr>
@@ -6426,11 +6583,69 @@ function renderAdminLogsTable() {
             }).join('');
         }
 
+        // Submit Checked Records as Worker Lookup Daily Report (Just like Female Report)
+        async function submitLookupChkAsWorkReport() {
+            if (!lookupChkQualifiedRecords || lookupChkQualifiedRecords.length === 0) {
+                alert('রিপোর্ট হিসেবে জমা দেওয়ার মতো কোনো গ্রহণযোগ্য ডাটা নেই!');
+                return;
+            }
+
+            if (!currentUser) {
+                alert('⚠️ কাজের রিপোর্ট জমা দেওয়ার জন্য অনুগ্রহ করে প্রথমে আপনার কর্মী অ্যাকাউন্টে লগইন করুন।');
+                switchToSection('dashboard');
+                return;
+            }
+
+            const specialCount = (lookupChkSpecialRecords || []).length;
+            const specialMsg = specialCount > 0 ? `\n(যার মধ্যে ${specialCount} টি ⭐ স্পেশাল নাম্বার রয়েছে)` : '';
+
+            if (!confirm(`মোট ${lookupChkQualifiedRecords.length.toLocaleString()} টি গ্রহণযোগ্য লুকআপ নাম্বার আপনার আজকের কাজের রিপোর্ট হিসেবে জমা দিতে চান?${specialMsg}`)) {
+                return;
+            }
+
+            const records = lookupChkQualifiedRecords.map(r => ({
+                phone: r.phone,
+                name: r.name || '-',
+                age: '-',
+                income: r.income || '-',
+                household_income: r.income || '-',
+                market_value: r.market || '-',
+                est_market_value: r.market || '-'
+            }));
+
+            try {
+                const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
+                    p_lookup_type: 'valid',
+                    p_records: records,
+                    p_file_name: 'Lookup_Tool_Checked_Report.xlsx'
+                });
+
+                if (error) throw error;
+
+                alert(`✅ আপনার লুকআপ কাজের রিপোর্ট সফলভাবে জমা হয়েছে!\n\nমোট ডাটা: ${data.total_received}\nনতুন ইউনিক সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট ফিল্টার্ড: ${data.duplicates_count}`);
+                
+                if (typeof loadAdminLookupReports === 'function') loadAdminLookupReports();
+                if (typeof loadUserDashboard === 'function') loadUserDashboard();
+
+                // Switch to worker dashboard so they see their submitted report & stats
+                switchToSection('dashboard');
+
+            } catch(err) {
+                console.error('Lookup report submit error:', err);
+                alert('রিপোর্ট জমা দিতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        const uploadLookupChkQualifiedToDatabase = submitLookupChkAsWorkReport;
+
         function downloadLookupChkExcel(type) {
             let list = [];
             let fileName = '';
 
-            if (type === 'qualified') {
+            if (type === 'special') {
+                list = lookupChkSpecialRecords;
+                fileName = `Lookup_Special_VIP_${list.length}_Records`;
+            } else if (type === 'qualified') {
                 list = lookupChkQualifiedRecords;
                 fileName = `Lookup_Qualified_Kept_${list.length}_Records`;
             } else if (type === 'discarded') {
@@ -6452,7 +6667,8 @@ function renderAdminLogsTable() {
                 'Name': r.name || '-',
                 'Household Income': r.income || '-',
                 'Property / Market Value': r.market || '-',
-                'Status': r.isKept ? 'KEEP (RETAINED)' : 'REJECT (DISCARDED)',
+                'Status': r.isSpecial ? 'SPECIAL VIP (>18 Lakhs)' : (r.isKept ? 'KEEP (VALID)' : 'REJECT (DISCARDED)'),
+                'Special VIP': r.isSpecial ? 'YES' : 'NO',
                 'Match Reasons': (r.reasons || []).join('; ')
             }));
 
@@ -6464,7 +6680,7 @@ function renderAdminLogsTable() {
         }
 
         function downloadLookupChkTxt(type) {
-            let list = (type === 'qualified') ? lookupChkQualifiedRecords : (type === 'discarded' ? lookupChkDiscardedRecords : lookupChkAllRecords);
+            let list = (type === 'special') ? lookupChkSpecialRecords : ((type === 'qualified') ? lookupChkQualifiedRecords : (type === 'discarded' ? lookupChkDiscardedRecords : lookupChkAllRecords));
             if (!list || list.length === 0) {
                 alert('ডাউনলোড করার মতো কোনো নাম্বার নেই!');
                 return;
@@ -6475,7 +6691,7 @@ function renderAdminLogsTable() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Lookup_${type === 'qualified' ? 'Kept' : 'All'}_Phones_${list.length}.txt`;
+            a.download = `Lookup_${type === 'special' ? 'Special' : (type === 'qualified' ? 'Kept' : 'All')}_Phones_${list.length}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -6483,7 +6699,7 @@ function renderAdminLogsTable() {
         }
 
         function copyLookupChkPhones(type) {
-            let list = (type === 'qualified') ? lookupChkQualifiedRecords : (type === 'discarded' ? lookupChkDiscardedRecords : lookupChkAllRecords);
+            let list = (type === 'special') ? lookupChkSpecialRecords : ((type === 'qualified') ? lookupChkQualifiedRecords : lookupChkAllRecords);
             if (!list || list.length === 0) {
                 alert('কপি করার মতো কোনো নাম্বার নেই!');
                 return;
@@ -6491,10 +6707,308 @@ function renderAdminLogsTable() {
 
             const lines = list.map(r => r.phone).join('\n');
             navigator.clipboard.writeText(lines).then(() => {
-                alert(`✅ মোট ${list.length.toLocaleString()} টি গ্রহণযোগ্য ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!`);
+                alert(`✅ মোট ${list.length.toLocaleString()} টি ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!`);
             }).catch(err => {
                 alert('কপি করতে সমস্যা: ' + err.message);
             });
+        }
+
+        // =========================================================================
+        // ADMIN TAB 7: LOOKUP NUMBERS DIRECT UPLOAD ENGINE
+        // =========================================================================
+        let adminLookupUploadFileRows = [];
+
+        function switchAdminLookupUploadMode(mode) {
+            const btnFile = document.getElementById('btnAdminLookupUploadModeFile');
+            const btnPaste = document.getElementById('btnAdminLookupUploadModePaste');
+            const secFile = document.getElementById('adminLookupUploadFileSec');
+            const secPaste = document.getElementById('adminLookupUploadPasteSec');
+
+            if (mode === 'file') {
+                if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
+                if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+                if (secFile) secFile.classList.remove('hidden');
+                if (secPaste) secPaste.classList.add('hidden');
+            } else {
+                if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
+                if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+                if (secPaste) secPaste.classList.remove('hidden');
+                if (secFile) secFile.classList.add('hidden');
+            }
+        }
+
+        function handleAdminLookupUploadFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+                    if (!rows || rows.length === 0) {
+                        alert('ফাইলে কোনো ডাটা পাওয়া যায়নি!');
+                        return;
+                    }
+
+                    adminLookupUploadFileRows = rows;
+                    const countEl = document.getElementById('adminLookupUploadRowsCount');
+                    if (countEl) countEl.innerText = `${rows.length.toLocaleString()} Rows Found`;
+
+                    const headers = Object.keys(rows[0] || {});
+                    populateAdminLookupColDropdowns(headers);
+
+                    const mapBox = document.getElementById('adminLookupUploadColMap');
+                    if (mapBox) mapBox.classList.remove('hidden');
+
+                } catch(err) {
+                    console.error('Admin lookup file read error:', err);
+                    alert('ফাইল রিড করতে সমস্যা: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function populateAdminLookupColDropdowns(headers) {
+            const pSel = document.getElementById('adminLookupColPhone');
+            const iSel = document.getElementById('adminLookupColIncome');
+            const mSel = document.getElementById('adminLookupColMarket');
+            const nSel = document.getElementById('adminLookupColName');
+
+            [pSel, iSel, mSel, nSel].forEach(s => { if (s) s.innerHTML = ''; });
+            if (nSel) nSel.innerHTML = '<option value="">-- Optional (খালি) --</option>';
+
+            headers.forEach(h => {
+                const optP = new Option(h, h);
+                const optI = new Option(h, h);
+                const optM = new Option(h, h);
+                const optN = new Option(h, h);
+
+                const lower = h.toLowerCase().trim();
+                if (lower.includes('phone') || lower.includes('tel') || lower.includes('number') || lower.includes('cell') || lower.includes('mobile')) optP.selected = true;
+                if (lower.includes('income') || lower.includes('salary') || lower.includes('household') || lower.includes('hh')) optI.selected = true;
+                if (lower.includes('market') || lower.includes('property') || lower.includes('value') || lower.includes('home_val')) optM.selected = true;
+                if (lower.includes('name') || lower.includes('full') || lower.includes('owner')) optN.selected = true;
+
+                if (pSel) pSel.appendChild(optP);
+                if (iSel) iSel.appendChild(optI);
+                if (mSel) mSel.appendChild(optM);
+                if (nSel) nSel.appendChild(optN);
+            });
+        }
+
+        async function submitAdminLookupUploadFile() {
+            if (!adminLookupUploadFileRows || adminLookupUploadFileRows.length === 0) {
+                alert('অনুগ্রহ করে প্রথমে একটি ফাইল নির্বাচন করুন।');
+                return;
+            }
+
+            const pCol = document.getElementById('adminLookupColPhone')?.value;
+            const iCol = document.getElementById('adminLookupColIncome')?.value;
+            const mCol = document.getElementById('adminLookupColMarket')?.value;
+            const nCol = document.getElementById('adminLookupColName')?.value;
+            const lookupType = document.getElementById('adminLookupUploadType')?.value || 'valid';
+
+            if (!pCol) {
+                alert('অনুগ্রহ করে ফোন নাম্বার কলাম নির্বাচন করুন।');
+                return;
+            }
+
+            const btn = document.getElementById('btnAdminLookupUploadSubmitFile');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ আপলোড হচ্ছে...</span>';
+            }
+
+            try {
+                const records = [];
+                adminLookupUploadFileRows.forEach(row => {
+                    let rawPhone = String(row[pCol] || '').trim();
+                    let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+
+                    if (cleanPhone.length < 6) {
+                        Object.keys(row).forEach(k => {
+                            const val = String(row[k] || '').trim();
+                            const digs = val.replace(/[^0-9]/g, '');
+                            if (digs.length >= 7 && digs.length <= 16 && cleanPhone.length < 6) {
+                                cleanPhone = digs;
+                            }
+                        });
+                    }
+
+                    if (!cleanPhone || cleanPhone.length < 6) return;
+
+                    const incVal = iCol ? String(row[iCol] || '').trim() : '';
+                    const mktVal = mCol ? String(row[mCol] || '').trim() : '';
+                    const nameVal = nCol ? String(row[nCol] || '').trim() : '';
+
+                    records.push({
+                        phone: cleanPhone,
+                        name: nameVal || '-',
+                        age: '-',
+                        income: incVal || '-',
+                        household_income: incVal || '-',
+                        market_value: mktVal || '-',
+                        est_market_value: mktVal || '-'
+                    });
+                });
+
+                if (records.length === 0) {
+                    alert('কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি!');
+                    return;
+                }
+
+                const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
+                    p_lookup_type: lookupType,
+                    p_records: records,
+                    p_file_name: 'Admin_Lookup_Upload.xlsx'
+                });
+
+                if (error) throw error;
+
+                const resCard = document.getElementById('adminLookupUploadResultCard');
+                if (resCard) {
+                    resCard.className = 'p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 block';
+                    resCard.innerHTML = `
+                        <div class="flex items-center space-x-2 font-black text-sm text-emerald-950 mb-1">
+                            <span>✅</span>
+                            <span>লুকআপ ডাটাবেজে সফলভাবে আপলোড সম্পন্ন হয়েছে!</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-2 font-mono">
+                            <div class="bg-white p-2 rounded-lg border border-emerald-200">মোট প্রাপ্ত: <strong>${data.total_received}</strong></div>
+                            <div class="bg-white p-2 rounded-lg border border-emerald-200 text-emerald-700">নতুন সংরক্ষিত: <strong>+${data.new_inserted}</strong></div>
+                            <div class="bg-white p-2 rounded-lg border border-amber-200 text-amber-700">ডুপ্লিকেট বাদ: <strong>${data.duplicates_count}</strong></div>
+                        </div>
+                    `;
+                }
+
+                alert(`✅ সফলভাবে লুকআপ ডাটাবেজে আপলোড হয়েছে!\n\nমোট প্রাপ্ত: ${data.total_received}\nনতুন সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট বাদ: ${data.duplicates_count}`);
+
+                // Reload lookup reports view
+                loadAdminLookupReports();
+
+            } catch(err) {
+                console.error('Admin lookup upload error:', err);
+                alert('আপলোডে সমস্যা হয়েছে: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>📤 ফাইলে থাকা সমস্ত ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>';
+                }
+            }
+        }
+
+        async function submitAdminLookupUploadPaste() {
+            const rawText = (document.getElementById('adminLookupUploadPasteInput')?.value || '').trim();
+            if (!rawText) {
+                alert('অনুগ্রহ করে টেক্সট বক্সে ডাটা পেস্ট করুন।');
+                return;
+            }
+
+            const lookupType = document.getElementById('adminLookupUploadType')?.value || 'valid';
+            const btn = document.getElementById('btnAdminLookupUploadSubmitPaste');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ আপলোড হচ্ছে...</span>';
+            }
+
+            try {
+                const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                const records = [];
+
+                lines.forEach(line => {
+                    let parts = [];
+                    if (line.includes('\t')) {
+                        parts = line.split('\t').map(p => p.trim());
+                    } else if (line.includes(',')) {
+                        parts = line.split(',').map(p => p.trim());
+                    } else {
+                        parts = line.split(/\s{2,}/).map(p => p.trim());
+                    }
+
+                    let phone = '';
+                    let income = '';
+                    let market = '';
+                    let name = '';
+
+                    parts.forEach(p => {
+                        const digits = p.replace(/[^0-9]/g, '');
+                        if (!phone && digits.length >= 7 && digits.length <= 15) {
+                            phone = digits;
+                        } else if (p.includes('$') || p.includes('k') || p.includes('万') || p.includes('lakh') || digits.length >= 4) {
+                            if (!income) {
+                                income = p;
+                            } else if (!market) {
+                                market = p;
+                            }
+                        } else if (!name && /[a-zA-Z]/.test(p)) {
+                            name = p;
+                        }
+                    });
+
+                    if (!phone && parts[0]) phone = parts[0].replace(/[^0-9]/g, '');
+                    if (!income && parts[1]) income = parts[1];
+                    if (!market && parts[2]) market = parts[2];
+                    if (!name && parts[3]) name = parts[3];
+
+                    if (!phone || phone.length < 6) return;
+
+                    records.push({
+                        phone: phone,
+                        name: name || '-',
+                        age: '-',
+                        income: income || '-',
+                        household_income: income || '-',
+                        market_value: market || '-',
+                        est_market_value: market || '-'
+                    });
+                });
+
+                if (records.length === 0) {
+                    alert('কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি!');
+                    return;
+                }
+
+                const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
+                    p_lookup_type: lookupType,
+                    p_records: records,
+                    p_file_name: 'Admin_Lookup_Paste.xlsx'
+                });
+
+                if (error) throw error;
+
+                const resCard = document.getElementById('adminLookupUploadResultCard');
+                if (resCard) {
+                    resCard.className = 'p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 block';
+                    resCard.innerHTML = `
+                        <div class="flex items-center space-x-2 font-black text-sm text-emerald-950 mb-1">
+                            <span>✅</span>
+                            <span>পেস্ট করা ডাটা লুকআপ ডাটাবেজে সফলভাবে আপলোড সম্পন্ন হয়েছে!</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-2 font-mono">
+                            <div class="bg-white p-2 rounded-lg border border-emerald-200">মোট প্রাপ্ত: <strong>${data.total_received}</strong></div>
+                            <div class="bg-white p-2 rounded-lg border border-emerald-200 text-emerald-700">নতুন সংরক্ষিত: <strong>+${data.new_inserted}</strong></div>
+                            <div class="bg-white p-2 rounded-lg border border-amber-200 text-amber-700">ডুপ্লিকেট বাদ: <strong>${data.duplicates_count}</strong></div>
+                        </div>
+                    `;
+                }
+
+                alert(`✅ সফলভাবে লুকআপ ডাটাবেজে আপলোড হয়েছে!\n\nমোট প্রাপ্ত: ${data.total_received}\nনতুন সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট বাদ: ${data.duplicates_count}`);
+
+                loadAdminLookupReports();
+
+            } catch(err) {
+                console.error('Admin paste lookup upload error:', err);
+                alert('আপলোডে সমস্যা হয়েছে: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>📤 পেস্ট করা ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>';
+                }
+            }
         }
 
 // ==========================================
