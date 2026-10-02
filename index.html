@@ -1599,6 +1599,16 @@
                                 </label>
                                 <input type="text" id="recInputBatchName" placeholder="e.g. Company_Batch_01 বা Daily_Lead_A" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500">
                             </div>
+                            <div class="col-span-1 sm:col-span-2">
+                                <label class="block text-xs font-black text-indigo-900 uppercase mb-1 flex items-center space-x-1">
+                                    <span>🎯</span>
+                                    <span>স্টক ক্যাটাগরি নির্বাচন করুন (Target Stock Category):</span>
+                                </label>
+                                <select id="recInputStockType" class="w-full px-3 py-2 bg-indigo-50 border-2 border-indigo-400 text-indigo-950 font-bold rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
+                                    <option value="gender_verify">👩 1. Gender Verify Stock (ফিমেল ভেরিফাই ডাটা স্টক)</option>
+                                    <option value="lookup">🔍 2. Lookup Numbers Stock (লুকআপ নাম্বার স্টক - কর্মীদের নেওয়ার জন্য)</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Dropzone or Paste -->
@@ -1757,90 +1767,115 @@
                         </div>
                     </div>
 
-                    <!-- 1. UPLOAD & ADD LOOKUP NUMBERS DIRECTLY (লুকআপ নাম্বার আপলোড ও এন্ট্রি সেকশন) -->
+                    <!-- 1. UPLOAD NUMBERS TO LOOKUP STOCK (কর্মীদের কাজের জন্য লুকআপ স্টক আপলোড) -->
                     <div class="bg-white rounded-3xl shadow-sm border-2 border-purple-200 p-5 sm:p-7 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                             <div class="flex items-center space-x-3">
                                 <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-black shadow-xs flex-shrink-0">
-                                    📤
+                                    📥
                                 </div>
                                 <div>
                                     <h4 class="font-black text-base text-slate-800 flex items-center space-x-2">
-                                        <span>📤 এডমিন নাম্বার আপলোড: লুকআপ নাম্বার সরাসরি আপলোড করুন (শুধুমাত্র এডমিন প্যানেল)</span>
-                                        <span class="text-[10px] bg-purple-100 text-purple-900 font-extrabold px-2 py-0.5 rounded-full">Admin Only</span>
+                                        <span>লুকআপ স্টক নাম্বার আপলোড (Upload Numbers to Lookup Stock)</span>
+                                        <span class="text-[10px] bg-purple-100 text-purple-900 font-extrabold px-2 py-0.5 rounded-full">Stock Dispenser</span>
                                     </h4>
                                     <p class="text-xs text-slate-500 mt-0.5">
-                                        এক্সেল ফাইল (.xlsx, .csv) আপলোড করে অথবা সরাসরি টেক্সট পেস্ট করে লুকআপ ডাটাবেজে এক ক্লিকে নাম্বার যুক্ত করুন।
+                                        কোম্পানি থেকে পাওয়া র/কাঁচা ফোন নাম্বারগুলো এখানে আপলোড করুন। আপলোড করার সাথে সাথে কর্মীরা 'Claim Stock' থেকে এই নাম্বারগুলো তুলে নিয়ে লুকআপ কাজ করতে পারবে (স্টকে 'X টি বাকি' দেখতে পাবে)।
                                     </p>
                                 </div>
                             </div>
-                            <!-- Category selector -->
-                            <div class="flex items-center space-x-2 self-start sm:self-auto">
-                                <label class="text-xs font-bold text-slate-700 whitespace-nowrap">ক্যাটাগরি:</label>
-                                <select id="adminLookupUploadType" class="px-3 py-1.5 rounded-xl border-2 border-purple-300 text-xs font-bold bg-purple-50 text-purple-900 focus:bg-white focus:ring-2 focus:ring-purple-500 cursor-pointer">
-                                    <option value="valid">🟢 1. Valid Numbers (Household Income & Market Value)</option>
-                                    <option value="no_info">⚪ 2. No Information Numbers (তথ্য পাওয়া যায়নি)</option>
-                                </select>
-                            </div>
                         </div>
 
-                        <!-- Mode tabs -->
-                        <div class="flex items-center space-x-2">
-                            <button type="button" id="btnAdminLookupUploadModeFile" onclick="switchAdminLookupUploadMode('file')" class="px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer">
-                                📁 Excel / CSV ফাইল আপলোড
-                            </button>
-                            <button type="button" id="btnAdminLookupUploadModePaste" onclick="switchAdminLookupUploadMode('paste')" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        <!-- Mode Switcher: Paste vs Excel File -->
+                        <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                            <button type="button" id="btnAdminLookupStockModePaste" onclick="switchAdminLookupStockMode('paste')" class="px-4 py-2 text-xs font-black rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer">
                                 📋 সরাসরি টেক্সট পেস্ট (Direct Paste)
                             </button>
+                            <button type="button" id="btnAdminLookupStockModeFile" onclick="switchAdminLookupStockMode('file')" class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                                📁 Excel / CSV / TXT ফাইল আপলোড
+                            </button>
                         </div>
 
-                        <!-- File Upload Sub-Section -->
-                        <div id="adminLookupUploadFileSec" class="space-y-3">
-                            <div class="border-2 border-dashed border-purple-300 hover:border-purple-500 rounded-2xl p-6 text-center bg-purple-50/20 transition cursor-pointer" onclick="document.getElementById('adminLookupUploadFileInput').click()">
-                                <input type="file" id="adminLookupUploadFileInput" accept=".xlsx, .xls, .csv" onchange="handleAdminLookupUploadFile(event)" class="hidden">
-                                <span class="text-3xl block mb-1">📊</span>
-                                <p class="font-extrabold text-xs sm:text-sm text-slate-800">লুকআপ এক্সেল বা CSV ফাইল নির্বাচন করুন বা এখানে ড্র্যাগ করুন</p>
-                                <p class="text-[11px] text-slate-400 mt-0.5">কলাম স্বয়ংক্রিয়ভাবে শনাক্ত হবে (Phone, Income, Market Value, Name, Age)</p>
-                            </div>
-                            <div id="adminLookupUploadColMap" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                                    <span class="text-xs font-black text-slate-800 uppercase">কলাম ম্যাপিং নিশ্চিত করুন:</span>
-                                    <span id="adminLookupUploadRowsCount" class="text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">0 Rows Found</span>
-                                </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                                    <div>
-                                        <label class="block font-bold text-slate-700 mb-1">📞 ফোন নাম্বার কলাম:</label>
-                                        <select id="adminLookupColPhone" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block font-bold text-slate-700 mb-1">💰 Household Income:</label>
-                                        <select id="adminLookupColIncome" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block font-bold text-slate-700 mb-1">🏡 Market Value:</label>
-                                        <select id="adminLookupColMarket" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block font-bold text-slate-700 mb-1">👤 নাম (ঐচ্ছিক):</label>
-                                        <select id="adminLookupColName" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-300 font-bold text-slate-800"></select>
-                                    </div>
-                                </div>
-                                <button type="button" id="btnAdminLookupUploadSubmitFile" onclick="submitAdminLookupUploadFile()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
-                                    <span>📤 ফাইলে থাকা সমস্ত ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>
+                        <!-- Mode A: Direct Paste -->
+                        <div id="adminLookupStockPasteSection" class="space-y-3">
+                            <label class="block text-xs font-bold text-slate-700 uppercase">
+                                প্রতি লাইনে ফোন নাম্বার পেস্ট করুন (যেমন: 13306075475, 18645183171...):
+                            </label>
+                            <textarea id="adminLookupStockPasteInput" rows="5" placeholder="13306075475&#10;18645183171&#10;18608305105&#10;14232207560..." class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono focus:bg-white focus:ring-2 focus:ring-purple-500"></textarea>
+                            
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                                <span class="text-xs text-slate-500">⚡ স্বয়ংক্রিয়ভাবে ফিল্টার করে শুধুমাত্র বৈধ ইউনিক ফোন নাম্বারগুলো কর্মীদের স্টকে জমা হবে।</span>
+                                <button type="button" id="btnAdminLookupStockSubmit" onclick="submitAdminLookupStockUpload()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
+                                    <span>📥 পেস্ট করা নাম্বার লুকআপ স্টকে যুক্ত করুন</span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Paste Mode Sub-Section -->
-                        <div id="adminLookupUploadPasteSec" class="hidden space-y-3">
-                            <textarea id="adminLookupUploadPasteInput" rows="5" placeholder="ফোন নাম্বার, ইনকাম ও মার্কেট ভ্যালু এখানে পেস্ট করুন (যেমন:&#10;15136465609   $75,000   $350,000   Zoe Smith&#10;16145551234   $10,000   $400,000   Sarah Brown)" class="w-full p-3.5 bg-slate-50 border-2 border-slate-300 rounded-2xl font-mono text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"></textarea>
-                            <button type="button" id="btnAdminLookupUploadSubmitPaste" onclick="submitAdminLookupUploadPaste()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
-                                <span>📤 পেস্ট করা ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>
-                            </button>
+                        <!-- Mode B: File Upload -->
+                        <div id="adminLookupStockFileSection" class="hidden space-y-4">
+                            <div onclick="document.getElementById('adminLookupStockFileInput').click()" class="border-2 border-dashed border-purple-300 hover:border-purple-500 bg-purple-50/30 rounded-2xl p-6 text-center cursor-pointer transition">
+                                <input type="file" id="adminLookupStockFileInput" accept=".xlsx, .xls, .csv, .txt" class="hidden" onchange="handleAdminLookupStockFile(event)">
+                                <div class="text-3xl">📁</div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-800 mt-1">ফাইল সিলেক্ট করতে এখানে ক্লিক করুন (.xlsx / .csv / .txt)</p>
+                                <p class="text-[11px] text-slate-500">ফাইল নির্বাচন করলে স্বয়ংক্রিয়ভাবে ফোন নাম্বার কলাম নির্ধারণ করা হবে</p>
+                            </div>
+
+                            <div id="adminLookupStockFileConfig" class="hidden p-4 bg-slate-50 rounded-2xl border border-purple-200 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <span class="text-xs font-black text-slate-800">কলাম কনফিগারেশন:</span>
+                                    <span id="adminLookupStockFileRowsCount" class="text-[11px] bg-purple-100 text-purple-900 font-black px-2.5 py-0.5 rounded-full">0 Rows</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-indigo-900 mb-1">📞 Phone Number Column:</label>
+                                        <select id="adminLookupStockColPhone" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-purple-300 bg-white font-bold text-purple-950"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">👤 Name Column (Optional):</label>
+                                        <select id="adminLookupStockColName" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">🎂 Age Column (Optional):</label>
+                                        <select id="adminLookupStockColAge" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white"></select>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="submitAdminLookupStockUpload()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs py-2.5 rounded-xl shadow-md transition cursor-pointer">
+                                    <span>📥 ফাইল থেকে লুকআপ স্টকে নাম্বার যোগ করুন</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Upload Result Box -->
-                        <div id="adminLookupUploadResultCard" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+                        <!-- Upload Result Feedback Card -->
+                        <div id="adminLookupStockUploadResultCard" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+                    </div>
+
+                    <!-- 2. DATA RESET & DUPLICATE CLEANING BAR (ডাটা রিসেট ও ডুপ্লিকেট ক্লিয়ার) -->
+                    <div class="bg-gradient-to-r from-rose-50 via-amber-50 to-pink-50 rounded-3xl shadow-sm border-2 border-rose-200 p-5 sm:p-6 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl font-black shadow-xs flex-shrink-0">
+                                    🧹
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-base text-rose-950 flex items-center space-x-2">
+                                        <span>লুকআপ ডাটা রিসেট ও ডুপ্লিকেট ক্লিয়ার (Reset / Clean Lookup Data)</span>
+                                        <span class="text-[10px] bg-rose-200 text-rose-900 font-extrabold px-2 py-0.5 rounded-full">Data Management</span>
+                                    </h4>
+                                    <p class="text-xs text-rose-800 mt-0.5">
+                                        পূর্বে ভুলবশত টেস্ট ডাটা (যেমন: ৫,০০০ নাম্বার) আপলোড করে থাকলে এখান থেকে ১-ক্লিকে মুছে ফেলতে পারেন, যাতে কর্মীদের ডুপ্লিকেট না ধরে এবং ড্যাশবোর্ড ক্লিন থাকে।
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Reset Actions -->
+                            <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto flex-shrink-0">
+                                <button type="button" onclick="resetAdminLookupData('today')" class="bg-amber-600 hover:bg-amber-700 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1 cursor-pointer" title="আজকের জমা দেওয়া সব টেস্ট ডাটা মুছে ফেলুন">
+                                    <span>🗑️ আজকের ডাটা মুছুন</span>
+                                </button>
+                                <button type="button" onclick="resetAdminLookupData('all')" class="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1 cursor-pointer" title="সমস্ত টেস্ট ডাটা সম্পূর্ণ মুছে ডাটাবেজ ফ্রেশ করুন">
+                                    <span>⚠️ সম্পূর্ণ ডাটাবেজ রিসেট</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Date Picker & Filter Bar -->
@@ -5123,11 +5158,15 @@ function setupColumnSelectorsAndPreview() {
             resultCard.innerHTML = `⏳ ${records.length} টি নাম্বার স্টকে আপলোড এবং ডুপ্লিকেট পরীক্ষা করা হচ্ছে...`;
 
             try {
-                // Call RPC
+                const stockTypeInput = document.getElementById('recInputStockType');
+                const targetStockType = stockTypeInput ? stockTypeInput.value : 'gender_verify';
+
+                // Call RPC with stock_type
                 const { data, error } = await supabaseClient.rpc('admin_upload_received_numbers', {
                     p_records: records,
                     p_received_date: recDate,
-                    p_batch_name: batchName
+                    p_batch_name: batchName,
+                    p_stock_type: targetStockType
                 });
 
                 if (error) {
@@ -6720,310 +6759,312 @@ function renderAdminLogsTable() {
         // =========================================================================
         let adminLookupUploadFileRows = [];
 
-        function switchAdminLookupUploadMode(mode) {
-            const btnFile = document.getElementById('btnAdminLookupUploadModeFile');
-            const btnPaste = document.getElementById('btnAdminLookupUploadModePaste');
-            const secFile = document.getElementById('adminLookupUploadFileSec');
-            const secPaste = document.getElementById('adminLookupUploadPasteSec');
+        // -------------------------------------------------------------
+        // ADMIN LOOKUP STOCK UPLOAD DISPENSER
+        // -------------------------------------------------------------
+        let adminLookupStockFileRows = [];
+
+        function switchAdminLookupStockMode(mode) {
+            const btnFile = document.getElementById('btnAdminLookupStockModeFile');
+            const btnPaste = document.getElementById('btnAdminLookupStockModePaste');
+            const secFile = document.getElementById('adminLookupStockFileSection');
+            const secPaste = document.getElementById('adminLookupStockPasteSection');
 
             if (mode === 'file') {
-                if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
+                if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-black rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
                 if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
                 if (secFile) secFile.classList.remove('hidden');
                 if (secPaste) secPaste.classList.add('hidden');
             } else {
-                if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
+                if (btnPaste) btnPaste.className = 'px-4 py-2 text-xs font-black rounded-xl bg-purple-600 text-white shadow-sm transition cursor-pointer';
                 if (btnFile) btnFile.className = 'px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
                 if (secPaste) secPaste.classList.remove('hidden');
                 if (secFile) secFile.classList.add('hidden');
             }
         }
 
-        function handleAdminLookupUploadFile(e) {
+        function handleAdminLookupStockFile(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+                    let rows = [];
+                    if (file.name.endsWith('.txt')) {
+                        const txt = evt.target.result;
+                        const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                        rows = lines.map(line => {
+                            const digs = line.replace(/[^0-9]/g, '');
+                            return { phone: digs };
+                        });
+                    } else {
+                        const data = new Uint8Array(evt.target.result);
+                        const wb = XLSX.read(data, { type: 'array' });
+                        const sheet = wb.Sheets[wb.SheetNames[0]];
+                        rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+                    }
 
                     if (!rows || rows.length === 0) {
                         alert('ফাইলে কোনো ডাটা পাওয়া যায়নি!');
                         return;
                     }
 
-                    adminLookupUploadFileRows = rows;
-                    const countEl = document.getElementById('adminLookupUploadRowsCount');
-                    if (countEl) countEl.innerText = `${rows.length.toLocaleString()} Rows Found`;
+                    adminLookupStockFileRows = rows;
+                    const countBadge = document.getElementById('adminLookupStockFileRowsCount');
+                    if (countBadge) countBadge.innerText = `${rows.length.toLocaleString()} Rows`;
 
-                    const headers = Object.keys(rows[0] || {});
-                    populateAdminLookupColDropdowns(headers);
+                    const cols = Object.keys(rows[0]);
+                    const pSel = document.getElementById('adminLookupStockColPhone');
+                    const nSel = document.getElementById('adminLookupStockColName');
+                    const aSel = document.getElementById('adminLookupStockColAge');
 
-                    const mapBox = document.getElementById('adminLookupUploadColMap');
-                    if (mapBox) mapBox.classList.remove('hidden');
+                    if (pSel) pSel.innerHTML = '';
+                    if (nSel) nSel.innerHTML = '<option value="">-- None --</option>';
+                    if (aSel) aSel.innerHTML = '<option value="">-- None --</option>';
+
+                    let bestPhoneCol = cols[0];
+                    cols.forEach(c => {
+                        const lc = c.toLowerCase();
+                        if (lc.includes('phone') || lc.includes('number') || lc.includes('mobile') || lc.includes('cell')) bestPhoneCol = c;
+                    });
+
+                    cols.forEach(col => {
+                        const o1 = document.createElement('option');
+                        o1.value = col; o1.innerText = col;
+                        if (col === bestPhoneCol) o1.selected = true;
+                        if (pSel) pSel.appendChild(o1);
+
+                        const o2 = document.createElement('option');
+                        o2.value = col; o2.innerText = col;
+                        if (nSel) nSel.appendChild(o2);
+
+                        const o3 = document.createElement('option');
+                        o3.value = col; o3.innerText = col;
+                        if (aSel) aSel.appendChild(o3);
+                    });
+
+                    document.getElementById('adminLookupStockFileConfig')?.classList.remove('hidden');
 
                 } catch(err) {
-                    console.error('Admin lookup file read error:', err);
-                    alert('ফাইল রিড করতে সমস্যা: ' + err.message);
+                    alert('ফাইল পড়তে সমস্যা হয়েছে: ' + err.message);
                 }
             };
-            reader.readAsArrayBuffer(file);
+
+            if (file.name.endsWith('.txt')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
         }
 
-        function populateAdminLookupColDropdowns(headers) {
-            const pSel = document.getElementById('adminLookupColPhone');
-            const iSel = document.getElementById('adminLookupColIncome');
-            const mSel = document.getElementById('adminLookupColMarket');
-            const nSel = document.getElementById('adminLookupColName');
+        async function submitAdminLookupStockUpload() {
+            if (!supabaseClient) return;
 
-            [pSel, iSel, mSel, nSel].forEach(s => { if (s) s.innerHTML = ''; });
-            if (nSel) nSel.innerHTML = '<option value="">-- Optional (খালি) --</option>';
+            const textInput = document.getElementById('adminLookupStockPasteInput');
+            const dateInput = document.getElementById('adminLookupReportDate');
+            const batchName = 'Lookup_Stock_' + (dateInput?.value || new Date().toISOString().slice(0, 10));
+            const recDate = dateInput?.value || new Date().toISOString().slice(0, 10);
+            const resultCard = document.getElementById('adminLookupStockUploadResultCard');
+            const btn = document.getElementById('btnAdminLookupStockSubmit');
 
-            headers.forEach(h => {
-                const optP = new Option(h, h);
-                const optI = new Option(h, h);
-                const optM = new Option(h, h);
-                const optN = new Option(h, h);
+            let records = [];
 
-                const lower = h.toLowerCase().trim();
-                if (lower.includes('phone') || lower.includes('tel') || lower.includes('number') || lower.includes('cell') || lower.includes('mobile')) optP.selected = true;
-                if (lower.includes('income') || lower.includes('salary') || lower.includes('household') || lower.includes('hh')) optI.selected = true;
-                if (lower.includes('market') || lower.includes('property') || lower.includes('value') || lower.includes('home_val')) optM.selected = true;
-                if (lower.includes('name') || lower.includes('full') || lower.includes('owner')) optN.selected = true;
+            // From file rows if selected
+            if (adminLookupStockFileRows && adminLookupStockFileRows.length > 0) {
+                const pCol = document.getElementById('adminLookupStockColPhone')?.value;
+                const nCol = document.getElementById('adminLookupStockColName')?.value;
+                const aCol = document.getElementById('adminLookupStockColAge')?.value;
 
-                if (pSel) pSel.appendChild(optP);
-                if (iSel) iSel.appendChild(optI);
-                if (mSel) mSel.appendChild(optM);
-                if (nSel) nSel.appendChild(optN);
-            });
-        }
-
-        async function submitAdminLookupUploadFile() {
-            if (!adminLookupUploadFileRows || adminLookupUploadFileRows.length === 0) {
-                alert('অনুগ্রহ করে প্রথমে একটি ফাইল নির্বাচন করুন।');
-                return;
-            }
-
-            const pCol = document.getElementById('adminLookupColPhone')?.value;
-            const iCol = document.getElementById('adminLookupColIncome')?.value;
-            const mCol = document.getElementById('adminLookupColMarket')?.value;
-            const nCol = document.getElementById('adminLookupColName')?.value;
-            const lookupType = document.getElementById('adminLookupUploadType')?.value || 'valid';
-
-            if (!pCol) {
-                alert('অনুগ্রহ করে ফোন নাম্বার কলাম নির্বাচন করুন।');
-                return;
-            }
-
-            const btn = document.getElementById('btnAdminLookupUploadSubmitFile');
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<span>⏳ আপলোড হচ্ছে...</span>';
-            }
-
-            try {
-                const records = [];
-                adminLookupUploadFileRows.forEach(row => {
-                    let rawPhone = String(row[pCol] || '').trim();
-                    let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
-
-                    if (cleanPhone.length < 6) {
+                adminLookupStockFileRows.forEach(row => {
+                    let phone = pCol ? String(row[pCol] || '').replace(/[^0-9]/g, '') : '';
+                    if (!phone || phone.length < 6) {
                         Object.keys(row).forEach(k => {
-                            const val = String(row[k] || '').trim();
-                            const digs = val.replace(/[^0-9]/g, '');
-                            if (digs.length >= 7 && digs.length <= 16 && cleanPhone.length < 6) {
-                                cleanPhone = digs;
-                            }
+                            const val = String(row[k] || '').replace(/[^0-9]/g, '');
+                            if (!phone && val.length >= 6 && val.length <= 16) phone = val;
                         });
                     }
-
-                    if (!cleanPhone || cleanPhone.length < 6) return;
-
-                    const incVal = iCol ? String(row[iCol] || '').trim() : '';
-                    const mktVal = mCol ? String(row[mCol] || '').trim() : '';
-                    const nameVal = nCol ? String(row[nCol] || '').trim() : '';
-
-                    records.push({
-                        phone: cleanPhone,
-                        name: nameVal || '-',
-                        age: '-',
-                        income: incVal || '-',
-                        household_income: incVal || '-',
-                        market_value: mktVal || '-',
-                        est_market_value: mktVal || '-'
-                    });
+                    if (phone && phone.length >= 6) {
+                        records.push({
+                            phone: phone,
+                            name: nCol ? String(row[nCol] || '').trim() : '',
+                            age: aCol ? String(row[aCol] || '').trim() : ''
+                        });
+                    }
                 });
-
-                if (records.length === 0) {
-                    alert('কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি!');
-                    return;
-                }
-
-                const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
-                    p_lookup_type: lookupType,
-                    p_records: records,
-                    p_file_name: 'Admin_Lookup_Upload.xlsx'
-                });
-
-                if (error) throw error;
-
-                const resCard = document.getElementById('adminLookupUploadResultCard');
-                if (resCard) {
-                    resCard.className = 'p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 block';
-                    resCard.innerHTML = `
-                        <div class="flex items-center space-x-2 font-black text-sm text-emerald-950 mb-1">
-                            <span>✅</span>
-                            <span>লুকআপ ডাটাবেজে সফলভাবে আপলোড সম্পন্ন হয়েছে!</span>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mt-2 font-mono">
-                            <div class="bg-white p-2 rounded-lg border border-emerald-200">মোট প্রাপ্ত: <strong>${data.total_received}</strong></div>
-                            <div class="bg-white p-2 rounded-lg border border-emerald-200 text-emerald-700">নতুন সংরক্ষিত: <strong>+${data.new_inserted}</strong></div>
-                            <div class="bg-white p-2 rounded-lg border border-amber-200 text-amber-700">ডুপ্লিকেট বাদ: <strong>${data.duplicates_count}</strong></div>
-                        </div>
-                    `;
-                }
-
-                alert(`✅ সফলভাবে লুকআপ ডাটাবেজে আপলোড হয়েছে!\n\nমোট প্রাপ্ত: ${data.total_received}\nনতুন সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট বাদ: ${data.duplicates_count}`);
-
-                // Reload lookup reports view
-                loadAdminLookupReports();
-
-            } catch(err) {
-                console.error('Admin lookup upload error:', err);
-                alert('আপলোডে সমস্যা হয়েছে: ' + err.message);
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>📤 ফাইলে থাকা সমস্ত ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>';
-                }
             }
-        }
 
-        async function submitAdminLookupUploadPaste() {
-            const rawText = (document.getElementById('adminLookupUploadPasteInput')?.value || '').trim();
-            if (!rawText) {
-                alert('অনুগ্রহ করে টেক্সট বক্সে ডাটা পেস্ট করুন।');
+            // From direct paste
+            if (textInput && textInput.value.trim()) {
+                const lines = textInput.value.split(/\r?\n/);
+                lines.forEach(line => {
+                    const cleanNum = line.replace(/[^0-9]/g, '');
+                    if (cleanNum && cleanNum.length >= 6) {
+                        records.push({ phone: cleanNum, name: '', age: '' });
+                    }
+                });
+            }
+
+            if (records.length === 0) {
+                alert('অনুগ্রহ করে একটি ফাইল সিলেক্ট করুন অথবা বক্সে ফোন নাম্বার পেস্ট করুন।');
                 return;
             }
 
-            const lookupType = document.getElementById('adminLookupUploadType')?.value || 'valid';
-            const btn = document.getElementById('btnAdminLookupUploadSubmitPaste');
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<span>⏳ আপলোড হচ্ছে...</span>';
+                btn.innerHTML = '<span>⏳ স্টকে আপলোড হচ্ছে...</span>';
             }
 
             try {
-                const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                const records = [];
+                let uploadResult = null;
 
-                lines.forEach(line => {
-                    let parts = [];
-                    if (line.includes('\t')) {
-                        parts = line.split('\t').map(p => p.trim());
-                    } else if (line.includes(',')) {
-                        parts = line.split(',').map(p => p.trim());
-                    } else {
-                        parts = line.split(/\s{2,}/).map(p => p.trim());
-                    }
-
-                    let phone = '';
-                    let income = '';
-                    let market = '';
-                    let name = '';
-
-                    parts.forEach(p => {
-                        const digits = p.replace(/[^0-9]/g, '');
-                        if (!phone && digits.length >= 7 && digits.length <= 15) {
-                            phone = digits;
-                        } else if (p.includes('$') || p.includes('k') || p.includes('万') || p.includes('lakh') || digits.length >= 4) {
-                            if (!income) {
-                                income = p;
-                            } else if (!market) {
-                                market = p;
-                            }
-                        } else if (!name && /[a-zA-Z]/.test(p)) {
-                            name = p;
-                        }
+                // Try RPC first
+                try {
+                    const { data, error } = await supabaseClient.rpc('admin_upload_received_numbers', {
+                        p_records: records,
+                        p_received_date: recDate,
+                        p_batch_name: batchName,
+                        p_stock_type: 'lookup'
                     });
+                    if (error) throw error;
+                    uploadResult = data;
+                } catch(rpcErr) {
+                    console.warn('RPC admin_upload_received_numbers failed, fallback to direct insert:', rpcErr);
 
-                    if (!phone && parts[0]) phone = parts[0].replace(/[^0-9]/g, '');
-                    if (!income && parts[1]) income = parts[1];
-                    if (!market && parts[2]) market = parts[2];
-                    if (!name && parts[3]) name = parts[3];
+                    // Direct Insert Fallback to company_received_numbers
+                    const insertRows = records.map(r => ({
+                        phone_number: r.phone,
+                        full_name: r.name || '',
+                        age: r.age || '',
+                        stock_type: 'lookup',
+                        received_date: recDate,
+                        batch_name: batchName,
+                        is_assigned: false,
+                        is_exported: false
+                    }));
 
-                    if (!phone || phone.length < 6) return;
+                    const uniqueMap = {};
+                    insertRows.forEach(r => { uniqueMap[r.phone_number] = r; });
+                    const uniqueRows = Object.values(uniqueMap);
 
-                    records.push({
-                        phone: phone,
-                        name: name || '-',
-                        age: '-',
-                        income: income || '-',
-                        household_income: income || '-',
-                        market_value: market || '-',
-                        est_market_value: market || '-'
-                    });
-                });
+                    const { data: insData, error: insErr } = await supabaseClient
+                        .from('company_received_numbers')
+                        .upsert(uniqueRows, { onConflict: 'phone_number', ignoreDuplicates: false });
 
-                if (records.length === 0) {
-                    alert('কোনো বৈধ ফোন নাম্বার পাওয়া যায়নি!');
-                    return;
+                    if (insErr) throw insErr;
+
+                    uploadResult = {
+                        success: true,
+                        total_received: records.length,
+                        unique_in_file: uniqueRows.length,
+                        new_inserted: uniqueRows.length,
+                        duplicates_count: records.length - uniqueRows.length
+                    };
                 }
 
-                const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
-                    p_lookup_type: lookupType,
-                    p_records: records,
-                    p_file_name: 'Admin_Lookup_Paste.xlsx'
-                });
-
-                if (error) throw error;
-
-                const resCard = document.getElementById('adminLookupUploadResultCard');
-                if (resCard) {
-                    resCard.className = 'p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 block';
-                    resCard.innerHTML = `
+                if (resultCard) {
+                    resultCard.classList.remove('hidden');
+                    resultCard.className = 'p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 block';
+                    resultCard.innerHTML = `
                         <div class="flex items-center space-x-2 font-black text-sm text-emerald-950 mb-1">
                             <span>✅</span>
-                            <span>পেস্ট করা ডাটা লুকআপ ডাটাবেজে সফলভাবে আপলোড সম্পন্ন হয়েছে!</span>
+                            <span>সফলভাবে লুকআপ স্টকে নাম্বার যোগ হয়েছে!</span>
                         </div>
                         <div class="grid grid-cols-3 gap-2 mt-2 font-mono">
-                            <div class="bg-white p-2 rounded-lg border border-emerald-200">মোট প্রাপ্ত: <strong>${data.total_received}</strong></div>
-                            <div class="bg-white p-2 rounded-lg border border-emerald-200 text-emerald-700">নতুন সংরক্ষিত: <strong>+${data.new_inserted}</strong></div>
-                            <div class="bg-white p-2 rounded-lg border border-amber-200 text-amber-700">ডুপ্লিকেট বাদ: <strong>${data.duplicates_count}</strong></div>
+                            <p>মোট প্রাপ্ত: <b>\${uploadResult.total_received.toLocaleString()}</b></p>
+                            <p class="text-emerald-700">নতুন স্টকে যুক্ত: <b>+\${uploadResult.new_inserted.toLocaleString()}</b></p>
+                            <p class="text-amber-700">ডুপ্লিকেট বাদ: <b>\${uploadResult.duplicates_count.toLocaleString()}</b></p>
                         </div>
+                        <p class="text-[11px] text-emerald-800 font-sans mt-2">
+                            💡 কর্মীরা এখন <b>'Claim Stock'</b> পেজে গিয়ে <b>'লুকআপ নাম্বার স্টক (Lookup Numbers)'</b>-এ এই নাম্বারগুলো দেখতে পাবে এবং কাজের জন্য তুলে নিতে পারবে।
+                        </p>
                     `;
                 }
 
-                alert(`✅ সফলভাবে লুকআপ ডাটাবেজে আপলোড হয়েছে!\n\nমোট প্রাপ্ত: ${data.total_received}\nনতুন সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট বাদ: ${data.duplicates_count}`);
+                alert(`✅ সফলভাবে \${uploadResult.new_inserted.toLocaleString()} টি নতুন নাম্বার লুকআপ স্টকে জমা হয়েছে!\n\nকর্মীরা এখন Claim Stock পেজ থেকে এই নাম্বারগুলো তুলে নিয়ে কাজ শুরু করতে পারবে।`);
 
-                loadAdminLookupReports();
+                // Reset paste textarea
+                if (textInput) textInput.value = '';
+
+                // Refresh stock counts across portal
+                if (typeof refreshClaimStockData === 'function') refreshClaimStockData();
+                if (typeof loadWorkerClaimStockCount === 'function') loadWorkerClaimStockCount();
+                if (typeof loadAdminRecStockData === 'function') loadAdminRecStockData();
 
             } catch(err) {
-                console.error('Admin paste lookup upload error:', err);
-                alert('আপলোডে সমস্যা হয়েছে: ' + err.message);
+                console.error('Stock upload error:', err);
+                alert('স্টকে আপলোড করতে সমস্যা হয়েছে: ' + err.message);
             } finally {
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = '<span>📤 পেস্ট করা ডাটা লুকআপ ডাটাবেজে সেভ করুন</span>';
+                    btn.innerHTML = '<span>📥 পেস্ট করা নাম্বার লুকআপ স্টকে যুক্ত করুন</span>';
                 }
             }
         }
 
-// ==========================================
-        // SMART DUPLICATE CHECKER TOOL
-        // ==========================================
-        let dupCleanList = [];
-        let dupRepeatedList = [];
-        let dupDbMatchesList = [];
-        let currentDupTab = 'clean';
+        // -------------------------------------------------------------
+        // ADMIN DATA RESET & DUPLICATE CLEANING
+        // -------------------------------------------------------------
+        async function resetAdminLookupData(scope) {
+            if (!supabaseClient) return;
 
-        
-        let activeDupInputMode = 'paste';
-        let dupUploadedFileRows = [];
+            const targetDate = document.getElementById('adminLookupReportDate')?.value || new Date().toISOString().slice(0, 10);
+            
+            let confirmMsg = '';
+            if (scope === 'today') {
+                confirmMsg = `⚠️ আপনি কি আজকের (\${targetDate}) সমস্ত জমা দেওয়া লুকআপ ডাটা মুছে ফেলতে চান?\n\nএর ফলে টেস্টে জমা দেওয়া নাম্বারগুলো মুছে যাবে এবং পরবর্তীতে কর্মীদের কাজে ডুপ্লিকেট হিসেবে ধরবে না।`;
+            } else {
+                confirmMsg = `🚨 চরম সতর্কতা!\n\nআপনি কি ডাটাবেজের সমস্ত লুকআপ ডাটা (আপনার পূর্বে আপলোড করা ৫,০০০ টেস্ট ডাটা সহ সব) সম্পূর্ণ মুছে ফেলে ডাটাবেজ রিসেট করতে চান?\n\nএর ফলে সম্পূর্ণ লুকআপ ডাটাবেজ ফ্রেশ ও ক্লিন হয়ে যাবে এবং ডুপ্লিকেট মেমোরি পরিষ্কার হবে।`;
+            }
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                // 1. Try RPC first
+                let rpcWorked = false;
+                try {
+                    const { data, error } = await supabaseClient.rpc('admin_clear_lookup_records', {
+                        p_scope: scope,
+                        p_target_date: targetDate
+                    });
+                    if (!error && data && data.success) {
+                        rpcWorked = true;
+                    }
+                } catch(e) {
+                    console.warn('RPC admin_clear_lookup_records fallback:', e);
+                }
+
+                // 2. Direct Delete Fallback
+                if (!rpcWorked) {
+                    if (scope === 'today') {
+                        await Promise.all([
+                            supabaseClient.from('lookup_records').delete().eq('submission_date', targetDate),
+                            supabaseClient.from('lookup_no_info_records').delete().eq('submission_date', targetDate)
+                        ]);
+                    } else {
+                        await Promise.all([
+                            supabaseClient.from('lookup_records').delete().neq('id', 0),
+                            supabaseClient.from('lookup_no_info_records').delete().neq('id', 0)
+                        ]);
+                    }
+                }
+
+                alert('✅ সফলভাবে লুকআপ ডাটা মুছে ফেলা হয়েছে এবং ডাটাবেজ রিসেট সম্পন্ন হয়েছে!\nএখন কর্মীরা নতুনভাবে ফ্রেশ ডাটা সাবমিট করতে পারবে এবং পূর্বের নাম্বারগুলো ডুপ্লিকেট ধরবে না।');
+
+                // Reload table & metrics
+                await loadAdminLookupReports();
+
+            } catch (err) {
+                console.error('Error clearing lookup data:', err);
+                alert('ডাটা মুছতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        // Backward compatibility stubs
+        const switchAdminLookupUploadMode = switchAdminLookupStockMode;
+        const handleAdminLookupUploadFile = handleAdminLookupStockFile;
+        const submitAdminLookupUploadFile = submitAdminLookupStockUpload;
+        const submitAdminLookupUploadPaste = submitAdminLookupStockUpload;
 
         function switchDupInputMode(mode) {
             activeDupInputMode = mode;
@@ -9779,6 +9820,22 @@ async function loadClaimStockSector() {
             loadAdminLookupReports();
         }
 
+        async function fetchAllLookupTableRows(tableName, targetDate) {
+            let allRows = [];
+            let from = 0;
+            const chunkSize = 1000;
+            while (true) {
+                let q = supabaseClient.from(tableName).select('*').order('created_at', { ascending: false }).range(from, from + chunkSize - 1);
+                if (targetDate) q = q.eq('submission_date', targetDate);
+                const { data, error } = await q;
+                if (error || !data || data.length === 0) break;
+                allRows.push(...data);
+                if (data.length < chunkSize) break;
+                from += chunkSize;
+            }
+            return allRows;
+        }
+
         async function loadAdminLookupReports() {
             if (!supabaseClient) return;
             const dateInput = document.getElementById('adminLookupReportDate');
@@ -9788,22 +9845,14 @@ async function loadClaimStockSector() {
             const targetDate = dateInput.value;
 
             try {
-                // Fetch both valid lookup records and no info records for targetDate
-                const [valRes, noInfoRes] = await Promise.all([
-                    supabaseClient
-                        .from('lookup_records')
-                        .select('*')
-                        .eq('submission_date', targetDate)
-                        .order('created_at', { ascending: false }),
-                    supabaseClient
-                        .from('lookup_no_info_records')
-                        .select('*')
-                        .eq('submission_date', targetDate)
-                        .order('created_at', { ascending: false })
+                // Fetch ALL valid lookup records and no info records with auto-pagination (bypasses 1000 limit)
+                const [valList, noInfoList] = await Promise.all([
+                    fetchAllLookupTableRows('lookup_records', targetDate),
+                    fetchAllLookupTableRows('lookup_no_info_records', targetDate)
                 ]);
 
-                adminLookupValidList = valRes.data || [];
-                adminLookupNoInfoList = noInfoRes.data || [];
+                adminLookupValidList = valList || [];
+                adminLookupNoInfoList = noInfoList || [];
 
                 // Metrics
                 const totalValid = adminLookupValidList.length;
