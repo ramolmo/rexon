@@ -2610,20 +2610,20 @@
                         </p>
                     </div>
 
-                    <!-- Rule 2: Low income (<=10k or 0) and Market value 350k+ -->
+                    <!-- Rule 2: Market value 350k+ / 400k+ with any income -->
                     <div class="p-4 bg-indigo-50/80 rounded-2xl border-2 border-indigo-300 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="font-black text-indigo-950 text-sm flex items-center space-x-1.5">
                                 <span>🏡</span>
-                                <span>শর্ত ২ (মার্কেট $350k+)</span>
+                                <span>শর্ত ২ (মার্কেট 50k+)</span>
                             </span>
-                            <span class="bg-indigo-200 text-indigo-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">VALID (KEEP)</span>
+                            <span class="bg-indigo-200 text-indigo-900 font-black text-[10px] px-2 py-0.5 rounded-md uppercase">100% VALID (KEEP)</span>
                         </div>
                         <p class="font-extrabold text-indigo-900 text-xs">
-                            আয় $10k বা $0 কিন্তু মার্কেট ভ্যালু $350,000+
+                            মার্কেট ভ্যালু 50,000+ / 00,000+ (যেকোনো আয়)
                         </p>
                         <p class="text-[11px] text-indigo-800 leading-relaxed font-sans">
-                            যদি কোনো নাম্বারের পারিবারিক আয় মাত্র <strong>$10,000 বা তার কম (এমনকি একবারে $0 বা খালি)</strong> থাকে এবং ঐ নাম্বারের প্রোপার্টি / মার্কেট ভ্যালু <strong>$350,000 বা তার বেশি ($350k+)</strong> হয়, তবে সেটিও <strong>বৈধ (Valid)</strong> হবে।
+                            যেকোনো নাম্বারের মার্কেট ভ্যালু যদি <strong>50,000 বা 00,000 এর বেশি</strong> হয়, তবে তার আয় যাই থাকুক—কম (/usr/bin/bash, 0k), মাঝারি (0k-0k, 0k-0k, 0k-0k) বা খালি—সেটি ১০০% <strong>বৈধ / গ্রহণযোগ্য (Valid)</strong> হবে।
                         </p>
                     </div>
 
@@ -2748,9 +2748,9 @@
                         <p class="text-[10px] text-slate-400">Income 75k+</p>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-400">
-                        <p class="text-[11px] font-bold text-indigo-800 uppercase">কম আয়ে মার্কেট $350k+</p>
+                        <p class="text-[11px] font-bold text-indigo-800 uppercase">মার্কেট ভ্যালু $350k+</p>
                         <p id="lchkStatRule2" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</p>
-                        <p class="text-[10px] text-slate-400">Low Inc + Mkt 350k+</p>
+                        <p class="text-[10px] text-slate-400">Market $350k+ (Any Inc)</p>
                     </div>
                 </div>
 
@@ -6211,60 +6211,62 @@ function renderAdminLogsTable() {
             let isKept = false;
             const passedRules = [];
 
-            // 1. SPECIAL CHECK: Market Value > 18 Lakhs ($1,800,000 / $1.8M)
+            const hasIncome = inc && (inc.max > 0 || inc.raw !== '');
+            const hasMarket = mkt && (mkt.max > 0 || mkt.raw !== '');
+
+            // 1. ⭐ SPECIAL NUMBER CHECK: Market Value > 18 Lakhs ($1,800,000 / $1.8M / 180万)
             if (mkt && mkt.max > 1800000) {
                 isSpecial = true;
                 isKept = true;
                 passedRules.push(`⭐ স্পেশাল নাম্বার: মার্কেট ভ্যালু ১৮ লাখ$ এর বেশি ($${Math.round(mkt.max).toLocaleString()} > $1.8M)`);
             }
 
-            // 2. RULE 1: Household income around 75k$ ($75k - $100k or $75k+)
-            // Market value whatever it is, even if empty/0, it is VALID!
+            // 2. CONDITION A: Market Value >= $350,000 ($350k+ / $400k+)
+            // "kono number 400k$ market value thaklei oi number o valid ar er baire jai hok joto kom beshi hok bepar na tachara 40k$-50k$ thakleo valid kintu oi number gular market value 350k$+ thaklei hobe"
+            // Market Value >= 350k / 400k is VALID regardless of income (whether $0, $10k, $20k-$30k, $40k-$50k, $50k-$60k, etc.)!
+            if (mkt && mkt.max >= 345000) {
+                if (!isKept) {
+                    isKept = true;
+                    passedRules.push(`মার্কেট ভ্যালু $350k+ ($${Math.round(mkt.max).toLocaleString()}) থাকায় গ্রহণযোগ্য (Valid)`);
+                }
+            }
+
+            // 3. CONDITION B: Household Income >= $75,000 ($75k+)
+            // "mot kotha household income 75k$ thakle oi number er market value na thakleo cholbe"
+            // Household Income >= $75k is VALID even if market value is empty, 0, or missing!
             if (inc) {
                 if ((inc.min >= 70000 && inc.max <= 105000) ||
                     (inc.avg >= 74000) ||
                     (74000 <= inc.min && inc.min <= 105000) ||
-                    (inc.max >= 75000)) {
-                    isKept = true;
-                    passedRules.push('শর্ত ১: বাৎসরিক আয় $75k+ (মার্কেট ভ্যালু যাই থাকুক বা খালি থাকলেও Valid)');
+                    (inc.max >= 74000)) {
+                    if (!isKept) {
+                        isKept = true;
+                        passedRules.push(`বাৎসরিক আয় $75k+ ($${Math.round(inc.max).toLocaleString()}) থাকায় গ্রহণযোগ্য (মার্কেট ভ্যালু না থাকলেও Valid)`);
+                    }
                 }
             }
 
-            // 3. RULE 2: Household income <= 10k$ (or 0$ or low/empty) AND Market Value >= 350k$ ($350,000+)
-            if (mkt && mkt.max >= 340000) {
-                let isLowIncome = false;
-                if (!inc || inc.min <= 10000 || inc.max <= 12000 || inc.avg <= 10000) {
-                    isLowIncome = true;
-                }
-
-                if (isLowIncome) {
-                    isKept = true;
-                    passedRules.push(`শর্ত ২: কম আয় ($10k বা $0) হলেও মার্কেট ভ্যালু $350k+ ($${Math.round(mkt.max).toLocaleString()}) থাকায় Valid`);
-                }
+            if (isKept) {
+                return { isKept: true, isSpecial, reasons: passedRules };
             }
 
-            // 4. RULE 4 (Safe retention fallback): Market Value <= 400k (with positive value)
-            if (mkt && mkt.max <= 400000 && mkt.min > 0) {
-                if (!isKept) {
-                    isKept = true;
-                    passedRules.push(`শর্ত ৪: মার্কেট ভ্যালু ৪০万美元 এর মধ্যে ($${Math.round(mkt.max).toLocaleString()} ≤ $400k)`);
-                }
-            }
-
-            // 5. RULE 5 (Safe retention fallback): Income 40k-50k AND Market Value 350k-400k
-            if (inc && mkt && !isKept) {
-                const inc4050 = (inc.min >= 38000 && inc.max <= 55000) || (inc.avg >= 39000 && inc.avg <= 52000);
-                const mkt3540 = (mkt.min >= 340000 && mkt.max <= 410000);
-                if (inc4050 && mkt3540) {
-                    isKept = true;
-                    passedRules.push('শর্ত ৫: আয় $40k-$50k এবং মার্কেট ভ্যালু $350k-$400k');
-                }
+            // REJECTION REASONS:
+            // "shudhu bad porbe jodi kono infoi na thake oi number ar jodi market value 350k$ er niche othoba jodi kono number 75k$ er niche household icome hoy tahole bad porbe ai number gulo jodi shudhu single data thake tobei tachara baki valid"
+            let rejectReason = 'কোনো গ্রহণযোগ্য শর্তের আওতায় পড়েনি (Unqualified / বাদ)';
+            if (!hasIncome && !hasMarket) {
+                rejectReason = 'কোনো তথ্য পাওয়া যায়নি (No Information / খালি ডাটা)';
+            } else if (hasIncome && !hasMarket) {
+                rejectReason = `আয় $75k এর নিচে ($${Math.round(inc.max).toLocaleString()}) এবং মার্কেট ভ্যালু খালি থাকায় বাদ`;
+            } else if (!hasIncome && hasMarket) {
+                rejectReason = `মার্কেট ভ্যালু $350k এর নিচে ($${Math.round(mkt.max).toLocaleString()}) এবং আয় খালি থাকায় বাদ`;
+            } else if (hasIncome && hasMarket) {
+                rejectReason = `আয় $75k এর নিচে এবং মার্কেট ভ্যালুও $350k এর নিচে ($${Math.round(mkt.max).toLocaleString()} < $350k) থাকায় বাদ`;
             }
 
             return {
-                isKept: isKept,
-                isSpecial: isSpecial,
-                reasons: isKept ? passedRules : ['কোনো গ্রহণযোগ্য শর্তের আওতায় পড়েনি (Unqualified / বাদ)']
+                isKept: false,
+                isSpecial: false,
+                reasons: [rejectReason]
             };
         }
 
@@ -6439,8 +6441,8 @@ function renderAdminLogsTable() {
             const spCount = lookupChkSpecialRecords.length;
             const dCount = lookupChkDiscardedRecords.length;
 
-            const r1Count = records.filter(r => (r.reasons || []).some(s => s.includes('শর্ত ১'))).length;
-            const r2Count = records.filter(r => (r.reasons || []).some(s => s.includes('শর্ত ২'))).length;
+            const r1Count = records.filter(r => (r.reasons || []).some(s => s.includes('বাৎসরিক আয় $75k+') || s.includes('শর্ত ১'))).length;
+            const r2Count = records.filter(r => (r.reasons || []).some(s => s.includes('মার্কেট ভ্যালু $350k+') || s.includes('শর্ত ২'))).length;
 
             const qPct = total > 0 ? Math.round((qCount / total) * 100) : 0;
             const dPct = total > 0 ? Math.round((dCount / total) * 100) : 0;
