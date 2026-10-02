@@ -4663,9 +4663,7 @@ function setupColumnSelectorsAndPreview() {
             // -------------------------------------------------------------
             try {
                 const fileName = selectedFileData ? selectedFileData.name : 'upload.xlsx';
-                const chunkSize = 200; // Small safe chunks execute in <400ms each to prevent statement timeout!
-                const totalChunks = Math.ceil(records.length / chunkSize);
-
+                let chunkSize = 50; // Ultra-safe 50 records per chunk (executes in ~100-200ms)
                 let combinedData = {
                     total_received: records.length,
                     unique_in_file: 0,
@@ -4677,34 +4675,47 @@ function setupColumnSelectorsAndPreview() {
                 records.forEach(r => seenInBatch.add(r.phone));
                 combinedData.unique_in_file = seenInBatch.size;
 
-                for (let i = 0; i < records.length; i += chunkSize) {
+                let i = 0;
+                while (i < records.length) {
                     const chunk = records.slice(i, i + chunkSize);
-                    const chunkNum = Math.floor(i / chunkSize) + 1;
-                    const pct = Math.round((chunkNum / totalChunks) * 95);
+                    const currentTotalChunks = Math.ceil(records.length / chunkSize);
+                    const currentChunkNum = Math.floor(i / chunkSize) + 1;
+                    const pct = Math.round((i / records.length) * 95);
                     progressBar.style.width = `${pct}%`;
-                    statusText.innerText = `Submitting records to database... (Chunk ${chunkNum}/${totalChunks}: ${Math.min(i + chunkSize, records.length)}/${records.length})`;
+                    statusText.innerText = `Submitting records to database... (Chunk ${currentChunkNum}/${currentTotalChunks}: ${Math.min(i + chunk.length, records.length)}/${records.length})`;
 
                     let res;
-                    if (chosenReportType === 'lookup_report') {
-                        res = await supabaseClient.rpc('submit_lookup_work_batch', {
-                            p_lookup_type: currentLookupDeliveryType,
-                            p_records: chunk,
-                            p_file_name: fileName
-                        });
-                    } else {
-                        res = await supabaseClient.rpc('submit_full_work_batch', {
-                            p_records: chunk,
-                            p_report_type: chosenReportType,
-                            p_file_name: fileName
-                        });
+                    try {
+                        if (chosenReportType === 'lookup_report') {
+                            res = await supabaseClient.rpc('submit_lookup_work_batch', {
+                                p_lookup_type: currentLookupDeliveryType,
+                                p_records: chunk,
+                                p_file_name: fileName
+                            });
+                        } else {
+                            res = await supabaseClient.rpc('submit_full_work_batch', {
+                                p_records: chunk,
+                                p_report_type: chosenReportType,
+                                p_file_name: fileName
+                            });
+                        }
+                        if (res.error) throw res.error;
+                    } catch (chunkErr) {
+                        const errStr = chunkErr.message || '';
+                        if ((errStr.includes('timeout') || errStr.includes('canceling statement')) && chunkSize > 20) {
+                            console.warn('Chunk timed out on Supabase, reducing chunk size to 20 and retrying...', chunkErr);
+                            chunkSize = 20;
+                            continue; // retry current slice with smaller chunk
+                        } else {
+                            throw chunkErr;
+                        }
                     }
-
-                    if (res.error) throw res.error;
 
                     if (res.data) {
                         combinedData.new_inserted += (res.data.new_inserted || 0);
                         combinedData.duplicates_count += (res.data.duplicates_count || 0);
                     }
+                    i += chunk.length;
                 }
 
                 data = combinedData;
