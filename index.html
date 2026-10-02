@@ -236,6 +236,7 @@
                         <select id="signupDept" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white font-medium">
                             <option value="gender_verify">👩 Female Report Verify</option>
                             <option value="number_lookup">📞 Number Lookup (Lookup Reports)</option>
+                            <option value="signal_work">📡 Signal Department (Signal Number Work)</option>
                         </select>
                     </div>
 
@@ -577,7 +578,7 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Step 1: Select Report Type to Submit:
                     </label>
-                    <div id="workerReportTypeOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div id="workerReportTypeOptions" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <!-- Option 1: Female Report (Primary - বয়স ৪৩+ আবশ্যক) -->
                         <label id="optFemaleReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition">
                             <input type="radio" name="workerReportType" value="female_report" checked onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-rose-600 mt-1">
@@ -598,7 +599,21 @@
                             <div>
                                 <span class="font-black text-sm text-slate-800 block">🔍 2. Lookup Report (লুকআপ ডাটা)</span>
                                 <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    Household Income & Market Value প্রাপ্ত নাম্বার (সম্পূর্ণ আইসোলেটেড সেক্টর)।
+                                    Household Income & Market Value প্রাপ্ত নাম্বার।
+                                </span>
+                            </div>
+                        </label>
+
+                        <!-- Option 3: Signal Report -->
+                        <label id="optSignalReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="signal_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-cyan-600 mt-1">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-black text-sm text-slate-800 block">📡 3. Signal Report (সিগন্যাল ডাটা)</span>
+                                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full">New Work</span>
+                                </div>
+                                <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
+                                    কোম্পানির নতুন সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট।
                                 </span>
                             </div>
                         </label>
@@ -1104,10 +1119,10 @@
                             <div>
                                 <label class="block font-bold text-slate-700 uppercase mb-1">📂 ক্যাটাগরি (রিপোর্ট টাইপ):</label>
                                 <select id="quickExportCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500">
-                                    <option value="all">🌟 সব ডাটা একসাথে (Female + Lookup)</option>
+                                    <option value="all">🌟 সব ডাটা একসাথে (Female + Lookup + Signal)</option>
                                     <option value="female_report">👩 শুধুমাত্র ফিমেল রিপোর্ট (Female Only)</option>
-                                    
                                     <option value="lookup_report">🔍 শুধুমাত্র লুকআপ রিপোর্ট (Lookup Only)</option>
+                                    <option value="signal_report">📡 শুধুমাত্র সিগন্যাল রিপোর্ট (Signal Only)</option>
                                 </select>
                             </div>
 
@@ -1186,9 +1201,9 @@
                                 <label class="text-xs font-semibold text-slate-600 block mb-1">Report Type:</label>
                                 <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                     <option value="all">All Report Types</option>
-                                    
                                     <option value="female_report">👩 Female Report</option>
                                     <option value="lookup_report">🔍 Lookup Report</option>
+                                    <option value="signal_report">📡 Signal Report</option>
                                 </select>
                             </div>
                             <div>
@@ -1276,6 +1291,7 @@
                                     <select id="newMemberDept" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold">
                                         <option value="gender_verify">Gender Verify</option>
                                         <option value="number_lookup">Number Lookup</option>
+                                        <option value="signal_work">📡 Signal Department</option>
                                     </select>
                                 </div>
 
@@ -1295,6 +1311,7 @@
                                 <option value="all">All Departments</option>
                                 <option value="gender_verify">Gender Verify</option>
                                 <option value="number_lookup">Number Lookup</option>
+                                <option value="signal_work">📡 Signal Department</option>
                             </select>
                         </div>
                         <div class="text-xs text-slate-500">
@@ -1687,6 +1704,7 @@
                                 <select id="recInputStockType" class="w-full px-3 py-2 bg-indigo-50 border-2 border-indigo-400 text-indigo-950 font-bold rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
                                     <option value="gender_verify">👩 1. Gender Verify Stock (ফিমেল ভেরিফাই ডাটা স্টক)</option>
                                     <option value="lookup">🔍 2. Lookup Numbers Stock (লুকআপ নাম্বার স্টক - কর্মীদের নেওয়ার জন্য)</option>
+                                    <option value="signal">📡 3. Signal Numbers Stock (কোম্পানি সিগন্যাল নাম্বার স্টক)</option>
                                 </select>
                             </div>
                         </div>
@@ -2325,16 +2343,21 @@
 
             <!-- Stock Category Switcher Tabs: Gender Verify vs Lookup Numbers -->
             <div class="bg-white rounded-2xl shadow-sm p-3 border border-slate-200">
-                <div class="flex flex-col sm:flex-row items-center gap-2">
-                    <button type="button" id="tabClaimCatGv" onclick="switchClaimCategory('gender_verify')" class="w-full sm:flex-1 py-3 px-5 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-2 transition bg-indigo-600 text-white shadow-md">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button type="button" id="tabClaimCatGv" onclick="switchClaimCategory('gender_verify')" class="w-full py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition bg-indigo-600 text-white shadow-md cursor-pointer">
                         <span>🚻</span>
-                        <span>জেন্ডার ভেরিফাই স্টক (Gender Verify)</span>
-                        <span id="badgeGvStockAvail" class="ml-2 px-2 py-0.5 text-[11px] bg-white/20 rounded-full font-black">0 টি বাকি</span>
+                        <span>জেন্ডার ভেরিফাই স্টক</span>
+                        <span id="badgeGvStockAvail" class="ml-1 px-2 py-0.5 text-[10px] bg-white/20 rounded-full font-black whitespace-nowrap">0 টি বাকি</span>
                     </button>
-                    <button type="button" id="tabClaimCatLookup" onclick="switchClaimCategory('lookup')" class="w-full sm:flex-1 py-3 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100">
+                    <button type="button" id="tabClaimCatLookup" onclick="switchClaimCategory('lookup')" class="w-full py-3 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100 cursor-pointer">
                         <span>🔍</span>
-                        <span>লুকআপ নাম্বার স্টক (Lookup Numbers)</span>
-                        <span id="badgeLookupStockAvail" class="ml-2 px-2 py-0.5 text-[11px] bg-indigo-200 text-indigo-900 rounded-full font-black">0 টি বাকি</span>
+                        <span>লুকআপ নাম্বার স্টক</span>
+                        <span id="badgeLookupStockAvail" class="ml-1 px-2 py-0.5 text-[10px] bg-indigo-200 text-indigo-900 rounded-full font-black whitespace-nowrap">0 টি বাকি</span>
+                    </button>
+                    <button type="button" id="tabClaimCatSignal" onclick="switchClaimCategory('signal')" class="w-full py-3 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition text-cyan-800 bg-cyan-50 hover:bg-cyan-100 cursor-pointer">
+                        <span>📡</span>
+                        <span>সিগন্যাল নাম্বার স্টক</span>
+                        <span id="badgeSignalStockAvail" class="ml-1 px-2 py-0.5 text-[10px] bg-cyan-200 text-cyan-900 rounded-full font-black whitespace-nowrap">0 টি বাকি</span>
                     </button>
                 </div>
             </div>
@@ -3506,12 +3529,16 @@
                 } else if (isLeader) {
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-black bg-amber-400 text-slate-950 shadow-sm border border-amber-300';
                     badge.innerText = '👑 Team Leader (আনলিমিটেড)';
-                    const deptName = currentProfile.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify';
+                    let deptName = 'Gender Verify';
+                    if (currentProfile.department === 'number_lookup') deptName = 'Number Lookup';
+                    else if (currentProfile.department === 'signal_work' || currentProfile.department === 'signal') deptName = '📡 Signal Department';
                     document.getElementById('userDeptTitle').innerText = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
                     setupWorkerReportOptions(currentProfile.department);
                     switchToSection('dashboard');
                 } else {
-                    const deptLabel = currentProfile.department === 'number_lookup' ? 'Number Lookup' : 'Gender Verify';
+                    let deptLabel = 'Gender Verify';
+                    if (currentProfile.department === 'number_lookup') deptLabel = 'Number Lookup';
+                    else if (currentProfile.department === 'signal_work' || currentProfile.department === 'signal') deptLabel = '📡 Signal Department';
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-indigo-200 text-indigo-900';
                     badge.innerText = deptLabel;
                     document.getElementById('userDeptTitle').innerText = deptLabel;
@@ -3549,25 +3576,28 @@
 function setupWorkerReportOptions(dept) {
             const optFemale = document.getElementById('optFemaleReport');
             const optLookup = document.getElementById('optLookupReport');
+            const optSignal = document.getElementById('optSignalReport');
 
-            if (dept === 'number_lookup') {
-                if (optFemale) optFemale.classList.add('hidden');
+            // All options remain visible for worker convenience
+            if (optFemale) optFemale.classList.remove('hidden');
+            if (optLookup) optLookup.classList.remove('hidden');
+            if (optSignal) optSignal.classList.remove('hidden');
+
+            if (dept === 'signal_work' || dept === 'signal') {
+                if (optSignal) {
+                    const r = optSignal.querySelector('input');
+                    if (r) r.checked = true;
+                }
+            } else if (dept === 'number_lookup') {
                 if (optLookup) {
-                    optLookup.classList.remove('hidden');
                     const r = optLookup.querySelector('input');
                     if (r) r.checked = true;
                 }
             } else {
                 // Gender verify workers default to Female Report
                 if (optFemale) {
-                    optFemale.classList.remove('hidden');
                     const r = optFemale.querySelector('input');
                     if (r) r.checked = true;
-                }
-                if (dept === 'admin') {
-                    if (optLookup) optLookup.classList.remove('hidden');
-                } else {
-                    if (optLookup) optLookup.classList.add('hidden');
                 }
             }
             if (typeof handleWorkerReportTypeChanged === 'function') {
@@ -4270,6 +4300,7 @@ function setupWorkerReportOptions(dept) {
             const extraCols = document.getElementById('lookupExtraCols');
             const optFemale = document.getElementById('optFemaleReport');
             const optLookup = document.getElementById('optLookupReport');
+            const optSignal = document.getElementById('optSignalReport');
             const femaleAgeBanner = document.getElementById('femaleAgeRuleBanner');
 
             if (chosenReportType === 'lookup_report') {
@@ -4277,15 +4308,25 @@ function setupWorkerReportOptions(dept) {
                 if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-purple-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
+                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
                 if (extraCols) {
                     if (currentLookupDeliveryType === 'valid') extraCols.classList.remove('hidden');
                     else extraCols.classList.add('hidden');
                 }
+            } else if (chosenReportType === 'signal_report') {
+                if (subCard) subCard.classList.add('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-cyan-500 shadow-sm cursor-pointer transition';
+                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
+                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
+                if (extraCols) extraCols.classList.add('hidden');
             } else {
+                // female_report
                 if (subCard) subCard.classList.add('hidden');
                 if (femaleAgeBanner) femaleAgeBanner.classList.remove('hidden');
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
+                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
                 if (extraCols) extraCols.classList.add('hidden');
             }
 
@@ -4723,7 +4764,7 @@ function setupColumnSelectorsAndPreview() {
                 progressBar.style.width = '100%';
                 statusText.innerText = 'Report Submitted Successfully!';
 
-                const repTitle = chosenReportType === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
+                const repTitle = chosenReportType === 'female_report' ? '👩 Female Report' : (chosenReportType === 'signal_report' ? '📡 Signal Report' : '🔍 Lookup Report');
 
                 const resultCard = document.getElementById('lastUploadResultCard');
                 resultCard.className = 'mt-6 p-5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
@@ -5027,6 +5068,7 @@ function setupColumnSelectorsAndPreview() {
                                 <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs py-1 px-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer">
                                     <option value="gender_verify" ${u.department === 'gender_verify' ? 'selected' : ''}>🚻 Gender Verify</option>
                                     <option value="number_lookup" ${u.department === 'number_lookup' ? 'selected' : ''}>🔍 Lookup</option>
+                                    <option value="signal_work" ${u.department === 'signal_work' ? 'selected' : ''}>📡 Signal Work</option>
                                 </select>
                             </td>
 
@@ -5939,6 +5981,8 @@ function setupColumnSelectorsAndPreview() {
                 let repBadge = '';
                 if (item.report_type === 'female_report') {
                     repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Report</span>';
+                } else if (item.report_type === 'signal_report') {
+                    repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-cyan-100 text-cyan-800 font-bold">📡 Signal Report</span>';
                 } else {
                     repBadge = '<span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Report</span>';
                 }
@@ -8646,6 +8690,8 @@ async function runDuplicateCheck() {
 
                     if (activeClaimStockCategory === 'lookup') {
                         fbQuery = fbQuery.eq('stock_type', 'lookup');
+                    } else if (activeClaimStockCategory === 'signal') {
+                        fbQuery = fbQuery.eq('stock_type', 'signal');
                     } else {
                         fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
                     }
@@ -8831,13 +8877,19 @@ async function runDuplicateCheck() {
             activeClaimStockCategory = cat;
             const btnGv = document.getElementById('tabClaimCatGv');
             const btnLookup = document.getElementById('tabClaimCatLookup');
+            const btnSignal = document.getElementById('tabClaimCatSignal');
 
-            if (cat === 'gender_verify') {
-                if (btnGv) btnGv.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-2 transition bg-indigo-600 text-white shadow-md';
-                if (btnLookup) btnLookup.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100';
-            } else {
-                if (btnLookup) btnLookup.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-2 transition bg-indigo-600 text-white shadow-md';
-                if (btnGv) btnGv.className = 'w-full sm:flex-1 py-3 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100';
+            const inactiveCls = 'w-full py-3 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100 cursor-pointer';
+            [btnGv, btnLookup, btnSignal].forEach(b => {
+                if (b) b.className = inactiveCls;
+            });
+
+            if (cat === 'gender_verify' && btnGv) {
+                btnGv.className = 'w-full py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition bg-indigo-600 text-white shadow-md cursor-pointer';
+            } else if (cat === 'lookup' && btnLookup) {
+                btnLookup.className = 'w-full py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition bg-indigo-600 text-white shadow-md cursor-pointer';
+            } else if (cat === 'signal' && btnSignal) {
+                btnSignal.className = 'w-full py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition bg-cyan-600 text-white shadow-md cursor-pointer';
             }
 
             refreshClaimStockData();
@@ -8881,8 +8933,15 @@ async function loadClaimStockSector() {
                     .eq('is_assigned', false)
                     .eq('stock_type', 'lookup');
 
+                const { count: signalCount } = await supabaseClient
+                    .from('company_received_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_assigned', false)
+                    .eq('stock_type', 'signal');
+
                 const gvAvail = gvCount || 0;
                 const lookupAvail = lookupCount || 0;
+                const signalAvail = signalCount || 0;
 
                 const badgeGv = document.getElementById('badgeGvStockAvail');
                 if (badgeGv) badgeGv.innerText = `${gvAvail.toLocaleString()} টি বাকি`;
@@ -8890,7 +8949,12 @@ async function loadClaimStockSector() {
                 const badgeLookup = document.getElementById('badgeLookupStockAvail');
                 if (badgeLookup) badgeLookup.innerText = `${lookupAvail.toLocaleString()} টি বাকি`;
 
-                const activeCount = activeClaimStockCategory === 'lookup' ? lookupAvail : gvAvail;
+                const badgeSignal = document.getElementById('badgeSignalStockAvail');
+                if (badgeSignal) badgeSignal.innerText = `${signalAvail.toLocaleString()} টি বাকি`;
+
+                let activeCount = gvAvail;
+                if (activeClaimStockCategory === 'lookup') activeCount = lookupAvail;
+                else if (activeClaimStockCategory === 'signal') activeCount = signalAvail;
                 const availEl = document.getElementById('secStockAvailable');
                 if (availEl) availEl.innerText = activeCount.toLocaleString();
 
@@ -9090,6 +9154,8 @@ async function loadClaimStockSector() {
 
                     if (activeClaimStockCategory === 'lookup') {
                         fbQuery = fbQuery.eq('stock_type', 'lookup');
+                    } else if (activeClaimStockCategory === 'signal') {
+                        fbQuery = fbQuery.eq('stock_type', 'signal');
                     } else {
                         fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
                     }
