@@ -234,8 +234,9 @@
                     <div id="deptSelectContainer" class="hidden">
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Your Department</label>
                         <select id="signupDept" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-semibold focus:ring-2 focus:ring-indigo-500">
-                                        <option value="gender_verify">🚻 1. Gender Verify Department (ফিমেল ও সিগন্যাল কাজ)</option>
-                                        <option value="lookup">🔍 2. Number Lookup Department (লুকআপ রিপোর্ট কাজ)</option>
+                                        <option value="gender_verify">🚻 1. Gender Verify Department (ফিমেল ভেরিফাই কাজ)</option>
+                                        <option value="signal">📡 2. Signal Number Department (সিগন্যাল নাম্বার কাজ)</option>
+                                        <option value="lookup">🔍 3. Number Lookup Department (লুকআপ রিপোর্ট কাজ)</option>
                                     </select>
                     </div>
 
@@ -603,16 +604,16 @@
                             </div>
                         </label>
 
-                        <!-- Option 3: Signal Report -->
+                        <!-- Option 3: Signal Report (Age 43+ Mandatory) -->
                         <label id="optSignalReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition">
                             <input type="radio" name="workerReportType" value="signal_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-cyan-600 mt-1">
                             <div>
                                 <div class="flex items-center space-x-2">
-                                    <span class="font-black text-sm text-slate-800 block">📡 3. Signal Report (সিগন্যাল ডাটা)</span>
-                                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full">New Work</span>
+                                    <span class="font-black text-sm text-slate-900 block">📡 3. Signal Report (সিগন্যাল ভেরিফাইড ডাটা)</span>
+                                    <span class="bg-cyan-100 text-cyan-900 text-[10px] font-black px-2 py-0.5 rounded-full">বয়স ৪৩+ আবশ্যক</span>
                                 </div>
                                 <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    কোম্পানির নতুন সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট।
+                                    ফিমেল ডাটার মতোই বয়স অবশ্যই ৪৩ বছর বা তার বেশি হতে হবে। ৪৩ এর নিচের যেকোনো নাম্বার স্বয়ংক্রিয়ভাবে বাদ যাবে (Deceased / Unknown বয়স থাকলে কোনো সমস্যা নেই)।
                                 </span>
                             </div>
                         </label>
@@ -913,31 +914,39 @@
                 </div>
             </div>
 
-            <!-- Admin Stats Cards by Report Types -->
-            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- Admin Stats Cards by Report Types (Optimized Responsive Grid) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <div onclick="filterAdminSubmissionsBy('all')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600 cursor-pointer hover:shadow-md hover:border-indigo-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
                         <span class="text-[10px] text-indigo-600 font-bold group-hover:underline">View All ➔</span>
                     </div>
                     <p id="adminStatTotalUnique" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Unique numbers stored</p>
+                    <p class="text-xs text-slate-400">মাস্টার ডাটাবেজ</p>
                 </div>
-                                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
+                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
-                        <span class="text-[10px] bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-pink-100">Day-by-Day ➔</span>
+                        <span class="text-[10px] bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-pink-100">View ➔</span>
                     </div>
                     <p id="adminStatFemaleReport" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Click to view all female data</p>
+                    <p class="text-xs text-slate-400">ফিমেল ভেরিফাই ডাটা</p>
+                </div>
+                <div onclick="filterAdminSubmissionsBy('signal_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-cyan-500 cursor-pointer hover:shadow-md hover:border-cyan-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">📡 Signal Reports</p>
+                        <span class="text-[10px] bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded font-bold group-hover:bg-cyan-100">Live ➔</span>
+                    </div>
+                    <p id="adminStatSignalReport" class="text-2xl font-extrabold text-cyan-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">সিগন্যাল নাম্বার ডাটা</p>
                 </div>
                 <div onclick="filterAdminSubmissionsBy('lookup_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500 cursor-pointer hover:shadow-md hover:border-purple-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Reports</p>
-                        <span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-purple-100">Day-by-Day ➔</span>
+                        <span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-purple-100">View ➔</span>
                     </div>
                     <p id="adminStatLookupReport" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Income & Market value data</p>
+                    <p class="text-xs text-slate-400">আয় ও মার্কেট ডাটা</p>
                 </div>
                 <div onclick="filterAdminSubmissionsBy('today')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
                     <div class="flex items-center justify-between">
@@ -945,7 +954,7 @@
                         <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-blue-100">Today ➔</span>
                     </div>
                     <p id="adminStatToday" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">Added today across workers</p>
+                    <p class="text-xs text-slate-400">আজকের মোট জমা</p>
                 </div>
                 <div onclick="switchAdminTab('rec_stock')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-600 col-span-2 lg:col-span-1 cursor-pointer hover:shadow-md hover:border-emerald-400 transition group">
                     <div class="flex items-center justify-between">
@@ -1162,7 +1171,10 @@
                             </button>
 
                             <button type="button" onclick="filterAdminSubmissionsBy('female_report')" id="qfBtnFemale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200 transition">
-                                👩 Female Data (দিন অনুযায়ী)
+                                👩 Female Data
+                            </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('signal_report')" id="qfBtnSignal" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-cyan-50 hover:text-cyan-800 hover:border-cyan-200 transition">
+                                📡 Signal Data (সিগন্যাল)
                             </button>
                             <button type="button" onclick="filterAdminSubmissionsBy('lookup_report')" id="qfBtnLookup" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200 transition">
                                 🔍 Lookup Data
@@ -1304,9 +1316,10 @@
                         <div class="flex items-center space-x-3">
                             <input type="text" id="adminUserSearchInput" oninput="renderAdminUserTable()" placeholder="Search worker email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
                             <select id="adminUserDeptFilter" onchange="renderAdminUserTable()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
-                                <option value="all">All Departments (সকল)</option>
-                                <option value="gender_verify">Gender Verify (Female & Signal)</option>
-                                <option value="lookup">Number Lookup</option>
+                                <option value="all">All Departments (সকল ডিপার্টমেন্ট)</option>
+                                <option value="gender_verify">🚻 Gender Verify (Female)</option>
+                                <option value="signal">📡 Signal Number (সিগন্যাল)</option>
+                                <option value="lookup">🔍 Number Lookup (লুকআপ)</option>
                             </select>
                         </div>
                         <div class="text-xs text-slate-500">
@@ -1374,28 +1387,36 @@
                         </button>
                     </div>
 
-                    <!-- Stat Cards for Company Deliveries -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <!-- Stat Cards for Company Deliveries (5 Categories) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
                             <p class="text-xs font-bold text-slate-500 uppercase">Total Given</p>
                             <p id="cdStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">Total delivered</p>
+                            <p class="text-[11px] text-slate-400">মোট দেওয়া ডাটা</p>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Data</p>
                             <p id="cdStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">Delivered to company</p>
+                            <p class="text-[11px] text-slate-400">ফিমেল ডেলিভারি</p>
                         </div>
+
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-cyan-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">📡 Signal Data</p>
+                            <p id="cdStatSignal" class="text-2xl font-extrabold text-cyan-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">সিগন্যাল ডেলিভারি</p>
+                        </div>
+
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Data</p>
                             <p id="cdStatLookup" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">Income & Market Val</p>
+                            <p class="text-[11px] text-slate-400">ইনকাম ও মার্কেট</p>
                         </div>
-                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 lg:col-span-1">
+
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 sm:col-span-1">
                             <p class="text-xs font-bold text-slate-500 uppercase">Today's Given</p>
                             <p id="cdStatToday" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">Delivered today</p>
+                            <p class="text-[11px] text-slate-400">আজকের ডেলিভারি</p>
                         </div>
                     </div>
 
@@ -1421,7 +1442,8 @@
                                     📂 Data Category (ক্যাটাগরি - ৩টি আলাদা সেক্টর):
                                 </label>
                                 <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
-                                    <option value="female_data">👩 1. Female Data (মহিলা ডাটা)</option>
+                                    <option value="female_data">👩 1. Female Data (মহিলা ডাটা ডেলিভারি)</option>
+                                    <option value="signal_data">📡 2. Signal Data (সিগন্যাল নাম্বার ডেলিভারি)</option>
                                     <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
                                 </select>
                             </div>
@@ -1522,6 +1544,7 @@
                                     <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
                                         <option value="all">All Categories (সবগুলো)</option>
                                         <option value="female_data">👩 Female Data</option>
+                                        <option value="signal_data">📡 Signal Data</option>
                                         <option value="lookup_data">🔍 Lookup Data</option>
                                     </select>
                                 </div>
@@ -3269,6 +3292,19 @@
         };
 
         const TursoVault = {
+            _subStatsCache: null,
+            _subStatsCacheTime: 0,
+            _stockStatsCache: null,
+            _stockStatsCacheTime: 0,
+            _delivStatsCache: null,
+            _delivStatsCacheTime: 0,
+
+            clearCache() {
+                this._subStatsCache = null;
+                this._stockStatsCache = null;
+                this._delivStatsCache = null;
+            },
+
             getConfig() {
                 return {
                     url: localStorage.getItem('turso_db_url') || TURSO_DEFAULT_CONFIG.url,
@@ -3468,6 +3504,7 @@
             },
 
             async insertSubmissions(chunk, reportType, fileName, profile) {
+                this.clearCache();
                 if (!chunk || chunk.length === 0) return { success: true, count: 0 };
                 await this.init();
                 let inserted = 0;
@@ -3506,6 +3543,7 @@
             },
 
             async insertStockNumbers(records, stockType, recDate, batchName) {
+                this.clearCache();
                 if (!records || records.length === 0) return { success: true, count: 0 };
                 await this.init();
                 let inserted = 0;
@@ -3540,6 +3578,7 @@
             },
 
             async insertDeliveries(records, category, companyName, deliveryDate, batchName) {
+                this.clearCache();
                 if (!records || records.length === 0) return { success: true, count: 0 };
                 await this.init();
                 let inserted = 0;
@@ -3706,29 +3745,39 @@
                 };
             },
 
-            async getSubmissionsStats() {
+            async getSubmissionsStats(force = false) {
+                const now = Date.now();
+                if (!force && this._subStatsCache && (now - this._subStatsCacheTime < 15000)) {
+                    return this._subStatsCache;
+                }
                 await this.init();
                 const sql = `
                     SELECT 
                         COUNT(*) as total_unique,
                         SUM(CASE WHEN report_type = 'female_report' OR report_type = 'female' THEN 1 ELSE 0 END) as female_count,
-                        SUM(CASE WHEN report_type = 'lookup_report' OR report_type = 'lookup' THEN 1 ELSE 0 END) as lookup_count,
                         SUM(CASE WHEN report_type = 'signal_report' OR report_type = 'signal' THEN 1 ELSE 0 END) as signal_count,
+                        SUM(CASE WHEN report_type = 'lookup_report' OR report_type = 'lookup' THEN 1 ELSE 0 END) as lookup_count,
                         SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today_count
                     FROM turso_submissions;
                 `;
                 const res = await this.query(sql);
                 const row = res.rows[0] || {};
-                return {
+                this._subStatsCache = {
                     totalUnique: parseInt(row.total_unique || 0, 10),
                     femaleCount: parseInt(row.female_count || 0, 10),
-                    lookupCount: parseInt(row.lookup_count || 0, 10),
                     signalCount: parseInt(row.signal_count || 0, 10),
+                    lookupCount: parseInt(row.lookup_count || 0, 10),
                     todayTotal: parseInt(row.today_count || 0, 10)
                 };
+                this._subStatsCacheTime = now;
+                return this._subStatsCache;
             },
 
-            async getStockStats() {
+            async getStockStats(force = false) {
+                const now = Date.now();
+                if (!force && this._stockStatsCache && (now - this._stockStatsCacheTime < 15000)) {
+                    return this._stockStatsCache;
+                }
                 await this.init();
                 const sql = `
                     SELECT 
@@ -3743,7 +3792,7 @@
                 `;
                 const res = await this.query(sql);
                 const row = res.rows[0] || {};
-                return {
+                this._stockStatsCache = {
                     total: parseInt(row.total || 0, 10),
                     available: parseInt(row.available || 0, 10),
                     claimed: parseInt(row.claimed || 0, 10),
@@ -3752,29 +3801,40 @@
                     lookupAvail: parseInt(row.lookup_avail || 0, 10),
                     signalAvail: parseInt(row.signal_avail || 0, 10)
                 };
+                this._stockStatsCacheTime = now;
+                return this._stockStatsCache;
             },
 
-            async getDeliveryStats() {
+            async getDeliveryStats(force = false) {
+                const now = Date.now();
+                if (!force && this._delivStatsCache && (now - this._delivStatsCacheTime < 15000)) {
+                    return this._delivStatsCache;
+                }
                 await this.init();
                 const sql = `
                     SELECT 
                         COUNT(*) as total,
                         SUM(CASE WHEN category = 'female_data' THEN 1 ELSE 0 END) as female_deliv,
+                        SUM(CASE WHEN category = 'signal_data' THEN 1 ELSE 0 END) as signal_deliv,
                         SUM(CASE WHEN category = 'lookup_data' THEN 1 ELSE 0 END) as lookup_deliv,
                         SUM(CASE WHEN date(delivered_at) = date('now') OR date(created_at) = date('now') THEN 1 ELSE 0 END) as today_deliv
                     FROM turso_deliveries;
                 `;
                 const res = await this.query(sql);
                 const row = res.rows[0] || {};
-                return {
+                this._delivStatsCache = {
                     total: parseInt(row.total || 0, 10),
                     femaleDeliv: parseInt(row.female_deliv || 0, 10),
+                    signalDeliv: parseInt(row.signal_deliv || 0, 10),
                     lookupDeliv: parseInt(row.lookup_deliv || 0, 10),
                     todayDeliv: parseInt(row.today_deliv || 0, 10)
                 };
+                this._delivStatsCacheTime = now;
+                return this._delivStatsCache;
             },
 
             async deleteSubmissions(scope, targetDate) {
+                this.clearCache();
                 await this.init();
                 let sql = `DELETE FROM turso_submissions;`;
                 if (scope === 'specific_date' && targetDate) {
@@ -4537,19 +4597,15 @@
                     currentProfile.role = 'admin';
                     currentProfile.department = 'admin';
                     currentProfile.is_unlimited_quota = true;
-                    // Auto-sync in database table so RPCs never complain
-                    try {
-                        await supabaseClient.from('profiles').upsert({
-                            id: currentUser.id,
-                            email: currentUser.email,
-                            username: currentProfile.username || 'Admin',
-                            role: 'admin',
-                            department: 'admin',
-                            is_unlimited_quota: true
-                        });
-                    } catch(syncErr) {
-                        console.warn('Admin profile sync notice:', syncErr);
-                    }
+                    // Non-blocking auto-sync in background to keep website lightning fast
+                    supabaseClient.from('profiles').upsert({
+                        id: currentUser.id,
+                        email: currentUser.email,
+                        username: currentProfile.username || 'Admin',
+                        role: 'admin',
+                        department: 'admin',
+                        is_unlimited_quota: true
+                    }).then(() => {}).catch(e => console.warn('Admin background sync notice:', e));
                 }
 
                 document.getElementById('userInfo').classList.remove('hidden');
@@ -4583,14 +4639,24 @@
                 } else if (isLeader) {
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-black bg-amber-400 text-slate-950 shadow-sm border border-amber-300';
                     badge.innerText = '👑 Team Leader (আনলিমিটেড)';
-                    let deptName = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify (Female & Signal)';
+                    let deptName = 'Gender Verify (Female)';
+                    if (currentProfile.department === 'signal' || currentProfile.department === 'signal_work') {
+                        deptName = '📡 Signal Number';
+                    } else if (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') {
+                        deptName = '🔍 Number Lookup';
+                    }
                     document.getElementById('userDeptTitle').innerText = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👷</span><span>My Work (আমার কাজ)</span>';
                     if (navLookupBtn) navLookupBtn.classList.add('hidden');
                     setupWorkerReportOptions(currentProfile.department);
                     switchToSection('dashboard');
                 } else {
-                    let deptLabel = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify (Female & Signal)';
+                    let deptLabel = '🚻 Gender Verify Department';
+                    if (currentProfile.department === 'signal' || currentProfile.department === 'signal_work') {
+                        deptLabel = '📡 Signal Number Department';
+                    } else if (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') {
+                        deptLabel = '🔍 Number Lookup Department';
+                    }
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-indigo-200 text-indigo-900';
                     badge.innerText = deptLabel;
                     document.getElementById('userDeptTitle').innerText = deptLabel;
@@ -4634,14 +4700,24 @@ function setupWorkerReportOptions(dept) {
 
             const isAdmin = currentProfile && currentProfile.role === 'admin';
             const isLookup = (dept === 'lookup' || dept === 'number_lookup');
+            const isSignal = (dept === 'signal' || dept === 'signal_work');
 
             if (isAdmin) {
                 // Admin sees all 3 report options
                 if (optFemale) optFemale.classList.remove('hidden');
                 if (optLookup) optLookup.classList.remove('hidden');
                 if (optSignal) optSignal.classList.remove('hidden');
+            } else if (isSignal) {
+                // Signal Number worker ONLY sees Signal Report!
+                if (optFemale) optFemale.classList.add('hidden');
+                if (optLookup) optLookup.classList.add('hidden');
+                if (optSignal) {
+                    optSignal.classList.remove('hidden');
+                    const r = optSignal.querySelector('input');
+                    if (r) r.checked = true;
+                }
             } else if (isLookup) {
-                // Number Lookup worker ONLY sees Lookup Report
+                // Number Lookup worker ONLY sees Lookup Report!
                 if (optFemale) optFemale.classList.add('hidden');
                 if (optSignal) optSignal.classList.add('hidden');
                 if (optLookup) {
@@ -4650,14 +4726,14 @@ function setupWorkerReportOptions(dept) {
                     if (r) r.checked = true;
                 }
             } else {
-                // Gender Verify worker sees Female Report AND Signal Report (Hides Lookup Report)
+                // Gender Verify worker ONLY sees Female Report!
                 if (optLookup) optLookup.classList.add('hidden');
+                if (optSignal) optSignal.classList.add('hidden');
                 if (optFemale) {
                     optFemale.classList.remove('hidden');
                     const r = optFemale.querySelector('input');
                     if (r) r.checked = true;
                 }
-                if (optSignal) optSignal.classList.remove('hidden');
             }
 
             if (typeof handleWorkerReportTypeChanged === 'function') {
@@ -4863,6 +4939,7 @@ function setupWorkerReportOptions(dept) {
                     mObj.totalUnique += (log.new_inserted || 0);
                     mObj.dupCount += (log.duplicates_count || 0);
                     if (log.report_type === 'female_report') mObj.femaleCount += (log.new_inserted || 0);
+                    else if (log.report_type === 'signal_report') mObj.signalCount = (mObj.signalCount || 0) + (log.new_inserted || 0);
                     else if (log.report_type === 'lookup_report' || log.report_type === 'lookup_valid' || log.report_type === 'lookup_no_info') mObj.lookupCount += (log.new_inserted || 0);
 
                     if (!mObj.days[dKey]) {
@@ -5210,8 +5287,8 @@ function setupWorkerReportOptions(dept) {
                 }
 
                 if (phone || name) {
-                    // Check female age rule (< 43 auto remove)
-                    if (selectedRep === 'female_report' && isFemaleUnderage(age)) {
+                    // Check female & signal age rule (< 43 auto remove)
+                    if ((selectedRep === 'female_report' || selectedRep === 'signal_report') && isFemaleUnderage(age)) {
                         underagePastedCount++;
                         return; // Auto remove!
                     }
@@ -5389,7 +5466,17 @@ function setupWorkerReportOptions(dept) {
                 }
             } else if (chosenReportType === 'signal_report') {
                 if (subCard) subCard.classList.add('hidden');
-                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (femaleAgeBanner) {
+                    femaleAgeBanner.classList.remove('hidden');
+                    femaleAgeBanner.className = 'mt-3 p-3.5 rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200 flex items-center space-x-2.5 text-cyan-950 text-xs shadow-xs';
+                    femaleAgeBanner.innerHTML = `
+                        <span class="text-xl flex-shrink-0">🛡️</span>
+                        <div>
+                            <span class="font-black text-cyan-900">সিগন্যাল রিপোর্ট বয়স ফিল্টার সক্রিয়:</span>
+                            <span class="text-cyan-800 font-medium ml-1">ফিমেল ডাটার মতোই যেকোনো নাম্বার ৪৩ বছরের নিচে হলে তা স্বয়ংক্রিয়ভাবে বাদ যাবে। ৪৩ বা তার বেশি বয়সী নাম্বার এবং Deceased বা Unknown বয়স থাকলে কোনো সমস্যা নেই, গ্রহণ করা হবে।</span>
+                        </div>
+                    `;
+                }
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-cyan-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
@@ -5710,10 +5797,10 @@ function setupColumnSelectorsAndPreview() {
                 let marketVal = chosenMarketValueCol ? String(row[chosenMarketValueCol] || '').trim() : '';
 
                 if (cleanPhone && cleanPhone.length >= 6) {
-                    // STRICT FEMALE AGE FILTER:
+                    // STRICT FEMALE & SIGNAL AGE FILTER:
                     // Under 43 is strictly forbidden and auto removed!
                     // Age >= 43, Deceased, Decressed, Unknown, Empty are ALLOWED!
-                    if (chosenReportType === 'female_report' && isFemaleUnderage(ageVal)) {
+                    if ((chosenReportType === 'female_report' || chosenReportType === 'signal_report') && isFemaleUnderage(ageVal)) {
                         underageFilteredCount++;
                         return; // Auto remove!
                     }
@@ -6027,6 +6114,7 @@ function setupColumnSelectorsAndPreview() {
                 if (document.getElementById('adminStatTotalUnique')) document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
                 if (document.getElementById('adminStatMaleReport')) document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
                 if (document.getElementById('adminStatFemaleReport')) document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
+                if (document.getElementById('adminStatSignalReport')) document.getElementById('adminStatSignalReport').innerText = (maleCount || signalCount || 0).toLocaleString();
                 if (document.getElementById('adminStatLookupReport')) document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
                 if (document.getElementById('adminStatToday')) document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
 
@@ -6175,8 +6263,9 @@ function setupColumnSelectorsAndPreview() {
 
                             <!-- 3. Department Selector (Single Combined Dropdown) -->
                             <td class="py-2.5 px-2.5">
-                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs py-1 px-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                                    <option value="gender_verify" ${(u.department === 'gender_verify' || u.department === 'signal_work' || u.department === 'signal') ? 'selected' : ''}>🚻 Gender Verify (Female & Signal)</option>
+                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs py-1 px-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                                    <option value="gender_verify" ${u.department === 'gender_verify' ? 'selected' : ''}>🚻 Gender Verify</option>
+                                    <option value="signal" ${(u.department === 'signal' || u.department === 'signal_work') ? 'selected' : ''}>📡 Signal Number</option>
                                     <option value="lookup" ${(u.department === 'lookup' || u.department === 'number_lookup') ? 'selected' : ''}>🔍 Number Lookup</option>
                                 </select>
                             </td>
@@ -6321,6 +6410,9 @@ function setupColumnSelectorsAndPreview() {
             } else if (type === 'female_report') {
                 if (reportFilter) reportFilter.value = 'female_report';
                 if (dateFilter) dateFilter.value = '';
+            } else if (type === 'signal_report') {
+                if (reportFilter) reportFilter.value = 'signal_report';
+                if (dateFilter) dateFilter.value = '';
             } else if (type === 'lookup_report') {
                 if (reportFilter) reportFilter.value = 'lookup_report';
                 if (dateFilter) dateFilter.value = '';
@@ -6341,6 +6433,7 @@ function setupColumnSelectorsAndPreview() {
                 'all': document.getElementById('qfBtnAll'),
                 'male_report': document.getElementById('qfBtnMale'),
                 'female_report': document.getElementById('qfBtnFemale'),
+                'signal_report': document.getElementById('qfBtnSignal'),
                 'lookup_report': document.getElementById('qfBtnLookup'),
                 'today': document.getElementById('qfBtnToday')
             };
@@ -7111,7 +7204,7 @@ function setupColumnSelectorsAndPreview() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
                     'Department': item.department || '-',
                     'Submitted By (Worker)': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Time': new Date(item.created_at).toLocaleString()
@@ -7152,6 +7245,10 @@ function setupColumnSelectorsAndPreview() {
                 </td></tr>`;
                 return;
             }
+
+            // High Performance Fast Rendering: Render first 60 rows for instant load
+            const maxSubInitial = window._adminSubmissionsShowAll ? list.length : 60;
+            const displayList = list.slice(0, maxSubInitial);
 
             // Function to render a single row
             function renderItemRow(item, idx) {
@@ -7251,7 +7348,11 @@ function setupColumnSelectorsAndPreview() {
 
                 body.innerHTML = outputHtml;
             } else {
-                body.innerHTML = list.map((item, idx) => renderItemRow(item, idx)).join('');
+                let rowsHtml = displayList.map((item, idx) => renderItemRow(item, idx)).join('');
+            if (list.length > maxSubInitial) {
+                rowsHtml += `<tr><td colspan="7" class="py-3 text-center bg-slate-50 border-t border-slate-200"><button onclick="window._adminSubmissionsShowAll=true; filterAdminSubmissionsLocal();" class="px-4 py-1.5 text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white border border-indigo-200 rounded-lg shadow-xs hover:bg-indigo-50 transition">📥 বাকি ${(list.length - maxSubInitial).toLocaleString()} টি রেকর্ড দেখুন (Show All ${list.length.toLocaleString()} Records)</button></td></tr>`;
+            }
+            body.innerHTML = rowsHtml;
             }
         }
 
@@ -7269,6 +7370,7 @@ function setupColumnSelectorsAndPreview() {
             try {
                 const { data, error } = await supabaseClient.rpc('admin_set_user_block_status', {
                     p_user_id: userId,
+                    p_is_blocked: shouldBlock,
                     p_blocked: shouldBlock,
                     p_reason: shouldBlock ? 'Blocked by administrator' : ''
                 });
@@ -7307,7 +7409,7 @@ function renderAdminLogsTable() {
             if (adminLogsCache.length > 0) {
                 body.innerHTML = adminLogsCache.map(l => {
                     const timeStr = new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    const repLabel = l.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
+                    const repLabel = l.report_type === 'female_report' ? '👩 Female Report' : (l.report_type === 'signal_report' ? '📡 Signal Report' : '🔍 Lookup Report');
                     return `
                         <tr class="hover:bg-slate-50 text-xs">
                             <td class="py-3 px-4 font-mono text-slate-500">${timeStr}</td>
@@ -7352,7 +7454,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
                     'Department': item.department || '-',
                     'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -7394,7 +7496,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
                     'Department': item.department || '-',
                     'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -7426,7 +7528,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
                     'Department': item.department || '-',
                     'Submitted By': item.username || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -9302,8 +9404,14 @@ async function runDuplicateCheck() {
                 if (marketContainer) marketContainer.classList.remove('hidden');
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
+            } else if (cat === 'signal_data') {
+                if (hint) hint.innerHTML = 'Enter or paste rows for <span class="font-bold text-cyan-800">Signal Data (সিগন্যাল নাম্বার)</span>: <span class="font-mono bg-cyan-50 text-cyan-950 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)';
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             } else {
-                if (hint) hint.innerHTML = `Enter or paste rows for ${cat === 'female_data' ? 'Female' : 'Lookup'} Data: <span class="font-mono bg-slate-100 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
+                if (hint) hint.innerHTML = 'Enter or paste rows for <span class="font-bold text-pink-800">Female Data (ফিমেল ডাটা)</span>: <span class="font-mono bg-pink-50 text-pink-950 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 Jane Doe 45)';
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -9711,6 +9819,8 @@ async function runDuplicateCheck() {
 
                         if (elTotal) elTotal.innerText = tStats.total.toLocaleString();
                         if (elFemale) elFemale.innerText = tStats.femaleDeliv.toLocaleString();
+                        const elSignal = document.getElementById('cdStatSignal');
+                        if (elSignal) elSignal.innerText = (tStats.signalDeliv || 0).toLocaleString();
                         if (elLookup) elLookup.innerText = tStats.lookupDeliv.toLocaleString();
                         if (elToday) elToday.innerText = tStats.todayDeliv.toLocaleString();
                         if (badgeTotal) badgeTotal.innerText = tStats.total.toLocaleString();
@@ -9810,6 +9920,8 @@ async function runDuplicateCheck() {
                     let catBadge = '';
                     if (item.category === 'female_data') {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Data</span>';
+                    } else if (item.category === 'signal_data') {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-cyan-100 text-cyan-900 font-black">📡 Signal Data</span>';
                     } else {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Data</span>';
                     }
@@ -12322,7 +12434,7 @@ async function loadClaimStockSector() {
                         'Age': item.age || '',
                         'Household Income': item.household_income || '',
                         'Est Market Value': item.est_market_value || '',
-                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
+                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
                         'Department': item.department || '-',
                         'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                         'Submission Date': new Date(item.created_at).toLocaleDateString(),
