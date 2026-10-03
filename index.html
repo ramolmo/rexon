@@ -840,6 +840,22 @@
                         <span class="bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Master Admin Portal</span>
                     </div>
                     <h2 class="text-2xl font-bold text-slate-800 mt-1">Master Control & Team Operations</h2>
+                    <p class="text-sm text-slate-500 mt-1">All submitted files and numbers (Phone, Name, Age) are stored centrally. View live, manage departments, and export consolidated Excel sheets.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button onclick="openQuickSearchModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow-md flex items-center space-x-1.5 transition" title="নাম বা ফোন নাম্বার দিয়ে দ্রুত ডাটা খুঁজুন">
+                        <span class="text-base">⚡</span>
+                        <span>Quick Search (নাম / নাম্বার)</span>
+                    </button>
+                    <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Download all consolidated data across workers">
+                        <span>📥 Download Master Excel</span>
+                    </button>
+                    <button onclick="openResetDataModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Clear/delete previous data to start fresh daily data">
+                        <span>🗑️ Reset / Delete Data</span>
+                    </button>
+                    <button onclick="refreshAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-300 transition">
+                        🔄 Refresh
+                    </button>
                 </div>
             </div>
 
@@ -894,24 +910,6 @@
                             <span>🟢 এখনই পুনরায় চালু করুন (Resume)</span>
                         </button>
                     </div>
-                </div>
-            </div>
-                    <p class="text-sm text-slate-500">All submitted files and numbers (Phone, Name, Age) are stored centrally. View live, manage departments, and export consolidated Excel sheets.</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <button onclick="openQuickSearchModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow-md flex items-center space-x-1.5 transition" title="নাম বা ফোন নাম্বার দিয়ে দ্রুত ডাটা খুঁজুন">
-                        <span class="text-base">⚡</span>
-                        <span>Quick Search (নাম / নাম্বার)</span>
-                    </button>
-                    <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Download all consolidated data across workers">
-                        <span>📥 Download Master Excel</span>
-                    </button>
-                    <button onclick="openResetDataModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Clear/delete previous data to start fresh daily data">
-                        <span>🗑️ Reset / Delete Data</span>
-                    </button>
-                    <button onclick="refreshAdminData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-300 transition">
-                        🔄 Refresh
-                    </button>
                 </div>
             </div>
 
@@ -2705,9 +2703,14 @@
                                 🔴 ডাটাবেজের ডুপ্লিকেট (<span id="dupCountDb">0</span>)
                             </button>
                         </div>
-                        <button onclick="downloadDupTabExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow flex items-center space-x-1.5 transition">
-                            <span>📥 Download Current Tab (.xlsx)</span>
-                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="downloadDupTabExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow flex items-center space-x-1.5 transition">
+                                <span>📥 Download Current Tab (.xlsx)</span>
+                            </button>
+                            <button onclick="downloadAllQcExcel()" class="bg-slate-800 hover:bg-slate-900 text-amber-300 font-black text-xs px-4 py-2 rounded-xl shadow flex items-center space-x-1.5 transition border border-amber-400/40" title="৪ টি ক্যাটাগরির সম্পূর্ণ ডাটা ৪ টি আলাদা শিটে একসাথে ডাউনলোড করুন">
+                                <span>📊 4-in-1 Complete QC Report</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -3369,15 +3372,12 @@
                             UNIQUE(source_table, phone_number)
                         );
                     `);
-                    await this.query(`
-                        CREATE INDEX IF NOT EXISTS idx_ts_phone ON turso_submissions(phone_number);
-                    `);
-                    await this.query(`
-                        CREATE INDEX IF NOT EXISTS idx_ts_user ON turso_submissions(username);
-                    `);
-                    await this.query(`
-                        CREATE INDEX IF NOT EXISTS idx_ts_report ON turso_submissions(report_type);
-                    `);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_phone ON turso_submissions(phone_number);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_created ON turso_submissions(created_at);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_user ON turso_submissions(username);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_email ON turso_submissions(user_email);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_report ON turso_submissions(report_type);`);
+
                     await this.query(`
                         CREATE TABLE IF NOT EXISTS turso_stock_numbers (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -3390,25 +3390,38 @@
                             assigned_to_username TEXT,
                             assigned_to_email TEXT,
                             assigned_at TEXT,
+                            received_date TEXT,
+                            batch_name TEXT,
                             created_at TEXT,
                             archived_at TEXT DEFAULT (datetime('now'))
                         );
                     `);
-                    await this.query(`
-                        CREATE INDEX IF NOT EXISTS idx_tstock_phone ON turso_stock_numbers(phone_number);
-                    `);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tstock_phone ON turso_stock_numbers(phone_number);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tstock_assigned ON turso_stock_numbers(is_assigned);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tstock_type ON turso_stock_numbers(stock_type);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tstock_assigned_at ON turso_stock_numbers(assigned_at);`);
+
                     await this.query(`
                         CREATE TABLE IF NOT EXISTS turso_deliveries (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             phone_number TEXT NOT NULL UNIQUE,
                             full_name TEXT,
                             age TEXT,
+                            household_income TEXT,
+                            est_market_value TEXT,
                             company_name TEXT,
                             category TEXT,
+                            batch_name TEXT,
+                            delivery_date TEXT,
                             delivered_at TEXT,
+                            created_at TEXT DEFAULT (datetime('now')),
                             archived_at TEXT DEFAULT (datetime('now'))
                         );
                     `);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tdel_phone ON turso_deliveries(phone_number);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tdel_date ON turso_deliveries(delivery_date);`);
+                    await this.query(`CREATE INDEX IF NOT EXISTS idx_tdel_company ON turso_deliveries(company_name);`);
+
                     await this.query(`
                         CREATE TABLE IF NOT EXISTS turso_sync_logs (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -3454,16 +3467,20 @@
                 }
             },
 
-            async asyncRecordSubmissions(chunk, reportType, fileName, profile) {
-                try {
-                    if (!chunk || chunk.length === 0) return;
-                    const valuesSql = chunk.map(r => {
+            async insertSubmissions(chunk, reportType, fileName, profile) {
+                if (!chunk || chunk.length === 0) return { success: true, count: 0 };
+                await this.init();
+                let inserted = 0;
+                const subChunkSize = 250;
+                for (let i = 0; i < chunk.length; i += subChunkSize) {
+                    const sub = chunk.slice(i, i + subChunkSize);
+                    const valuesSql = sub.map(r => {
                         const phone = this.escapeSql(r.phone || r.phone_number);
                         const name = this.escapeSql(r.name || r.full_name || '');
                         const age = this.escapeSql(r.age || '');
                         const inc = this.escapeSql(r.income || r.household_income || '');
-                        const val = this.escapeSql(r.est_market_value || '');
-                        const rep = this.escapeSql(reportType || 'female_report');
+                        const val = this.escapeSql(r.market_value || r.est_market_value || '');
+                        const rep = this.escapeSql(reportType || 'general');
                         const dept = this.escapeSql(profile?.department || '-');
                         const email = this.escapeSql(profile?.email || '');
                         const user = this.escapeSql(profile?.username || '');
@@ -3478,32 +3495,130 @@
                         (source_table, phone_number, full_name, age, household_income, est_market_value, report_type, department, user_email, username, file_name, created_at)
                         VALUES ${valuesSql};
                     `;
-                    await this.query(sql);
-                } catch (e) {
-                    console.warn('Background Turso write notice:', e.message);
+                    const res = await this.query(sql);
+                    inserted += (res.affectedRowCount || sub.length);
                 }
+                return { success: true, count: inserted };
             },
 
-            
+            async asyncRecordSubmissions(chunk, reportType, fileName, profile) {
+                return this.insertSubmissions(chunk, reportType, fileName, profile);
+            },
+
+            async insertStockNumbers(records, stockType, recDate, batchName) {
+                if (!records || records.length === 0) return { success: true, count: 0 };
+                await this.init();
+                let inserted = 0;
+                const subChunkSize = 250;
+                const dateVal = this.escapeSql(recDate || new Date().toISOString().slice(0, 10));
+                const bName = this.escapeSql(batchName || 'Company_Stock');
+                const stype = this.escapeSql(stockType || 'gender_verify');
+
+                for (let i = 0; i < records.length; i += subChunkSize) {
+                    const sub = records.slice(i, i + subChunkSize);
+                    const valuesSql = sub.map(r => {
+                        const phone = this.escapeSql(r.phone || r.phone_number);
+                        const name = this.escapeSql(r.name || r.full_name || '');
+                        const age = this.escapeSql(r.age || '');
+                        const created = this.escapeSql(new Date().toISOString());
+                        return `(${phone}, ${name}, ${age}, ${stype}, 0, ${dateVal}, ${bName}, ${created})`;
+                    }).join(', ');
+
+                    const sql = `
+                        INSERT OR IGNORE INTO turso_stock_numbers
+                        (phone_number, full_name, age, stock_type, is_assigned, received_date, batch_name, created_at)
+                        VALUES ${valuesSql};
+                    `;
+                    const res = await this.query(sql);
+                    inserted += (res.affectedRowCount || sub.length);
+                }
+                return { success: true, count: inserted };
+            },
+
+            async asyncRecordStock(records, stockType, recDate, batchName) {
+                return this.insertStockNumbers(records, stockType, recDate, batchName);
+            },
+
+            async insertDeliveries(records, category, companyName, deliveryDate, batchName) {
+                if (!records || records.length === 0) return { success: true, count: 0 };
+                await this.init();
+                let inserted = 0;
+                const subChunkSize = 250;
+                const dateVal = this.escapeSql(deliveryDate || new Date().toISOString().slice(0, 10));
+                const compVal = this.escapeSql(companyName || 'Company');
+                const catVal = this.escapeSql(category || 'general');
+                const bName = this.escapeSql(batchName || `Batch_${deliveryDate}`);
+
+                for (let i = 0; i < records.length; i += subChunkSize) {
+                    const sub = records.slice(i, i + subChunkSize);
+                    const valuesSql = sub.map(r => {
+                        const phone = this.escapeSql(r.phone || r.phone_number);
+                        const name = this.escapeSql(r.name || r.full_name || '');
+                        const age = this.escapeSql(r.age || '');
+                        const inc = this.escapeSql(r.income || r.household_income || '');
+                        const mkt = this.escapeSql(r.market_value || r.est_market_value || '');
+                        const delAt = this.escapeSql(new Date().toISOString());
+                        return `(${phone}, ${name}, ${age}, ${inc}, ${mkt}, ${compVal}, ${catVal}, ${bName}, ${dateVal}, ${delAt})`;
+                    }).join(', ');
+
+                    const sql = `
+                        INSERT OR IGNORE INTO turso_deliveries
+                        (phone_number, full_name, age, household_income, est_market_value, company_name, category, batch_name, delivery_date, delivered_at)
+                        VALUES ${valuesSql};
+                    `;
+                    const res = await this.query(sql);
+                    inserted += (res.affectedRowCount || sub.length);
+                }
+                return { success: true, count: inserted };
+            },
+
             async claimStock(qty, stockType, profile) {
                 await this.init();
                 const cleanType = (stockType === 'lookup') ? 'lookup' : (stockType === 'signal' ? 'signal' : 'gender_verify');
-                
+                const username = this.escapeSql(profile?.username || 'Worker');
+                const email = this.escapeSql(profile?.email || '');
+
+                // 6-hour quota rule: if not admin and not team_leader and not unlimited quota
+                if (profile && profile.role !== 'admin' && profile.role !== 'team_leader' && !profile.is_unlimited_quota) {
+                    const quotaSql = `
+                        SELECT COUNT(*) as claimed_count 
+                        FROM turso_stock_numbers 
+                        WHERE (assigned_to_email = ${email} OR assigned_to_username = ${username})
+                          AND datetime(assigned_at) >= datetime('now', '-6 hours');
+                    `;
+                    const qRes = await this.query(quotaSql);
+                    const claimedCount = parseInt(qRes.rows[0]?.claimed_count || 0, 10);
+                    if (claimedCount >= 1000) {
+                        return {
+                            success: false,
+                            message: `৬ ঘণ্টার কোটা লিমিট (১,০০০ টি) পূর্ণ হয়েছে! সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার নিতে পারেন। আপনি গত ৬ ঘণ্টায় ইতিমধ্যে ${claimedCount} টি নাম্বার নিয়েছেন। ৬ ঘণ্টা পূর্ণ হলে আবার স্বয়ংক্রিয়ভাবে নতুন কোটা পাবেন।`,
+                            count: 0,
+                            data: []
+                        };
+                    }
+                    const remainingQuota = 1000 - claimedCount;
+                    if (qty > remainingQuota) {
+                        qty = remainingQuota;
+                    }
+                }
+
                 // 1. Fetch unassigned rows from turso_stock_numbers
+                const typeCondition = (cleanType === 'gender_verify')
+                    ? "(stock_type = 'gender_verify' OR stock_type IS NULL OR stock_type = '')"
+                    : `stock_type = '${cleanType}'`;
+
                 const fetchSql = `
                     SELECT id, phone_number, full_name, age 
                     FROM turso_stock_numbers 
-                    WHERE is_assigned = 0 AND stock_type = '${cleanType}'
+                    WHERE is_assigned = 0 AND ${typeCondition}
                     ORDER BY id ASC LIMIT ${qty};
                 `;
                 const res = await this.query(fetchSql);
                 if (!res.rows || res.rows.length === 0) {
-                    return { success: false, count: 0, data: [] };
+                    return { success: false, message: 'স্টকে কোনো নতুন নাম্বার খালি নেই!', count: 0, data: [] };
                 }
 
                 const ids = res.rows.map(r => r.id).join(',');
-                const username = this.escapeSql(profile?.username || 'Worker');
-                const email = this.escapeSql(profile?.email || '');
 
                 // 2. Mark assigned in Turso
                 const updateSql = `
@@ -3527,27 +3642,147 @@
                 };
             },
 
-async asyncRecordStock(records, stockType) {
-                try {
-                    if (!records || records.length === 0) return;
-                    const valuesSql = records.map(r => {
-                        const phone = this.escapeSql(r.phone || r.phone_number);
-                        const name = this.escapeSql(r.name || r.full_name || '');
-                        const age = this.escapeSql(r.age || '');
-                        const stype = this.escapeSql(stockType || 'gender_verify');
-                        const created = this.escapeSql(new Date().toISOString());
-                        return `(${phone}, ${name}, ${age}, ${stype}, ${created})`;
-                    }).join(', ');
+            async checkDuplicates(phoneList) {
+                await this.init();
+                const companyDeliveredMatches = [];
+                const dbSubmissionMatches = [];
+                const stockMatches = [];
+                const chunkSize = 250;
 
-                    const sql = `
-                        INSERT OR IGNORE INTO turso_stock_numbers
-                        (phone_number, full_name, age, stock_type, created_at)
-                        VALUES ${valuesSql};
-                    `;
-                    await this.query(sql);
-                } catch (e) {
-                    console.warn('Background Turso stock write notice:', e.message);
+                for (let i = 0; i < phoneList.length; i += chunkSize) {
+                    const chunk = phoneList.slice(i, i + chunkSize);
+                    const inClause = chunk.map(p => this.escapeSql(p)).join(', ');
+
+                    // 1. Check Turso Deliveries (Company Deliveries)
+                    try {
+                        const delSql = `
+                            SELECT phone_number, full_name, age, company_name, category, delivery_date, delivered_at 
+                            FROM turso_deliveries 
+                            WHERE phone_number IN (${inClause});
+                        `;
+                        const delRes = await this.query(delSql);
+                        if (delRes.rows && delRes.rows.length > 0) {
+                            companyDeliveredMatches.push(...delRes.rows);
+                        }
+                    } catch(e) {
+                        console.warn('Turso deliveries dup check notice:', e.message);
+                    }
+
+                    // 2. Check Turso Submissions (Central DB Submissions)
+                    try {
+                        const subSql = `
+                            SELECT phone_number, full_name, age, report_type, username, user_email, created_at 
+                            FROM turso_submissions 
+                            WHERE phone_number IN (${inClause});
+                        `;
+                        const subRes = await this.query(subSql);
+                        if (subRes.rows && subRes.rows.length > 0) {
+                            dbSubmissionMatches.push(...subRes.rows);
+                        }
+                    } catch(e) {
+                        console.warn('Turso submissions dup check notice:', e.message);
+                    }
+
+                    // 3. Check Turso Stock (Company Stock)
+                    try {
+                        const stSql = `
+                            SELECT phone_number, full_name, age, stock_type, is_assigned, assigned_to_username, created_at 
+                            FROM turso_stock_numbers 
+                            WHERE phone_number IN (${inClause});
+                        `;
+                        const stRes = await this.query(stSql);
+                        if (stRes.rows && stRes.rows.length > 0) {
+                            stockMatches.push(...stRes.rows);
+                        }
+                    } catch(e) {
+                        console.warn('Turso stock dup check notice:', e.message);
+                    }
                 }
+
+                return {
+                    companyDeliveries: companyDeliveredMatches,
+                    submissions: dbSubmissionMatches,
+                    stock: stockMatches
+                };
+            },
+
+            async getSubmissionsStats() {
+                await this.init();
+                const sql = `
+                    SELECT 
+                        COUNT(*) as total_unique,
+                        SUM(CASE WHEN report_type = 'female_report' OR report_type = 'female' THEN 1 ELSE 0 END) as female_count,
+                        SUM(CASE WHEN report_type = 'lookup_report' OR report_type = 'lookup' THEN 1 ELSE 0 END) as lookup_count,
+                        SUM(CASE WHEN report_type = 'signal_report' OR report_type = 'signal' THEN 1 ELSE 0 END) as signal_count,
+                        SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today_count
+                    FROM turso_submissions;
+                `;
+                const res = await this.query(sql);
+                const row = res.rows[0] || {};
+                return {
+                    totalUnique: parseInt(row.total_unique || 0, 10),
+                    femaleCount: parseInt(row.female_count || 0, 10),
+                    lookupCount: parseInt(row.lookup_count || 0, 10),
+                    signalCount: parseInt(row.signal_count || 0, 10),
+                    todayTotal: parseInt(row.today_count || 0, 10)
+                };
+            },
+
+            async getStockStats() {
+                await this.init();
+                const sql = `
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN is_assigned = 0 THEN 1 ELSE 0 END) as available,
+                        SUM(CASE WHEN is_assigned = 1 THEN 1 ELSE 0 END) as claimed,
+                        SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today,
+                        SUM(CASE WHEN is_assigned = 0 AND (stock_type = 'gender_verify' OR stock_type IS NULL OR stock_type = '') THEN 1 ELSE 0 END) as gv_avail,
+                        SUM(CASE WHEN is_assigned = 0 AND stock_type = 'lookup' THEN 1 ELSE 0 END) as lookup_avail,
+                        SUM(CASE WHEN is_assigned = 0 AND stock_type = 'signal' THEN 1 ELSE 0 END) as signal_avail
+                    FROM turso_stock_numbers;
+                `;
+                const res = await this.query(sql);
+                const row = res.rows[0] || {};
+                return {
+                    total: parseInt(row.total || 0, 10),
+                    available: parseInt(row.available || 0, 10),
+                    claimed: parseInt(row.claimed || 0, 10),
+                    today: parseInt(row.today || 0, 10),
+                    gvAvail: parseInt(row.gv_avail || 0, 10),
+                    lookupAvail: parseInt(row.lookup_avail || 0, 10),
+                    signalAvail: parseInt(row.signal_avail || 0, 10)
+                };
+            },
+
+            async getDeliveryStats() {
+                await this.init();
+                const sql = `
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN category = 'female_data' THEN 1 ELSE 0 END) as female_deliv,
+                        SUM(CASE WHEN category = 'lookup_data' THEN 1 ELSE 0 END) as lookup_deliv,
+                        SUM(CASE WHEN date(delivered_at) = date('now') OR date(created_at) = date('now') THEN 1 ELSE 0 END) as today_deliv
+                    FROM turso_deliveries;
+                `;
+                const res = await this.query(sql);
+                const row = res.rows[0] || {};
+                return {
+                    total: parseInt(row.total || 0, 10),
+                    femaleDeliv: parseInt(row.female_deliv || 0, 10),
+                    lookupDeliv: parseInt(row.lookup_deliv || 0, 10),
+                    todayDeliv: parseInt(row.today_deliv || 0, 10)
+                };
+            },
+
+            async deleteSubmissions(scope, targetDate) {
+                await this.init();
+                let sql = `DELETE FROM turso_submissions;`;
+                if (scope === 'specific_date' && targetDate) {
+                    sql = `DELETE FROM turso_submissions WHERE date(created_at) = '${targetDate}';`;
+                } else if (scope === 'before_date' && targetDate) {
+                    sql = `DELETE FROM turso_submissions WHERE date(created_at) < '${targetDate}';`;
+                }
+                return this.query(sql);
             },
 
             async syncAll(onProgress) {
@@ -3568,7 +3803,6 @@ async asyncRecordStock(records, stockType) {
                     if (error) throw error;
                     if (!rows || rows.length === 0) break;
 
-                    // Insert in sub-batches of 100
                     for (let i = 0; i < rows.length; i += 100) {
                         const sub = rows.slice(i, i + 100);
                         const valList = sub.map(r => {
@@ -3724,6 +3958,69 @@ async asyncRecordStock(records, stockType) {
                 return totalSynced;
             }
         };
+
+        // GLOBAL FETCH ALL SUBMISSIONS ENGINE (Queries Turso 9 GB Vault first, merges Supabase if needed)
+        async function fetchAllSubmissions(filters = {}) {
+            let results = [];
+            // 1. Fetch from Turso 9 GB Vault (Primary storage)
+            try {
+                if (typeof TursoVault !== 'undefined') {
+                    let sql = `SELECT * FROM turso_submissions WHERE 1=1 `;
+                    if (filters.date) {
+                        sql += ` AND date(created_at) = '${filters.date}'`;
+                    }
+                    if (filters.report_type && filters.report_type !== 'all') {
+                        sql += ` AND report_type = '${filters.report_type}'`;
+                    }
+                    if (filters.user_email && filters.user_email !== 'all') {
+                        sql += ` AND (user_email = '${filters.user_email}' OR username = '${filters.user_email}')`;
+                    }
+                    sql += ` ORDER BY id DESC LIMIT 50000;`;
+                    const tRes = await TursoVault.query(sql);
+                    if (tRes && tRes.rows && tRes.rows.length > 0) {
+                        results.push(...tRes.rows);
+                    }
+                }
+            } catch(tErr) {
+                console.warn('Turso fetchAllSubmissions notice:', tErr);
+            }
+
+            // 2. Also fetch from Supabase master_numbers if available & merge (avoid duplicates)
+            if (supabaseClient) {
+                try {
+                    const seenPhones = new Set(results.map(r => r.phone_number));
+                    let from = 0;
+                    const chunkSize = 1000;
+                    while (from < 10000) {
+                        let q = supabaseClient.from('master_numbers').select('*').order('created_at', { ascending: false }).range(from, from + chunkSize - 1);
+                        if (filters.date) {
+                            const startIso = `${filters.date}T00:00:00.000Z`;
+                            const endIso = `${filters.date}T23:59:59.999Z`;
+                            q = q.gte('created_at', startIso).lte('created_at', endIso);
+                        }
+                        if (filters.report_type && filters.report_type !== 'all') {
+                            q = q.eq('report_type', filters.report_type);
+                        }
+                        if (filters.user_email && filters.user_email !== 'all') {
+                            q = q.eq('user_email', filters.user_email);
+                        }
+                        const { data, error } = await q;
+                        if (error || !data || data.length === 0) break;
+                        for (const row of data) {
+                            if (!seenPhones.has(row.phone_number)) {
+                                seenPhones.add(row.phone_number);
+                                results.push(row);
+                            }
+                        }
+                        if (data.length < chunkSize) break;
+                        from += chunkSize;
+                    }
+                } catch(sErr) {
+                    console.warn('Supabase fetchAllSubmissions notice:', sErr);
+                }
+            }
+            return results;
+        }
 
         // UI Handlers for Turso
         async function refreshTursoStats() {
@@ -5504,6 +5801,14 @@ function setupColumnSelectorsAndPreview() {
 
                     let res;
                     try {
+                        // PRIMARY WRITE TO TURSO 9 GB VAULT (Zero-Data-Loss, Unlimited Storage)
+                        try {
+                            if (typeof TursoVault !== 'undefined') {
+                                await TursoVault.insertSubmissions(chunk, chosenReportType, fileName, currentProfile);
+                            }
+                        } catch(tSubErr) {
+                            console.warn('Turso primary write notice:', tSubErr);
+                        }
                         if (chosenReportType === 'lookup_report') {
                             res = await supabaseClient.rpc('submit_lookup_work_batch', {
                                 p_lookup_type: currentLookupDeliveryType,
@@ -5682,23 +5987,42 @@ function setupColumnSelectorsAndPreview() {
                 const todayIso = todayStart.toISOString();
 
                 // High-Speed Concurrent Stats & Profile Fetching (Promise.all)
-                const [
-                    { count: totalUnique },
-                    { count: maleCount },
-                    { count: femaleCount },
-                    { count: lookupCount },
-                    { count: todayTotal },
-                    { data: profiles, error: pErr },
-                    { data: logs, error: lErr }
-                ] = await Promise.all([
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report'),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report'),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report'),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayIso),
-                    supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false }).limit(200)
-                ]);
+                let totalUnique = 0, maleCount = 0, femaleCount = 0, lookupCount = 0, todayTotal = 0;
+                let profiles = [], logs = [];
+
+                // 1. Fetch Report Counts from Turso 9 GB Vault (Primary storage)
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        const tStats = await TursoVault.getSubmissionsStats();
+                        totalUnique = tStats.totalUnique;
+                        femaleCount = tStats.femaleCount;
+                        lookupCount = tStats.lookupCount;
+                        maleCount = tStats.signalCount;
+                        todayTotal = tStats.todayTotal;
+                    }
+                } catch(tDashErr) {
+                    console.warn('Turso dashboard stats notice:', tDashErr);
+                }
+
+                // 2. Fetch User Database & Profiles ONLY from Supabase (Strict User DB Isolation)
+                try {
+                    if (supabaseClient) {
+                        const [pRes, lRes] = await Promise.all([
+                            supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }),
+                            supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false }).limit(200)
+                        ]);
+                        profiles = pRes.data || [];
+                        logs = lRes.data || [];
+
+                        // Fallback counts if Turso was empty
+                        if (totalUnique === 0) {
+                            const { count: sbTotal } = await supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true });
+                            if (sbTotal) totalUnique = sbTotal;
+                        }
+                    }
+                } catch(sDashErr) {
+                    console.warn('Supabase profile fetch notice:', sDashErr);
+                }
 
                 if (document.getElementById('adminStatTotalUnique')) document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
                 if (document.getElementById('adminStatMaleReport')) document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
@@ -5935,6 +6259,25 @@ function setupColumnSelectorsAndPreview() {
             const dateFilter = document.getElementById('adminSubDateFilter') ? document.getElementById('adminSubDateFilter').value : '';
 
             try {
+                // 1. Fetch live submissions from Turso 9 GB Vault
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        let sql = `SELECT * FROM turso_submissions WHERE 1=1 `;
+                        if (reportFilter !== 'all') sql += ` AND report_type = '${reportFilter}'`;
+                        if (workerFilter !== 'all') sql += ` AND (user_email = '${workerFilter}' OR username = '${workerFilter}')`;
+                        if (dateFilter) sql += ` AND date(created_at) = '${dateFilter}'`;
+                        sql += ` ORDER BY id DESC LIMIT 1000;`;
+                        const tRes = await TursoVault.query(sql);
+                        if (tRes && tRes.rows && tRes.rows.length > 0) {
+                            adminSubmissionsCache = tRes.rows;
+                            filterAdminSubmissionsLocal();
+                            return;
+                        }
+                    }
+                } catch (tFetchErr) {
+                    console.warn('Turso submissions live fetch notice:', tFetchErr);
+                }
+
                 let query = supabaseClient
                     .from('master_numbers')
                     .select('*')
@@ -6129,6 +6472,18 @@ function setupColumnSelectorsAndPreview() {
                 const targetStockType = stockTypeInput ? stockTypeInput.value : 'gender_verify';
 
                 // Call RPC with stock_type
+                // 1. Direct Primary Write to Turso 9 GB Vault (Unlimited Capacity)
+                let tursoStockCount = 0;
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        const tRes = await TursoVault.insertStockNumbers(records, targetStockType, recDate, batchName);
+                        tursoStockCount = tRes.count || records.length;
+                    }
+                } catch(tStockErr) {
+                    console.warn('Turso stock write notice:', tStockErr);
+                }
+
+                // 2. Optional Supabase Sync
                 const { data, error } = await supabaseClient.rpc('admin_upload_received_numbers', {
                     p_records: records,
                     p_received_date: recDate,
@@ -6203,6 +6558,35 @@ function setupColumnSelectorsAndPreview() {
             const dateFilter = document.getElementById('recHistoryDateFilter') ? document.getElementById('recHistoryDateFilter').value : 'all';
 
             try {
+                // 1. Fetch live stock stats and rows from Turso 9 GB Vault
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        const tStats = await TursoVault.getStockStats();
+                        if (tStats && (tStats.total > 0 || tStats.available > 0)) {
+                            if (document.getElementById('recStatTotal')) document.getElementById('recStatTotal').innerText = tStats.total.toLocaleString();
+                            if (document.getElementById('recStatAvailable')) document.getElementById('recStatAvailable').innerText = tStats.available.toLocaleString();
+                            if (document.getElementById('recStockAvailableBadge')) document.getElementById('recStockAvailableBadge').innerText = tStats.available.toLocaleString();
+                            if (document.getElementById('recStatExported')) document.getElementById('recStatExported').innerText = tStats.claimed.toLocaleString();
+                            if (document.getElementById('recStatToday')) document.getElementById('recStatToday').innerText = tStats.today.toLocaleString();
+
+                            updateStockDepletionAlert(tStats.total, tStats.available, tStats.claimed);
+                            loadAdminWorkerClaimsLog();
+
+                            let sql = `SELECT * FROM turso_stock_numbers WHERE 1=1 `;
+                            if (dateFilter !== 'all') sql += ` AND received_date = '${dateFilter}'`;
+                            sql += ` ORDER BY id DESC LIMIT 500;`;
+                            const tRowsRes = await TursoVault.query(sql);
+                            if (tRowsRes && tRowsRes.rows && tRowsRes.rows.length > 0) {
+                                recStockCache = tRowsRes.rows;
+                                filterRecStockHistoryLocal();
+                                return;
+                            }
+                        }
+                    }
+                } catch (tRecErr) {
+                    console.warn('Turso stock fetch notice:', tRecErr);
+                }
+
                 // Fetch stats: Accurately count available unassigned vs claimed by workers
                 const { count: totalRec } = await supabaseClient
                     .from('company_received_numbers')
@@ -8119,35 +8503,58 @@ async function runDuplicateCheck() {
             const inputRecords = {};
             const inputOrder = [];
 
+            // Smart Multi-Pattern Parsing
             lines.forEach(line => {
                 const trimmed = line.trim();
                 if (!trimmed) return;
 
-                // Smart extraction: find phone number (6 to 16 digits)
                 let phone = '';
                 let name = '';
                 let age = '';
 
-                const tokens = trimmed.split(/[\t,;]+|\s{2,}/);
-                for (const tok of tokens) {
-                    const digs = tok.replace(/[^0-9]/g, '');
-                    if (digs.length >= 7 && digs.length <= 16 && !phone) {
-                        phone = digs;
-                    } else if (digs.length <= 3 && parseInt(digs) >= 15 && parseInt(digs) <= 120 && !age) {
-                        age = digs;
-                    } else if (!name && /[a-zA-Z]/.test(tok) && digs.length <= 2) {
-                        name = tok.trim();
+                // Case 1: Tab, comma, semicolon, pipe separated
+                const delims = trimmed.split(/[\t,;|]+/);
+                if (delims.length >= 2) {
+                    for (const d of delims) {
+                        const dStr = d.trim();
+                        const digs = dStr.replace(/[^0-9]/g, '');
+                        if (digs.length >= 7 && digs.length <= 16 && !phone) {
+                            phone = digs;
+                        } else if (digs.length >= 2 && digs.length <= 3 && parseInt(digs, 10) >= 15 && parseInt(digs, 10) <= 120 && !age) {
+                            age = digs;
+                        } else if (!name && /[a-zA-Z]/.test(dStr) && digs.length <= 2) {
+                            name = dStr;
+                        }
                     }
                 }
 
-                // Fallback: regex search for phone digits
+                // Case 2: Space separated
+                if (!phone) {
+                    const tokens = trimmed.split(/\s+/);
+                    const nameParts = [];
+                    for (const tok of tokens) {
+                        const digs = tok.replace(/[^0-9]/g, '');
+                        if (digs.length >= 7 && digs.length <= 16 && !phone) {
+                            phone = digs;
+                        } else if (digs.length >= 2 && digs.length <= 3 && parseInt(digs, 10) >= 15 && parseInt(digs, 10) <= 120 && !age) {
+                            age = digs;
+                        } else if (/[a-zA-Z]/.test(tok)) {
+                            nameParts.append ? nameParts.append(tok) : nameParts.push(tok);
+                        }
+                    }
+                    if (nameParts.length > 0 && !name) {
+                        name = nameParts.join(' ');
+                    }
+                }
+
+                // Fallback: regex search for 7-16 digits
                 if (!phone) {
                     const match = trimmed.match(/\b\d{7,16}\b/);
                     if (match) phone = match[0];
                 }
                 if (!phone) {
                     const justDigs = trimmed.replace(/[^0-9]/g, '');
-                    if (justDigs.length >= 6 && justDigs.length <= 16) phone = justDigs;
+                    if (justDigs.length >= 7 && justDigs.length <= 16) phone = justDigs;
                 }
 
                 if (phone) {
@@ -8197,17 +8604,61 @@ async function runDuplicateCheck() {
                 });
             });
 
-            // 2. Cross-check against database & company deliveries
+            const existingDbSet = new Set();
+            const companyDeliveredSet = new Set();
+
+            // 2. Comprehensive Cross-Check against TURSO 9 GB VAULT (Primary Storage)
+            try {
+                if (typeof TursoVault !== 'undefined') {
+                    const tursoDupRes = await TursoVault.checkDuplicates(inputOrder);
+                    
+                    // A. Turso Company Deliveries
+                    if (checkCompany && tursoDupRes.companyDeliveries && tursoDupRes.companyDeliveries.length > 0) {
+                        tursoDupRes.companyDeliveries.forEach(row => {
+                            if (!companyDeliveredSet.has(row.phone_number)) {
+                                companyDeliveredSet.add(row.phone_number);
+                                const rec = inputRecords[row.phone_number] || {};
+                                dupCompanyDeliveredList.push({
+                                    phone: row.phone_number,
+                                    name: row.full_name || rec.name || '-',
+                                    age: row.age || rec.age || '-',
+                                    count: 1,
+                                    delivery_date: row.delivery_date || row.delivered_at || 'পূর্বের তারিখ',
+                                    company_name: row.company_name || 'Client',
+                                    status: `⚠️ পূর্বে ${row.delivery_date || ''} তারিখে কোম্পানিকে ডেলিভারি দেওয়া হয়েছে (${row.company_name || 'Client'}) [Turso Vault]`
+                                });
+                            }
+                        });
+                    }
+
+                    // B. Turso Central Submissions
+                    if (checkDb && tursoDupRes.submissions && tursoDupRes.submissions.length > 0) {
+                        tursoDupRes.submissions.forEach(row => {
+                            if (!existingDbSet.has(row.phone_number)) {
+                                existingDbSet.add(row.phone_number);
+                                const rec = inputRecords[row.phone_number] || {};
+                                dupDbMatchesList.push({
+                                    phone: row.phone_number,
+                                    name: row.full_name || rec.name || '-',
+                                    age: row.age || rec.age || '-',
+                                    count: 1,
+                                    status: `ডাটাবেজে পূর্বে জমা দেওয়া (${row.username || row.user_email || 'Worker'}) [Turso Vault]`
+                                });
+                            }
+                        });
+                    }
+                }
+            } catch (tursoDupErr) {
+                console.warn('Turso dup check notice:', tursoDupErr);
+            }
+
+            // 3. Fallback Cross-Check against Supabase (if available)
             if (supabaseClient) {
                 try {
                     const chunkSize = 200;
-                    const existingDbSet = new Set();
-                    const companyDeliveredSet = new Set();
-
                     for (let i = 0; i < inputOrder.length; i += chunkSize) {
                         const chunk = inputOrder.slice(i, i + chunkSize);
 
-                        // A. Check against company_deliveries (Company duplicates)
                         if (checkCompany) {
                             try {
                                 const { data: compData } = await supabaseClient
@@ -8217,25 +8668,26 @@ async function runDuplicateCheck() {
 
                                 if (compData && compData.length > 0) {
                                     compData.forEach(row => {
-                                        companyDeliveredSet.add(row.phone_number);
-                                        const rec = inputRecords[row.phone_number] || {};
-                                        dupCompanyDeliveredList.push({
-                                            phone: row.phone_number,
-                                            name: row.full_name || rec.name || '-',
-                                            age: row.age || rec.age || '-',
-                                            count: 1,
-                                            delivery_date: row.delivery_date || 'পূর্বের তারিখ',
-                                            company_name: row.company_name || 'Company',
-                                            status: `⚠️ পূর্বে ${row.delivery_date || ''} তারিখে কোম্পানিকে ডেলিভারি দেওয়া হয়েছে (${row.company_name || 'Client'})`
-                                        });
+                                        if (!companyDeliveredSet.has(row.phone_number)) {
+                                            companyDeliveredSet.add(row.phone_number);
+                                            const rec = inputRecords[row.phone_number] || {};
+                                            dupCompanyDeliveredList.push({
+                                                phone: row.phone_number,
+                                                name: row.full_name || rec.name || '-',
+                                                age: row.age || rec.age || '-',
+                                                count: 1,
+                                                delivery_date: row.delivery_date || 'পূর্বের তারিখ',
+                                                company_name: row.company_name || 'Company',
+                                                status: `⚠️ পূর্বে ${row.delivery_date || ''} তারিখে কোম্পানিকে ডেলিভারি দেওয়া হয়েছে (${row.company_name || 'Client'})`
+                                            });
+                                        }
                                     });
                                 }
                             } catch (compErr) {
-                                console.warn('Company deliveries cross check notice:', compErr);
+                                console.warn('Supabase deliveries cross check notice:', compErr);
                             }
                         }
 
-                        // B. Check against master_numbers (Central Database)
                         if (checkDb) {
                             try {
                                 const { data: dbData } = await supabaseClient
@@ -8245,30 +8697,31 @@ async function runDuplicateCheck() {
 
                                 if (dbData && dbData.length > 0) {
                                     dbData.forEach(row => {
-                                        existingDbSet.add(row.phone_number);
-                                        const rec = inputRecords[row.phone_number] || {};
-                                        dupDbMatchesList.push({
-                                            phone: row.phone_number,
-                                            name: row.full_name || rec.name || '-',
-                                            age: row.age || rec.age || '-',
-                                            count: 1,
-                                            status: `ডাটাবেজে পূর্বে জমা দেওয়া (${row.user_email || 'Worker'})`
-                                        });
+                                        if (!existingDbSet.has(row.phone_number)) {
+                                            existingDbSet.add(row.phone_number);
+                                            const rec = inputRecords[row.phone_number] || {};
+                                            dupDbMatchesList.push({
+                                                phone: row.phone_number,
+                                                name: row.full_name || rec.name || '-',
+                                                age: row.age || rec.age || '-',
+                                                count: 1,
+                                                status: `ডাটাবেজে পূর্বে জমা দেওয়া (${row.user_email || 'Worker'})`
+                                            });
+                                        }
                                     });
                                 }
                             } catch(dbErr) {
-                                console.warn('Master numbers cross check notice:', dbErr);
+                                console.warn('Supabase master numbers cross check notice:', dbErr);
                             }
                         }
                     }
-
-                    // STRICT QUALITY CONTROL: Exclude company delivered numbers and DB numbers from clean list!
-                    dupCleanList = dupCleanList.filter(item => !companyDeliveredSet.has(item.phone) && !existingDbSet.has(item.phone));
-
                 } catch (err) {
-                    console.error('Cross-check error:', err);
+                    console.error('Supabase cross-check error:', err);
                 }
             }
+
+            // STRICT QUALITY CONTROL: Exclude company delivered numbers and DB numbers from clean list!
+            dupCleanList = dupCleanList.filter(item => !companyDeliveredSet.has(item.phone) && !existingDbSet.has(item.phone));
 
             // Update Metric Counts
             document.getElementById('dupStatTotal').innerText = inputOrder.length.toLocaleString();
@@ -8360,19 +8813,36 @@ async function runDuplicateCheck() {
             XLSX.writeFile(wb, `Clean_Company_Delivery_${today}.xlsx`);
         }
 
+        // Download Current Tab (Full Data Support: Clean, Company, File Dups, DB Dups)
         function downloadDupTabExcel() {
-            let activeList = currentDupTab === 'clean' ? dupCleanList : (currentDupTab === 'duplicates' ? dupRepeatedList : dupDbMatchesList);
-            let tabName = currentDupTab === 'clean' ? 'Clean_Unique_Numbers' : (currentDupTab === 'duplicates' ? 'Repeated_File_Duplicates' : 'Already_In_Database');
+            let activeList = [];
+            let tabName = '';
 
-            if (activeList.length === 0) {
-                alert('No records to download.');
+            if (currentDupTab === 'clean') {
+                activeList = dupCleanList;
+                tabName = 'Clean_Company_Fresh';
+            } else if (currentDupTab === 'company') {
+                activeList = window.dupCompanyDeliveredList || [];
+                tabName = 'Company_Previously_Delivered';
+            } else if (currentDupTab === 'duplicates') {
+                activeList = dupRepeatedList;
+                tabName = 'Repeated_File_Duplicates';
+            } else {
+                activeList = dupDbMatchesList;
+                tabName = 'Already_In_Database';
+            }
+
+            if (!activeList || activeList.length === 0) {
+                alert('এই ক্যাটাগরিতে ডাউনলোড করার মতো কোনো রেকর্ড নেই।');
                 return;
             }
 
             const exportData = activeList.map((item, idx) => ({
                 'SL': idx + 1,
                 'Phone Number': item.phone,
-                'Count': item.count,
+                'Full Name': item.name || '',
+                'Age': item.age || '',
+                'Count': item.count || 1,
                 'Status': item.status
             }));
 
@@ -8380,6 +8850,38 @@ async function runDuplicateCheck() {
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, tabName);
             XLSX.writeFile(wb, `${tabName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // Comprehensive 4-in-1 Complete QC Audit Workbook Download
+        function downloadAllQcExcel() {
+            const wb = XLSX.utils.book_new();
+            const today = new Date().toISOString().slice(0, 10);
+
+            // Sheet 1: Clean Fresh
+            const s1Data = (dupCleanList || []).map((r, i) => ({
+                'SL': i + 1, 'Phone Number': r.phone, 'Full Name': r.name || '', 'Age': r.age || '', 'Status': r.status
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(s1Data.length > 0 ? s1Data : [{'Notice': 'No records'}]), '1_Fresh_Clean_Numbers');
+
+            // Sheet 2: Company Delivered Dups
+            const s2Data = (window.dupCompanyDeliveredList || []).map((r, i) => ({
+                'SL': i + 1, 'Phone Number': r.phone, 'Full Name': r.name || '', 'Age': r.age || '', 'Delivery Date': r.delivery_date || '', 'Company': r.company_name || '', 'Status': r.status
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(s2Data.length > 0 ? s2Data : [{'Notice': 'No records'}]), '2_Company_Delivered');
+
+            // Sheet 3: File Duplicates
+            const s3Data = (dupRepeatedList || []).map((r, i) => ({
+                'SL': i + 1, 'Phone Number': r.phone, 'Full Name': r.name || '', 'Age': r.age || '', 'Count': r.count, 'Status': r.status
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(s3Data.length > 0 ? s3Data : [{'Notice': 'No records'}]), '3_File_Repeats');
+
+            // Sheet 4: Database Dups
+            const s4Data = (dupDbMatchesList || []).map((r, i) => ({
+                'SL': i + 1, 'Phone Number': r.phone, 'Full Name': r.name || '', 'Age': r.age || '', 'Status': r.status
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(s4Data.length > 0 ? s4Data : [{'Notice': 'No records'}]), '4_Master_DB_Duplicates');
+
+            XLSX.writeFile(wb, `Complete_QC_Audit_Report_${today}.xlsx`);
         }
 
         // ==================== USERNAME EDIT MODAL LOGIC ====================
@@ -8621,6 +9123,15 @@ async function runDuplicateCheck() {
 
                 msgBox.className = 'p-3 rounded-lg text-xs bg-amber-50 text-amber-800 font-semibold block';
                 msgBox.innerText = 'Deleting previous records from database...';
+
+                // 1.5 Delete from Turso 9 GB Vault (Leaves Supabase User Database 100% Intact)
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        await TursoVault.deleteSubmissions(scope, targetDate);
+                    }
+                } catch(tResetErr) {
+                    console.warn('Turso reset notice:', tResetErr);
+                }
 
                 // 2. Try RPC first, fallback to direct delete
                 try {
@@ -9013,6 +9524,15 @@ async function runDuplicateCheck() {
                     btn.disabled = true;
                     btn.innerHTML = '<span>⏳ ফাইল প্রসেস করা হচ্ছে, অনুগ্রহ করে একটু অপেক্ষা করুন...</span>';
                     try {
+                // 1. Direct Primary Write to Turso 9 GB Vault
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        await TursoVault.insertDeliveries(records, category, companyName, deliveryDate);
+                    }
+                } catch(tDelErr) {
+                    console.warn('Turso deliveries insert notice:', tDelErr);
+                }
+
                         await new Promise((resolve, reject) => {
                             const r = new FileReader();
                             r.onload = function(evt) {
@@ -9178,7 +9698,39 @@ async function runDuplicateCheck() {
             const dateFilter = document.getElementById('cdFilterDate')?.value || '';
             const catFilter = document.getElementById('cdFilterCategory')?.value || 'all';
 
-            // 1. Calculate overall stats
+            // 1. Calculate overall stats from Turso 9 GB Vault
+            try {
+                if (typeof TursoVault !== 'undefined') {
+                    const tStats = await TursoVault.getDeliveryStats();
+                    if (tStats && tStats.total > 0) {
+                        const elTotal = document.getElementById('cdStatTotal');
+                        const elFemale = document.getElementById('cdStatFemale');
+                        const elLookup = document.getElementById('cdStatLookup');
+                        const elToday = document.getElementById('cdStatToday');
+                        const badgeTotal = document.getElementById('companyDelivTotalBadge');
+
+                        if (elTotal) elTotal.innerText = tStats.total.toLocaleString();
+                        if (elFemale) elFemale.innerText = tStats.femaleDeliv.toLocaleString();
+                        if (elLookup) elLookup.innerText = tStats.lookupDeliv.toLocaleString();
+                        if (elToday) elToday.innerText = tStats.todayDeliv.toLocaleString();
+                        if (badgeTotal) badgeTotal.innerText = tStats.total.toLocaleString();
+
+                        let sql = `SELECT * FROM turso_deliveries WHERE 1=1 `;
+                        if (dateFilter) sql += ` AND delivery_date = '${dateFilter}'`;
+                        if (catFilter !== 'all') sql += ` AND category = '${catFilter}'`;
+                        sql += ` ORDER BY id DESC LIMIT 500;`;
+                        const tRes = await TursoVault.query(sql);
+                        if (tRes && tRes.rows && tRes.rows.length > 0) {
+                            cdDeliveriesCache = tRes.rows;
+                            filterCompanyDeliveriesLocal();
+                            return;
+                        }
+                    }
+                }
+            } catch(tDelStatErr) {
+                console.warn('Turso delivery stats notice:', tDelStatErr);
+            }
+
             try {
                 const { count: totalDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true });
                 const { count: maleDeliv } = await supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'male_data');
