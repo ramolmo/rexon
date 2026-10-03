@@ -3347,14 +3347,18 @@
                     ]
                 };
 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
                 const res = await fetch(`${cleanUrl}/v2/pipeline`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${config.token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 if (!res.ok) {
                     const errTxt = await res.text();
@@ -6074,18 +6078,30 @@ function setupColumnSelectorsAndPreview() {
                 const todayIso = todayStart.toISOString();
 
                 // High-Speed Concurrent Stats & Profile Fetching (Promise.all)
-                let totalUnique = 0, maleCount = 0, femaleCount = 0, lookupCount = 0, todayTotal = 0;
+                let totalUnique = 0, maleCount = 0, femaleCount = 0, signalCount = 0, lookupCount = 0, todayTotal = 0;
                 let profiles = [], logs = [];
 
-                // 1. Fetch Report Counts from Turso 9 GB Vault (Primary storage)
+                // 1. Fetch live report counts, stock counts, and delivery stats from Turso
                 try {
                     if (typeof TursoVault !== 'undefined') {
-                        const tStats = await TursoVault.getSubmissionsStats();
-                        totalUnique = tStats.totalUnique;
-                        femaleCount = tStats.femaleCount;
-                        lookupCount = tStats.lookupCount;
-                        maleCount = tStats.signalCount;
-                        todayTotal = tStats.todayTotal;
+                        const [tStats, sStats, dStats] = await Promise.all([
+                            TursoVault.getSubmissionsStats().catch(() => ({})),
+                            TursoVault.getStockStats().catch(() => ({})),
+                            TursoVault.getDeliveryStats().catch(() => ({}))
+                        ]);
+                        totalUnique = tStats.totalUnique || 0;
+                        femaleCount = tStats.femaleCount || 0;
+                        signalCount = tStats.signalCount || 0;
+                        maleCount = signalCount;
+                        lookupCount = tStats.lookupCount || 0;
+                        todayTotal = tStats.todayTotal || 0;
+
+                        if (document.getElementById('recStockAvailableBadge') && sStats.available !== undefined) {
+                            document.getElementById('recStockAvailableBadge').innerText = (sStats.available || 0).toLocaleString();
+                        }
+                        if (document.getElementById('companyDelivTotalBadge') && dStats.total !== undefined) {
+                            document.getElementById('companyDelivTotalBadge').innerText = (dStats.total || 0).toLocaleString();
+                        }
                     }
                 } catch(tDashErr) {
                     console.warn('Turso dashboard stats notice:', tDashErr);
@@ -6114,7 +6130,7 @@ function setupColumnSelectorsAndPreview() {
                 if (document.getElementById('adminStatTotalUnique')) document.getElementById('adminStatTotalUnique').innerText = (totalUnique || 0).toLocaleString();
                 if (document.getElementById('adminStatMaleReport')) document.getElementById('adminStatMaleReport').innerText = (maleCount || 0).toLocaleString();
                 if (document.getElementById('adminStatFemaleReport')) document.getElementById('adminStatFemaleReport').innerText = (femaleCount || 0).toLocaleString();
-                if (document.getElementById('adminStatSignalReport')) document.getElementById('adminStatSignalReport').innerText = (maleCount || signalCount || 0).toLocaleString();
+                if (document.getElementById('adminStatSignalReport')) document.getElementById('adminStatSignalReport').innerText = (signalCount || 0).toLocaleString();
                 if (document.getElementById('adminStatLookupReport')) document.getElementById('adminStatLookupReport').innerText = (lookupCount || 0).toLocaleString();
                 if (document.getElementById('adminStatToday')) document.getElementById('adminStatToday').innerText = (todayTotal || 0).toLocaleString();
 
@@ -6343,21 +6359,21 @@ function setupColumnSelectorsAndPreview() {
             const body = document.getElementById('adminSubmissionsTableBody');
             body.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Loading submissions...</td></tr>`;
 
-            const reportFilter = document.getElementById('adminSubReportFilter').value;
-            const workerFilter = document.getElementById('adminSubWorkerFilter').value;
-            const dateFilter = document.getElementById('adminSubDateFilter') ? document.getElementById('adminSubDateFilter').value : '';
+            const reportFilter = document.getElementById('adminSubReportFilter')?.value || 'all';
+            const workerFilter = document.getElementById('adminSubWorkerFilter')?.value || 'all';
+            const dateFilter = document.getElementById('adminSubDateFilter')?.value || '';
 
             try {
                 // 1. Fetch live submissions from Turso 9 GB Vault
                 try {
                     if (typeof TursoVault !== 'undefined') {
                         let sql = `SELECT * FROM turso_submissions WHERE 1=1 `;
-                        if (reportFilter !== 'all') sql += ` AND report_type = '${reportFilter}'`;
-                        if (workerFilter !== 'all') sql += ` AND (user_email = '${workerFilter}' OR username = '${workerFilter}')`;
+                        if (reportFilter && reportFilter !== 'all') sql += ` AND report_type = '${reportFilter}'`;
+                        if (workerFilter && workerFilter !== 'all') sql += ` AND (user_email = '${workerFilter}' OR username = '${workerFilter}')`;
                         if (dateFilter) sql += ` AND date(created_at) = '${dateFilter}'`;
                         sql += ` ORDER BY id DESC LIMIT 1000;`;
                         const tRes = await TursoVault.query(sql);
-                        if (tRes && tRes.rows && tRes.rows.length > 0) {
+                        if (tRes && tRes.rows) {
                             adminSubmissionsCache = tRes.rows;
                             filterAdminSubmissionsLocal();
                             return;
@@ -6669,7 +6685,7 @@ function setupColumnSelectorsAndPreview() {
                             if (dateFilter !== 'all') sql += ` AND received_date = '${dateFilter}'`;
                             sql += ` ORDER BY id DESC LIMIT 500;`;
                             const tRowsRes = await TursoVault.query(sql);
-                            if (tRowsRes && tRowsRes.rows && tRowsRes.rows.length > 0) {
+                            if (tRowsRes && tRowsRes.rows) {
                                 recStockCache = tRowsRes.rows;
                                 filterRecStockHistoryLocal();
                                 return;
@@ -9830,7 +9846,7 @@ async function runDuplicateCheck() {
                         if (catFilter !== 'all') sql += ` AND category = '${catFilter}'`;
                         sql += ` ORDER BY id DESC LIMIT 500;`;
                         const tRes = await TursoVault.query(sql);
-                        if (tRes && tRes.rows && tRes.rows.length > 0) {
+                        if (tRes && tRes.rows) {
                             cdDeliveriesCache = tRes.rows;
                             filterCompanyDeliveriesLocal();
                             return;
