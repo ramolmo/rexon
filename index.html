@@ -3987,22 +3987,35 @@ async asyncRecordStock(records, stockType) {
         }
 
         async function checkSession() {
-            if (!supabaseClient) return;
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
-            if (session && session.user) {
-                currentUser = session.user;
-                await loadUserProfile();
-                setupGoogleDriveClient();
-            const recDateInput = document.getElementById('recInputDate');
-            if (recDateInput && !recDateInput.value) {
-                recDateInput.value = new Date().toISOString().slice(0, 10);
+            if (!supabaseClient) {
+                currentUser = null;
+                currentProfile = null;
+                showView('loginView');
+                return;
             }
-            const cdDateInput = document.getElementById('cdInputDate');
-            if (cdDateInput && !cdDateInput.value) {
-                cdDateInput.value = new Date().toISOString().slice(0, 10);
-            }
-
-            } else {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (session && session.user) {
+                    currentUser = session.user;
+                    await loadUserProfile();
+                    setupGoogleDriveClient();
+                    const recDateInput = document.getElementById('recInputDate');
+                    if (recDateInput && !recDateInput.value) {
+                        recDateInput.value = new Date().toISOString().slice(0, 10);
+                    }
+                    const cdDateInput = document.getElementById('cdInputDate');
+                    if (cdDateInput && !cdDateInput.value) {
+                        cdDateInput.value = new Date().toISOString().slice(0, 10);
+                    }
+                } else {
+                    currentUser = null;
+                    currentProfile = null;
+                    showView('loginView');
+                }
+            } catch(e) {
+                console.warn('Session check notice:', e);
+                currentUser = null;
+                currentProfile = null;
                 showView('loginView');
             }
         }
@@ -4163,12 +4176,34 @@ async asyncRecordStock(records, stockType) {
         }
 
         async function handleLogout() {
-            if (supabaseClient) await supabaseClient.auth.signOut();
+            try {
+                if (supabaseClient) {
+                    await supabaseClient.auth.signOut();
+                }
+            } catch (err) {
+                console.warn('SignOut error:', err);
+            }
+            // Completely wipe all cached auth tokens from localStorage
+            try {
+                Object.keys(localStorage).forEach(k => {
+                    if (k.startsWith('sb-') || k.includes('auth-token') || k === 'supabase.auth.token') {
+                        localStorage.removeItem(k);
+                    }
+                });
+            } catch(e) {}
+
             currentUser = null;
             currentProfile = null;
-            document.getElementById('userInfo').classList.add('hidden');
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
+            }
             const navLinks = document.getElementById('navLinks');
-            if (navLinks) navLinks.classList.add('hidden');
+            if (navLinks) {
+                navLinks.classList.add('hidden');
+                navLinks.classList.remove('flex');
+            }
             showView('loginView');
             switchAuthMode('signin');
         }
@@ -4334,17 +4369,18 @@ function setupWorkerReportOptions(dept) {
         }
 
         function showView(viewId) {
-            // Strict Admin Access Control:
-            // Non-admin users are strictly blocked from accessing Admin Dashboard or Lookup Checker!
-            if (viewId === 'adminDashboard' && (!currentProfile || currentProfile.role !== 'admin')) {
-                console.warn('Unauthorized attempt to view adminDashboard blocked.');
-                showView('userDashboard');
-                return;
-            }
-            if (viewId === 'lookupCheckerView' && (!currentProfile || currentProfile.role !== 'admin')) {
-                alert('🔒 এই টুলটি শুধুমাত্র অ্যাডমিনদের জন্য সংরক্ষিত।');
-                showView('userDashboard');
-                return;
+            // IRONCLAD ACCESS CONTROL:
+            // 1. If user is NOT logged in, NEVER show any dashboard! ALWAYS force loginView!
+            if (!currentUser) {
+                viewId = 'loginView';
+            } else {
+                // 2. If logged in, block non-admin from admin views!
+                if (viewId === 'adminDashboard' && (!currentProfile || currentProfile.role !== 'admin')) {
+                    viewId = 'userDashboard';
+                }
+                if (viewId === 'lookupCheckerView' && (!currentProfile || currentProfile.role !== 'admin')) {
+                    viewId = 'userDashboard';
+                }
             }
 
             ['loginView', 'userDashboard', 'adminDashboard', 'duplicateCheckView', 'claimStockView', 'lookupCheckerView'].forEach(id => {
