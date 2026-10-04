@@ -947,6 +947,14 @@
                     <p id="adminStatSignalReport" class="text-2xl font-extrabold text-sky-600 mt-1">0</p>
                     <p class="text-xs text-slate-400">Click to view all signal data</p>
                 </div>
+                <div onclick="filterAdminSubmissionsBy('lookup_no_info')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-slate-500 cursor-pointer hover:shadow-md hover:border-slate-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">⚪ Lookup No Info</p>
+                        <span class="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-slate-200">Day-by-Day ➔</span>
+                    </div>
+                    <p id="adminStatLookupNoInfo" class="text-2xl font-extrabold text-slate-700 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Click to view no info data</p>
+                </div>
                 <div onclick="filterAdminSubmissionsBy('today')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">Today's Total</p>
@@ -1178,6 +1186,9 @@
                             <button type="button" onclick="filterAdminSubmissionsBy('signal_report')" id="qfBtnSignal" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition">
                                 📡 Signal Data
                             </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('lookup_no_info')" id="qfBtnLookupNoInfo" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-800 transition">
+                                ⚪ Lookup No Info
+                            </button>
                             <button type="button" onclick="filterAdminSubmissionsBy('today')" id="qfBtnToday" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition">
                                 📅 Today's Only
                             </button>
@@ -1210,7 +1221,8 @@
                                 <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                     <option value="all">All Report Types</option>
                                     <option value="female_report">👩 Female Report</option>
-                                    <option value="lookup_report">🔍 Lookup Report</option>
+                                    <option value="lookup_report">🔍 Lookup Report (Valid - আয় ও মার্কেট ভ্যালু)</option>
+                                    <option value="lookup_no_info">⚪ Lookup No Info (কোনো তথ্য নেই)</option>
                                     <option value="signal_report">📡 Signal Report</option>
                                 </select>
                             </div>
@@ -1226,6 +1238,9 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="downloadAdminLookupNoInfoExcel()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs px-3.5 py-2 rounded-lg shadow flex items-center space-x-1.5 transition cursor-pointer" title="নির্বাচিত তারিখের শুধুমাত্র Lookup No Information ডাটা আলাদা ডাউনলোড করুন">
+                                <span>⚪ Lookup No Info (.xlsx)</span>
+                            </button>
                             <button onclick="downloadDateFilteredExcel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow flex items-center space-x-1.5 transition" title="Export dated Excel file for the selected date">
                                 <span>📥 Export Date Record (.xlsx)</span>
                             </button>
@@ -3808,7 +3823,8 @@
                     SELECT 
                         COUNT(*) as total_unique,
                         SUM(CASE WHEN report_type = 'female_report' OR report_type = 'female' THEN 1 ELSE 0 END) as female_count,
-                        SUM(CASE WHEN report_type = 'lookup_report' OR report_type = 'lookup' THEN 1 ELSE 0 END) as lookup_count,
+                        SUM(CASE WHEN (report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income != 'no_info' AND household_income != 'No Information' AND household_income != '-' AND household_income != 'no' AND household_income != '' AND household_income IS NOT NULL) THEN 1 ELSE 0 END) as lookup_count,
+                        SUM(CASE WHEN report_type = 'lookup_no_info' OR ((report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income = 'no_info' OR household_income = 'No Information' OR household_income = '-' OR household_income = 'no' OR household_income = '' OR household_income IS NULL)) THEN 1 ELSE 0 END) as lookup_no_info_count,
                         SUM(CASE WHEN report_type = 'signal_report' OR report_type = 'signal' THEN 1 ELSE 0 END) as signal_count,
                         SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today_count
                     FROM turso_submissions;
@@ -3819,6 +3835,7 @@
                     totalUnique: parseInt(row.total_unique || 0, 10),
                     femaleCount: parseInt(row.female_count || 0, 10),
                     lookupCount: parseInt(row.lookup_count || 0, 10),
+                    lookupNoInfoCount: parseInt(row.lookup_no_info_count || 0, 10),
                     signalCount: parseInt(row.signal_count || 0, 10),
                     todayTotal: parseInt(row.today_count || 0, 10)
                 };
@@ -4067,7 +4084,11 @@
                     if (filters.date) {
                         sql += ` AND date(created_at) = '${filters.date}'`;
                     }
-                    if (filters.report_type && filters.report_type !== 'all') {
+                    if (filters.report_type === 'lookup_no_info') {
+                        sql += ` AND (report_type = 'lookup_no_info' OR ((report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income = 'no_info' OR household_income = 'No Information' OR household_income = '-' OR household_income = 'no' OR household_income IS NULL OR household_income = '')))`;
+                    } else if (filters.report_type === 'lookup_report') {
+                        sql += ` AND (report_type = 'lookup_report' OR report_type = 'lookup') AND household_income != 'no_info' AND household_income != 'No Information' AND household_income != '-' AND household_income != 'no' AND household_income IS NOT NULL AND household_income != ''`;
+                    } else if (filters.report_type && filters.report_type !== 'all') {
                         sql += ` AND report_type = '${filters.report_type}'`;
                     }
                     if (filters.user_email && filters.user_email !== 'all') {
@@ -4117,6 +4138,60 @@
                     console.warn('Supabase fetchAllSubmissions notice:', sErr);
                 }
             }
+            // 3. For Lookup Reports, also seamlessly include Supabase lookup tables
+            if (supabaseClient) {
+                try {
+                    const seenPhones = new Set(results.map(r => r.phone_number));
+                    if (filters.report_type === 'lookup_no_info') {
+                        const noInfoRows = await fetchAllLookupTableRows('lookup_no_info_records', filters.date || '');
+                        if (noInfoRows && noInfoRows.length > 0) {
+                            noInfoRows.forEach(r => {
+                                if (!seenPhones.has(r.phone_number)) {
+                                    seenPhones.add(r.phone_number);
+                                    results.push({
+                                        id: r.id,
+                                        phone_number: r.phone_number,
+                                        full_name: r.full_name || '-',
+                                        age: r.age || '-',
+                                        household_income: 'No Information',
+                                        est_market_value: 'No Information',
+                                        report_type: 'lookup_no_info',
+                                        department: 'lookup',
+                                        user_email: r.worker_email,
+                                        username: r.worker_username,
+                                        created_at: r.created_at || r.submission_date
+                                    });
+                                }
+                            });
+                        }
+                    } else if (filters.report_type === 'lookup_report') {
+                        const valRows = await fetchAllLookupTableRows('lookup_records', filters.date || '');
+                        if (valRows && valRows.length > 0) {
+                            valRows.forEach(r => {
+                                if (!seenPhones.has(r.phone_number)) {
+                                    seenPhones.add(r.phone_number);
+                                    results.push({
+                                        id: r.id,
+                                        phone_number: r.phone_number,
+                                        full_name: r.full_name || '-',
+                                        age: r.age || '-',
+                                        household_income: r.household_income || '',
+                                        est_market_value: r.est_market_value || '',
+                                        report_type: 'lookup_report',
+                                        department: 'lookup',
+                                        user_email: r.worker_email,
+                                        username: r.worker_username,
+                                        created_at: r.created_at || r.submission_date
+                                    });
+                                }
+                            });
+                        }
+                    }
+                } catch(e) {
+                    console.warn('fetchAllSubmissions lookup tables notice:', e);
+                }
+            }
+
             return results;
         }
 
@@ -6130,6 +6205,7 @@ function setupColumnSelectorsAndPreview() {
                     sbFemaleRes,
                     sbSignalRes,
                     sbLookupRes,
+                    sbLookupNoInfoRes,
                     sbTodayRes,
                     sbStockAvailRes,
                     sbDelivTotalRes,
@@ -6149,6 +6225,7 @@ function setupColumnSelectorsAndPreview() {
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report'), { count: 0 }),
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).or('report_type.eq.signal_report,report_type.eq.male_report'), { count: 0 }),
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report'), { count: 0 }),
+                    safeQuery(supabaseClient.from('lookup_no_info_records').select('*', { count: 'exact', head: true }), { count: 0 }),
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayIso), { count: 0 }),
 
                     // Supabase Stock Available & Deliveries Total
@@ -6165,6 +6242,7 @@ function setupColumnSelectorsAndPreview() {
                 const signalCount = (tursoSubStats.signalCount || 0) + (sbSignalRes.count || 0);
                 const maleCount = signalCount;
                 const lookupCount = (tursoSubStats.lookupCount || 0) + (sbLookupRes.count || 0);
+                const lookupNoInfoCount = (tursoSubStats.lookupNoInfoCount || 0) + (sbLookupNoInfoRes.count || 0);
                 const todayTotal = (tursoSubStats.todayTotal || 0) + (sbTodayRes.count || 0);
 
                 const sbAvailNum = (sbStockAvailRes.count !== null && sbStockAvailRes.count !== undefined) ? sbStockAvailRes.count : 0;
@@ -6177,6 +6255,7 @@ function setupColumnSelectorsAndPreview() {
                 if (document.getElementById('adminStatFemaleReport')) document.getElementById('adminStatFemaleReport').innerText = femaleCount.toLocaleString();
                 if (document.getElementById('adminStatSignalReport')) document.getElementById('adminStatSignalReport').innerText = signalCount.toLocaleString();
                 if (document.getElementById('adminStatLookupReport')) document.getElementById('adminStatLookupReport').innerText = lookupCount.toLocaleString();
+                if (document.getElementById('adminStatLookupNoInfo')) document.getElementById('adminStatLookupNoInfo').innerText = lookupNoInfoCount.toLocaleString();
                 if (document.getElementById('adminStatToday')) document.getElementById('adminStatToday').innerText = todayTotal.toLocaleString();
 
                 // Update Tab Badges Immediately (No more 0!)
@@ -6490,7 +6569,13 @@ function setupColumnSelectorsAndPreview() {
                 try {
                     if (typeof TursoVault !== 'undefined') {
                         let sql = `SELECT * FROM turso_submissions WHERE 1=1 `;
-                        if (reportFilter && reportFilter !== 'all') sql += ` AND report_type = '${reportFilter}'`;
+                        if (reportFilter === 'lookup_no_info') {
+                            sql += ` AND (report_type = 'lookup_no_info' OR ((report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income = 'no_info' OR household_income = 'No Information' OR household_income = '-' OR household_income = 'no' OR household_income IS NULL OR household_income = '')))`;
+                        } else if (reportFilter === 'lookup_report') {
+                            sql += ` AND (report_type = 'lookup_report' OR report_type = 'lookup') AND household_income != 'no_info' AND household_income != 'No Information' AND household_income != '-' AND household_income != 'no' AND household_income IS NOT NULL AND household_income != ''`;
+                        } else if (reportFilter && reportFilter !== 'all') {
+                            sql += ` AND report_type = '${reportFilter}'`;
+                        }
                         if (workerFilter && workerFilter !== 'all') sql += ` AND (user_email = '${workerFilter}' OR username = '${workerFilter}')`;
                         if (dateFilter) sql += ` AND date(created_at) = '${dateFilter}'`;
                         sql += ` ORDER BY id DESC LIMIT 1000;`;
@@ -6503,16 +6588,58 @@ function setupColumnSelectorsAndPreview() {
 
                 let sbRows = [];
                 try {
-                    let query = supabaseClient.from('master_numbers').select('*').order('created_at', { ascending: false }).limit(1000);
-                    if (reportFilter && reportFilter !== 'all') query = query.eq('report_type', reportFilter);
-                    if (workerFilter && workerFilter !== 'all') query = query.eq('user_email', workerFilter);
-                    if (dateFilter) {
-                        const startIso = `${dateFilter}T00:00:00.000Z`;
-                        const endIso = `${dateFilter}T23:59:59.999Z`;
-                        query = query.gte('created_at', startIso).lte('created_at', endIso);
+                    if (reportFilter === 'lookup_no_info') {
+                        let q = supabaseClient.from('lookup_no_info_records').select('*').order('created_at', { ascending: false }).limit(1000);
+                        if (dateFilter) q = q.eq('submission_date', dateFilter);
+                        if (workerFilter && workerFilter !== 'all') q = q.or(`worker_email.eq.${workerFilter},worker_username.eq.${workerFilter}`);
+                        const res = await safeQuery(q, { data: [] });
+                        if (res && res.data) {
+                            sbRows = res.data.map(r => ({
+                                id: r.id,
+                                phone_number: r.phone_number,
+                                full_name: r.full_name || '-',
+                                age: r.age || '-',
+                                household_income: 'No Information',
+                                est_market_value: 'No Information',
+                                report_type: 'lookup_no_info',
+                                department: 'lookup',
+                                user_email: r.worker_email,
+                                username: r.worker_username,
+                                created_at: r.created_at || r.submission_date
+                            }));
+                        }
+                    } else if (reportFilter === 'lookup_report') {
+                        let q = supabaseClient.from('lookup_records').select('*').order('created_at', { ascending: false }).limit(1000);
+                        if (dateFilter) q = q.eq('submission_date', dateFilter);
+                        if (workerFilter && workerFilter !== 'all') q = q.or(`worker_email.eq.${workerFilter},worker_username.eq.${workerFilter}`);
+                        const res = await safeQuery(q, { data: [] });
+                        if (res && res.data) {
+                            sbRows = res.data.map(r => ({
+                                id: r.id,
+                                phone_number: r.phone_number,
+                                full_name: r.full_name || '-',
+                                age: r.age || '-',
+                                household_income: r.household_income || '',
+                                est_market_value: r.est_market_value || '',
+                                report_type: 'lookup_report',
+                                department: 'lookup',
+                                user_email: r.worker_email,
+                                username: r.worker_username,
+                                created_at: r.created_at || r.submission_date
+                            }));
+                        }
+                    } else {
+                        let query = supabaseClient.from('master_numbers').select('*').order('created_at', { ascending: false }).limit(1000);
+                        if (reportFilter && reportFilter !== 'all') query = query.eq('report_type', reportFilter);
+                        if (workerFilter && workerFilter !== 'all') query = query.eq('user_email', workerFilter);
+                        if (dateFilter) {
+                            const startIso = `${dateFilter}T00:00:00.000Z`;
+                            const endIso = `${dateFilter}T23:59:59.999Z`;
+                            query = query.gte('created_at', startIso).lte('created_at', endIso);
+                        }
+                        const res = await safeQuery(query, { data: [] });
+                        if (res && res.data) sbRows = res.data;
                     }
-                    const res = await safeQuery(query, { data: [] });
-                    if (res && res.data) sbRows = res.data;
                 } catch(sbErr) {
                     console.warn('Supabase submissions query notice:', sbErr);
                 }
@@ -6548,6 +6675,9 @@ function setupColumnSelectorsAndPreview() {
             } else if (type === 'signal_report') {
                 if (reportFilter) reportFilter.value = 'signal_report';
                 if (dateFilter) dateFilter.value = '';
+            } else if (type === 'lookup_no_info') {
+                if (reportFilter) reportFilter.value = 'lookup_no_info';
+                if (dateFilter) dateFilter.value = '';
             } else if (type === 'today') {
                 if (reportFilter) reportFilter.value = 'all';
                 if (dateFilter) dateFilter.value = new Date().toISOString().slice(0, 10);
@@ -6567,6 +6697,7 @@ function setupColumnSelectorsAndPreview() {
                 'female_report': document.getElementById('qfBtnFemale'),
                 'signal_report': document.getElementById('qfBtnSignal'),
                 'lookup_report': document.getElementById('qfBtnLookup'),
+                'lookup_no_info': document.getElementById('qfBtnLookupNoInfo'),
                 'today': document.getElementById('qfBtnToday')
             };
 
@@ -7545,6 +7676,18 @@ function renderAdminLogsTable() {
                         'Household Income': item.household_income || '',
                         'Est Market Value': item.est_market_value || ''
                     }));
+                } else if (reportFilter === 'lookup_no_info') {
+                    // Pure phone numbers for Lookup No Info (separate file)
+                    exportRows = allRows.map(item => ({
+                        'Phone Number': item.phone_number,
+                        'Status': 'No Information (কোনো তথ্য পাওয়া যায় নাই)'
+                    }));
+                } else if (reportFilter === 'lookup_no_info') {
+                    // Pure phone numbers for Lookup No Info (separate file)
+                    exportRows = allRows.map(item => ({
+                        'Phone Number': item.phone_number,
+                        'Status': 'No Information (কোনো তথ্য পাওয়া যায় নাই)'
+                    }));
                 } else if (reportFilter === 'signal_report') {
                     // Pure phone numbers for Signal Report
                     exportRows = allRows.map(item => ({
@@ -7609,8 +7752,19 @@ function renderAdminLogsTable() {
 
                 const ws = XLSX.utils.json_to_sheet(exportRows);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Submissions");
-                XLSX.writeFile(wb, `Submissions_Export_${new Date().toISOString().slice(0,10)}_Total_${exportRows.length}.xlsx`);
+                let sheetTitle = 'Submissions';
+                if (reportFilter === 'lookup_no_info') sheetTitle = 'No_Information';
+                else if (reportFilter === 'lookup_report') sheetTitle = 'Valid_Lookup';
+                else if (reportFilter === 'signal_report') sheetTitle = 'Signal_Data';
+                XLSX.utils.book_append_sheet(wb, ws, sheetTitle);
+
+                let fileNamePrefix = 'Submissions_Export';
+                if (reportFilter === 'lookup_no_info') fileNamePrefix = 'Lookup_No_Information';
+                else if (reportFilter === 'lookup_report') fileNamePrefix = 'Lookup_Valid';
+                else if (reportFilter === 'signal_report') fileNamePrefix = 'Signal_Records';
+
+                XLSX.writeFile(wb, `${fileNamePrefix}_${new Date().toISOString().slice(0,10)}_Total_${exportRows.length}.xlsx`);
+                alert(`📥 মোট ${exportRows.length.toLocaleString()} টি ${reportFilter === 'lookup_no_info' ? 'Lookup No Information' : 'রেকর্ড'} সফলভাবে ডাউনলোড হয়েছে!`);
             } catch(err) {
                 alert('Export failed: ' + err.message);
             }
@@ -9549,6 +9703,40 @@ async function runDuplicateCheck() {
             loadAdminSubmissionsData();
         }
 
+        async function downloadAdminLookupNoInfoExcel() {
+            if (!supabaseClient) return;
+            const dateVal = document.getElementById('adminSubDateFilter')?.value;
+            const workerFilter = document.getElementById('adminSubWorkerFilter')?.value || 'all';
+
+            try {
+                const allRows = await fetchAllSubmissions({
+                    date: dateVal || null,
+                    report_type: 'lookup_no_info',
+                    user_email: workerFilter
+                });
+
+                if (!allRows || allRows.length === 0) {
+                    alert('নির্বাচিত তারিখ বা ফিল্টারে কোনো Lookup No Information ডাটা পাওয়া যায়নি।');
+                    return;
+                }
+
+                // Strictly Phone Number & Status: No Information
+                const exportRows = allRows.map(item => ({
+                    'Phone Number': String(item.phone_number || item.phone || '').trim(),
+                    'Status': 'No Information (কোনো তথ্য পাওয়া যায় নাই)'
+                })).filter(r => r['Phone Number'].length >= 6);
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "No_Information");
+                const fileName = `Lookup_No_Information_${dateVal || new Date().toISOString().slice(0, 10)}_Total_${exportRows.length}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                alert(`📥 মোট ${exportRows.length.toLocaleString()} টি Lookup No Information নাম্বারের এক্সেল ফাইল ডাউনলোড সম্পন্ন হয়েছে!`);
+            } catch(err) {
+                alert('Download error: ' + err.message);
+            }
+        }
+
         async function downloadDateFilteredExcel() {
             if (!supabaseClient) return;
             const dateVal = document.getElementById('adminSubDateFilter')?.value;
@@ -9600,10 +9788,21 @@ async function runDuplicateCheck() {
 
                 const ws = XLSX.utils.json_to_sheet(exportRows);
                 const wb = XLSX.utils.book_new();
-                const sheetTitle = dateVal ? `Records_${dateVal}` : 'Date_Records';
+                let sheetTitle = 'Submissions';
+                if (reportFilter === 'lookup_no_info') sheetTitle = 'No_Information';
+                else if (reportFilter === 'lookup_report') sheetTitle = 'Valid_Lookup';
+                else if (reportFilter === 'signal_report') sheetTitle = 'Signal_Data';
+                else if (dateVal) sheetTitle = `Records_${dateVal}`;
                 XLSX.utils.book_append_sheet(wb, ws, sheetTitle.slice(0, 31));
-                const fileName = `Daily_Records_${dateVal || new Date().toISOString().slice(0, 10)}_Total_${exportRows.length}.xlsx`;
+
+                let fileNamePrefix = 'Daily_Records';
+                if (reportFilter === 'lookup_no_info') fileNamePrefix = 'Lookup_No_Information';
+                else if (reportFilter === 'lookup_report') fileNamePrefix = 'Lookup_Valid';
+                else if (reportFilter === 'signal_report') fileNamePrefix = 'Signal_Records';
+
+                const fileName = `${fileNamePrefix}_${dateVal || new Date().toISOString().slice(0, 10)}_Total_${exportRows.length}.xlsx`;
                 XLSX.writeFile(wb, fileName);
+                alert(`📥 মোট ${exportRows.length.toLocaleString()} টি ${reportFilter === 'lookup_no_info' ? 'Lookup No Information' : 'রেকর্ড'} সফলভাবে ডাউনলোড হয়েছে!`);
             } catch (err) {
                 alert('Download error: ' + err.message);
             }
@@ -12220,13 +12419,17 @@ async function loadClaimStockSector() {
                 XLSX.writeFile(wb, `Lookup_Valid_${targetDate}.xlsx`);
             } else {
                 // Pure phone numbers only for No Information
-                const cleanNumbers = list
-                    .map(r => String(r.phone_number || r.phone || r).trim())
-                    .filter(p => p.length >= 6);
-                const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
+                const exportRows = list.map(r => ({
+                    'Phone Number': String(r.phone_number || r.phone || '').trim(),
+                    'Status': 'No Information (কোনো তথ্য পাওয়া যায় নাই)'
+                })).filter(r => r['Phone Number'].length >= 6);
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'No_Information');
-                XLSX.writeFile(wb, `Lookup_No_Information_${targetDate}.xlsx`);
+                const sheetName = 'No_Information';
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                XLSX.writeFile(wb, `Lookup_No_Information_${targetDate}_Total_${exportRows.length}.xlsx`);
+                alert(`📥 মোট ${exportRows.length.toLocaleString()} টি Lookup No Information নাম্বারের এক্সেল ফাইল ডাউনলোড সম্পন্ন হয়েছে!`);
             }
         }
 
