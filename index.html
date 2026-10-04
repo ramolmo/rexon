@@ -2987,10 +2987,10 @@
                         <p id="lchkStatRule2" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</p>
                         <p class="text-[10px] text-slate-400">Market $350k+ (Any Inc)</p>
                     </div>
-                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
-                        <p class="text-[11px] font-bold text-amber-900 uppercase">⚠️ ভুল ডাটা ($ ছাড়া)</p>
-                        <p id="lchkStatMistake" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">0</p>
-                        <p id="lchkStatMistakePct" class="text-[10px] text-amber-600 font-bold">সংশোধনযোগ্য Mistake</p>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-rose-500">
+                        <p class="text-[11px] font-bold text-rose-900 uppercase">❌ No Information ($ ছাড়া)</p>
+                        <p id="lchkStatMistake" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
+                        <p id="lchkStatMistakePct" class="text-[10px] text-rose-600 font-bold">কোনো তথ্য পাওয়া যায় নাই</p>
                     </div>
                 </div>
 
@@ -3011,9 +3011,9 @@
                                 <span>🔴 অযোগ্য ডাটা (Discarded):</span>
                                 <span id="lchkTabBadgeDiscarded" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
-                            <button type="button" id="btnLchkTabMistake" onclick="switchLookupChkTableTab('mistake')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-800 transition cursor-pointer flex items-center space-x-1.5">
-                                <span>⚠️ ভুল ডাটা (Mistake):</span>
-                                <span id="lchkTabBadgeMistake" class="bg-amber-200 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                            <button type="button" id="btnLchkTabMistake" onclick="switchLookupChkTableTab('mistake')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-800 transition cursor-pointer flex items-center space-x-1.5">
+                                <span>❌ No Information / ভুল ডাটা:</span>
+                                <span id="lchkTabBadgeMistake" class="bg-rose-200 text-rose-900 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
                             <button type="button" id="btnLchkTabAll" onclick="switchLookupChkTableTab('all')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>📋 সমস্ত ডাটা (All):</span>
@@ -3038,6 +3038,12 @@
                             <button type="button" onclick="copyLookupChkPhones('qualified')" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="পাস করা সব ফোন নাম্বার এক ক্লিকে ক্লিপবোর্ডে কপি করুন">
                                 <span>📋 Copy</span>
                             </button>
+                            <button type="button" onclick="downloadLookupChkExcel('no_info')" class="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="যেসকল নাম্বারে কোনো তথ্য পাওয়া যায়নি (No Information) সেগুলো ডাউনলোড করুন">
+                                <span>❌ No Info (.xlsx)</span>
+                            </button>
+                            <button type="button" onclick="downloadLookupChkTxt('no_info')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs px-3 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="No Information ফোন নাম্বারগুলো টেক্সট ফাইলে ডাউনলোড করুন">
+                                <span>📄 No Info (.txt)</span>
+                            </button>
                             <button type="button" onclick="downloadLookupChkExcel('all')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer" title="সব ডাটা স্ট্যাটাস ও কারণসহ ডাউনলোড করুন">
                                 <span>📦 All (.xlsx)</span>
                             </button>
@@ -3051,6 +3057,36 @@
                             <input type="text" id="lchkTableSearchInput" oninput="filterLookupChkTableLocal()" placeholder="Search phone, name, income, market value..." class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-purple-400">
                         </div>
                         <span id="lchkTableRenderCount" class="text-xs text-slate-500 font-bold">Showing 0 records</span>
+                    </div>
+
+                    <!-- No Information / Mistake Notice & Quick Download Bar -->
+                    <div id="lchkNoInfoBanner" class="hidden bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border-2 border-rose-300 rounded-2xl p-4 mb-3 flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-3xl">⚠️</span>
+                            <div>
+                                <p class="text-xs sm:text-sm font-black text-rose-950 flex items-center gap-1.5">
+                                    <span>নিচের নম্বরগুলোতে কোনো তথ্য পাওয়া যায়নি:</span>
+                                    <span class="bg-rose-600 text-white px-2 py-0.5 rounded text-[11px] font-bold">No Information (কোনো তথ্যই পাওয়া যায় নাই)</span>
+                                </p>
+                                <p class="text-[11px] text-slate-600 mt-0.5">
+                                    এসব নম্বরে কোনো $ আয় বা প্রপার্টি ভ্যালু পাওয়া যায়নি। আপনি নিচের লাল বাটন থেকে এক ক্লিকে সম্পূর্ণ No Info লিস্ট ডাউনলোড করে নিতে পারেন অথবা চাইলে সরাসরি সংশোধন করে জমা দিতে পারেন।
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 shrink-0">
+                            <button type="button" onclick="downloadLookupChkExcel('no_info')" class="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer" title="সবগুলো No Info নাম্বার এক্সেল ফাইলে ডাউনলোড করুন">
+                                <span>📥 No Info (.xlsx) ডাউনলোড</span>
+                            </button>
+                            <button type="button" onclick="downloadLookupChkTxt('no_info')" class="bg-rose-800 hover:bg-rose-900 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer" title="সবগুলো No Info নাম্বার টেক্সট ফাইলে ডাউনলোড করুন">
+                                <span>📄 No Info (.txt)</span>
+                            </button>
+                            <button type="button" onclick="copyLookupChkPhones('no_info')" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer" title="ক্লিপবোর্ডে কপি করুন">
+                                <span>📋 কপি</span>
+                            </button>
+                            <button type="button" onclick="submitLookupChkNoInfoAsWorkReport()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer" title="সাইট থেকে সরাসরি No Information রিপোর্ট ডাটাবেজে জমা দিন">
+                                <span>📤 No Info রিপোর্ট জমা</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Live Results Table -->
@@ -8137,6 +8173,15 @@ function renderAdminLogsTable() {
                 if (btnA) btnA.className = 'px-4 py-2 text-xs font-black rounded-xl bg-purple-700 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             }
 
+                        const noInfoBanner = document.getElementById('lchkNoInfoBanner');
+            if (noInfoBanner) {
+                if (tab === 'mistake') {
+                    noInfoBanner.classList.remove('hidden');
+                } else {
+                    noInfoBanner.classList.add('hidden');
+                }
+            }
+
             filterLookupChkTableLocal();
         }
 
@@ -8195,7 +8240,10 @@ function renderAdminLogsTable() {
                             <input type="text" id="lchkMistakeMkt_${r.origIdx}" value="${r.market !== '-' ? r.market : ''}" placeholder="$350,000" class="w-full px-2 py-1 border border-amber-300 rounded-lg text-xs font-mono font-bold text-indigo-800 bg-white focus:ring-2 focus:ring-amber-400 focus:outline-none">
                         </td>
                         <td class="py-3 px-3.5 text-center">
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-900 border border-amber-300 whitespace-nowrap">⚠️ $ নেই (Mistake)</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-rose-100 text-rose-800 border border-rose-300 whitespace-nowrap flex items-center justify-center space-x-1 inline-flex">
+                                <span>❌</span>
+                                <span>No Information (তথ্য নেই)</span>
+                            </span>
                         </td>
                         <td class="py-3 px-3.5">
                             <div class="flex items-center space-x-1.5">
@@ -8466,9 +8514,9 @@ function renderAdminLogsTable() {
             } else if (type === 'discarded') {
                 list = lookupChkDiscardedRecords;
                 fileName = `Lookup_Discarded_Rejected_${list.length}_Records`;
-            } else if (type === 'mistake') {
+            } else if (type === 'no_info' || type === 'mistake') {
                 list = lookupChkMistakeRecords;
-                fileName = `Lookup_Mistakes_${list.length}_Records`;
+                fileName = `Lookup_No_Information_Kono_Tottho_Pawa_Jay_Nai_${list.length}_Numbers`;
             } else {
                 list = lookupChkAllRecords;
                 fileName = `Lookup_All_Analysis_${list.length}_Records`;
@@ -8476,6 +8524,25 @@ function renderAdminLogsTable() {
 
             if (!list || list.length === 0) {
                 alert('ডাউনলোড করার মতো কোনো ডাটা নেই!');
+                return;
+            }
+
+            const todayStr = new Date().toISOString().slice(0, 10);
+
+            // Special handling for No Information numbers
+            if (type === 'no_info' || type === 'mistake') {
+                const exportData = list.map(r => ({
+                    'Phone Number': String(r.phone || r.phone_number || '').trim(),
+                    'Household Income': 'No Information',
+                    'Est Market Value': 'No Information',
+                    'Status': 'No Information (কোনো তথ্য পাওয়া যায় নাই)'
+                })).filter(r => r['Phone Number'].length >= 6);
+
+                const ws = XLSX.utils.json_to_sheet(exportData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'No_Information');
+                XLSX.writeFile(wb, `${fileName}_${todayStr}.xlsx`);
+                alert(`📥 মোট ${exportData.length.toLocaleString()} টি No Information (কোনো তথ্য পাওয়া যায় নাই) নাম্বারের এক্সেল ফাইল ডাউনলোড সম্পন্ন হয়েছে!`);
                 return;
             }
 
@@ -8490,42 +8557,118 @@ function renderAdminLogsTable() {
             const wb = XLSX.utils.book_new();
             const sheetTitle = type === 'special' ? 'Special_VIP' : (type === 'qualified' ? 'Qualified_Lookup' : 'Lookup_Report');
             XLSX.utils.book_append_sheet(wb, ws, sheetTitle);
-            const todayStr = new Date().toISOString().slice(0, 10);
             XLSX.writeFile(wb, `${fileName}_${todayStr}.xlsx`);
         }
 
         function downloadLookupChkTxt(type) {
-            let list = (type === 'special') ? lookupChkSpecialRecords : ((type === 'qualified') ? lookupChkQualifiedRecords : (type === 'discarded' ? lookupChkDiscardedRecords : lookupChkAllRecords));
+            let list = [];
+            if (type === 'special') list = lookupChkSpecialRecords;
+            else if (type === 'qualified') list = lookupChkQualifiedRecords;
+            else if (type === 'discarded') list = lookupChkDiscardedRecords;
+            else if (type === 'no_info' || type === 'mistake') list = lookupChkMistakeRecords;
+            else list = lookupChkAllRecords;
+
             if (!list || list.length === 0) {
                 alert('ডাউনলোড করার মতো কোনো নাম্বার নেই!');
                 return;
             }
 
-            const lines = list.map(r => r.phone).join('\n');
+            const lines = list.map(r => r.phone).filter(p => p && p.length >= 6).join('\n');
             const blob = new Blob([lines], { type: 'text/plain;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Lookup_${type === 'special' ? 'Special' : (type === 'qualified' ? 'Kept' : 'All')}_Phones_${list.length}.txt`;
+            const titleType = (type === 'no_info' || type === 'mistake') ? 'No_Information_Kono_Tottho_Pawa_Jay_Nai' : (type === 'special' ? 'Special' : (type === 'qualified' ? 'Kept' : 'All'));
+            a.download = `Lookup_${titleType}_Phones_${list.length}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+
+            if (type === 'no_info' || type === 'mistake') {
+                alert(`📄 মোট ${list.length.toLocaleString()} টি No Information (কোনো তথ্য পাওয়া যায় নাই) ফোন নাম্বার টেক্সট ফাইলে ডাউনলোড করা হয়েছে!`);
+            }
         }
 
         function copyLookupChkPhones(type) {
-            let list = (type === 'special') ? lookupChkSpecialRecords : ((type === 'qualified') ? lookupChkQualifiedRecords : lookupChkAllRecords);
+            let list = [];
+            if (type === 'special') list = lookupChkSpecialRecords;
+            else if (type === 'qualified') list = lookupChkQualifiedRecords;
+            else if (type === 'no_info' || type === 'mistake') list = lookupChkMistakeRecords;
+            else list = lookupChkAllRecords;
+
             if (!list || list.length === 0) {
                 alert('কপি করার মতো কোনো নাম্বার নেই!');
                 return;
             }
 
-            const lines = list.map(r => r.phone).join('\n');
+            const lines = list.map(r => r.phone).filter(p => p && p.length >= 6).join('\n');
             navigator.clipboard.writeText(lines).then(() => {
-                alert(`✅ মোট ${list.length.toLocaleString()} টি ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!`);
+                const label = (type === 'no_info' || type === 'mistake') ? 'No Information (কোনো তথ্য পাওয়া যায় নাই)' : '';
+                alert(`✅ মোট ${list.length.toLocaleString()} টি ${label} ফোন নাম্বার ক্লিপবোর্ডে কপি করা হয়েছে!`);
             }).catch(err => {
                 alert('কপি করতে সমস্যা: ' + err.message);
             });
+        }
+
+        // Direct submission of No Information records to database
+        async function submitLookupChkNoInfoAsWorkReport() {
+            const lockStatus = checkReportSubmissionLockStatus();
+            if (lockStatus.isClosed) {
+                alert(`দুঃখিত স্যার, আপনি সময়মতো কাজ জমা করতে পারেন নাই, তাই আপনার কাজ আজকে গ্রহণ করা হবে না। আপনি আবার পরে চেষ্টা করেন।\n\n⏰ আর ${lockStatus.remainingText} পর আবার রিপোর্ট জমা দেওয়া যাবে।`);
+                return;
+            }
+            if (!lookupChkMistakeRecords || lookupChkMistakeRecords.length === 0) {
+                alert('জমা দেওয়ার মতো কোনো No Information ডাটা নেই!');
+                return;
+            }
+
+            if (!currentUser) {
+                alert('⚠️ কাজের রিপোর্ট জমা দেওয়ার জন্য অনুগ্রহ করে প্রথমে আপনার কর্মী অ্যাকাউন্টে লগইন করুন।');
+                switchToSection('dashboard');
+                return;
+            }
+
+            if (!confirm(`মোট ${lookupChkMistakeRecords.length.toLocaleString()} টি No Information (কোনো তথ্য পাওয়া যায় নাই) নাম্বার আপনার আজকের কাজের রিপোর্ট হিসেবে জমা দিতে চান?`)) {
+                return;
+            }
+
+            const records = lookupChkMistakeRecords.map(r => ({
+                phone: r.phone,
+                name: r.name || '-',
+                age: '-',
+                income: 'no_info',
+                household_income: 'no_info',
+                market_value: 'no_info',
+                est_market_value: 'no_info'
+            }));
+
+            try {
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        await TursoVault.insertSubmissions(records, 'lookup_report', 'Lookup_No_Info_Checked_Report.xlsx', currentProfile);
+                    }
+                } catch(tSubErr) {
+                    console.warn('Turso lookup no_info write notice:', tSubErr);
+                }
+
+                const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
+                    p_lookup_type: 'no_info',
+                    p_records: records,
+                    p_file_name: 'Lookup_No_Info_Checked_Report.xlsx'
+                });
+
+                if (error) throw error;
+
+                alert(`✅ আপনার No Information (কোনো তথ্য পাওয়া যায় নাই) রিপোর্ট সফলভাবে জমা হয়েছে!\n\nমোট ডাটা: ${data.total_received}\nনতুন সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট ফিল্টার্ড: ${data.duplicates_count}`);
+                
+                if (typeof loadAdminLookupReports === 'function') loadAdminLookupReports();
+                if (typeof loadUserDashboard === 'function') loadUserDashboard();
+
+            } catch(err) {
+                console.error('Submit lookup no_info report error:', err);
+                alert('রিপোর্ট জমা দিতে সমস্যা হয়েছে: ' + err.message);
+            }
         }
 
         // =========================================================================
