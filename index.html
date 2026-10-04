@@ -939,6 +939,14 @@
                     <p id="adminStatLookupReport" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
                     <p class="text-xs text-slate-400">Income & Market value data</p>
                 </div>
+                <div onclick="filterAdminSubmissionsBy('signal_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-sky-500 cursor-pointer hover:shadow-md hover:border-sky-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">📡 Signal Reports</p>
+                        <span class="text-[10px] bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-sky-100">Day-by-Day ➔</span>
+                    </div>
+                    <p id="adminStatSignalReport" class="text-2xl font-extrabold text-sky-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Click to view all signal data</p>
+                </div>
                 <div onclick="filterAdminSubmissionsBy('today')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">Today's Total</p>
@@ -1167,6 +1175,9 @@
                             <button type="button" onclick="filterAdminSubmissionsBy('lookup_report')" id="qfBtnLookup" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200 transition">
                                 🔍 Lookup Data
                             </button>
+                            <button type="button" onclick="filterAdminSubmissionsBy('signal_report')" id="qfBtnSignal" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition">
+                                📡 Signal Data
+                            </button>
                             <button type="button" onclick="filterAdminSubmissionsBy('today')" id="qfBtnToday" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition">
                                 📅 Today's Only
                             </button>
@@ -1392,6 +1403,11 @@
                             <p id="cdStatLookup" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
                             <p class="text-[11px] text-slate-400">Income & Market Val</p>
                         </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-sky-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">📡 Signal Data</p>
+                            <p id="cdStatSignal" class="text-2xl font-extrabold text-sky-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Delivered to company</p>
+                        </div>
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 lg:col-span-1">
                             <p class="text-xs font-bold text-slate-500 uppercase">Today's Given</p>
                             <p id="cdStatToday" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
@@ -1422,6 +1438,7 @@
                                 </label>
                                 <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
                                     <option value="female_data">👩 1. Female Data (মহিলা ডাটা)</option>
+                                    <option value="signal_data">📡 2. Signal Data (সিগন্যাল ডাটা)</option>
                                     <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
                                 </select>
                             </div>
@@ -1522,6 +1539,7 @@
                                     <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
                                         <option value="all">All Categories (সবগুলো)</option>
                                         <option value="female_data">👩 Female Data</option>
+                                        <option value="signal_data">📡 Signal Data</option>
                                         <option value="lookup_data">🔍 Lookup Data</option>
                                     </select>
                                 </div>
@@ -2887,15 +2905,48 @@
 
                 <!-- 2. Direct Paste Section -->
                 <div id="lookupChkPasteSection" class="hidden space-y-4">
+                    <!-- Column Sequence Selector Options -->
+                    <div class="bg-purple-50/70 border border-purple-200 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-black text-purple-900 flex items-center gap-1.5">
+                                <span>⚙️ কলাম সিকোয়েন্স (Column Order) সিলেক্ট করুন:</span>
+                            </p>
+                            <span class="text-[10px] text-purple-700 bg-purple-100 font-bold px-2 py-0.5 rounded-full">রো ১ থেকেই ডাটা রিড হবে</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs font-bold text-slate-700">
+                            <label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100/50">
+                                <input type="radio" name="lchkColOrder" value="num_inc_mkt" checked class="text-purple-600 focus:ring-purple-500">
+                                <span>১. নাম্বার ➔ ২. আয় ➔ ৩. মার্কেট</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100/50">
+                                <input type="radio" name="lchkColOrder" value="num_name_inc_mkt" class="text-purple-600 focus:ring-purple-500">
+                                <span>১. নাম্বার ➔ ২. নাম ➔ ৩. আয় ➔ ৪. মার্কেট</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100/50">
+                                <input type="radio" name="lchkColOrder" value="num_mkt_inc" class="text-purple-600 focus:ring-purple-500">
+                                <span>১. নাম্বার ➔ ২. মার্কেট ➔ ৩. আয়</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100/50">
+                                <input type="radio" name="lchkColOrder" value="smart_auto" class="text-purple-600 focus:ring-purple-500">
+                                <span>🤖 স্মার্ট অটো ডিটেকশন ($ Auto)</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
                             নোটপ্যাড বা এক্সেল থেকে ডাটা কপি করে এখানে পেস্ট করুন:
                         </label>
-                        <textarea id="lookupChkPasteInput" rows="6" placeholder="উদাহরণস্বরূপ:&#10;15136465609   $75,000 - $99,999   $350,000   Zoe Smith&#10;16145551234   $45,000   $380,000   Sarah Brown&#10;14155559876   $120,000   $650,000   John Doe" class="w-full p-4 bg-slate-50 border-2 border-slate-300 rounded-2xl font-mono text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"></textarea>
+                        <textarea id="lookupChkPasteInput" rows="6" placeholder="উদাহরণস্বরূপ:&#10;15136465609   $75,000 - $99,999   $350,000&#10;16145551234   $45,000   $380,000&#10;14155559876   $120,000   $650,000" class="w-full p-4 bg-slate-50 border-2 border-slate-300 rounded-2xl font-mono text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"></textarea>
                     </div>
-                    <button type="button" id="btnRunLookupPasteCheck" onclick="runLookupPasteCheck()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
-                        <span>⚡ পেস্ট করা ডাটা যাচাই ও ফিল্টার করুন</span>
-                    </button>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" id="btnRunLookupPasteCheck" onclick="runLookupPasteCheck()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
+                            <span>⚡ পেস্ট করা ডাটা যাচাই ও ফিল্টার করুন</span>
+                        </button>
+                        <button type="button" onclick="clearLookupCheckerAll()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-black text-xs sm:text-sm px-5 py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                            <span>🧹 সম্পূর্ণ ক্লিয়ার / নতুন করে শুরু করুন</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2936,6 +2987,11 @@
                         <p id="lchkStatRule2" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</p>
                         <p class="text-[10px] text-slate-400">Market $350k+ (Any Inc)</p>
                     </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-amber-500">
+                        <p class="text-[11px] font-bold text-amber-900 uppercase">⚠️ ভুল ডাটা ($ ছাড়া)</p>
+                        <p id="lchkStatMistake" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">0</p>
+                        <p id="lchkStatMistakePct" class="text-[10px] text-amber-600 font-bold">সংশোধনযোগ্য Mistake</p>
+                    </div>
                 </div>
 
                 <!-- Action Bar & Filter Switcher -->
@@ -2954,6 +3010,10 @@
                             <button type="button" id="btnLchkTabDiscarded" onclick="switchLookupChkTableTab('discarded')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>🔴 অযোগ্য ডাটা (Discarded):</span>
                                 <span id="lchkTabBadgeDiscarded" class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                            </button>
+                            <button type="button" id="btnLchkTabMistake" onclick="switchLookupChkTableTab('mistake')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-800 transition cursor-pointer flex items-center space-x-1.5">
+                                <span>⚠️ ভুল ডাটা (Mistake):</span>
+                                <span id="lchkTabBadgeMistake" class="bg-amber-200 text-amber-900 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
                             <button type="button" id="btnLchkTabAll" onclick="switchLookupChkTableTab('all')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>📋 সমস্ত ডাটা (All):</span>
@@ -3760,6 +3820,7 @@
                     SELECT 
                         COUNT(*) as total,
                         SUM(CASE WHEN category = 'female_data' THEN 1 ELSE 0 END) as female_deliv,
+                        SUM(CASE WHEN category = 'signal_data' THEN 1 ELSE 0 END) as signal_deliv,
                         SUM(CASE WHEN category = 'lookup_data' THEN 1 ELSE 0 END) as lookup_deliv,
                         SUM(CASE WHEN date(delivered_at) = date('now') OR date(created_at) = date('now') THEN 1 ELSE 0 END) as today_deliv
                     FROM turso_deliveries;
@@ -3769,6 +3830,7 @@
                 return {
                     total: parseInt(row.total || 0, 10),
                     femaleDeliv: parseInt(row.female_deliv || 0, 10),
+                    signalDeliv: parseInt(row.signal_deliv || 0, 10),
                     lookupDeliv: parseInt(row.lookup_deliv || 0, 10),
                     todayDeliv: parseInt(row.today_deliv || 0, 10)
                 };
@@ -6447,6 +6509,9 @@ function setupColumnSelectorsAndPreview() {
             } else if (type === 'lookup_report') {
                 if (reportFilter) reportFilter.value = 'lookup_report';
                 if (dateFilter) dateFilter.value = '';
+            } else if (type === 'signal_report') {
+                if (reportFilter) reportFilter.value = 'signal_report';
+                if (dateFilter) dateFilter.value = '';
             } else if (type === 'today') {
                 if (reportFilter) reportFilter.value = 'all';
                 if (dateFilter) dateFilter.value = new Date().toISOString().slice(0, 10);
@@ -6464,6 +6529,7 @@ function setupColumnSelectorsAndPreview() {
                 'all': document.getElementById('qfBtnAll'),
                 'male_report': document.getElementById('qfBtnMale'),
                 'female_report': document.getElementById('qfBtnFemale'),
+                'signal_report': document.getElementById('qfBtnSignal'),
                 'lookup_report': document.getElementById('qfBtnLookup'),
                 'today': document.getElementById('qfBtnToday')
             };
@@ -6891,16 +6957,11 @@ function setupColumnSelectorsAndPreview() {
                     downloadAnchor.click();
                     downloadAnchor.remove();
                 } else {
-                    // Export as Excel (.xlsx)
-                    const exportRows = data.map((d, idx) => ({
-                        'SL': idx + 1,
-                        'Phone Number': d.phone_number,
-                        'Full Name': d.full_name || '',
-                        'Age': d.age || '',
-                        'Received Date': d.received_date,
-                        'Batch Name': d.batch_name || 'Company_Received'
-                    }));
-                    const ws = XLSX.utils.json_to_sheet(exportRows);
+                    // Export as Excel (.xlsx) - Pure phone numbers only, no extra rows or columns
+                    const cleanNumbers = data
+                        .map(d => String(d.phone_number || d.phone || d).trim())
+                        .filter(p => p.length >= 6);
+                    const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, `Numbers_${extractedCount}`);
                     XLSX.writeFile(wb, `Company_Numbers_${extractedCount}_Qty_${todayStr}.xlsx`);
@@ -7440,18 +7501,33 @@ function renderAdminLogsTable() {
                     return;
                 }
 
-                const exportRows = allRows.map((item, idx) => ({
-                    'SL': idx + 1,
-                    'Phone Number': item.phone_number,
-                    'Full Name': item.full_name || '',
-                    'Age': item.age || '',
-                    'Household Income': item.household_income || '',
-                    'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
-                    'Department': item.department || '-',
-                    'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
-                    'Submission Date': new Date(item.created_at).toLocaleString()
-                }));
+                let exportRows;
+                if (reportFilter === 'lookup_report') {
+                    // Strictly 3 columns for Lookup Report: Phone Number, Household Income, Est Market Value (NO Name, Age, etc.)
+                    exportRows = allRows.map(item => ({
+                        'Phone Number': item.phone_number,
+                        'Household Income': item.household_income || '',
+                        'Est Market Value': item.est_market_value || ''
+                    }));
+                } else if (reportFilter === 'signal_report') {
+                    // Pure phone numbers for Signal Report
+                    exportRows = allRows.map(item => ({
+                        'Phone Number': item.phone_number
+                    }));
+                } else {
+                    exportRows = allRows.map((item, idx) => ({
+                        'SL': idx + 1,
+                        'Phone Number': item.phone_number,
+                        'Full Name': item.full_name || '',
+                        'Age': item.age || '',
+                        'Household Income': item.household_income || '',
+                        'Est Market Value': item.est_market_value || '',
+                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
+                        'Department': item.department || '-',
+                        'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                        'Submission Date': new Date(item.created_at).toLocaleString()
+                    }));
+                }
 
                 const ws = XLSX.utils.json_to_sheet(exportRows);
                 const wb = XLSX.utils.book_new();
@@ -7544,6 +7620,7 @@ function renderAdminLogsTable() {
         let currentLookupChkMode = 'file';
         let lookupChkFileRawRows = [];
         let lookupChkAllRecords = [];
+        let lookupChkMistakeRecords = [];
         let lookupChkQualifiedRecords = [];
         let lookupChkSpecialRecords = [];
         let lookupChkDiscardedRecords = [];
@@ -7848,19 +7925,26 @@ function renderAdminLogsTable() {
                 btn.innerHTML = '<span>⏳ পেস্ট করা ডাটা যাচাই হচ্ছে...</span>';
             }
 
+            const colOrder = document.querySelector('input[name="lchkColOrder"]:checked')?.value || 'num_inc_mkt';
+
             setTimeout(() => {
                 try {
-                    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
                     const parsedRecords = [];
 
-                    lines.forEach(line => {
+                    rawLines.forEach((line, lineIdx) => {
                         let parts = [];
                         if (line.includes('\t')) {
-                            parts = line.split('\t').map(p => p.trim());
+                            parts = line.split('\t').map(p => p.trim()).filter(p => p.length > 0);
                         } else if (line.includes(',')) {
-                            parts = line.split(',').map(p => p.trim());
+                            parts = line.split(',').map(p => p.trim()).filter(p => p.length > 0);
+                        } else if (line.includes('|')) {
+                            parts = line.split('|').map(p => p.trim()).filter(p => p.length > 0);
                         } else {
-                            parts = line.split(/\s{2,}/).map(p => p.trim());
+                            parts = line.split(/\s{2,}/).map(p => p.trim()).filter(p => p.length > 0);
+                            if (parts.length < 2) {
+                                parts = line.split(/\s+/).map(p => p.trim()).filter(p => p.length > 0);
+                            }
                         }
 
                         let phone = '';
@@ -7868,39 +7952,73 @@ function renderAdminLogsTable() {
                         let market = '';
                         let name = '';
 
-                        parts.forEach(p => {
-                            const digits = p.replace(/[^0-9]/g, '');
-                            if (!phone && digits.length >= 7 && digits.length <= 15) {
-                                phone = digits;
-                            } else if (p.includes('$') || p.includes('k') || p.includes('lakh') || digits.length >= 4) {
-                                if (!income) {
-                                    income = p;
-                                } else if (!market) {
-                                    market = p;
+                        if (colOrder === 'num_inc_mkt') {
+                            phone = parts[0] ? parts[0].replace(/[^0-9]/g, '') : '';
+                            income = parts[1] || '';
+                            market = parts[2] || '';
+                            if (parts[3]) name = parts.slice(3).join(' ');
+                        } else if (colOrder === 'num_name_inc_mkt') {
+                            phone = parts[0] ? parts[0].replace(/[^0-9]/g, '') : '';
+                            name = parts[1] || '';
+                            income = parts[2] || '';
+                            market = parts[3] || '';
+                        } else if (colOrder === 'num_mkt_inc') {
+                            phone = parts[0] ? parts[0].replace(/[^0-9]/g, '') : '';
+                            market = parts[1] || '';
+                            income = parts[2] || '';
+                            if (parts[3]) name = parts.slice(3).join(' ');
+                        } else {
+                            // Smart auto-detection
+                            parts.forEach(p => {
+                                const digits = p.replace(/[^0-9]/g, '');
+                                if (!phone && digits.length >= 7 && digits.length <= 15) {
+                                    phone = digits;
+                                } else if (p.includes('$') || p.includes('k') || p.includes('lakh')) {
+                                    if (!income) income = p;
+                                    else if (!market) market = p;
+                                } else if (!name && /[a-zA-Z]/.test(p)) {
+                                    name = p;
                                 }
-                            } else if (!name && /[a-zA-Z]/.test(p)) {
-                                name = p;
-                            }
-                        });
+                            });
+                            if (!phone && parts[0]) phone = parts[0].replace(/[^0-9]/g, '');
+                            if (!income && parts[1]) income = parts[1];
+                            if (!market && parts[2]) market = parts[2];
+                        }
 
-                        if (!phone && parts[0]) phone = parts[0].replace(/[^0-9]/g, '');
-                        if (!income && parts[1]) income = parts[1];
-                        if (!market && parts[2]) market = parts[2];
-                        if (!name && parts[3]) name = parts[3];
-
+                        // Ignore header text line only if phone has no valid digits at all
                         if (!phone || phone.length < 6) return;
 
-                        const evalRes = evaluateLookupRowRules(income, market);
+                        // DOLLAR SIGN ($) VALIDATION:
+                        // Row MUST contain '$' in income or market value. If not, mark as Mistake!
+                        const hasDollar = (income && income.includes('$')) || (market && market.includes('$'));
 
-                        parsedRecords.push({
-                            phone: phone,
-                            name: name || '-',
-                            income: income || '-',
-                            market: market || '-',
-                            isKept: evalRes.isKept,
-                            isSpecial: evalRes.isSpecial,
-                            reasons: evalRes.reasons
-                        });
+                        if (!hasDollar) {
+                            parsedRecords.push({
+                                origIdx: lineIdx,
+                                phone: phone,
+                                name: name || '-',
+                                income: income || '-',
+                                market: market || '-',
+                                isKept: false,
+                                isSpecial: false,
+                                isMistake: true,
+                                mistakeReason: '$ চিহ্ন নেই (Income বা Market Value তে $ প্রতীক পাওয়া যায়নি)',
+                                reasons: ['⚠️ ভুল ডাটা: $ চিহ্ন ছাড়া ডাটা গ্রহণযোগ্য হবে না']
+                            });
+                        } else {
+                            const evalRes = evaluateLookupRowRules(income, market);
+                            parsedRecords.push({
+                                origIdx: lineIdx,
+                                phone: phone,
+                                name: name || '-',
+                                income: income || '-',
+                                market: market || '-',
+                                isKept: evalRes.isKept,
+                                isSpecial: evalRes.isSpecial,
+                                isMistake: false,
+                                reasons: evalRes.reasons
+                            });
+                        }
                     });
 
                     processEvaluatedLookupRecords(parsedRecords);
@@ -7923,21 +8041,27 @@ function renderAdminLogsTable() {
                 return;
             }
 
+            // Ensure every record has an origIdx for in-place editing
+            records.forEach((r, idx) => { r.origIdx = idx; });
+
             lookupChkAllRecords = records;
-            lookupChkQualifiedRecords = records.filter(r => r.isKept);
-            lookupChkSpecialRecords = records.filter(r => r.isSpecial);
-            lookupChkDiscardedRecords = records.filter(r => !r.isKept);
+            lookupChkMistakeRecords = records.filter(r => r.isMistake);
+            lookupChkQualifiedRecords = records.filter(r => r.isKept && !r.isMistake);
+            lookupChkSpecialRecords = records.filter(r => r.isSpecial && !r.isMistake);
+            lookupChkDiscardedRecords = records.filter(r => !r.isKept && !r.isMistake);
 
             const total = records.length;
             const qCount = lookupChkQualifiedRecords.length;
             const spCount = lookupChkSpecialRecords.length;
             const dCount = lookupChkDiscardedRecords.length;
+            const mCount = lookupChkMistakeRecords.length;
 
             const r1Count = records.filter(r => (r.reasons || []).some(s => s.includes('বাৎসরিক আয় $75k+') || s.includes('শর্ত ১'))).length;
             const r2Count = records.filter(r => (r.reasons || []).some(s => s.includes('মার্কেট ভ্যালু $350k+') || s.includes('শর্ত ২'))).length;
 
             const qPct = total > 0 ? Math.round((qCount / total) * 100) : 0;
             const dPct = total > 0 ? Math.round((dCount / total) * 100) : 0;
+            const mPct = total > 0 ? Math.round((mCount / total) * 100) : 0;
 
             // Update Statistics Cards
             const elTotal = document.getElementById('lchkStatTotal');
@@ -7946,6 +8070,8 @@ function renderAdminLogsTable() {
             const elSp = document.getElementById('lchkStatSpecial');
             const elD = document.getElementById('lchkStatDiscarded');
             const elDPct = document.getElementById('lchkStatDiscardedPct');
+            const elM = document.getElementById('lchkStatMistake');
+            const elMPct = document.getElementById('lchkStatMistakePct');
             const elR1 = document.getElementById('lchkStatRule1');
             const elR2 = document.getElementById('lchkStatRule2');
 
@@ -7955,6 +8081,8 @@ function renderAdminLogsTable() {
             if (elSp) elSp.innerText = spCount.toLocaleString();
             if (elD) elD.innerText = dCount.toLocaleString();
             if (elDPct) elDPct.innerText = `${dPct}% বাদ (Discarded)`;
+            if (elM) elM.innerText = mCount.toLocaleString();
+            if (elMPct) elMPct.innerText = `${mCount} টি ভুল ($ ছাড়া)`;
             if (elR1) elR1.innerText = r1Count.toLocaleString();
             if (elR2) elR2.innerText = r2Count.toLocaleString();
 
@@ -7962,20 +8090,27 @@ function renderAdminLogsTable() {
             const bQ = document.getElementById('lchkTabBadgeQualified');
             const bSp = document.getElementById('lchkTabBadgeSpecial');
             const bD = document.getElementById('lchkTabBadgeDiscarded');
+            const bM = document.getElementById('lchkTabBadgeMistake');
             const bA = document.getElementById('lchkTabBadgeAll');
 
             if (bQ) bQ.innerText = qCount.toLocaleString();
             if (bSp) bSp.innerText = spCount.toLocaleString();
             if (bD) bD.innerText = dCount.toLocaleString();
+            if (bM) bM.innerText = mCount.toLocaleString();
             if (bA) bA.innerText = total.toLocaleString();
 
             // Show Result Container
             const resContainer = document.getElementById('lookupChkResultContainer');
             if (resContainer) resContainer.classList.remove('hidden');
 
-            switchLookupChkTableTab(spCount > 0 ? 'special' : 'qualified');
-
-            alert(`✅ কোয়ালিফিকেশন যাচাই সম্পন্ন হয়েছে!\n\n📊 মোট ডাটা: ${total.toLocaleString()} টি\n🟢 গ্রহণযোগ্য (Keep): ${qCount.toLocaleString()} টি (${qPct}%)\n⭐ স্পেশাল নাম্বার (>18 Lakhs): ${spCount.toLocaleString()} টি\n🔴 অযোগ্য (Discarded): ${dCount.toLocaleString()} টি (${dPct}%)\n\nএখন আপনি গ্রহণযোগ্য ডাটা এক ক্লিকে ডাউনলোড বা সরাসরি ডাটাবেজে আপলোড করতে পারবেন।`);
+            // Switch to appropriate tab: if mistakes exist, alert user and show mistakes or qualified
+            if (mCount > 0) {
+                switchLookupChkTableTab('mistake');
+                alert(`⚠️ মোট ${mCount.toLocaleString()} টি ডাটাতে "$" চিহ্ন পাওয়া যায়নি এবং এগুলো Mistake হিসেবে চিহ্নিত করা হয়েছে!\n\nআপনি "ভুল ডাটা (Mistake)" ট্যাবে গিয়ে সরাসরি ইনপুট বক্সে সঠিক $ মান লিখে "⚡ ঠিক করুন ও যুক্ত করুন" বাটনে ক্লিক করে ঠিক করতে পারেন এবং ওয়েবসাইট থেকেই সরাসরি রিপোর্ট জমা দিতে পারবেন।`);
+            } else {
+                switchLookupChkTableTab(spCount > 0 ? 'special' : 'qualified');
+                alert(`✅ কোয়ালিফিকেশন যাচাই সম্পন্ন হয়েছে!\n\n📊 মোট ডাটা: ${total.toLocaleString()} টি\n🟢 গ্রহণযোগ্য (Keep): ${qCount.toLocaleString()} টি (${qPct}%)\n⭐ স্পেশাল নাম্বার (>18 Lakhs): ${spCount.toLocaleString()} টি\n🔴 অযোগ্য (Discarded): ${dCount.toLocaleString()} টি (${dPct}%)\n\nএখন আপনি গ্রহণযোগ্য ডাটা এক ক্লিকে ডাউনলোড বা সরাসরি ডাটাবেজে আপলোড করতে পারবেন।`);
+            }
         }
 
         function switchLookupChkTableTab(tab) {
@@ -7983,9 +8118,10 @@ function renderAdminLogsTable() {
             const btnQ = document.getElementById('btnLchkTabQualified');
             const btnSp = document.getElementById('btnLchkTabSpecial');
             const btnD = document.getElementById('btnLchkTabDiscarded');
+            const btnM = document.getElementById('btnLchkTabMistake');
             const btnA = document.getElementById('btnLchkTabAll');
 
-            [btnQ, btnSp, btnD, btnA].forEach(b => {
+            [btnQ, btnSp, btnD, btnM, btnA].forEach(b => {
                 if (b) b.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5';
             });
 
@@ -7995,6 +8131,8 @@ function renderAdminLogsTable() {
                 if (btnSp) btnSp.className = 'px-4 py-2 text-xs font-black rounded-xl bg-amber-400 text-slate-950 shadow-sm transition cursor-pointer flex items-center space-x-1.5 border border-amber-500';
             } else if (tab === 'discarded') {
                 if (btnD) btnD.className = 'px-4 py-2 text-xs font-black rounded-xl bg-rose-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
+            } else if (tab === 'mistake') {
+                if (btnM) btnM.className = 'px-4 py-2 text-xs font-black rounded-xl bg-amber-500 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else {
                 if (btnA) btnA.className = 'px-4 py-2 text-xs font-black rounded-xl bg-purple-700 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             }
@@ -8010,6 +8148,8 @@ function renderAdminLogsTable() {
                 activeList = lookupChkSpecialRecords;
             } else if (currentLookupChkTab === 'discarded') {
                 activeList = lookupChkDiscardedRecords;
+            } else if (currentLookupChkTab === 'mistake') {
+                activeList = lookupChkMistakeRecords;
             } else {
                 activeList = lookupChkAllRecords;
             }
@@ -8033,11 +8173,43 @@ function renderAdminLogsTable() {
             if (!tbody) return;
 
             if (activeList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 font-sans text-xs">নির্বাচিত তালিকায় কোনো ডাটা নেই।</td></tr>`;
+                if (currentLookupChkTab === 'mistake') {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-emerald-600 font-sans text-xs font-bold">🎉 অসাধারণ! কোনো ভুল ডাটা ($ ছাড়া) নেই। সব ডাটা সঠিক রয়েছে।</td></tr>`;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 font-sans text-xs">নির্বাচিত তালিকায় কোনো ডাটা নেই।</td></tr>`;
+                }
                 return;
             }
 
             tbody.innerHTML = activeList.map((r, idx) => {
+                if (currentLookupChkTab === 'mistake' || r.isMistake) {
+                    return `
+                    <tr class="hover:bg-amber-50/60 transition border-b border-amber-100 bg-amber-50/20">
+                        <td class="py-3 px-3.5 text-center text-xs font-bold text-amber-900">${idx + 1}</td>
+                        <td class="py-3 px-3.5 font-mono font-bold text-xs text-slate-900">${r.phone}</td>
+                        <td class="py-3 px-3.5 text-xs text-slate-500">${r.name || '-'}</td>
+                        <td class="py-3 px-3.5 text-xs">
+                            <input type="text" id="lchkMistakeInc_${r.origIdx}" value="${r.income !== '-' ? r.income : ''}" placeholder="$75,000" class="w-full px-2 py-1 border border-amber-300 rounded-lg text-xs font-mono font-bold text-emerald-800 bg-white focus:ring-2 focus:ring-amber-400 focus:outline-none">
+                        </td>
+                        <td class="py-3 px-3.5 text-xs">
+                            <input type="text" id="lchkMistakeMkt_${r.origIdx}" value="${r.market !== '-' ? r.market : ''}" placeholder="$350,000" class="w-full px-2 py-1 border border-amber-300 rounded-lg text-xs font-mono font-bold text-indigo-800 bg-white focus:ring-2 focus:ring-amber-400 focus:outline-none">
+                        </td>
+                        <td class="py-3 px-3.5 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-900 border border-amber-300 whitespace-nowrap">⚠️ $ নেই (Mistake)</span>
+                        </td>
+                        <td class="py-3 px-3.5">
+                            <div class="flex items-center space-x-1.5">
+                                <button type="button" onclick="fixAndVerifyLookupMistakeRow(${r.origIdx})" class="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-xs transition flex items-center space-x-1">
+                                    <span>⚡ ঠিক করুন</span>
+                                </button>
+                                <button type="button" onclick="removeLookupMistakeRow(${r.origIdx})" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 cursor-pointer transition">
+                                    <span>🗑️ বাদ</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }
+
                 let badge = '';
                 if (r.isSpecial) {
                     badge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border border-amber-400 shadow-xs whitespace-nowrap flex items-center space-x-1 inline-flex"><span>⭐</span><span>SPECIAL ($1.8M+)</span></span>';
@@ -8049,35 +8221,169 @@ function renderAdminLogsTable() {
 
                 const reasonsHtml = (r.reasons || []).map(rs => {
                     const isSp = rs.includes('স্পেশাল') || rs.includes('1.8M');
-                    const cls = isSp ? 'bg-amber-100 text-amber-950 border border-amber-300 font-black' : (r.isKept ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200');
-                    return `<span class="inline-block text-[11px] px-2 py-0.5 rounded-md ${cls} font-semibold mr-1 mb-1">${rs}</span>`;
+                    const cls = isSp ? 'bg-amber-100 text-amber-950 border border-amber-300 font-black' : (r.isKept ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 font-bold' : 'bg-slate-100 text-slate-600 border border-slate-200');
+                    return `<span class="inline-block px-2 py-0.5 rounded-md text-[11px] mr-1 mb-1 border ${cls}">${rs}</span>`;
                 }).join('');
 
-                const rowBg = r.isSpecial ? 'bg-amber-50/50 hover:bg-amber-50 border-l-4 border-l-amber-500' : (!r.isKept ? 'bg-rose-50/20 hover:bg-rose-50/30' : 'hover:bg-slate-50');
-
                 return `
-                    <tr class="transition text-xs ${rowBg}">
-                        <td class="py-3 px-3.5 font-mono text-slate-400">${idx + 1}</td>
-                        <td class="py-3 px-3.5 font-mono font-black text-slate-900">
-                            <div class="flex items-center space-x-1.5">
-                                <span>${r.phone}</span>
-                                <button type="button" onclick="navigator.clipboard.writeText('${r.phone}'); alert('কপি হয়েছে: ${r.phone}');" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 cursor-pointer" title="কপি করুন">📋</button>
-                            </div>
-                        </td>
-                        <td class="py-3 px-3.5 font-medium text-slate-700">${r.name || '-'}</td>
-                        <td class="py-3 px-3.5 font-bold font-mono text-emerald-700">${r.income || '-'}</td>
-                        <td class="py-3 px-3.5 font-bold font-mono ${r.isSpecial ? 'text-amber-800 text-sm' : 'text-indigo-700'}">
-                            ${r.market || '-'}
-                            ${r.isSpecial ? '<span class="text-[10px] ml-1 text-amber-600 font-bold">(>18 Lakhs)</span>' : ''}
-                        </td>
-                        <td class="py-3 px-3.5 text-center">${badge}</td>
-                        <td class="py-3 px-3.5">${reasonsHtml}</td>
-                    </tr>
-                `;
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="py-3 px-3.5 text-center text-xs font-bold text-slate-400">${idx + 1}</td>
+                    <td class="py-3 px-3.5 font-mono font-bold text-xs text-slate-900">${r.phone}</td>
+                    <td class="py-3 px-3.5 text-xs text-slate-700">${r.name || '-'}</td>
+                    <td class="py-3 px-3.5 font-mono text-xs font-bold text-emerald-700">${r.income}</td>
+                    <td class="py-3 px-3.5 font-mono text-xs font-bold text-indigo-700">${r.market}</td>
+                    <td class="py-3 px-3.5 text-center">${badge}</td>
+                    <td class="py-3 px-3.5">${reasonsHtml}</td>
+                </tr>`;
             }).join('');
         }
 
-        // Submit Checked Records as Worker Lookup Daily Report (Just like Female Report)
+        // Fix single mistake row in-place
+        function fixAndVerifyLookupMistakeRow(origIdx) {
+            const rec = lookupChkAllRecords.find(r => r.origIdx === origIdx);
+            if (!rec) return;
+
+            const incInput = document.getElementById(`lchkMistakeInc_${origIdx}`);
+            const mktInput = document.getElementById(`lchkMistakeMkt_${origIdx}`);
+
+            const newInc = (incInput ? incInput.value : rec.income).trim();
+            const newMkt = (mktInput ? mktInput.value : rec.market).trim();
+
+            const hasDollar = newInc.includes('$') || newMkt.includes('$');
+            if (!hasDollar) {
+                alert('সংশোধনের জন্য অবশ্যই Household Income অথবা Market Value তে "$" প্রতীক দিতে হবে (যেমন: $75,000 বা $350,000)।');
+                return;
+            }
+
+            const evalRes = evaluateLookupRowRules(newInc, newMkt);
+
+            rec.income = newInc || '-';
+            rec.market = newMkt || '-';
+            rec.isMistake = false;
+
+            if (evalRes.isKept) {
+                rec.isKept = true;
+                rec.isSpecial = evalRes.isSpecial;
+                rec.reasons = evalRes.reasons;
+
+                // Remove from mistake list
+                lookupChkMistakeRecords = lookupChkMistakeRecords.filter(r => r.origIdx !== origIdx);
+                // Add to qualified list
+                if (!lookupChkQualifiedRecords.some(r => r.origIdx === origIdx)) {
+                    lookupChkQualifiedRecords.push(rec);
+                }
+                if (evalRes.isSpecial && !lookupChkSpecialRecords.some(r => r.origIdx === origIdx)) {
+                    lookupChkSpecialRecords.push(rec);
+                }
+                alert('✅ নাম্বারটি সফলভাবে সংশোধন করা হয়েছে এবং গ্রহণযোগ্য (Keep) তালিকায় যুক্ত করা হয়েছে!');
+            } else {
+                rec.isKept = false;
+                rec.isSpecial = false;
+                rec.reasons = evalRes.reasons;
+
+                lookupChkMistakeRecords = lookupChkMistakeRecords.filter(r => r.origIdx !== origIdx);
+                if (!lookupChkDiscardedRecords.some(r => r.origIdx === origIdx)) {
+                    lookupChkDiscardedRecords.push(rec);
+                }
+                alert('⚠️ সংশোধিত ডাটা অনুযায়ী এটি গ্রহণযোগ্যতার শর্ত পূরণ করে নাই, তাই এটি অযোগ্য (Discarded) তালিকায় স্থানান্তর করা হয়েছে।');
+            }
+
+            // Refresh UI Badges & Counts
+            updateLookupChkBadgesAndStats();
+            filterLookupChkTableLocal();
+        }
+
+        // Remove row from mistake list
+        function removeLookupMistakeRow(origIdx) {
+            lookupChkMistakeRecords = lookupChkMistakeRecords.filter(r => r.origIdx !== origIdx);
+            const rec = lookupChkAllRecords.find(r => r.origIdx === origIdx);
+            if (rec) {
+                rec.isMistake = false;
+                rec.isKept = false;
+                if (!lookupChkDiscardedRecords.some(r => r.origIdx === origIdx)) {
+                    lookupChkDiscardedRecords.push(rec);
+                }
+            }
+            updateLookupChkBadgesAndStats();
+            filterLookupChkTableLocal();
+        }
+
+        // Helper to update badges and statistics
+        function updateLookupChkBadgesAndStats() {
+            const total = lookupChkAllRecords.length;
+            const qCount = lookupChkQualifiedRecords.length;
+            const spCount = lookupChkSpecialRecords.length;
+            const dCount = lookupChkDiscardedRecords.length;
+            const mCount = lookupChkMistakeRecords.length;
+
+            const qPct = total > 0 ? Math.round((qCount / total) * 100) : 0;
+            const dPct = total > 0 ? Math.round((dCount / total) * 100) : 0;
+
+            const elTotal = document.getElementById('lchkStatTotal');
+            const elQ = document.getElementById('lchkStatQualified');
+            const elQPct = document.getElementById('lchkStatQualifiedPct');
+            const elSp = document.getElementById('lchkStatSpecial');
+            const elD = document.getElementById('lchkStatDiscarded');
+            const elDPct = document.getElementById('lchkStatDiscardedPct');
+            const elM = document.getElementById('lchkStatMistake');
+            const elMPct = document.getElementById('lchkStatMistakePct');
+
+            if (elTotal) elTotal.innerText = total.toLocaleString();
+            if (elQ) elQ.innerText = qCount.toLocaleString();
+            if (elQPct) elQPct.innerText = `${qPct}% সফল (Keep)`;
+            if (elSp) elSp.innerText = spCount.toLocaleString();
+            if (elD) elD.innerText = dCount.toLocaleString();
+            if (elDPct) elDPct.innerText = `${dPct}% বাদ (Discarded)`;
+            if (elM) elM.innerText = mCount.toLocaleString();
+            if (elMPct) elMPct.innerText = `${mCount} টি ভুল ($ ছাড়া)`;
+
+            const bQ = document.getElementById('lchkTabBadgeQualified');
+            const bSp = document.getElementById('lchkTabBadgeSpecial');
+            const bD = document.getElementById('lchkTabBadgeDiscarded');
+            const bM = document.getElementById('lchkTabBadgeMistake');
+            const bA = document.getElementById('lchkTabBadgeAll');
+
+            if (bQ) bQ.innerText = qCount.toLocaleString();
+            if (bSp) bSp.innerText = spCount.toLocaleString();
+            if (bD) bD.innerText = dCount.toLocaleString();
+            if (bM) bM.innerText = mCount.toLocaleString();
+            if (bA) bA.innerText = total.toLocaleString();
+        }
+
+        // Clear and reset entire Lookup Checker tool
+        function clearLookupCheckerAll() {
+            const pasteArea = document.getElementById('lookupChkPasteInput');
+            if (pasteArea) pasteArea.value = '';
+
+            const fileInp = document.getElementById('lookupChkFileInput');
+            if (fileInp) fileInp.value = '';
+
+            const fileCount = document.getElementById('lookupChkFileRowsCount');
+            if (fileCount) fileCount.innerText = '';
+
+            const cfg = document.getElementById('lookupChkColumnConfig');
+            if (cfg) cfg.classList.add('hidden');
+
+            const resContainer = document.getElementById('lookupChkResultContainer');
+            if (resContainer) resContainer.classList.add('hidden');
+
+            const searchInp = document.getElementById('lchkTableSearchInput');
+            if (searchInp) searchInp.value = '';
+
+            lookupChkAllRecords = [];
+            lookupChkQualifiedRecords = [];
+            lookupChkSpecialRecords = [];
+            lookupChkDiscardedRecords = [];
+            lookupChkMistakeRecords = [];
+            lookupChkFileRawRows = [];
+
+            updateLookupChkBadgesAndStats();
+            const tbody = document.getElementById('lookupChkTableBody');
+            if (tbody) tbody.innerHTML = '';
+
+            alert('🧹 লুকআপ চেকার সম্পূর্ণ ক্লিয়ার করা হয়েছে! আপনি এখন নতুন ডাটা চেক করতে পারেন।');
+        }
+
         async function submitLookupChkAsWorkReport() {
             // CHECK IF REPORT SUBMISSION IS CURRENTLY CLOSED / LOCKED
             const lockStatus = checkReportSubmissionLockStatus();
@@ -8114,6 +8420,15 @@ function renderAdminLogsTable() {
             }));
 
             try {
+                // Dual-write to Turso 9 GB Vault
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        await TursoVault.insertSubmissions(records, 'lookup_report', 'Lookup_Tool_Checked_Report.xlsx', currentProfile);
+                    }
+                } catch(tSubErr) {
+                    console.warn('Turso lookup report write notice:', tSubErr);
+                }
+
                 const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
                     p_lookup_type: 'valid',
                     p_records: records,
@@ -8151,6 +8466,9 @@ function renderAdminLogsTable() {
             } else if (type === 'discarded') {
                 list = lookupChkDiscardedRecords;
                 fileName = `Lookup_Discarded_Rejected_${list.length}_Records`;
+            } else if (type === 'mistake') {
+                list = lookupChkMistakeRecords;
+                fileName = `Lookup_Mistakes_${list.length}_Records`;
             } else {
                 list = lookupChkAllRecords;
                 fileName = `Lookup_All_Analysis_${list.length}_Records`;
@@ -8161,20 +8479,17 @@ function renderAdminLogsTable() {
                 return;
             }
 
-            const exportData = list.map((r, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': r.phone,
-                'Name': r.name || '-',
-                'Household Income': r.income || '-',
-                'Property / Market Value': r.market || '-',
-                'Status': r.isSpecial ? 'SPECIAL VIP (>18 Lakhs)' : (r.isKept ? 'KEEP (VALID)' : 'REJECT (DISCARDED)'),
-                'Special VIP': r.isSpecial ? 'YES' : 'NO',
-                'Match Reasons': (r.reasons || []).join('; ')
-            }));
+            // Strictly 3 columns for Lookup Report: Phone Number, Household Income, Est Market Value (NO Name, Age, etc.)
+            const exportData = list.map(r => ({
+                'Phone Number': String(r.phone || r.phone_number || '').trim(),
+                'Household Income': String(r.income || r.household_income || '').trim(),
+                'Est Market Value': String(r.market || r.est_market_value || '').trim()
+            })).filter(r => r['Phone Number'].length >= 6);
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Lookup Analysis");
+            const sheetTitle = type === 'special' ? 'Special_VIP' : (type === 'qualified' ? 'Qualified_Lookup' : 'Lookup_Report');
+            XLSX.utils.book_append_sheet(wb, ws, sheetTitle);
             const todayStr = new Date().toISOString().slice(0, 10);
             XLSX.writeFile(wb, `${fileName}_${todayStr}.xlsx`);
         }
@@ -8893,17 +9208,13 @@ async function runDuplicateCheck() {
                 return;
             }
 
-            const exportData = dupCleanList.map((item, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': item.phone,
-                'Full Name': item.name || '',
-                'Age': item.age || '',
-                'Status': 'Verified Clean (Not Previously Delivered)'
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportData);
+            // Pure phone numbers only - no extra columns (SL, Full Name, Age, Status) or header rows
+            const cleanNumbers = dupCleanList
+                .map(item => String(item.phone || item.phone_number || item).trim())
+                .filter(p => p.length >= 6);
+            const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Fresh_Company_Data');
+            XLSX.utils.book_append_sheet(wb, ws, 'Clean_Numbers');
             const today = new Date().toISOString().slice(0, 10);
             XLSX.writeFile(wb, `Clean_Company_Delivery_${today}.xlsx`);
         }
@@ -8932,6 +9243,18 @@ async function runDuplicateCheck() {
                 return;
             }
 
+            // When downloading clean numbers tab for work, export pure numbers only!
+            if (currentDupTab === 'clean') {
+                const cleanNumbers = activeList
+                    .map(item => String(item.phone || item.phone_number || item).trim())
+                    .filter(p => p.length >= 6);
+                const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Clean_Numbers');
+                XLSX.writeFile(wb, `Clean_Company_Fresh_${new Date().toISOString().slice(0,10)}.xlsx`);
+                return;
+            }
+
             const exportData = activeList.map((item, idx) => ({
                 'SL': idx + 1,
                 'Phone Number': item.phone,
@@ -8947,7 +9270,6 @@ async function runDuplicateCheck() {
             XLSX.writeFile(wb, `${tabName}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
-        // Comprehensive 4-in-1 Complete QC Audit Workbook Download
         function downloadAllQcExcel() {
             const wb = XLSX.utils.book_new();
             const today = new Date().toISOString().slice(0, 10);
@@ -9103,20 +9425,35 @@ async function runDuplicateCheck() {
                     return;
                 }
 
-                const exportRows = allRows.map((item, idx) => ({
-                    'SL': idx + 1,
-                    'Phone Number': item.phone_number,
-                    'Full Name': item.full_name || '-',
-                    'Age': item.age || '-',
-                    'Household Income': item.household_income || '-',
-                    'Est Market Value': item.est_market_value || '-',
-                    'Report Type': item.report_type || 'general',
-                    'Department': item.department || '-',
-                    'Worker Username': item.username || userEmailToNameMap[item.user_email] || '-',
-                    'Worker Email': item.user_email,
-                    'Date': new Date(item.created_at).toLocaleDateString(),
-                    'Time': new Date(item.created_at).toLocaleTimeString()
-                }));
+                let exportRows;
+                if (reportFilter === 'lookup_report') {
+                    // Strictly 3 columns for Lookup Report: Phone Number, Household Income, Est Market Value (NO Name, Age, etc.)
+                    exportRows = allRows.map(item => ({
+                        'Phone Number': item.phone_number,
+                        'Household Income': item.household_income || '',
+                        'Est Market Value': item.est_market_value || ''
+                    }));
+                } else if (reportFilter === 'signal_report') {
+                    // Pure phone numbers for Signal Report
+                    exportRows = allRows.map(item => ({
+                        'Phone Number': item.phone_number
+                    }));
+                } else {
+                    exportRows = allRows.map((item, idx) => ({
+                        'SL': idx + 1,
+                        'Phone Number': item.phone_number,
+                        'Full Name': item.full_name || '-',
+                        'Age': item.age || '-',
+                        'Household Income': item.household_income || '-',
+                        'Est Market Value': item.est_market_value || '-',
+                        'Report Type': item.report_type || 'general',
+                        'Department': item.department || '-',
+                        'Worker Username': item.username || userEmailToNameMap[item.user_email] || '-',
+                        'Worker Email': item.user_email,
+                        'Date': new Date(item.created_at).toLocaleDateString(),
+                        'Time': new Date(item.created_at).toLocaleTimeString()
+                    }));
+                }
 
                 const ws = XLSX.utils.json_to_sheet(exportRows);
                 const wb = XLSX.utils.book_new();
@@ -9384,7 +9721,7 @@ async function runDuplicateCheck() {
         }
 
         function onCdCategoryChanged() {
-            const cat = document.getElementById('cdInputCategory')?.value || 'male_data';
+            const cat = document.getElementById('cdInputCategory')?.value || 'female_data';
             const hint = document.getElementById('cdPasteHint');
             const nameContainer = document.getElementById('cdColNameContainer');
             const ageContainer = document.getElementById('cdColAgeContainer');
@@ -9397,8 +9734,14 @@ async function runDuplicateCheck() {
                 if (marketContainer) marketContainer.classList.remove('hidden');
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
+            } else if (cat === 'signal_data') {
+                if (hint) hint.innerHTML = 'Enter or paste rows for Signal Data: <span class="font-mono bg-sky-50 text-sky-900 px-1 rounded font-bold">Phone Number</span> (one per line, e.g. 15136465609)';
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             } else {
-                if (hint) hint.innerHTML = `Enter or paste rows for ${cat === 'female_data' ? 'Female' : 'Lookup'} Data: <span class="font-mono bg-slate-100 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
+                if (hint) hint.innerHTML = `Enter or paste rows for Female Data: <span class="font-mono bg-pink-50 text-pink-900 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -9815,9 +10158,10 @@ async function runDuplicateCheck() {
                 }
 
                 const todayIso = new Date().toISOString().slice(0, 10);
-                const [totalDelivRes, femaleDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
+                const [totalDelivRes, femaleDelivRes, signalDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data'), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'signal_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayIso), { count: 0 }),
                     (async () => {
@@ -9835,6 +10179,7 @@ async function runDuplicateCheck() {
 
                 const sbTotal = totalDelivRes.count || 0;
                 const sbFemale = femaleDelivRes.count || 0;
+                const sbSignal = signalDelivRes.count || 0;
                 const sbLookup = lookupDelivRes.count || 0;
                 const sbToday = todayDelivRes.count || 0;
                 const sbRows = sbRowsRes || [];
@@ -9842,7 +10187,7 @@ async function runDuplicateCheck() {
                 // COMBINE TURSO + SUPABASE DELIVERIES
                 const combTotal = (tStats.total || 0) + sbTotal;
                 const combFemale = (tStats.femaleDeliv || 0) + sbFemale;
-                const combSignal = (tStats.signalDeliv || 0);
+                const combSignal = (tStats.signalDeliv || 0) + sbSignal;
                 const combLookup = (tStats.lookupDeliv || 0) + sbLookup;
                 const combToday = (tStats.todayDeliv || 0) + sbToday;
 
@@ -10215,13 +10560,11 @@ async function runDuplicateCheck() {
 
         function downloadWorkerClaimedExcel() {
             if (!currentClaimedRecords || currentClaimedRecords.length === 0) return;
-            const exportRows = currentClaimedRecords.map((r, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': r.phone,
-                'Name': r.name || '',
-                'Age': r.age || ''
-            }));
-            const ws = XLSX.utils.json_to_sheet(exportRows);
+            // Pure phone numbers only - no extra columns (SL, Name, Age) or header rows
+            const cleanNumbers = currentClaimedRecords
+                .map(r => String(r.phone || r.phone_number || r).trim())
+                .filter(p => p.length >= 6);
+            const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Work_Numbers');
             XLSX.writeFile(wb, `Work_Numbers_${currentProfile?.username || 'user'}_${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -10789,13 +11132,11 @@ async function loadClaimStockSector() {
 
         function downloadSecClaimedExcel() {
             if (!secCurrentClaimed || secCurrentClaimed.length === 0) return;
-            const exportRows = secCurrentClaimed.map((r, idx) => ({
-                'SL': idx + 1,
-                'Phone Number': r.phone,
-                'Full Name': r.name || '',
-                'Age': r.age || ''
-            }));
-            const ws = XLSX.utils.json_to_sheet(exportRows);
+            // Pure phone numbers only - no extra columns (SL, Name, Age) or header rows
+            const cleanNumbers = secCurrentClaimed
+                .map(r => String(r.phone || r.phone_number || r).trim())
+                .filter(p => p.length >= 6);
+            const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Claimed_Numbers');
             XLSX.writeFile(wb, `Work_Stock_${currentProfile?.username || 'user'}_${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -11722,38 +12063,30 @@ async function loadClaimStockSector() {
                 return;
             }
 
-            let exportRows = [];
             if (type === 'valid') {
-                exportRows = list.map((r, i) => ({
-                    'SL': i + 1,
-                    'Phone Number': r.phone_number,
-                    'Household Income': r.household_income || '',
-                    'Est. Market Value': r.est_market_value || '',
-                    'Full Name': r.full_name || '',
-                    'Age': r.age || '',
-                    'Worker': r.worker_username || r.worker_email || '',
-                    'Date': r.submission_date
-                }));
-            } else {
-                exportRows = list.map((r, i) => ({
-                    'SL': i + 1,
-                    'Phone Number': r.phone_number,
-                    'Full Name': r.full_name || '',
-                    'Age': r.age || '',
-                    'Status': 'No Information Found',
-                    'Worker': r.worker_username || r.worker_email || '',
-                    'Date': r.submission_date
-                }));
-            }
+                // Strictly 3 columns: Phone Number, Household Income, Est Market Value (NO Name, Age, etc.)
+                const exportRows = list.map(r => ({
+                    'Phone Number': String(r.phone_number || r.phone || '').trim(),
+                    'Household Income': String(r.household_income || r.income || '').trim(),
+                    'Est Market Value': String(r.est_market_value || r.market_value || '').trim()
+                })).filter(r => r['Phone Number'].length >= 6);
 
-            const ws = XLSX.utils.json_to_sheet(exportRows);
-            const wb = XLSX.utils.book_new();
-            const sheetName = (type === 'valid') ? 'Valid_Lookup' : 'No_Information';
-            XLSX.utils.book_append_sheet(wb, ws, sheetName);
-            XLSX.writeFile(wb, `Lookup_${sheetName}_${targetDate}.xlsx`);
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Valid_Lookup');
+                XLSX.writeFile(wb, `Lookup_Valid_${targetDate}.xlsx`);
+            } else {
+                // Pure phone numbers only for No Information
+                const cleanNumbers = list
+                    .map(r => String(r.phone_number || r.phone || r).trim())
+                    .filter(p => p.length >= 6);
+                const ws = XLSX.utils.aoa_to_sheet(cleanNumbers.map(p => [p]));
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'No_Information');
+                XLSX.writeFile(wb, `Lookup_No_Information_${targetDate}.xlsx`);
+            }
         }
 
-        // Download as TXT File (clean plain text format)
         function downloadAdminLookupTxt(type) {
             const list = (type === 'valid') ? adminLookupValidList : adminLookupNoInfoList;
             const targetDate = document.getElementById('adminLookupReportDate')?.value || 'Today';
