@@ -728,8 +728,8 @@
                     </div>
 
                     <!-- Column Mapping Selectors -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-slate-200">
-                        <div>
+                    <div id="workerColumnSelectorsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-slate-200">
+                        <div id="workerColPhoneContainer">
                             <label class="block text-xs font-bold text-indigo-900 mb-1 flex items-center space-x-1">
                                 <span>📞</span>
                                 <span>Phone Number Column (ফোন নাম্বার):</span>
@@ -737,7 +737,7 @@
                             <select id="columnPhoneSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border-2 border-indigo-400 bg-indigo-50/30 font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500"></select>
                             <span class="text-[11px] text-emerald-600 font-semibold block mt-0.5">✓ নাম্বারের কলামটি সিলেক্ট করুন</span>
                         </div>
-                        <div>
+                        <div id="workerColNameContainer">
                             <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center space-x-1">
                                 <span>👤</span>
                                 <span>Full Name Column (নাম):</span>
@@ -753,19 +753,26 @@
                             <select id="columnAgeSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500"></select>
                             <span class="text-[11px] text-slate-400 block mt-0.5">বয়সের কলাম (যেমন: 25, 42)</span>
                         </div>
+                        <div id="workerColIncomeContainer" class="hidden">
+                            <label class="block text-xs font-bold text-purple-900 mb-1 flex items-center space-x-1">
+                                <span>💰</span>
+                                <span>Household Income Column (গৃহস্থালি আয়):</span>
+                            </label>
+                            <select id="columnIncomeSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border-2 border-purple-400 bg-purple-50/30 font-bold text-purple-900 focus:ring-2 focus:ring-purple-500"></select>
+                            <span class="text-[11px] text-purple-600 font-semibold block mt-0.5">✓ আয়ের কলাম সিলেক্ট করুন</span>
+                        </div>
+                        <div id="workerColMarketContainer" class="hidden">
+                            <label class="block text-xs font-bold text-purple-900 mb-1 flex items-center space-x-1">
+                                <span>🏡</span>
+                                <span>Est. Market Value Column (মার্কেট ভ্যালু):</span>
+                            </label>
+                            <select id="columnMarketValueSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border-2 border-purple-400 bg-purple-50/30 font-bold text-purple-900 focus:ring-2 focus:ring-purple-500"></select>
+                            <span class="text-[11px] text-purple-600 font-semibold block mt-0.5">✓ মার্কেট ভ্যালুর কলাম সিলেক্ট করুন</span>
+                        </div>
                     </div>
 
-                    <!-- Auto Extra Columns for Lookup Report (Income & Market Value) -->
-                    <div id="lookupExtraCols" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 bg-purple-50/50 p-3 rounded-xl border border-purple-200">
-                        <div>
-                            <label class="block text-xs font-bold text-purple-900 mb-1">💰 Household Income Column (গৃহস্থালি আয়):</label>
-                            <select id="columnIncomeSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-purple-900 mb-1">🏡 Est. Market Value Column (মার্কেট ভ্যালু):</label>
-                            <select id="columnMarketValueSelector" onchange="updateLivePreviewTable()" class="w-full text-xs px-3 py-2 rounded-lg border border-purple-300 bg-white font-medium focus:ring-2 focus:ring-purple-500"></select>
-                        </div>
-                    </div>
+                    <!-- Auto Extra Columns for Lookup Report (Container kept hidden for backwards safety) -->
+                    <div id="lookupExtraCols" class="hidden"></div>
 
                     <!-- LIVE 5-ROW VISUAL VERIFICATION TABLE -->
                     <div class="bg-white rounded-xl border border-slate-200 p-3 space-y-2">
@@ -778,9 +785,9 @@
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs min-w-[500px] border">
-                                <thead class="bg-slate-100 text-slate-700 uppercase font-bold border-b">
-                                    <tr>
-                                        <th class="py-2 px-3 border-r w-10">#</th>
+                                <thead id="workerLivePreviewHeader" class="bg-slate-100 text-slate-700 uppercase font-bold border-b">
+                                    <tr id="workerLivePreviewHeaderRow">
+                                        <th class="py-2 px-3 border-r w-10 text-center">#</th>
                                         <th class="py-2 px-3 border-r bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন)</th>
                                         <th class="py-2 px-3 border-r">👤 Full Name (নাম)</th>
                                         <th class="py-2 px-3">🎂 Age (বয়স)</th>
@@ -5375,62 +5382,130 @@ function setupWorkerReportOptions(dept) {
             parsedRows = [];
             let underagePastedCount = 0;
 
-            lines.forEach(l => {
-                const trimmed = l.trim();
-                if (!trimmed) return;
+            if (selectedRep === 'lookup_report') {
+                // Dedicated parser for Lookup Report: Extracts Phone, Household Income & Est Market Value
+                lines.forEach(l => {
+                    const trimmed = l.trim();
+                    if (!trimmed) return;
 
-                const tokens = trimmed.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
-                let phone = '';
-                let name = '';
-                let age = '';
+                    let tokens = [];
+                    if (trimmed.includes('\t')) {
+                        tokens = trimmed.split('\t').map(t => t.trim()).filter(Boolean);
+                    } else if (trimmed.includes(',')) {
+                        tokens = trimmed.split(',').map(t => t.trim()).filter(Boolean);
+                    } else if (trimmed.includes('|')) {
+                        tokens = trimmed.split('|').map(t => t.trim()).filter(Boolean);
+                    } else {
+                        tokens = trimmed.split(/\s{2,}/).map(t => t.trim()).filter(Boolean);
+                        if (tokens.length < 2) {
+                            tokens = trimmed.split(/\s+/).map(t => t.trim()).filter(Boolean);
+                        }
+                    }
 
-                tokens.forEach(tok => {
-                    const cleanNum = tok.replace(/[^0-9]/g, '');
-                    const lowerTok = tok.toLowerCase();
-                    if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
-                        phone = cleanNum;
-                    } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 1 && parseInt(cleanNum) <= 120 && !age) {
-                        age = cleanNum;
-                    } else if (!age && (lowerTok.includes('dec') || lowerTok.includes('unk') || lowerTok.includes('dead') || lowerTok === '?')) {
-                        age = tok;
-                    } else if (!name && /[a-zA-Z]/.test(tok)) {
-                        name = tok;
+                    let phone = '';
+                    let income = '';
+                    let market = '';
+
+                    // Check for dollar tokens or clean phone
+                    tokens.forEach(tok => {
+                        const cleanNum = tok.replace(/[^0-9]/g, '');
+                        if (!phone && cleanNum.length >= 7 && cleanNum.length <= 16 && !tok.includes('$')) {
+                            phone = cleanNum;
+                        } else if (tok.includes('$') || tok.includes('k') || tok.includes('lakh')) {
+                            if (!income) income = tok;
+                            else if (!market) market = tok;
+                        }
+                    });
+
+                    // Positional fallback
+                    if (!phone && tokens[0]) phone = tokens[0].replace(/[^0-9]/g, '');
+                    if (!income && tokens[1]) income = tokens[1];
+                    if (!market && tokens[2]) market = tokens[2];
+
+                    if (phone && phone.length >= 6) {
+                        if (currentLookupDeliveryType === 'valid') {
+                            parsedRows.push({
+                                'Phone Number': phone,
+                                'Household Income': income || '-',
+                                'Est. Market Value': market || '-'
+                            });
+                        } else {
+                            parsedRows.push({
+                                'Phone Number': phone
+                            });
+                        }
                     }
                 });
+            } else if (selectedRep === 'signal_report') {
+                // Signal Report parser: pure phone numbers only
+                lines.forEach(l => {
+                    const trimmed = l.trim();
+                    if (!trimmed) return;
+                    const tokens = trimmed.split(/[\t,;]+|\s+/).map(t => t.trim()).filter(Boolean);
+                    const clean = (tokens[0] || '').replace(/[^0-9]/g, '');
+                    if (clean && clean.length >= 6) {
+                        parsedRows.push({ 'Phone Number': clean });
+                    }
+                });
+            } else {
+                // female_report parser
+                lines.forEach(l => {
+                    const trimmed = l.trim();
+                    if (!trimmed) return;
 
-                if (!phone || !name) {
-                    const words = trimmed.split(/\s+/);
-                    const nameParts = [];
-                    words.forEach(w => {
-                        const cleanNum = w.replace(/[^0-9]/g, '');
-                        const lowerW = w.toLowerCase();
+                    const tokens = trimmed.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
+                    let phone = '';
+                    let name = '';
+                    let age = '';
+
+                    tokens.forEach(tok => {
+                        const cleanNum = tok.replace(/[^0-9]/g, '');
+                        const lowerTok = tok.toLowerCase();
                         if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
                             phone = cleanNum;
                         } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 1 && parseInt(cleanNum) <= 120 && !age) {
                             age = cleanNum;
-                        } else if (!age && (lowerW.includes('dec') || lowerW.includes('unk') || lowerW.includes('dead') || lowerW === '?')) {
-                            age = w;
-                        } else {
-                            nameParts.push(w);
+                        } else if (!age && (lowerTok.includes('dec') || lowerTok.includes('unk') || lowerTok.includes('dead') || lowerTok === '?')) {
+                            age = tok;
+                        } else if (!name && /[a-zA-Z]/.test(tok)) {
+                            name = tok;
                         }
                     });
-                    if (nameParts.length > 0) name = nameParts.join(' ');
-                }
 
-                if (phone || name) {
-                    // Check female age rule (< 43 auto remove)
-                    if (selectedRep === 'female_report' && isFemaleUnderage(age)) {
-                        underagePastedCount++;
-                        return; // Auto remove!
+                    if (!phone || !name) {
+                        const words = trimmed.split(/\s+/);
+                        const nameParts = [];
+                        words.forEach(w => {
+                            const cleanNum = w.replace(/[^0-9]/g, '');
+                            const lowerW = w.toLowerCase();
+                            if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
+                                phone = cleanNum;
+                            } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 1 && parseInt(cleanNum) <= 120 && !age) {
+                                age = cleanNum;
+                            } else if (!age && (lowerW.includes('dec') || lowerW.includes('unk') || lowerW.includes('dead') || lowerW === '?')) {
+                                age = w;
+                            } else {
+                                nameParts.push(w);
+                            }
+                        });
+                        if (nameParts.length > 0) name = nameParts.join(' ');
                     }
 
-                    parsedRows.push({
-                        'Phone': phone,
-                        'Full Name': name || 'Unknown',
-                        'Age': age || '-'
-                    });
-                }
-            });
+                    if (phone || name) {
+                        // Check female age rule (< 43 auto remove)
+                        if (selectedRep === 'female_report' && isFemaleUnderage(age)) {
+                            underagePastedCount++;
+                            return; // Auto remove!
+                        }
+
+                        parsedRows.push({
+                            'Phone': phone,
+                            'Full Name': name || 'Unknown',
+                            'Age': age || '-'
+                        });
+                    }
+                });
+            }
 
             const underageBanner = document.getElementById('underageAlertBanner');
             const underageTitle = document.getElementById('underageAlertTitle');
@@ -5585,15 +5660,28 @@ function setupWorkerReportOptions(dept) {
             const optSignal = document.getElementById('optSignalReport');
             const femaleAgeBanner = document.getElementById('femaleAgeRuleBanner');
 
+            const nameContainer = document.getElementById('workerColNameContainer');
+            const ageContainer = document.getElementById('workerColAgeContainer');
+            const incomeContainer = document.getElementById('workerColIncomeContainer');
+            const marketContainer = document.getElementById('workerColMarketContainer');
+
             if (chosenReportType === 'lookup_report') {
                 if (subCard) subCard.classList.remove('hidden');
                 if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-purple-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
-                if (extraCols) {
-                    if (currentLookupDeliveryType === 'valid') extraCols.classList.remove('hidden');
-                    else extraCols.classList.add('hidden');
+
+                // HIDE Name and Age for Lookup Report!
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+
+                if (currentLookupDeliveryType === 'valid') {
+                    if (incomeContainer) incomeContainer.classList.remove('hidden');
+                    if (marketContainer) marketContainer.classList.remove('hidden');
+                } else {
+                    if (incomeContainer) incomeContainer.classList.add('hidden');
+                    if (marketContainer) marketContainer.classList.add('hidden');
                 }
             } else if (chosenReportType === 'signal_report') {
                 if (subCard) subCard.classList.add('hidden');
@@ -5601,7 +5689,12 @@ function setupWorkerReportOptions(dept) {
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-cyan-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
-                if (extraCols) extraCols.classList.add('hidden');
+
+                // HIDE Name, Age, Income, Market for Signal Report!
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             } else {
                 // female_report
                 if (subCard) subCard.classList.add('hidden');
@@ -5609,11 +5702,17 @@ function setupWorkerReportOptions(dept) {
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
-                if (extraCols) extraCols.classList.add('hidden');
+
+                // SHOW Name and Age, HIDE Income and Market for Female Report!
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             }
+            if (extraCols) extraCols.classList.add('hidden');
 
             if (typeof parsedRows !== 'undefined' && parsedRows.length > 0) {
-                setupColumnSelectorsAndPreview();
+                updateLivePreviewTable();
             }
         }
 
@@ -5621,24 +5720,27 @@ function setupWorkerReportOptions(dept) {
             currentLookupDeliveryType = type;
             const lblValid = document.getElementById('lblLookupValid');
             const lblNoInfo = document.getElementById('lblLookupNoInfo');
-            const extraCols = document.getElementById('lookupExtraCols');
+            const incomeContainer = document.getElementById('workerColIncomeContainer');
+            const marketContainer = document.getElementById('workerColMarketContainer');
 
             if (type === 'valid') {
-                if (lblValid) lblValid.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-emerald-500 shadow-sm cursor-pointer transition';
-                if (lblNoInfo) lblNoInfo.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-slate-200 hover:border-purple-300 cursor-pointer transition';
-                if (extraCols) extraCols.classList.remove('hidden');
+                if (lblValid) lblValid.className = 'flex-1 text-center py-2 text-xs font-black rounded-xl bg-purple-600 text-white shadow-sm cursor-pointer transition';
+                if (lblNoInfo) lblNoInfo.className = 'flex-1 text-center py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer transition';
+                if (incomeContainer) incomeContainer.classList.remove('hidden');
+                if (marketContainer) marketContainer.classList.remove('hidden');
             } else {
-                if (lblNoInfo) lblNoInfo.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-purple-600 shadow-sm cursor-pointer transition';
-                if (lblValid) lblValid.className = 'flex items-start space-x-3 p-3.5 bg-white rounded-xl border-2 border-slate-200 hover:border-purple-300 cursor-pointer transition';
-                if (extraCols) extraCols.classList.add('hidden');
+                if (lblValid) lblValid.className = 'flex-1 text-center py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer transition';
+                if (lblNoInfo) lblNoInfo.className = 'flex-1 text-center py-2 text-xs font-black rounded-xl bg-purple-600 text-white shadow-sm cursor-pointer transition';
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             }
 
             if (typeof parsedRows !== 'undefined' && parsedRows.length > 0) {
-                setupColumnSelectorsAndPreview();
+                updateLivePreviewTable();
             }
         }
 
-function setupColumnSelectorsAndPreview() {
+        function setupColumnSelectorsAndPreview() {
             document.getElementById('previewRowCount').innerText = `${parsedRows.length.toLocaleString()} rows detected`;
 
             const sampleRow = parsedRows[0];
@@ -5646,96 +5748,97 @@ function setupColumnSelectorsAndPreview() {
             const phoneSel = document.getElementById('columnPhoneSelector');
             const nameSel = document.getElementById('columnNameSelector');
             const ageSel = document.getElementById('columnAgeSelector');
+            const incomeSel = document.getElementById('columnIncomeSelector');
+            const marketSel = document.getElementById('columnMarketValueSelector');
 
             phoneSel.innerHTML = '';
             nameSel.innerHTML = '<option value="">-- None / Empty --</option>';
             ageSel.innerHTML = '<option value="">-- None / Empty --</option>';
-
-            // Intelligent Content Scorer: Scans first 15 rows
-            const checkRows = parsedRows.slice(0, 15);
-            const colScores = {};
-            columns.forEach(c => { colScores[c] = { phone: 0, name: 0, age: 0 }; });
-
-            checkRows.forEach(row => {
-                columns.forEach(col => {
-                    const val = String(row[col] || '').trim();
-                    const cleanNum = val.replace(/[^0-9]/g, '');
-
-                    // Phone candidate: 7 to 16 digits
-                    if (cleanNum.length >= 7 && cleanNum.length <= 16) {
-                        colScores[col].phone += 3;
-                    }
-                    // Age candidate: 1-3 digits (15 to 120)
-                    if (cleanNum && cleanNum === val && parseInt(cleanNum) >= 15 && parseInt(cleanNum) <= 120) {
-                        colScores[col].age += 4;
-                    }
-                    // Name candidate: has letters, few or no digits
-                    if (/[a-zA-Z]/.test(val) && cleanNum.length <= 2) {
-                        colScores[col].name += 3;
-                    }
-
-                    // Header name bonus
-                    const lowerCol = col.toLowerCase();
-                    if (lowerCol.includes('phone') || lowerCol.includes('number') || lowerCol.includes('mobile') || lowerCol.includes('contact') || lowerCol.includes('cell')) {
-                        colScores[col].phone += 2;
-                    }
-                    if (lowerCol.includes('name') || lowerCol.includes('person') || lowerCol.includes('customer') || lowerCol.includes('naam')) {
-                        colScores[col].name += 2;
-                    }
-                    if (lowerCol.includes('age') || lowerCol.includes('boyos') || lowerCol.includes('dob')) {
-                        colScores[col].age += 2;
-                    }
-                });
-            });
-
-            // Find best columns
-            let bestPhoneCol = columns[0];
-            let maxPhoneScore = -1;
-            columns.forEach(c => {
-                if (colScores[c].phone > maxPhoneScore) {
-                    maxPhoneScore = colScores[c].phone;
-                    bestPhoneCol = c;
-                }
-            });
-
-            let bestNameCol = '';
-            let maxNameScore = -1;
-            columns.forEach(c => {
-                if (c !== bestPhoneCol && colScores[c].name > maxNameScore) {
-                    maxNameScore = colScores[c].name;
-                    bestNameCol = c;
-                }
-            });
-
-            let bestAgeCol = '';
-            let maxAgeScore = -1;
-            columns.forEach(c => {
-                if (c !== bestPhoneCol && c !== bestNameCol && colScores[c].age > maxAgeScore) {
-                    maxAgeScore = colScores[c].age;
-                    bestAgeCol = c;
-                }
-            });
-
-            // If Lookup Report and Valid Number: First cell = Phone, 2nd cell = Income, 3rd cell = Market Value
-            const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value;
-            const incomeSel = document.getElementById('columnIncomeSelector');
-            const marketSel = document.getElementById('columnMarketValueSelector');
-
             if (incomeSel) incomeSel.innerHTML = '<option value="">-- None / খালি --</option>';
             if (marketSel) marketSel.innerHTML = '<option value="">-- None / খালি --</option>';
 
+            const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value || 'female_report';
+
+            let bestPhoneCol = '';
+            let bestNameCol = '';
+            let bestAgeCol = '';
             let bestIncomeCol = '';
             let bestMarketCol = '';
 
-            if (selectedRep === 'lookup_report' && currentLookupDeliveryType === 'valid') {
-                if (columns.length >= 1) bestPhoneCol = columns[0];
-                if (columns.length >= 2) bestIncomeCol = columns[1];
-                if (columns.length >= 3) bestMarketCol = columns[2];
+            if (selectedRep === 'lookup_report') {
+                // Smart column detector specifically for Lookup Report
+                columns.forEach(col => {
+                    const lc = col.toLowerCase();
+                    if (lc.includes('phone') || lc.includes('number') || lc.includes('mobile') || lc.includes('cell') || lc.includes('ফোন')) {
+                        bestPhoneCol = col;
+                    }
+                    if (lc.includes('income') || lc.includes('salary') || lc.includes('household') || lc.includes('hh_income') || lc.includes('আয়')) {
+                        bestIncomeCol = col;
+                    }
+                    if (lc.includes('market') || lc.includes('property') || lc.includes('value') || lc.includes('est') || lc.includes('val') || lc.includes('ভ্যালু')) {
+                        bestMarketCol = col;
+                    }
+                });
+
+                if (!bestPhoneCol && columns.length >= 1) bestPhoneCol = columns[0];
+                if (!bestIncomeCol && columns.length >= 2) bestIncomeCol = columns[1];
+                if (!bestMarketCol && columns.length >= 3) bestMarketCol = columns[2];
             } else {
+                // Intelligent Content Scorer: Scans first 15 rows for female report
+                const checkRows = parsedRows.slice(0, 15);
+                const colScores = {};
+                columns.forEach(c => { colScores[c] = { phone: 0, name: 0, age: 0 }; });
+
+                checkRows.forEach(row => {
+                    columns.forEach(col => {
+                        const val = String(row[col] || '').trim();
+                        const cleanNum = val.replace(/[^0-9]/g, '');
+
+                        if (cleanNum.length >= 7 && cleanNum.length <= 16) {
+                            colScores[col].phone += 3;
+                        }
+                        if (cleanNum && cleanNum === val && parseInt(cleanNum) >= 15 && parseInt(cleanNum) <= 120) {
+                            colScores[col].age += 4;
+                        }
+                        if (/[a-zA-Z]/.test(val) && cleanNum.length <= 2) {
+                            colScores[col].name += 3;
+                        }
+
+                        const lowerCol = col.toLowerCase();
+                        if (lowerCol.includes('phone') || lowerCol.includes('number') || lowerCol.includes('mobile') || lowerCol.includes('contact') || lowerCol.includes('cell')) {
+                            colScores[col].phone += 2;
+                        }
+                        if (lowerCol.includes('name') || lowerCol.includes('person') || lowerCol.includes('customer') || lowerCol.includes('naam')) {
+                            colScores[col].name += 2;
+                        }
+                        if (lowerCol.includes('age') || lowerCol.includes('boyos') || lowerCol.includes('dob')) {
+                            colScores[col].age += 2;
+                        }
+                    });
+                });
+
+                let maxPhoneScore = -1;
                 columns.forEach(c => {
-                    const lc = c.toLowerCase();
-                    if (lc.includes('income') || lc.includes('salary') || lc.includes('ai') || lc.includes('আয়')) bestIncomeCol = c;
-                    if (lc.includes('market') || lc.includes('value') || lc.includes('val') || lc.includes('ভ্যালু')) bestMarketCol = c;
+                    if (colScores[c].phone > maxPhoneScore) {
+                        maxPhoneScore = colScores[c].phone;
+                        bestPhoneCol = c;
+                    }
+                });
+
+                let maxNameScore = -1;
+                columns.forEach(c => {
+                    if (c !== bestPhoneCol && colScores[c].name > maxNameScore) {
+                        maxNameScore = colScores[c].name;
+                        bestNameCol = c;
+                    }
+                });
+
+                let maxAgeScore = -1;
+                columns.forEach(c => {
+                    if (c !== bestPhoneCol && c !== bestNameCol && colScores[c].age > maxAgeScore) {
+                        maxAgeScore = colScores[c].age;
+                        bestAgeCol = c;
+                    }
                 });
             }
 
@@ -5771,6 +5874,36 @@ function setupColumnSelectorsAndPreview() {
                 }
             });
 
+            // STRICT VISIBILITY CONTROL: Hide Name & Age for Lookup Report!
+            const nameContainer = document.getElementById('workerColNameContainer');
+            const ageContainer = document.getElementById('workerColAgeContainer');
+            const incomeContainer = document.getElementById('workerColIncomeContainer');
+            const marketContainer = document.getElementById('workerColMarketContainer');
+            const extraCols = document.getElementById('lookupExtraCols');
+
+            if (selectedRep === 'lookup_report') {
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+                if (currentLookupDeliveryType === 'valid') {
+                    if (incomeContainer) incomeContainer.classList.remove('hidden');
+                    if (marketContainer) marketContainer.classList.remove('hidden');
+                } else {
+                    if (incomeContainer) incomeContainer.classList.add('hidden');
+                    if (marketContainer) marketContainer.classList.add('hidden');
+                }
+            } else if (selectedRep === 'signal_report') {
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            } else {
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            }
+            if (extraCols) extraCols.classList.add('hidden');
+
             updateLivePreviewTable();
 
             document.getElementById('filePreviewCard').classList.remove('hidden');
@@ -5778,7 +5911,6 @@ function setupColumnSelectorsAndPreview() {
             document.getElementById('lastUploadResultCard').classList.add('hidden');
         }
 
-        // Live 5-Row Preview Table Renderer with Smart Lookup Duplicate Pre-Check
         async function updateLivePreviewTable() {
             const previewTbody = document.getElementById('workerLivePreviewBody');
             if (!previewTbody || !parsedRows || parsedRows.length === 0) return;
@@ -5789,8 +5921,42 @@ function setupColumnSelectorsAndPreview() {
             const incomeCol = document.getElementById('columnIncomeSelector')?.value || '';
             const marketCol = document.getElementById('columnMarketValueSelector')?.value || '';
 
-            const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value;
+            const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value || 'female_report';
             const isLookup = (selectedRep === 'lookup_report');
+            const isSignal = (selectedRep === 'signal_report');
+
+            // Dynamic Table Header update!
+            const headerRow = document.getElementById('workerLivePreviewHeaderRow');
+            if (headerRow) {
+                if (isLookup) {
+                    if (currentLookupDeliveryType === 'valid') {
+                        headerRow.innerHTML = `
+                            <th class="py-2 px-3 border-r w-10 text-center">#</th>
+                            <th class="py-2 px-3 border-r bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
+                            <th class="py-2 px-3 border-r bg-purple-50 text-purple-900">💰 Household Income (গৃহস্থালি আয়)</th>
+                            <th class="py-2 px-3 bg-purple-50 text-purple-900">🏡 Est. Market Value (মার্কেট ভ্যালু)</th>
+                        `;
+                    } else {
+                        headerRow.innerHTML = `
+                            <th class="py-2 px-3 border-r w-10 text-center">#</th>
+                            <th class="py-2 px-3 bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
+                        `;
+                    }
+                } else if (isSignal) {
+                    headerRow.innerHTML = `
+                        <th class="py-2 px-3 border-r w-10 text-center">#</th>
+                        <th class="py-2 px-3 bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
+                    `;
+                } else {
+                    // female_report
+                    headerRow.innerHTML = `
+                        <th class="py-2 px-3 border-r w-10 text-center">#</th>
+                        <th class="py-2 px-3 border-r bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
+                        <th class="py-2 px-3 border-r">👤 Full Name (নাম)</th>
+                        <th class="py-2 px-3">🎂 Age (বয়স)</th>
+                    `;
+                }
+            }
 
             const sampleRows = parsedRows.slice(0, 5);
             const samplePhones = sampleRows.map(r => String(r[phoneCol] || '').replace(/[^0-9]/g, '')).filter(p => p.length >= 6);
@@ -5816,8 +5982,6 @@ function setupColumnSelectorsAndPreview() {
 
             previewTbody.innerHTML = sampleRows.map((row, idx) => {
                 const phoneVal = phoneCol ? String(row[phoneCol] || '').trim() : '-';
-                const nameVal = nameCol ? String(row[nameCol] || '').trim() : '-';
-                const ageVal = ageCol ? String(row[ageCol] || '').trim() : '-';
                 const cleanPhone = phoneVal.replace(/[^0-9]/g, '');
 
                 const hasLettersInPhone = /[a-zA-Z]/.test(phoneVal) && cleanPhone.length < 6;
@@ -5826,29 +5990,54 @@ function setupColumnSelectorsAndPreview() {
                 let rowBg = isDup ? 'bg-rose-50/80 border-rose-200' : 'hover:bg-slate-50';
                 let phoneClass = hasLettersInPhone ? 'bg-red-50 text-red-700 font-extrabold' : (isDup ? 'text-rose-700 font-black' : 'text-indigo-900 font-bold');
 
-                let extraCells = '';
-                if (isLookup && currentLookupDeliveryType === 'valid') {
-                    const inc = incomeCol ? String(row[incomeCol] || '').trim() : '-';
-                    const mkt = marketCol ? String(row[marketCol] || '').trim() : '-';
-                    extraCells = `
-                        <td class="py-2 px-3 border-r font-semibold text-purple-900">${inc}</td>
-                        <td class="py-2 px-3 border-r font-semibold text-purple-900">${mkt}</td>
+                if (isLookup) {
+                    if (currentLookupDeliveryType === 'valid') {
+                        const inc = incomeCol ? String(row[incomeCol] || '').trim() : '-';
+                        const mkt = marketCol ? String(row[marketCol] || '').trim() : '-';
+                        return `
+                            <tr class="${rowBg} border-b">
+                                <td class="py-2 px-3 border-r text-slate-400 font-bold text-center">${idx + 1}</td>
+                                <td class="py-2 px-3 border-r ${phoneClass}">
+                                    ${cleanPhone || phoneVal}
+                                    ${isDup ? `<span class="block text-[10px] text-rose-600 font-bold">${isDup}</span>` : ''}
+                                </td>
+                                <td class="py-2 px-3 border-r font-mono font-bold text-purple-900">${inc}</td>
+                                <td class="py-2 px-3 font-mono font-bold text-purple-900">${mkt}</td>
+                            </tr>
+                        `;
+                    } else {
+                        return `
+                            <tr class="${rowBg} border-b">
+                                <td class="py-2 px-3 border-r text-slate-400 font-bold text-center">${idx + 1}</td>
+                                <td class="py-2 px-3 ${phoneClass}">
+                                    ${cleanPhone || phoneVal}
+                                    ${isDup ? `<span class="block text-[10px] text-rose-600 font-bold">${isDup}</span>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    }
+                } else if (isSignal) {
+                    return `
+                        <tr class="${rowBg} border-b">
+                            <td class="py-2 px-3 border-r text-slate-400 font-bold text-center">${idx + 1}</td>
+                            <td class="py-2 px-3 ${phoneClass}">${cleanPhone || phoneVal}</td>
+                        </tr>
+                    `;
+                } else {
+                    const nameVal = nameCol ? String(row[nameCol] || '').trim() : '-';
+                    const ageVal = ageCol ? String(row[ageCol] || '').trim() : '-';
+                    return `
+                        <tr class="${rowBg} border-b">
+                            <td class="py-2 px-3 border-r text-slate-400 font-bold text-center">${idx + 1}</td>
+                            <td class="py-2 px-3 border-r ${phoneClass}">
+                                ${cleanPhone || phoneVal}
+                                ${isDup ? `<span class="block text-[10px] text-rose-600 font-bold">${isDup}</span>` : ''}
+                            </td>
+                            <td class="py-2 px-3 border-r">${nameVal}</td>
+                            <td class="py-2 px-3">${ageVal}</td>
+                        </tr>
                     `;
                 }
-
-                return `
-                    <tr class="${rowBg} text-xs transition">
-                        <td class="py-2 px-3 border-r font-mono text-slate-400">${idx + 1}</td>
-                        <td class="py-2 px-3 border-r font-mono ${phoneClass}">
-                            ${phoneVal}
-                            ${hasLettersInPhone ? '<span class="block text-[10px] text-red-600 font-sans">⚠️ এটি নাম! ফোন নাম্বার নয়</span>' : ''}
-                            ${isDup ? `<span class="block text-[10px] text-rose-600 font-sans font-bold">${isDup}</span>` : ''}
-                        </td>
-                        ${extraCells}
-                        <td class="py-2 px-3 border-r font-bold text-slate-800">${nameVal}</td>
-                        <td class="py-2 px-3 font-medium text-slate-600">${ageVal}</td>
-                    </tr>
-                `;
             }).join('');
         }
 
