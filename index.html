@@ -234,9 +234,8 @@
                     <div id="deptSelectContainer" class="hidden">
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Your Department</label>
                         <select id="signupDept" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-semibold focus:ring-2 focus:ring-indigo-500">
-                                        <option value="gender_verify">🚻 1. Gender Verify Department (ফিমেল ভেরিফাই কাজ)</option>
-                                        <option value="signal">📡 2. Signal Number Department (সিগন্যাল নাম্বার কাজ)</option>
-                                        <option value="lookup">🔍 3. Number Lookup Department (লুকআপ রিপোর্ট কাজ)</option>
+                                        <option value="gender_verify">🚻 1. Gender Verify Department (ফিমেল ও সিগন্যাল কাজ)</option>
+                                        <option value="lookup">🔍 2. Number Lookup Department (লুকআপ রিপোর্ট কাজ)</option>
                                     </select>
                     </div>
 
@@ -604,16 +603,16 @@
                             </div>
                         </label>
 
-                        <!-- Option 3: Signal Report (Age 43+ Mandatory) -->
+                        <!-- Option 3: Signal Report -->
                         <label id="optSignalReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition">
                             <input type="radio" name="workerReportType" value="signal_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-cyan-600 mt-1">
                             <div>
                                 <div class="flex items-center space-x-2">
-                                    <span class="font-black text-sm text-slate-900 block">📡 3. Signal Report (সিগন্যাল ভেরিফাইড ডাটা)</span>
-                                    <span class="bg-cyan-100 text-cyan-900 text-[10px] font-black px-2 py-0.5 rounded-full">বয়স ৪৩+ আবশ্যক</span>
+                                    <span class="font-black text-sm text-slate-800 block">📡 3. Signal Report (সিগন্যাল ডাটা)</span>
+                                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full">New Work</span>
                                 </div>
                                 <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    ফিমেল ডাটার মতোই বয়স অবশ্যই ৪৩ বছর বা তার বেশি হতে হবে। ৪৩ এর নিচের যেকোনো নাম্বার স্বয়ংক্রিয়ভাবে বাদ যাবে (Deceased / Unknown বয়স থাকলে কোনো সমস্যা নেই)।
+                                    কোম্পানির নতুন সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট।
                                 </span>
                             </div>
                         </label>
@@ -914,39 +913,31 @@
                 </div>
             </div>
 
-            <!-- Admin Stats Cards by Report Types (Optimized Responsive Grid) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <!-- Admin Stats Cards by Report Types -->
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <div onclick="filterAdminSubmissionsBy('all')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600 cursor-pointer hover:shadow-md hover:border-indigo-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
                         <span class="text-[10px] text-indigo-600 font-bold group-hover:underline">View All ➔</span>
                     </div>
                     <p id="adminStatTotalUnique" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
-                    <p class="text-xs text-slate-400">মাস্টার ডাটাবেজ</p>
+                    <p class="text-xs text-slate-400">Unique numbers stored</p>
                 </div>
-                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
+                                <div onclick="filterAdminSubmissionsBy('female_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500 cursor-pointer hover:shadow-md hover:border-pink-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Reports</p>
-                        <span class="text-[10px] bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-pink-100">View ➔</span>
+                        <span class="text-[10px] bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-pink-100">Day-by-Day ➔</span>
                     </div>
                     <p id="adminStatFemaleReport" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">ফিমেল ভেরিফাই ডাটা</p>
-                </div>
-                <div onclick="filterAdminSubmissionsBy('signal_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-cyan-500 cursor-pointer hover:shadow-md hover:border-cyan-400 transition group">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-bold text-slate-500 uppercase">📡 Signal Reports</p>
-                        <span class="text-[10px] bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded font-bold group-hover:bg-cyan-100">Live ➔</span>
-                    </div>
-                    <p id="adminStatSignalReport" class="text-2xl font-extrabold text-cyan-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">সিগন্যাল নাম্বার ডাটা</p>
+                    <p class="text-xs text-slate-400">Click to view all female data</p>
                 </div>
                 <div onclick="filterAdminSubmissionsBy('lookup_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500 cursor-pointer hover:shadow-md hover:border-purple-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Reports</p>
-                        <span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-purple-100">View ➔</span>
+                        <span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-purple-100">Day-by-Day ➔</span>
                     </div>
                     <p id="adminStatLookupReport" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">আয় ও মার্কেট ডাটা</p>
+                    <p class="text-xs text-slate-400">Income & Market value data</p>
                 </div>
                 <div onclick="filterAdminSubmissionsBy('today')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
                     <div class="flex items-center justify-between">
@@ -954,7 +945,7 @@
                         <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-blue-100">Today ➔</span>
                     </div>
                     <p id="adminStatToday" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
-                    <p class="text-xs text-slate-400">আজকের মোট জমা</p>
+                    <p class="text-xs text-slate-400">Added today across workers</p>
                 </div>
                 <div onclick="switchAdminTab('rec_stock')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-600 col-span-2 lg:col-span-1 cursor-pointer hover:shadow-md hover:border-emerald-400 transition group">
                     <div class="flex items-center justify-between">
@@ -1171,10 +1162,7 @@
                             </button>
 
                             <button type="button" onclick="filterAdminSubmissionsBy('female_report')" id="qfBtnFemale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200 transition">
-                                👩 Female Data
-                            </button>
-                            <button type="button" onclick="filterAdminSubmissionsBy('signal_report')" id="qfBtnSignal" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-cyan-50 hover:text-cyan-800 hover:border-cyan-200 transition">
-                                📡 Signal Data (সিগন্যাল)
+                                👩 Female Data (দিন অনুযায়ী)
                             </button>
                             <button type="button" onclick="filterAdminSubmissionsBy('lookup_report')" id="qfBtnLookup" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200 transition">
                                 🔍 Lookup Data
@@ -1298,8 +1286,7 @@
                                 <div class="flex items-center space-x-2">
                                     <label class="text-xs font-bold text-slate-700">ডিপার্টমেন্ট:</label>
                                     <select id="newMemberDept" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold">
-                                        <option value="gender_verify">🚻 Gender Verify (Female)</option>
-                                        <option value="signal">📡 Signal Number</option>
+                                        <option value="gender_verify">🚻 Gender Verify (Female & Signal)</option>
                                         <option value="lookup">🔍 Number Lookup</option>
                                     </select>
                                 </div>
@@ -1317,10 +1304,9 @@
                         <div class="flex items-center space-x-3">
                             <input type="text" id="adminUserSearchInput" oninput="renderAdminUserTable()" placeholder="Search worker email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
                             <select id="adminUserDeptFilter" onchange="renderAdminUserTable()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
-                                <option value="all">All Departments (সকল ডিপার্টমেন্ট)</option>
-                                <option value="gender_verify">🚻 Gender Verify (Female)</option>
-                                <option value="signal">📡 Signal Number (সিগন্যাল)</option>
-                                <option value="lookup">🔍 Number Lookup (লুকআপ)</option>
+                                <option value="all">All Departments (সকল)</option>
+                                <option value="gender_verify">Gender Verify (Female & Signal)</option>
+                                <option value="lookup">Number Lookup</option>
                             </select>
                         </div>
                         <div class="text-xs text-slate-500">
@@ -1388,36 +1374,28 @@
                         </button>
                     </div>
 
-                    <!-- Stat Cards for Company Deliveries (5 Categories) -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                    <!-- Stat Cards for Company Deliveries -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
                             <p class="text-xs font-bold text-slate-500 uppercase">Total Given</p>
                             <p id="cdStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">মোট দেওয়া ডাটা</p>
+                            <p class="text-[11px] text-slate-400">Total delivered</p>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Data</p>
                             <p id="cdStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">ফিমেল ডেলিভারি</p>
+                            <p class="text-[11px] text-slate-400">Delivered to company</p>
                         </div>
-
-                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-cyan-500">
-                            <p class="text-xs font-bold text-slate-500 uppercase">📡 Signal Data</p>
-                            <p id="cdStatSignal" class="text-2xl font-extrabold text-cyan-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">সিগন্যাল ডেলিভারি</p>
-                        </div>
-
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">🔍 Lookup Data</p>
                             <p id="cdStatLookup" class="text-2xl font-extrabold text-purple-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">ইনকাম ও মার্কেট</p>
+                            <p class="text-[11px] text-slate-400">Income & Market Val</p>
                         </div>
-
-                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 sm:col-span-1">
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-500 col-span-2 lg:col-span-1">
                             <p class="text-xs font-bold text-slate-500 uppercase">Today's Given</p>
                             <p id="cdStatToday" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
-                            <p class="text-[11px] text-slate-400">আজকের ডেলিভারি</p>
+                            <p class="text-[11px] text-slate-400">Delivered today</p>
                         </div>
                     </div>
 
@@ -1443,8 +1421,7 @@
                                     📂 Data Category (ক্যাটাগরি - ৩টি আলাদা সেক্টর):
                                 </label>
                                 <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
-                                    <option value="female_data">👩 1. Female Data (মহিলা ডাটা ডেলিভারি)</option>
-                                    <option value="signal_data">📡 2. Signal Data (সিগন্যাল নাম্বার ডেলিভারি)</option>
+                                    <option value="female_data">👩 1. Female Data (মহিলা ডাটা)</option>
                                     <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
                                 </select>
                             </div>
@@ -1545,7 +1522,6 @@
                                     <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
                                         <option value="all">All Categories (সবগুলো)</option>
                                         <option value="female_data">👩 Female Data</option>
-                                        <option value="signal_data">📡 Signal Data</option>
                                         <option value="lookup_data">🔍 Lookup Data</option>
                                     </select>
                                 </div>
@@ -2945,15 +2921,10 @@
                         <p id="lchkStatSpecial" class="text-2xl sm:text-3xl font-black text-amber-900 mt-1">0</p>
                         <p class="text-[10px] text-amber-800 font-bold">মার্কেট ভ্যালু > ১৮ লাখ$</p>
                     </div>
-                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
-                        <p class="text-[11px] font-bold text-blue-900 uppercase">ℹ️ কোনো তথ্য নেই (No Info)</p>
-                        <p id="lchkStatNoInfo" class="text-2xl sm:text-3xl font-black text-blue-600 mt-1">0</p>
-                        <p id="lchkStatNoInfoPct" class="text-[10px] text-blue-600 font-bold">0% তথ্যবিহীন</p>
-                    </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-rose-500">
                         <p class="text-[11px] font-bold text-rose-900 uppercase">🔴 অযোগ্য (Discarded)</p>
                         <p id="lchkStatDiscarded" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
-                        <p id="lchkStatDiscardedPct" class="text-[10px] text-rose-600 font-bold">0% বাদ (তথ্য মেলেনি)</p>
+                        <p id="lchkStatDiscardedPct" class="text-[10px] text-rose-600 font-bold">0% বাদ</p>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-400">
                         <p class="text-[11px] font-bold text-emerald-800 uppercase">আয় $75k+ (খালি ভ্যালুসহ)</p>
@@ -2979,10 +2950,6 @@
                             <button type="button" id="btnLchkTabSpecial" onclick="switchLookupChkTableTab('special')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-950 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>⭐ স্পেশাল ডাটা (>18 Lakhs):</span>
                                 <span id="lchkTabBadgeSpecial" class="bg-amber-300 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full">0</span>
-                            </button>
-                            <button type="button" id="btnLchkTabNoInfo" onclick="switchLookupChkTableTab('no_info')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-blue-900 transition cursor-pointer flex items-center space-x-1.5">
-                                <span>ℹ️ কোনো তথ্য নেই (No Info):</span>
-                                <span id="lchkTabBadgeNoInfo" class="bg-blue-100 text-blue-900 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
                             <button type="button" id="btnLchkTabDiscarded" onclick="switchLookupChkTableTab('discarded')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>🔴 অযোগ্য ডাটা (Discarded):</span>
@@ -3302,19 +3269,6 @@
         };
 
         const TursoVault = {
-            _subStatsCache: null,
-            _subStatsCacheTime: 0,
-            _stockStatsCache: null,
-            _stockStatsCacheTime: 0,
-            _delivStatsCache: null,
-            _delivStatsCacheTime: 0,
-
-            clearCache() {
-                this._subStatsCache = null;
-                this._stockStatsCache = null;
-                this._delivStatsCache = null;
-            },
-
             getConfig() {
                 return {
                     url: localStorage.getItem('turso_db_url') || TURSO_DEFAULT_CONFIG.url,
@@ -3357,18 +3311,14 @@
                     ]
                 };
 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
                 const res = await fetch(`${cleanUrl}/v2/pipeline`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${config.token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
+                    body: JSON.stringify(payload)
                 });
-                clearTimeout(timeoutId);
 
                 if (!res.ok) {
                     const errTxt = await res.text();
@@ -3518,7 +3468,6 @@
             },
 
             async insertSubmissions(chunk, reportType, fileName, profile) {
-                this.clearCache();
                 if (!chunk || chunk.length === 0) return { success: true, count: 0 };
                 await this.init();
                 let inserted = 0;
@@ -3557,7 +3506,6 @@
             },
 
             async insertStockNumbers(records, stockType, recDate, batchName) {
-                this.clearCache();
                 if (!records || records.length === 0) return { success: true, count: 0 };
                 await this.init();
                 let inserted = 0;
@@ -3592,7 +3540,6 @@
             },
 
             async insertDeliveries(records, category, companyName, deliveryDate, batchName) {
-                this.clearCache();
                 if (!records || records.length === 0) return { success: true, count: 0 };
                 await this.init();
                 let inserted = 0;
@@ -3631,9 +3578,8 @@
                 const username = this.escapeSql(profile?.username || 'Worker');
                 const email = this.escapeSql(profile?.email || '');
 
-                // 6-hour quota rule: if not admin, not team_leader, not unlimited quota, and NOT lookup
-                const isLookupWorker = (cleanType === 'lookup') || (profile && (profile.department === 'lookup' || profile.department === 'number_lookup'));
-                if (!isLookupWorker && profile && profile.role !== 'admin' && profile.role !== 'team_leader' && !profile.is_unlimited_quota) {
+                // 6-hour quota rule: if not admin and not team_leader and not unlimited quota
+                if (profile && profile.role !== 'admin' && profile.role !== 'team_leader' && !profile.is_unlimited_quota) {
                     const quotaSql = `
                         SELECT COUNT(*) as claimed_count 
                         FROM turso_stock_numbers 
@@ -3760,39 +3706,29 @@
                 };
             },
 
-            async getSubmissionsStats(force = false) {
-                const now = Date.now();
-                if (!force && this._subStatsCache && (now - this._subStatsCacheTime < 15000)) {
-                    return this._subStatsCache;
-                }
+            async getSubmissionsStats() {
                 await this.init();
                 const sql = `
                     SELECT 
                         COUNT(*) as total_unique,
                         SUM(CASE WHEN report_type = 'female_report' OR report_type = 'female' THEN 1 ELSE 0 END) as female_count,
-                        SUM(CASE WHEN report_type = 'signal_report' OR report_type = 'signal' THEN 1 ELSE 0 END) as signal_count,
                         SUM(CASE WHEN report_type = 'lookup_report' OR report_type = 'lookup' THEN 1 ELSE 0 END) as lookup_count,
+                        SUM(CASE WHEN report_type = 'signal_report' OR report_type = 'signal' THEN 1 ELSE 0 END) as signal_count,
                         SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today_count
                     FROM turso_submissions;
                 `;
                 const res = await this.query(sql);
                 const row = res.rows[0] || {};
-                this._subStatsCache = {
+                return {
                     totalUnique: parseInt(row.total_unique || 0, 10),
                     femaleCount: parseInt(row.female_count || 0, 10),
-                    signalCount: parseInt(row.signal_count || 0, 10),
                     lookupCount: parseInt(row.lookup_count || 0, 10),
+                    signalCount: parseInt(row.signal_count || 0, 10),
                     todayTotal: parseInt(row.today_count || 0, 10)
                 };
-                this._subStatsCacheTime = now;
-                return this._subStatsCache;
             },
 
-            async getStockStats(force = false) {
-                const now = Date.now();
-                if (!force && this._stockStatsCache && (now - this._stockStatsCacheTime < 15000)) {
-                    return this._stockStatsCache;
-                }
+            async getStockStats() {
                 await this.init();
                 const sql = `
                     SELECT 
@@ -3807,7 +3743,7 @@
                 `;
                 const res = await this.query(sql);
                 const row = res.rows[0] || {};
-                this._stockStatsCache = {
+                return {
                     total: parseInt(row.total || 0, 10),
                     available: parseInt(row.available || 0, 10),
                     claimed: parseInt(row.claimed || 0, 10),
@@ -3816,40 +3752,29 @@
                     lookupAvail: parseInt(row.lookup_avail || 0, 10),
                     signalAvail: parseInt(row.signal_avail || 0, 10)
                 };
-                this._stockStatsCacheTime = now;
-                return this._stockStatsCache;
             },
 
-            async getDeliveryStats(force = false) {
-                const now = Date.now();
-                if (!force && this._delivStatsCache && (now - this._delivStatsCacheTime < 15000)) {
-                    return this._delivStatsCache;
-                }
+            async getDeliveryStats() {
                 await this.init();
                 const sql = `
                     SELECT 
                         COUNT(*) as total,
                         SUM(CASE WHEN category = 'female_data' THEN 1 ELSE 0 END) as female_deliv,
-                        SUM(CASE WHEN category = 'signal_data' THEN 1 ELSE 0 END) as signal_deliv,
                         SUM(CASE WHEN category = 'lookup_data' THEN 1 ELSE 0 END) as lookup_deliv,
                         SUM(CASE WHEN date(delivered_at) = date('now') OR date(created_at) = date('now') THEN 1 ELSE 0 END) as today_deliv
                     FROM turso_deliveries;
                 `;
                 const res = await this.query(sql);
                 const row = res.rows[0] || {};
-                this._delivStatsCache = {
+                return {
                     total: parseInt(row.total || 0, 10),
                     femaleDeliv: parseInt(row.female_deliv || 0, 10),
-                    signalDeliv: parseInt(row.signal_deliv || 0, 10),
                     lookupDeliv: parseInt(row.lookup_deliv || 0, 10),
                     todayDeliv: parseInt(row.today_deliv || 0, 10)
                 };
-                this._delivStatsCacheTime = now;
-                return this._delivStatsCache;
             },
 
             async deleteSubmissions(scope, targetDate) {
-                this.clearCache();
                 await this.init();
                 let sql = `DELETE FROM turso_submissions;`;
                 if (scope === 'specific_date' && targetDate) {
@@ -4612,15 +4537,19 @@
                     currentProfile.role = 'admin';
                     currentProfile.department = 'admin';
                     currentProfile.is_unlimited_quota = true;
-                    // Non-blocking auto-sync in background to keep website lightning fast
-                    supabaseClient.from('profiles').upsert({
-                        id: currentUser.id,
-                        email: currentUser.email,
-                        username: currentProfile.username || 'Admin',
-                        role: 'admin',
-                        department: 'admin',
-                        is_unlimited_quota: true
-                    }).then(() => {}).catch(e => console.warn('Admin background sync notice:', e));
+                    // Auto-sync in database table so RPCs never complain
+                    try {
+                        await supabaseClient.from('profiles').upsert({
+                            id: currentUser.id,
+                            email: currentUser.email,
+                            username: currentProfile.username || 'Admin',
+                            role: 'admin',
+                            department: 'admin',
+                            is_unlimited_quota: true
+                        });
+                    } catch(syncErr) {
+                        console.warn('Admin profile sync notice:', syncErr);
+                    }
                 }
 
                 document.getElementById('userInfo').classList.remove('hidden');
@@ -4654,24 +4583,14 @@
                 } else if (isLeader) {
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-black bg-amber-400 text-slate-950 shadow-sm border border-amber-300';
                     badge.innerText = '👑 Team Leader (আনলিমিটেড)';
-                    let deptName = 'Gender Verify (Female)';
-                    if (currentProfile.department === 'signal' || currentProfile.department === 'signal_work') {
-                        deptName = '📡 Signal Number';
-                    } else if (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') {
-                        deptName = '🔍 Number Lookup';
-                    }
+                    let deptName = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify (Female & Signal)';
                     document.getElementById('userDeptTitle').innerText = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👷</span><span>My Work (আমার কাজ)</span>';
                     if (navLookupBtn) navLookupBtn.classList.add('hidden');
                     setupWorkerReportOptions(currentProfile.department);
                     switchToSection('dashboard');
                 } else {
-                    let deptLabel = '🚻 Gender Verify Department';
-                    if (currentProfile.department === 'signal' || currentProfile.department === 'signal_work') {
-                        deptLabel = '📡 Signal Number Department';
-                    } else if (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') {
-                        deptLabel = '🔍 Number Lookup Department';
-                    }
+                    let deptLabel = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify (Female & Signal)';
                     badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-indigo-200 text-indigo-900';
                     badge.innerText = deptLabel;
                     document.getElementById('userDeptTitle').innerText = deptLabel;
@@ -4715,24 +4634,14 @@ function setupWorkerReportOptions(dept) {
 
             const isAdmin = currentProfile && currentProfile.role === 'admin';
             const isLookup = (dept === 'lookup' || dept === 'number_lookup');
-            const isSignal = (dept === 'signal' || dept === 'signal_work');
 
             if (isAdmin) {
                 // Admin sees all 3 report options
                 if (optFemale) optFemale.classList.remove('hidden');
                 if (optLookup) optLookup.classList.remove('hidden');
                 if (optSignal) optSignal.classList.remove('hidden');
-            } else if (isSignal) {
-                // Signal Number worker ONLY sees Signal Report!
-                if (optFemale) optFemale.classList.add('hidden');
-                if (optLookup) optLookup.classList.add('hidden');
-                if (optSignal) {
-                    optSignal.classList.remove('hidden');
-                    const r = optSignal.querySelector('input');
-                    if (r) r.checked = true;
-                }
             } else if (isLookup) {
-                // Number Lookup worker ONLY sees Lookup Report!
+                // Number Lookup worker ONLY sees Lookup Report
                 if (optFemale) optFemale.classList.add('hidden');
                 if (optSignal) optSignal.classList.add('hidden');
                 if (optLookup) {
@@ -4741,14 +4650,14 @@ function setupWorkerReportOptions(dept) {
                     if (r) r.checked = true;
                 }
             } else {
-                // Gender Verify worker ONLY sees Female Report!
+                // Gender Verify worker sees Female Report AND Signal Report (Hides Lookup Report)
                 if (optLookup) optLookup.classList.add('hidden');
-                if (optSignal) optSignal.classList.add('hidden');
                 if (optFemale) {
                     optFemale.classList.remove('hidden');
                     const r = optFemale.querySelector('input');
                     if (r) r.checked = true;
                 }
+                if (optSignal) optSignal.classList.remove('hidden');
             }
 
             if (typeof handleWorkerReportTypeChanged === 'function') {
@@ -4756,13 +4665,48 @@ function setupWorkerReportOptions(dept) {
             }
         }
 
+        
+        // Safe Query Wrapper: Awaits any Thenable or Promise, catching rejections safely without needing .catch on builder
+        async function safeQuery(thenableOrPromise, fallback = {}) {
+            try {
+                if (!thenableOrPromise) return fallback;
+                const res = await thenableOrPromise;
+                return res || fallback;
+            } catch (err) {
+                console.warn('safeQuery handled notice:', err);
+                return fallback;
+            }
+        }
+
         function showView(viewId) {
             // IRONCLAD ACCESS CONTROL:
-            // 1. If user is NOT logged in, NEVER show any dashboard! ALWAYS force loginView!
-            if (!currentUser) {
+            // 1. If not logged in or explicitly requesting loginView, NEVER show header controls!
+            if (!currentUser || viewId === 'loginView') {
                 viewId = 'loginView';
+                const userInfo = document.getElementById('userInfo');
+                if (userInfo) {
+                    userInfo.classList.add('hidden');
+                    userInfo.classList.remove('flex');
+                }
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks) {
+                    navLinks.classList.add('hidden');
+                    navLinks.classList.remove('flex');
+                }
             } else {
-                // 2. If logged in, block non-admin from admin views!
+                // User is authenticated and viewing a dashboard section
+                const userInfo = document.getElementById('userInfo');
+                if (userInfo) {
+                    userInfo.classList.remove('hidden');
+                    userInfo.classList.add('flex');
+                }
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks) {
+                    navLinks.classList.remove('hidden');
+                    navLinks.classList.add('flex');
+                }
+
+                // Block non-admin from admin views
                 if (viewId === 'adminDashboard' && (!currentProfile || currentProfile.role !== 'admin')) {
                     viewId = 'userDashboard';
                 }
@@ -4796,9 +4740,6 @@ function setupWorkerReportOptions(dept) {
                     loadAdminDashboard();
                 } else {
                     showView('userDashboard');
-                    if (typeof setupWorkerReportOptions === 'function' && currentProfile) {
-                        setupWorkerReportOptions(currentProfile.department);
-                    }
                     loadUserDashboard();
                 }
 
@@ -4957,7 +4898,6 @@ function setupWorkerReportOptions(dept) {
                     mObj.totalUnique += (log.new_inserted || 0);
                     mObj.dupCount += (log.duplicates_count || 0);
                     if (log.report_type === 'female_report') mObj.femaleCount += (log.new_inserted || 0);
-                    else if (log.report_type === 'signal_report') mObj.signalCount = (mObj.signalCount || 0) + (log.new_inserted || 0);
                     else if (log.report_type === 'lookup_report' || log.report_type === 'lookup_valid' || log.report_type === 'lookup_no_info') mObj.lookupCount += (log.new_inserted || 0);
 
                     if (!mObj.days[dKey]) {
@@ -5305,8 +5245,8 @@ function setupWorkerReportOptions(dept) {
                 }
 
                 if (phone || name) {
-                    // Check female & signal age rule (< 43 auto remove)
-                    if ((selectedRep === 'female_report' || selectedRep === 'signal_report') && isFemaleUnderage(age)) {
+                    // Check female age rule (< 43 auto remove)
+                    if (selectedRep === 'female_report' && isFemaleUnderage(age)) {
                         underagePastedCount++;
                         return; // Auto remove!
                     }
@@ -5484,17 +5424,7 @@ function setupWorkerReportOptions(dept) {
                 }
             } else if (chosenReportType === 'signal_report') {
                 if (subCard) subCard.classList.add('hidden');
-                if (femaleAgeBanner) {
-                    femaleAgeBanner.classList.remove('hidden');
-                    femaleAgeBanner.className = 'mt-3 p-3.5 rounded-xl bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200 flex items-center space-x-2.5 text-cyan-950 text-xs shadow-xs';
-                    femaleAgeBanner.innerHTML = `
-                        <span class="text-xl flex-shrink-0">🛡️</span>
-                        <div>
-                            <span class="font-black text-cyan-900">সিগন্যাল রিপোর্ট বয়স ফিল্টার সক্রিয়:</span>
-                            <span class="text-cyan-800 font-medium ml-1">ফিমেল ডাটার মতোই যেকোনো নাম্বার ৪৩ বছরের নিচে হলে তা স্বয়ংক্রিয়ভাবে বাদ যাবে। ৪৩ বা তার বেশি বয়সী নাম্বার এবং Deceased বা Unknown বয়স থাকলে কোনো সমস্যা নেই, গ্রহণ করা হবে।</span>
-                        </div>
-                    `;
-                }
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-cyan-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
@@ -5815,10 +5745,10 @@ function setupColumnSelectorsAndPreview() {
                 let marketVal = chosenMarketValueCol ? String(row[chosenMarketValueCol] || '').trim() : '';
 
                 if (cleanPhone && cleanPhone.length >= 6) {
-                    // STRICT FEMALE & SIGNAL AGE FILTER:
+                    // STRICT FEMALE AGE FILTER:
                     // Under 43 is strictly forbidden and auto removed!
                     // Age >= 43, Deceased, Decressed, Unknown, Empty are ALLOWED!
-                    if ((chosenReportType === 'female_report' || chosenReportType === 'signal_report') && isFemaleUnderage(ageVal)) {
+                    if (chosenReportType === 'female_report' && isFemaleUnderage(ageVal)) {
                         underageFilteredCount++;
                         return; // Auto remove!
                     }
@@ -6091,7 +6021,7 @@ function setupColumnSelectorsAndPreview() {
                 todayStart.setHours(0,0,0,0);
                 const todayIso = todayStart.toISOString();
 
-                // 1. CONCURRENT PARALLEL FETCH (Turso + Supabase Unified Engine)
+                // 1. CONCURRENT PARALLEL FETCH (Turso + Supabase Unified Engine via safeQuery)
                 const [
                     tursoSubStats,
                     tursoStockStats,
@@ -6103,40 +6033,32 @@ function setupColumnSelectorsAndPreview() {
                     sbSignalRes,
                     sbLookupRes,
                     sbTodayRes,
-                    sbStockTotalRes,
                     sbStockAvailRes,
-                    sbStockClaimedRes,
-                    sbStockTodayRes,
                     sbDelivTotalRes,
                     claimsLogRes
                 ] = await Promise.all([
                     // Turso Vault Stats
-                    (typeof TursoVault !== 'undefined' ? TursoVault.getSubmissionsStats().catch(() => ({})) : Promise.resolve({})),
-                    (typeof TursoVault !== 'undefined' ? TursoVault.getStockStats().catch(() => ({})) : Promise.resolve({})),
-                    (typeof TursoVault !== 'undefined' ? TursoVault.getDeliveryStats().catch(() => ({})) : Promise.resolve({})),
+                    safeQuery(typeof TursoVault !== 'undefined' ? TursoVault.getSubmissionsStats() : null, {}),
+                    safeQuery(typeof TursoVault !== 'undefined' ? TursoVault.getStockStats() : null, {}),
+                    safeQuery(typeof TursoVault !== 'undefined' ? TursoVault.getDeliveryStats() : null, {}),
 
                     // Supabase Profiles & Upload Logs
-                    supabaseClient.from('profiles').select('*').catch(() => ({ data: [] })),
-                    supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false }).limit(500).catch(() => ({ data: [] })),
+                    safeQuery(supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }), { data: [] }),
+                    safeQuery(supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false }).limit(500), { data: [] }),
 
                     // Supabase Master Numbers Stats
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report').catch(() => ({ count: 0 })),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).or('report_type.eq.signal_report,report_type.eq.male_report').catch(() => ({ count: 0 })),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report').catch(() => ({ count: 0 })),
-                    supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayIso).catch(() => ({ count: 0 })),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }), { count: 0 }),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report'), { count: 0 }),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).or('report_type.eq.signal_report,report_type.eq.male_report'), { count: 0 }),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report'), { count: 0 }),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayIso), { count: 0 }),
 
-                    // Supabase Stock Numbers Stats
-                    supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
-                    supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_assigned', false).catch(() => ({ count: 0 })),
-                    supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_assigned', true).catch(() => ({ count: 0 })),
-                    supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('received_date', todayIso.slice(0, 10)).catch(() => ({ count: 0 })),
-
-                    // Supabase Deliveries Total
-                    supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
+                    // Supabase Stock Available & Deliveries Total
+                    safeQuery(supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_assigned', false), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
 
                     // Admin worker claims log
-                    supabaseClient.rpc('get_admin_worker_claims_log').catch(() => ({ data: null }))
+                    safeQuery(supabaseClient.rpc('get_admin_worker_claims_log'), { data: null })
                 ]);
 
                 // COMBINE ALL METRICS (Turso + Supabase) so no numbers ever disappear!
@@ -6159,7 +6081,7 @@ function setupColumnSelectorsAndPreview() {
                 if (document.getElementById('adminStatLookupReport')) document.getElementById('adminStatLookupReport').innerText = lookupCount.toLocaleString();
                 if (document.getElementById('adminStatToday')) document.getElementById('adminStatToday').innerText = todayTotal.toLocaleString();
 
-                // Update Tab Badges Immediately
+                // Update Tab Badges Immediately (No more 0!)
                 if (document.getElementById('recStockAvailableBadge')) document.getElementById('recStockAvailableBadge').innerText = totalStockAvail.toLocaleString();
                 if (document.getElementById('companyDelivTotalBadge')) document.getElementById('companyDelivTotalBadge').innerText = totalDeliveries.toLocaleString();
 
@@ -6229,7 +6151,7 @@ function setupColumnSelectorsAndPreview() {
                 // D. From Turso submissions
                 try {
                     if (typeof TursoVault !== 'undefined') {
-                        const tUsersRes = await TursoVault.query("SELECT DISTINCT user_id, user_email, username, department FROM turso_submissions WHERE user_id IS NOT NULL;");
+                        const tUsersRes = await safeQuery(TursoVault.query("SELECT DISTINCT user_id, user_email, username, department FROM turso_submissions WHERE user_id IS NOT NULL;"), null);
                         if (tUsersRes && tUsersRes.rows) {
                             tUsersRes.rows.forEach(tu => {
                                 const uid = tu.user_id;
@@ -6318,13 +6240,14 @@ function setupColumnSelectorsAndPreview() {
                 renderAdminUserTable();
                 renderAdminLogsTable();
 
-                // PRELOAD ALL TABS CONCURRENTLY (No waiting or having to click to see data!)
+                // Preload all tabs concurrently so when user clicks ANY tab, it displays instantly!
                 loadAdminSubmissionsData();
-                loadCompanyDeliveriesData();
-                loadCompanyReceivedData();
+                if (typeof loadCompanyDeliveriesData === 'function') loadCompanyDeliveriesData();
+                if (typeof loadCompanyReceivedData === 'function') loadCompanyReceivedData();
 
             } catch (err) {
                 console.error('loadAdminDashboard error:', err);
+                renderAdminUserTable();
             }
         }
 
@@ -6381,9 +6304,8 @@ function setupColumnSelectorsAndPreview() {
 
                             <!-- 3. Department Selector (Single Combined Dropdown) -->
                             <td class="py-2.5 px-2.5">
-                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs py-1 px-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                                    <option value="gender_verify" ${u.department === 'gender_verify' ? 'selected' : ''}>🚻 Gender Verify</option>
-                                    <option value="signal" ${(u.department === 'signal' || u.department === 'signal_work') ? 'selected' : ''}>📡 Signal Number</option>
+                                <select onchange="updateUserDepartment('${u.id}', this.value)" class="text-xs py-1 px-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 font-semibold focus:bg-white focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                                    <option value="gender_verify" ${(u.department === 'gender_verify' || u.department === 'signal_work' || u.department === 'signal') ? 'selected' : ''}>🚻 Gender Verify (Female & Signal)</option>
                                     <option value="lookup" ${(u.department === 'lookup' || u.department === 'number_lookup') ? 'selected' : ''}>🔍 Number Lookup</option>
                                 </select>
                             </td>
@@ -6474,7 +6396,7 @@ function setupColumnSelectorsAndPreview() {
                         if (workerFilter && workerFilter !== 'all') sql += ` AND (user_email = '${workerFilter}' OR username = '${workerFilter}')`;
                         if (dateFilter) sql += ` AND date(created_at) = '${dateFilter}'`;
                         sql += ` ORDER BY id DESC LIMIT 1000;`;
-                        const tRes = await TursoVault.query(sql).catch(() => null);
+                        const tRes = await safeQuery(TursoVault.query(sql), null);
                         if (tRes && tRes.rows) tRows = tRes.rows;
                     }
                 } catch(tErr) {
@@ -6491,8 +6413,8 @@ function setupColumnSelectorsAndPreview() {
                         const endIso = `${dateFilter}T23:59:59.999Z`;
                         query = query.gte('created_at', startIso).lte('created_at', endIso);
                     }
-                    const { data } = await query;
-                    if (data) sbRows = data;
+                    const res = await safeQuery(query, { data: [] });
+                    if (res && res.data) sbRows = res.data;
                 } catch(sbErr) {
                     console.warn('Supabase submissions query notice:', sbErr);
                 }
@@ -6510,6 +6432,795 @@ function setupColumnSelectorsAndPreview() {
                 }
             }
         }
+
+        function filterAdminSubmissionsBy(type) {
+            switchAdminTab('submissions');
+            const reportFilter = document.getElementById('adminSubReportFilter');
+            const dateFilter = document.getElementById('adminSubDateFilter');
+
+            if (type === 'male_report') {
+                if (reportFilter) reportFilter.value = 'male_report';
+                if (dateFilter) dateFilter.value = '';
+            } else if (type === 'female_report') {
+                if (reportFilter) reportFilter.value = 'female_report';
+                if (dateFilter) dateFilter.value = '';
+            } else if (type === 'lookup_report') {
+                if (reportFilter) reportFilter.value = 'lookup_report';
+                if (dateFilter) dateFilter.value = '';
+            } else if (type === 'today') {
+                if (reportFilter) reportFilter.value = 'all';
+                if (dateFilter) dateFilter.value = new Date().toISOString().slice(0, 10);
+            } else {
+                if (reportFilter) reportFilter.value = 'all';
+                if (dateFilter) dateFilter.value = '';
+            }
+
+            updateSubmissionsQuickFilterUI(type);
+            loadAdminSubmissionsData();
+        }
+
+        function updateSubmissionsQuickFilterUI(activeType) {
+            const btnMap = {
+                'all': document.getElementById('qfBtnAll'),
+                'male_report': document.getElementById('qfBtnMale'),
+                'female_report': document.getElementById('qfBtnFemale'),
+                'lookup_report': document.getElementById('qfBtnLookup'),
+                'today': document.getElementById('qfBtnToday')
+            };
+
+            Object.keys(btnMap).forEach(k => {
+                const btn = btnMap[k];
+                if (!btn) return;
+                if (k === activeType) {
+                    btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg border transition bg-indigo-600 text-white shadow-sm';
+                } else {
+                    btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition';
+                }
+            });
+        }
+
+        // 1-Click JSON Snapshot Backup of Central Database
+
+        // ==========================================
+        // COMPANY RECEIVED NUMBERS STOCK & ON-DEMAND DISPENSER
+        // ==========================================
+        
+        
+
+        function setDispenseQty(qty) {
+            const input = document.getElementById('dispenseQuantity');
+            if (qty === 'all') {
+                const avail = parseInt(document.getElementById('recStatAvailable').innerText.replace(/,/g, '')) || 0;
+                input.value = avail > 0 ? avail : 1000;
+            } else {
+                input.value = qty;
+            }
+        }
+
+        function handleRecFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                recStockParsedRows = XLSX.utils.sheet_to_json(worksheet);
+                alert(`ফাইল থেকে ${recStockParsedRows.length} টি সারি পাওয়া গেছে। এখন 'Save & Stock Numbers' বাটনে ক্লিক করুন।`);
+            };
+
+            if (file.name.endsWith('.txt')) {
+                const textReader = new FileReader();
+                textReader.onload = function(e) {
+                    const lines = e.target.result.split(/\r?\n/);
+                    recStockParsedRows = [];
+                    lines.forEach(l => {
+                        const cleanNum = l.replace(/[^0-9]/g, '');
+                        if (cleanNum.length >= 6) {
+                            recStockParsedRows.push({ phone: cleanNum });
+                        }
+                    });
+                    alert(`TXT ফাইল থেকে ${recStockParsedRows.length} টি ফোন নাম্বার পাওয়া গেছে।`);
+                };
+                textReader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        async function submitCompanyReceivedStock() {
+            if (!supabaseClient) return;
+
+            const dateInput = document.getElementById('recInputDate');
+            const batchInput = document.getElementById('recInputBatchName');
+            const textInput = document.getElementById('recTextInput');
+            const resultCard = document.getElementById('recUploadResultCard');
+            const btn = document.getElementById('btnSubmitRecStock');
+
+            const recDate = dateInput && dateInput.value ? dateInput.value : new Date().toISOString().slice(0, 10);
+            const batchName = batchInput && batchInput.value.trim() ? batchInput.value.trim() : 'Company_Stock';
+
+            let records = [];
+
+            // From parsed file
+            if (recStockParsedRows && recStockParsedRows.length > 0) {
+                recStockParsedRows.forEach(row => {
+                    let phone = '';
+                    let name = '';
+                    let age = '';
+
+                    Object.keys(row).forEach(k => {
+                        const val = String(row[k] || '').trim();
+                        const cleanNum = val.replace(/[^0-9]/g, '');
+                        if (!phone && cleanNum.length >= 6 && cleanNum.length <= 16) {
+                            phone = cleanNum;
+                        } else if (!name && val.length > 1 && !/^[0-9]+$/.test(val)) {
+                            name = val;
+                        } else if (!age && /^[0-9]{1,3}$/.test(val) && parseInt(val) <= 120) {
+                            age = val;
+                        }
+                    });
+
+                    if (phone) {
+                        records.push({ phone, name, age });
+                    }
+                });
+            }
+
+            // From text paste
+            if (textInput && textInput.value.trim()) {
+                const lines = textInput.value.split(/\r?\n/);
+                lines.forEach(line => {
+                    const cleanNum = line.replace(/[^0-9]/g, '');
+                    if (cleanNum.length >= 6) {
+                        records.push({ phone: cleanNum, name: '', age: '' });
+                    }
+                });
+            }
+
+            if (records.length === 0) {
+                alert('অনুগ্রহ করে একটি এক্সেল/টেক্সট ফাইল আপলোড করুন অথবা বক্সে ফোন নাম্বার পেস্ট করুন।');
+                return;
+            }
+
+            btn.disabled = true;
+            resultCard.classList.remove('hidden');
+            resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-indigo-50 border border-indigo-200 text-indigo-900';
+            resultCard.innerHTML = `⏳ ${records.length} টি নাম্বার স্টকে আপলোড এবং ডুপ্লিকেট পরীক্ষা করা হচ্ছে...`;
+
+            try {
+                const stockTypeInput = document.getElementById('recInputStockType');
+                const targetStockType = stockTypeInput ? stockTypeInput.value : 'gender_verify';
+
+                // Call RPC with stock_type
+                // 1. Direct Primary Write to Turso 9 GB Vault (Unlimited Capacity)
+                let tursoStockCount = 0;
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        const tRes = await TursoVault.insertStockNumbers(records, targetStockType, recDate, batchName);
+                        tursoStockCount = tRes.count || records.length;
+                    }
+                } catch(tStockErr) {
+                    console.warn('Turso stock write notice:', tStockErr);
+                }
+
+                // 2. Optional Supabase Sync
+                const { data, error } = await supabaseClient.rpc('admin_upload_received_numbers', {
+                    p_records: records,
+                    p_received_date: recDate,
+                    p_batch_name: batchName,
+                    p_stock_type: targetStockType
+                });
+
+                if (error) {
+                    // Fallback to direct table insert if RPC not yet run
+                    console.warn('RPC notice, using direct insert fallback:', error);
+                    let newInserted = 0;
+                    for (let i = 0; i < records.length; i += 500) {
+                        const chunk = records.slice(i, i + 500).map(r => ({
+                            received_date: recDate,
+                            phone_number: r.phone,
+                            full_name: r.name,
+                            age: r.age,
+                            batch_name: batchName,
+                            admin_email: currentUser ? currentUser.email : 'admin'
+                        }));
+                        const { error: insErr } = await supabaseClient
+                            .from('company_received_numbers')
+                            .upsert(chunk, { onConflict: 'phone_number', ignoreDuplicates: true });
+                        if (!insErr) newInserted += chunk.length;
+                    }
+                    resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-900';
+                    resultCard.innerHTML = `✅ স্টকে সফলভাবে সেভ করা হয়েছে! (${records.length} টি প্রসেস করা হয়েছে)`;
+                } else {
+                    // Background dual-write to Turso 9 GB Cloud Vault
+                    try {
+                        if (typeof TursoVault !== 'undefined' && TursoVault.asyncRecordStock) {
+                            TursoVault.asyncRecordStock(records, targetStockType);
+                        }
+                    } catch(tErr) {
+                        console.warn('Turso stock dual-write notice:', tErr);
+                    }
+
+                    resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-900';
+                    resultCard.innerHTML = `
+                        <div class="flex items-center space-x-2 font-bold text-sm mb-1">
+                            <span>✅</span>
+                            <span>স্টকে সফলভাবে সংরক্ষণ করা হয়েছে!</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono">
+                            <div>মোট প্রসেস: <b>${data.total_received}</b></div>
+                            <div>ফাইলে ইউনিক: <b>${data.unique_in_file}</b></div>
+                            <div class="text-emerald-700">নতুন সেভ: <b>+${data.new_inserted}</b></div>
+                            <div class="text-amber-700">ডুপ্লিকেট বাদ: <b>${data.duplicates_count}</b></div>
+                        </div>
+                    `;
+                }
+
+                // Reset form
+                if (textInput) textInput.value = '';
+                document.getElementById('recFileInput').value = '';
+                recStockParsedRows = [];
+                await loadCompanyReceivedData();
+            } catch (err) {
+                resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-800';
+                resultCard.innerHTML = `⚠️ আপলোড ত্রুটি: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function loadCompanyReceivedData() {
+            if (!supabaseClient) return;
+
+            const tbody = document.getElementById('recStockTableBody');
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Loading received stock records...</td></tr>`;
+
+            const dateFilter = document.getElementById('recHistoryDateFilter') ? document.getElementById('recHistoryDateFilter').value : 'all';
+
+            try {
+                let tStats = { total: 0, available: 0, claimed: 0, today: 0 };
+                let tRows = [];
+
+                try {
+                    if (typeof TursoVault !== 'undefined') {
+                        tStats = await safeQuery(TursoVault.getStockStats(), { total: 0, available: 0, claimed: 0, today: 0 });
+                        let sql = `SELECT * FROM turso_stock_numbers WHERE 1=1 `;
+                        if (dateFilter !== 'all') sql += ` AND received_date = '${dateFilter}'`;
+                        sql += ` ORDER BY id DESC LIMIT 500;`;
+                        const tRowsRes = await safeQuery(TursoVault.query(sql), null);
+                        if (tRowsRes && tRowsRes.rows) tRows = tRowsRes.rows;
+                    }
+                } catch(tErr) {
+                    console.warn('Turso stock fetch notice:', tErr);
+                }
+
+                const todayIso = new Date().toISOString().slice(0, 10);
+                const [totalRecRes, availRecRes, claimedRecRes, todayRecRes, sbRowsRes] = await Promise.all([
+                    safeQuery(supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_assigned', false), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('is_assigned', true), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_received_numbers').select('*', { count: 'exact', head: true }).eq('received_date', todayIso), { count: 0 }),
+                    (async () => {
+                        try {
+                            let q = supabaseClient.from('company_received_numbers').select('*').order('created_at', { ascending: false }).limit(500);
+                            if (dateFilter !== 'all') q = q.eq('received_date', dateFilter);
+                            const { data } = await q;
+                            return data || [];
+                        } catch(e) {
+                            return [];
+                        }
+                    })()
+                ]);
+
+                const sbTotal = totalRecRes.count || 0;
+                const sbAvail = availRecRes.count || 0;
+                const sbClaimed = claimedRecRes.count || 0;
+                const sbToday = todayRecRes.count || 0;
+                const sbRows = sbRowsRes || [];
+
+                // COMBINE TURSO + SUPABASE STOCK
+                const combinedTotal = (tStats.total || 0) + sbTotal;
+                const combinedAvail = (tStats.available || 0) + sbAvail;
+                const combinedClaimed = (tStats.claimed || 0) + sbClaimed;
+                const combinedToday = (tStats.today || 0) + sbToday;
+
+                if (document.getElementById('recStatTotal')) document.getElementById('recStatTotal').innerText = combinedTotal.toLocaleString();
+                if (document.getElementById('recStatAvailable')) document.getElementById('recStatAvailable').innerText = combinedAvail.toLocaleString();
+                if (document.getElementById('recStockAvailableBadge')) document.getElementById('recStockAvailableBadge').innerText = combinedAvail.toLocaleString();
+                if (document.getElementById('recStatExported')) document.getElementById('recStatExported').innerText = combinedClaimed.toLocaleString();
+                if (document.getElementById('recStatToday')) document.getElementById('recStatToday').innerText = combinedToday.toLocaleString();
+
+                updateStockDepletionAlert(combinedTotal, combinedAvail, combinedClaimed);
+                loadAdminWorkerClaimsLog();
+
+                // Merge rows from both Turso and Supabase
+                recStockCache = [...tRows, ...sbRows];
+
+                const dateSet = new Set();
+                recStockCache.forEach(r => {
+                    if (r.received_date) dateSet.add(r.received_date);
+                });
+
+                const dispenseDateSelect = document.getElementById('dispenseDateFilter');
+                if (dispenseDateSelect) {
+                    dispenseDateSelect.innerHTML = '<option value="all">🌟 All Dates (সব তারিখের স্টক থেকে)</option>';
+                    dateSet.forEach(d => {
+                        dispenseDateSelect.innerHTML += `<option value="${d}">📅 ${d} এর স্টক</option>`;
+                    });
+                }
+
+                const historyDateSelect = document.getElementById('recHistoryDateFilter');
+                if (historyDateSelect && historyDateSelect.options.length <= 1) {
+                    historyDateSelect.innerHTML = '<option value="all">All Dates</option>';
+                    dateSet.forEach(d => {
+                        historyDateSelect.innerHTML += `<option value="${d}">${d}</option>`;
+                    });
+                }
+
+                filterRecStockHistoryLocal();
+
+            } catch (err) {
+                console.error('loadCompanyReceivedData error:', err);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No records found.</td></tr>`;
+            }
+        }
+
+        function filterRecStockHistoryLocal() {
+            const tbody = document.getElementById('recStockTableBody');
+            if (!tbody) return;
+
+            const search = (document.getElementById('recHistorySearch')?.value || '').trim().toLowerCase();
+
+            let list = recStockCache;
+            if (search) {
+                list = list.filter(r => {
+                    const phone = (r.phone_number || '').toLowerCase();
+                    const batch = (r.batch_name || '').toLowerCase();
+                    const name = (r.full_name || '').toLowerCase();
+                    return phone.includes(search) || batch.includes(search) || name.includes(search);
+                });
+            }
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">No records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((r, idx) => {
+                const statusBadge = r.is_exported
+                    ? `<span class="px-2 py-0.5 text-xs rounded bg-amber-100 text-amber-800 font-bold">📤 Exported</span>`
+                    : `<span class="px-2 py-0.5 text-xs rounded bg-emerald-100 text-emerald-800 font-bold">🟢 Available</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50 text-xs">
+                        <td class="py-2.5 px-4 font-mono text-slate-400">${idx + 1}</td>
+                        <td class="py-2.5 px-4 font-mono font-bold text-slate-800">${r.phone_number}</td>
+                        <td class="py-2.5 px-4 font-medium text-slate-700">${r.full_name || '-'}</td>
+                        <td class="py-2.5 px-4 font-medium text-slate-600">📅 ${r.received_date}</td>
+                        <td class="py-2.5 px-4 text-slate-500">${r.batch_name || '-'}</td>
+                        <td class="py-2.5 px-4">${statusBadge}</td>
+                        <td class="py-2.5 px-4 text-right">
+                            <button onclick="copySingleNumber('${r.phone_number}')" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs p-1 rounded hover:bg-indigo-50" title="Copy Number">
+                                📋 Copy
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function copySingleNumber(phone) {
+            navigator.clipboard.writeText(phone);
+            alert(`Phone number copied: ${phone}`);
+        }
+
+        // ==========================================
+        // 🎯 EXECUTE CUSTOM ON-DEMAND NUMBER DISPENSE
+        // ==========================================
+        async function executeNumberDispense() {
+            if (!supabaseClient) return;
+
+            const qtyInput = document.getElementById('dispenseQuantity');
+            const rawQty = parseInt(qtyInput ? qtyInput.value : 0);
+
+            if (!rawQty || rawQty <= 0) {
+                alert('অনুগ্রহ করে আপনি কতগুলো নাম্বার চান তা লিখুন (যেমন: 500 বা 1000)।');
+                return;
+            }
+
+            const dateFilter = document.getElementById('dispenseDateFilter')?.value || 'all';
+            const statusFilter = document.getElementById('dispenseStatusFilter')?.value || 'unused';
+            const markExported = document.getElementById('dispenseMarkExported')?.checked ?? true;
+            const formatRadio = document.querySelector('input[name="dispenseFormat"]:checked');
+            const chosenFormat = formatRadio ? formatRadio.value : 'txt';
+
+            const btn = document.getElementById('btnExecuteDispense');
+            const msgBox = document.getElementById('dispenseResultMsg');
+
+            btn.disabled = true;
+            msgBox.classList.remove('hidden');
+            msgBox.className = 'text-xs p-3 rounded-xl bg-white/20 text-white font-medium';
+            msgBox.innerHTML = `⏳ স্টক থেকে ${rawQty.toLocaleString()} টি নাম্বার খোঁজা ও তৈরি করা হচ্ছে...`;
+
+            try {
+                // Query numbers
+                let query = supabaseClient
+                    .from('company_received_numbers')
+                    .select('*')
+                    .order('id', { ascending: true })
+                    .limit(rawQty);
+
+                if (statusFilter === 'unused') {
+                    query = query.eq('is_exported', false);
+                }
+                if (dateFilter !== 'all') {
+                    query = query.eq('received_date', dateFilter);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    throw new Error('আপনার ফিল্টারের সাথে মিল রেখে স্টকে কোনো নাম্বার অবশিষ্ট নেই।');
+                }
+
+                const extractedCount = data.length;
+
+                // Mark as exported if checked
+                if (markExported) {
+                    const idsToMark = data.map(d => d.id);
+                    await supabaseClient
+                        .from('company_received_numbers')
+                        .update({ is_exported: true, exported_at: new Date().toISOString() })
+                        .in('id', idsToMark);
+                }
+
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                if (chosenFormat === 'txt') {
+                    // Export as Plain Text (.txt) - 1 number per line
+                    const textLines = data.map(d => d.phone_number).join('\r\n');
+                    const blob = new Blob([textLines], { type: 'text/plain;charset=utf-8' });
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.href = URL.createObjectURL(blob);
+                    downloadAnchor.download = `Company_Numbers_${extractedCount}_Qty_${todayStr}.txt`;
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                } else {
+                    // Export as Excel (.xlsx)
+                    const exportRows = data.map((d, idx) => ({
+                        'SL': idx + 1,
+                        'Phone Number': d.phone_number,
+                        'Full Name': d.full_name || '',
+                        'Age': d.age || '',
+                        'Received Date': d.received_date,
+                        'Batch Name': d.batch_name || 'Company_Received'
+                    }));
+                    const ws = XLSX.utils.json_to_sheet(exportRows);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, `Numbers_${extractedCount}`);
+                    XLSX.writeFile(wb, `Company_Numbers_${extractedCount}_Qty_${todayStr}.xlsx`);
+                }
+
+                msgBox.className = 'text-xs p-3 rounded-xl bg-emerald-500 text-slate-950 font-bold';
+                msgBox.innerHTML = `✅ সফল! ${extractedCount.toLocaleString()} টি নাম্বার সফলভাবে .${chosenFormat.toUpperCase()} ফাইলে ডাউনলোড হয়েছে।${markExported ? ' (স্টকে ব্যবহৃত হিসেবে চিহ্নিত করা হয়েছে)' : ''}`;
+
+                // Refresh stock counters
+                await loadCompanyReceivedData();
+            } catch (err) {
+                msgBox.className = 'text-xs p-3 rounded-xl bg-red-500 text-white font-bold';
+                msgBox.innerHTML = `⚠️ উত্তোলন ত্রুটি: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function setupGoogleDriveClient() {
+            const savedClientId = localStorage.getItem('gdrive_client_id') || '171403934003-q673l41i2h57c7p9pjob191bnv76d2ge.apps.googleusercontent.com';
+            const inputEl = document.getElementById('gdriveClientIdInput');
+            if (inputEl && savedClientId) {
+                inputEl.value = savedClientId;
+            }
+            updateGoogleDriveUI();
+        }
+
+        function updateGoogleDriveUI() {
+            const notConnectedDiv = document.getElementById('gdriveNotConnected');
+            const connectedDiv = document.getElementById('gdriveConnected');
+            const emailBadge = document.getElementById('gdriveConnectedEmail');
+
+            if (googleAccessToken && googleUserEmail) {
+                if (notConnectedDiv) notConnectedDiv.classList.add('hidden');
+                if (connectedDiv) connectedDiv.classList.remove('hidden');
+                if (emailBadge) emailBadge.innerText = googleUserEmail;
+            } else {
+                if (notConnectedDiv) notConnectedDiv.classList.remove('hidden');
+                if (connectedDiv) connectedDiv.classList.add('hidden');
+            }
+        }
+
+        function handleConnectGoogleDrive() {
+            const inputEl = document.getElementById('gdriveClientIdInput');
+            const clientId = inputEl ? inputEl.value.trim() : '';
+
+            if (!clientId) {
+                alert('অনুগ্রহ করে আপনার Google OAuth Client ID দিন। নিচে দেওয়া নির্দেশিকা দেখে Google Cloud থেকে বিনামূল্যে Client ID তৈরি করে নিন।');
+                return;
+            }
+
+            localStorage.setItem('gdrive_client_id', clientId);
+
+            if (!window.google || !google.accounts || !google.accounts.oauth2) {
+                alert('Google Identity Services লোড হচ্ছে, অনুগ্রহ করে কয়েক সেকেন্ড পর আবার চেষ্টা করুন।');
+                return;
+            }
+
+            try {
+                window.googleTokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: clientId,
+                    scope: 'https://www.googleapis.com/auth/drive.file',
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            window.googleAccessToken = tokenResponse.access_token;
+                            localStorage.setItem('gdrive_access_token', window.googleAccessToken);
+
+                            try {
+                                const aboutRes = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
+                                    headers: { Authorization: `Bearer ${window.googleAccessToken}` }
+                                });
+                                const aboutData = await aboutRes.json();
+                                window.googleUserEmail = (aboutData.user && aboutData.user.emailAddress) || 'Connected Google User';
+                                localStorage.setItem('gdrive_user_email', window.googleUserEmail);
+                            } catch (e) {
+                                window.googleUserEmail = 'Google Drive Connected';
+                                localStorage.setItem('gdrive_user_email', window.googleUserEmail);
+                            }
+
+                            updateGoogleDriveUI();
+                            alert(`গুগল ড্রাইভ সফলভাবে কানেক্ট হয়েছে! (${window.googleUserEmail})\nএখন আপনি ১-ক্লিকেই গুগল ড্রাইভে ডাটাবেজ ব্যাকআপ পাঠাতে পারবেন।`);
+                        }
+                    },
+                });
+
+                window.googleTokenClient.requestAccessToken();
+            } catch (err) {
+                alert('Google Drive connection error: ' + err.message);
+            }
+        }
+
+        function handleDisconnectGoogleDrive() {
+            googleAccessToken = null;
+            googleUserEmail = null;
+            localStorage.removeItem('gdrive_access_token');
+            localStorage.removeItem('gdrive_user_email');
+            updateGoogleDriveUI();
+            alert('গুগল ড্রাইভ ডিসকানেক্ট করা হয়েছে।');
+        }
+
+        async function uploadDatabaseBackupToGoogleDrive() {
+            if (!googleAccessToken) {
+                alert('প্রথমে আপনার গুগল অ্যাকাউন্ট কানেক্ট করুন।');
+                return;
+            }
+
+            const btn = document.getElementById('gdriveUploadBtn');
+            const statusBox = document.getElementById('gdriveUploadStatus');
+
+            if (btn) btn.disabled = true;
+            if (statusBox) {
+                statusBox.classList.remove('hidden');
+                statusBox.className = 'text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 p-3 rounded-lg font-medium';
+                statusBox.innerHTML = '⏳ সুপাবেস ডাটাবেজ থেকে সমস্ত রেকর্ড সংগ্রহ করা হচ্ছে...';
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    throw new Error('ডাটাবেজে কোনো রেকর্ড পাওয়া যায়নি।');
+                }
+
+                if (statusBox) statusBox.innerHTML = `⏳ ${data.length.toLocaleString()} টি রেকর্ড সরাসরি গুগল ড্রাইভে আপলোড করা হচ্ছে...`;
+
+                const today = new Date().toISOString().slice(0, 10);
+                const fileName = `Work_Manager_Full_Backup_${today}.json`;
+                const fileContent = JSON.stringify({
+                    backup_date: today,
+                    total_records: data.length,
+                    exported_from: 'Work Manager Portal',
+                    data: data
+                }, null, 2);
+
+                const metadata = {
+                    name: fileName,
+                    mimeType: 'application/json',
+                    description: `Automated Full Central Database Backup with ${data.length} unique phone records.`
+                };
+
+                const boundary = '-------314159265358979323846';
+                const delimiter = "\r\n--" + boundary + "\r\n";
+                const close_delim = "\r\n--" + boundary + "--";
+
+                const multipartRequestBody =
+                    delimiter +
+                    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                    JSON.stringify(metadata) +
+                    delimiter +
+                    'Content-Type: application/json\r\n\r\n' +
+                    fileContent +
+                    close_delim;
+
+                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + googleAccessToken,
+                        'Content-Type': 'multipart/related; boundary=' + boundary
+                    },
+                    body: multipartRequestBody
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        googleAccessToken = null;
+                        localStorage.removeItem('gdrive_access_token');
+                        updateGoogleDriveUI();
+                        throw new Error('গুগল লগইন সেশনের মেয়াদ শেষ হয়ে গেছে। অনুগ্রহ করে আবার "Connect Google Drive" এ ক্লিক করুন।');
+                    }
+                    const errData = await res.json();
+                    throw new Error(errData.error ? errData.error.message : 'Upload failed');
+                }
+
+                const driveFile = await res.json();
+
+                if (statusBox) {
+                    statusBox.className = 'text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 p-3 rounded-lg font-medium';
+                    statusBox.innerHTML = `
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="font-bold">✅ সফলভাবে আপনার গুগল ড্রাইভে সেভ হয়েছে!</span>
+                                <div class="text-[11px] text-emerald-700 mt-0.5">ফাইল: ${fileName} (${data.length.toLocaleString()} টি রেকর্ড)</div>
+                            </div>
+                            <a href="https://drive.google.com/file/d/${driveFile.id}/view" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold transition flex items-center space-x-1">
+                                <span>গুগল ড্রাইভে দেখুন ↗</span>
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                if (statusBox) {
+                    statusBox.className = 'text-xs text-red-700 bg-red-50 border border-red-200 p-3 rounded-lg font-medium';
+                    statusBox.innerHTML = `⚠️ আপলোড ব্যর্থ হয়েছে: ${err.message}`;
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function downloadFullDatabaseJsonBackup() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    alert('No records found in database to backup.');
+                    return;
+                }
+
+                const today = new Date().toISOString().slice(0, 10);
+                const backupPayload = {
+                    backup_date: today,
+                    exported_by: currentUser ? currentUser.email : 'admin',
+                    total_records: data.length,
+                    data: data
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupPayload, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `Full_Database_Backup_${today}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+            } catch (err) {
+                alert('Backup download failed: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // ADMIN SUBMISSION MANAGEMENT & RECORD CLEANER
+        // ==========================================
+        async function adminDeleteSingleNumber(id, phone) {
+            if (!confirm(`Are you sure you want to delete this record (${phone})?`)) return;
+            try {
+                const { error } = await supabaseClient.from('master_numbers').delete().eq('id', id);
+                if (error) throw error;
+                alert('Record deleted successfully!');
+                await loadAdminSubmissionsData();
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        async function adminDeleteInvalidRecords() {
+            if (!adminSubmissionsCache || adminSubmissionsCache.length === 0) {
+                alert('কোনো রেকর্ড নেই।');
+                return;
+            }
+
+            const invalidRows = adminSubmissionsCache.filter(r => {
+                const phone = String(r.phone_number || '').trim();
+                const digits = phone.replace(/[^0-9]/g, '');
+                return /[a-zA-Z]/.test(phone) && digits.length < 6;
+            });
+
+            if (invalidRows.length === 0) {
+                alert('কোনো ভুল রেকর্ড পাওয়া যায়নি! সব রেকর্ডে সঠিক ফোন নাম্বার রয়েছে।');
+                return;
+            }
+
+            if (!confirm(`মোট ${invalidRows.length} টি ভুল রেকর্ড পাওয়া গেছে (যেখানে ফোন নাম্বারের জায়গায় নাম চলে এসেছে)।\nআপনি কি এই ${invalidRows.length} টি ভুল রেকর্ড ডাটাবেজ থেকে মুছে ফেলতে চান?`)) {
+                return;
+            }
+
+            try {
+                const ids = invalidRows.map(r => r.id);
+                const { error } = await supabaseClient.from('master_numbers').delete().in('id', ids);
+                if (error) throw error;
+
+                alert(`সফলভাবে ${ids.length} টি ভুল রেকর্ড মুছে ফেলা হয়েছে!`);
+                await loadAdminSubmissionsData();
+                await loadAdminDashboard();
+            } catch (err) {
+                alert('মুছতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        async function downloadDateSpecificExcel(targetDate) {
+            if (!supabaseClient) return;
+            try {
+                // Fetch 100% of records for targetDate with auto-pagination (Zero Data Loss!)
+                const allRows = await fetchAllSubmissions({ date: targetDate });
+                if (!allRows || allRows.length === 0) {
+                    alert('No records found for date: ' + targetDate);
+                    return;
+                }
+
+                const exportRows = allRows.map((item, idx) => ({
+                    'SL': idx + 1,
+                    'Phone Number': item.phone_number,
+                    'Full Name': item.full_name || '',
+                    'Age': item.age || '',
+                    'Household Income': item.household_income || '',
+                    'Est Market Value': item.est_market_value || '',
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
+                    'Department': item.department || '-',
+                    'Submitted By (Worker)': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                    'Submission Time': new Date(item.created_at).toLocaleString()
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(exportRows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, `Data_${targetDate}`);
+                XLSX.writeFile(wb, `Report_Data_${targetDate}_Total_${exportRows.length}.xlsx`);
+            } catch(err) {
+                console.error('downloadDateSpecificExcel error:', err);
+                alert('Export failed: ' + err.message);
+            }
+        }
+
 
         function filterAdminSubmissionsLocal() {
             const body = document.getElementById('adminSubmissionsTableBody');
@@ -6535,9 +7246,6 @@ function setupColumnSelectorsAndPreview() {
                 </td></tr>`;
                 return;
             }
-
-            // Show all records directly without needing to click
-            const displayList = list;
 
             // Function to render a single row
             function renderItemRow(item, idx) {
@@ -6694,7 +7402,7 @@ function renderAdminLogsTable() {
             if (adminLogsCache.length > 0) {
                 body.innerHTML = adminLogsCache.map(l => {
                     const timeStr = new Date(l.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    const repLabel = l.report_type === 'female_report' ? '👩 Female Report' : (l.report_type === 'signal_report' ? '📡 Signal Report' : '🔍 Lookup Report');
+                    const repLabel = l.report_type === 'female_report' ? '👩 Female Report' : '🔍 Lookup Report';
                     return `
                         <tr class="hover:bg-slate-50 text-xs">
                             <td class="py-3 px-4 font-mono text-slate-500">${timeStr}</td>
@@ -6739,7 +7447,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -6781,7 +7489,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -6813,7 +7521,7 @@ function renderAdminLogsTable() {
                     'Age': item.age || '',
                     'Household Income': item.household_income || '',
                     'Est Market Value': item.est_market_value || '',
-                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
+                    'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                     'Department': item.department || '-',
                     'Submitted By': item.username || item.user_email,
                     'Submission Date': new Date(item.created_at).toLocaleString()
@@ -6993,16 +7701,10 @@ function renderAdminLogsTable() {
 
             let isSpecial = false;
             let isKept = false;
-            let isNoInfo = false;
-            let isDiscarded = false;
             const passedRules = [];
 
-            const rawIncStr = String(incomeStr || '').trim().toLowerCase();
-            const rawMktStr = String(marketStr || '').trim().toLowerCase();
-            const isBlank = (s) => !s || s === '-' || s === '?' || s === 'n/a' || s === 'na' || s === 'none' || s === 'null' || s === 'no info' || s === 'no information' || s === 'unknown';
-
-            const hasAnyIncome = !isBlank(rawIncStr) && inc !== null;
-            const hasAnyMarket = !isBlank(rawMktStr) && mkt !== null;
+            const hasIncome = inc && (inc.max > 0 || inc.raw !== '');
+            const hasMarket = mkt && (mkt.max > 0 || mkt.raw !== '');
 
             // 1. ⭐ SPECIAL NUMBER CHECK: Market Value > 18 Lakhs ($1,800,000 / $1.8M)
             if (mkt && mkt.max > 1800000) {
@@ -7012,7 +7714,8 @@ function renderAdminLogsTable() {
             }
 
             // 2. CONDITION A: Market Value >= $350,000 ($350k+ / $400k+)
-            // Market Value >= 350k is VALID regardless of income
+            // "kono number 400k$ market value thaklei oi number o valid ar er baire jai hok joto kom beshi hok bepar na tachara 40k$-50k$ thakleo valid kintu oi number gular market value 350k$+ thaklei hobe"
+            // Market Value >= 350k / 400k is VALID regardless of income (whether $0, $10k, $20k-$30k, $40k-$50k, $50k-$60k, etc.)!
             if (mkt && mkt.max >= 345000) {
                 if (!isKept) {
                     isKept = true;
@@ -7021,7 +7724,8 @@ function renderAdminLogsTable() {
             }
 
             // 3. CONDITION B: Household Income >= $75,000 ($75k+)
-            // Household Income >= $75k is VALID even if market value is empty/0
+            // "mot kotha household income 75k$ thakle oi number er market value na thakleo cholbe"
+            // Household Income >= $75k is VALID even if market value is empty, 0, or missing!
             if (inc) {
                 if ((inc.min >= 70000 && inc.max <= 105000) ||
                     (inc.avg >= 74000) ||
@@ -7035,37 +7739,25 @@ function renderAdminLogsTable() {
             }
 
             if (isKept) {
-                return { isKept: true, isSpecial, isNoInfo: false, isDiscarded: false, reasons: passedRules };
+                return { isKept: true, isSpecial, reasons: passedRules };
             }
 
-            // User Rule:
-            // "jei number gulo te kono info thakbe na jemo household income market value oi number gulo no information a chole jabe"
-            // "ar shudhu matro shei number guloi bad porbe jeigulo amader deya totthor sathe milbe na kintu jodi kono kichui data na thake tahole oi no info hisabe count hobe"
-            if (!hasAnyIncome && !hasAnyMarket) {
-                return {
-                    isKept: false,
-                    isSpecial: false,
-                    isNoInfo: true,
-                    isDiscarded: false,
-                    reasons: ['কোনো তথ্য পাওয়া যায়নি (No Information: আয় ও মার্কেট ভ্যালু উভয়ই খালি)']
-                };
-            }
-
-            // If data WAS present but failed qualification -> DISCARDED
-            let rejectReason = 'তথ্য ক্রাইটেরিয়ার সাথে মিলেনি (Unqualified / বাদ)';
-            if (hasAnyIncome && !hasAnyMarket) {
+            // REJECTION REASONS:
+            // "shudhu bad porbe jodi kono infoi na thake oi number ar jodi market value 350k$ er niche othoba jodi kono number 75k$ er niche household icome hoy tahole bad porbe ai number gulo jodi shudhu single data thake tobei tachara baki valid"
+            let rejectReason = 'কোনো গ্রহণযোগ্য শর্তের আওতায় পড়েনি (Unqualified / বাদ)';
+            if (!hasIncome && !hasMarket) {
+                rejectReason = 'কোনো তথ্য পাওয়া যায়নি (No Information / খালি ডাটা)';
+            } else if (hasIncome && !hasMarket) {
                 rejectReason = `আয় $75k এর নিচে ($${Math.round(inc.max).toLocaleString()}) এবং মার্কেট ভ্যালু খালি থাকায় বাদ`;
-            } else if (!hasAnyIncome && hasAnyMarket) {
+            } else if (!hasIncome && hasMarket) {
                 rejectReason = `মার্কেট ভ্যালু $350k এর নিচে ($${Math.round(mkt.max).toLocaleString()}) এবং আয় খালি থাকায় বাদ`;
-            } else if (hasAnyIncome && hasAnyMarket) {
+            } else if (hasIncome && hasMarket) {
                 rejectReason = `আয় $75k এর নিচে এবং মার্কেট ভ্যালুও $350k এর নিচে ($${Math.round(mkt.max).toLocaleString()} < $350k) থাকায় বাদ`;
             }
 
             return {
                 isKept: false,
                 isSpecial: false,
-                isNoInfo: false,
-                isDiscarded: true,
                 reasons: [rejectReason]
             };
         }
@@ -7125,8 +7817,6 @@ function renderAdminLogsTable() {
                             market: marketVal || '-',
                             isKept: evalRes.isKept,
                             isSpecial: evalRes.isSpecial,
-                            isNoInfo: evalRes.isNoInfo,
-                            isDiscarded: evalRes.isDiscarded,
                             reasons: evalRes.reasons
                         });
                     });
@@ -7209,8 +7899,6 @@ function renderAdminLogsTable() {
                             market: market || '-',
                             isKept: evalRes.isKept,
                             isSpecial: evalRes.isSpecial,
-                            isNoInfo: evalRes.isNoInfo,
-                            isDiscarded: evalRes.isDiscarded,
                             reasons: evalRes.reasons
                         });
                     });
@@ -7294,11 +7982,10 @@ function renderAdminLogsTable() {
             currentLookupChkTab = tab;
             const btnQ = document.getElementById('btnLchkTabQualified');
             const btnSp = document.getElementById('btnLchkTabSpecial');
-            const btnNoInfo = document.getElementById('btnLchkTabNoInfo');
             const btnD = document.getElementById('btnLchkTabDiscarded');
             const btnA = document.getElementById('btnLchkTabAll');
 
-            [btnQ, btnSp, btnNoInfo, btnD, btnA].forEach(b => {
+            [btnQ, btnSp, btnD, btnA].forEach(b => {
                 if (b) b.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5';
             });
 
@@ -7306,8 +7993,6 @@ function renderAdminLogsTable() {
                 if (btnQ) btnQ.className = 'px-4 py-2 text-xs font-black rounded-xl bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else if (tab === 'special') {
                 if (btnSp) btnSp.className = 'px-4 py-2 text-xs font-black rounded-xl bg-amber-400 text-slate-950 shadow-sm transition cursor-pointer flex items-center space-x-1.5 border border-amber-500';
-            } else if (tab === 'no_info') {
-                if (btnNoInfo) btnNoInfo.className = 'px-4 py-2 text-xs font-black rounded-xl bg-blue-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else if (tab === 'discarded') {
                 if (btnD) btnD.className = 'px-4 py-2 text-xs font-black rounded-xl bg-rose-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else {
@@ -7323,8 +8008,6 @@ function renderAdminLogsTable() {
                 activeList = lookupChkQualifiedRecords;
             } else if (currentLookupChkTab === 'special') {
                 activeList = lookupChkSpecialRecords;
-            } else if (currentLookupChkTab === 'no_info') {
-                activeList = lookupChkNoInfoRecords;
             } else if (currentLookupChkTab === 'discarded') {
                 activeList = lookupChkDiscardedRecords;
             } else {
@@ -7395,19 +8078,15 @@ function renderAdminLogsTable() {
         }
 
         // Submit Checked Records as Worker Lookup Daily Report (Just like Female Report)
-        async function submitLookupChkAsWorkReport(subType = 'valid') {
+        async function submitLookupChkAsWorkReport() {
             // CHECK IF REPORT SUBMISSION IS CURRENTLY CLOSED / LOCKED
             const lockStatus = checkReportSubmissionLockStatus();
             if (lockStatus.isClosed) {
                 alert(`দুঃখিত স্যার, আপনি সময়মতো কাজ জমা করতে পারেন নাই, তাই আপনার কাজ আজকে গ্রহণ করা হবে না। আপনি আবার পরে চেষ্টা করেন।\n\n⏰ আর ${lockStatus.remainingText} পর আবার রিপোর্ট জমা দেওয়া যাবে।`);
                 return;
             }
-
-            const isNoInfo = (subType === 'no_info');
-            const targetList = isNoInfo ? lookupChkNoInfoRecords : lookupChkQualifiedRecords;
-
-            if (!targetList || targetList.length === 0) {
-                alert(isNoInfo ? 'জমা দেওয়ার মতো কোনো No Information ডাটা নেই!' : 'রিপোর্ট হিসেবে জমা দেওয়ার মতো কোনো গ্রহণযোগ্য (Valid) ডাটা নেই!');
+            if (!lookupChkQualifiedRecords || lookupChkQualifiedRecords.length === 0) {
+                alert('রিপোর্ট হিসেবে জমা দেওয়ার মতো কোনো গ্রহণযোগ্য ডাটা নেই!');
                 return;
             }
 
@@ -7417,17 +8096,14 @@ function renderAdminLogsTable() {
                 return;
             }
 
-            const count = targetList.length;
-            const specialCount = !isNoInfo ? (lookupChkSpecialRecords || []).length : 0;
-            const specialMsg = specialCount > 0 ? `\n(যার মধ্যে ${specialCount} টি ⭐ স্পেশাল VIP নাম্বার রয়েছে)` : '';
+            const specialCount = (lookupChkSpecialRecords || []).length;
+            const specialMsg = specialCount > 0 ? `\n(যার মধ্যে ${specialCount} টি ⭐ স্পেশাল নাম্বার রয়েছে)` : '';
 
-            const confirmMsg = isNoInfo
-                ? `মোট ${count.toLocaleString()} টি "No Information" (তথ্যবিহীন) লুকআপ নাম্বার আপনার আজকের রিপোর্টে জমা দিতে চান?`
-                : `মোট ${count.toLocaleString()} টি যাচাইকৃত ভ্যালিড ও গ্রহণযোগ্য লুকআপ নাম্বার আপনার আজকের কাজের রিপোর্ট হিসেবে সরাসরি জমা দিতে চান?${specialMsg}`;
+            if (!confirm(`মোট ${lookupChkQualifiedRecords.length.toLocaleString()} টি গ্রহণযোগ্য লুকআপ নাম্বার আপনার আজকের কাজের রিপোর্ট হিসেবে জমা দিতে চান?${specialMsg}`)) {
+                return;
+            }
 
-            if (!confirm(confirmMsg)) return;
-
-            const records = targetList.map(r => ({
+            const records = lookupChkQualifiedRecords.map(r => ({
                 phone: r.phone,
                 name: r.name || '-',
                 age: '-',
@@ -7437,29 +8113,16 @@ function renderAdminLogsTable() {
                 est_market_value: r.market || '-'
             }));
 
-            const batchFileName = isNoInfo ? 'Lookup_No_Info_Tool_Report.xlsx' : 'Lookup_Valid_Tool_Report.xlsx';
-
             try {
-                // 1. Submit to Turso 9 GB Cloud Vault
-                if (typeof TursoVault !== 'undefined') {
-                    try {
-                        await TursoVault.insertSubmissions(records, 'lookup_report', batchFileName, currentProfile);
-                    } catch(tSubErr) {
-                        console.warn('Turso lookup submit notice:', tSubErr);
-                    }
-                }
-
-                // 2. Submit to Supabase RPC
                 const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
-                    p_lookup_type: isNoInfo ? 'no_info' : 'valid',
+                    p_lookup_type: 'valid',
                     p_records: records,
-                    p_file_name: batchFileName
+                    p_file_name: 'Lookup_Tool_Checked_Report.xlsx'
                 });
 
-                if (error) console.warn('Supabase lookup RPC notice:', error);
+                if (error) throw error;
 
-                const inserted = (data && data.new_inserted !== undefined) ? data.new_inserted : count;
-                alert(`🎉 অভিনন্দন! ১-ক্লিকে আপনার লুকআপ কাজের রিপোর্ট সফলভাবে জমা হয়েছে!\n\nমোট রেকর্ড: ${count.toLocaleString()} টি\nরিপোর্ট টাইপ: ${isNoInfo ? 'ℹ️ No Information' : '🟢 Valid / Qualified Data'}`);
+                alert(`✅ আপনার লুকআপ কাজের রিপোর্ট সফলভাবে জমা হয়েছে!\n\nমোট ডাটা: ${data.total_received}\nনতুন ইউনিক সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট ফিল্টার্ড: ${data.duplicates_count}`);
                 
                 if (typeof loadAdminLookupReports === 'function') loadAdminLookupReports();
                 if (typeof loadUserDashboard === 'function') loadUserDashboard();
@@ -7485,9 +8148,6 @@ function renderAdminLogsTable() {
             } else if (type === 'qualified') {
                 list = lookupChkQualifiedRecords;
                 fileName = `Lookup_Qualified_Kept_${list.length}_Records`;
-            } else if (type === 'no_info') {
-                list = lookupChkNoInfoRecords;
-                fileName = `Lookup_No_Information_${list.length}_Records`;
             } else if (type === 'discarded') {
                 list = lookupChkDiscardedRecords;
                 fileName = `Lookup_Discarded_Rejected_${list.length}_Records`;
@@ -8737,14 +9397,8 @@ async function runDuplicateCheck() {
                 if (marketContainer) marketContainer.classList.remove('hidden');
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
-            } else if (cat === 'signal_data') {
-                if (hint) hint.innerHTML = 'Enter or paste rows for <span class="font-bold text-cyan-800">Signal Data (সিগন্যাল নাম্বার)</span>: <span class="font-mono bg-cyan-50 text-cyan-950 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)';
-                if (nameContainer) nameContainer.classList.remove('hidden');
-                if (ageContainer) ageContainer.classList.remove('hidden');
-                if (incomeContainer) incomeContainer.classList.add('hidden');
-                if (marketContainer) marketContainer.classList.add('hidden');
             } else {
-                if (hint) hint.innerHTML = 'Enter or paste rows for <span class="font-bold text-pink-800">Female Data (ফিমেল ডাটা)</span>: <span class="font-mono bg-pink-50 text-pink-950 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 Jane Doe 45)';
+                if (hint) hint.innerHTML = `Enter or paste rows for ${cat === 'female_data' ? 'Female' : 'Lookup'} Data: <span class="font-mono bg-slate-100 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -9148,12 +9802,12 @@ async function runDuplicateCheck() {
 
                 try {
                     if (typeof TursoVault !== 'undefined') {
-                        tStats = await TursoVault.getDeliveryStats().catch(() => ({ total: 0, femaleDeliv: 0, signalDeliv: 0, lookupDeliv: 0, todayDeliv: 0 }));
+                        tStats = await safeQuery(TursoVault.getDeliveryStats(), { total: 0, femaleDeliv: 0, signalDeliv: 0, lookupDeliv: 0, todayDeliv: 0 });
                         let sql = `SELECT * FROM turso_deliveries WHERE 1=1 `;
                         if (dateFilter) sql += ` AND delivery_date = '${dateFilter}'`;
                         if (catFilter !== 'all') sql += ` AND category = '${catFilter}'`;
                         sql += ` ORDER BY id DESC LIMIT 500;`;
-                        const tRes = await TursoVault.query(sql).catch(() => null);
+                        const tRes = await safeQuery(TursoVault.query(sql), null);
                         if (tRes && tRes.rows) tRows = tRes.rows;
                     }
                 } catch(tErr) {
@@ -9162,10 +9816,10 @@ async function runDuplicateCheck() {
 
                 const todayIso = new Date().toISOString().slice(0, 10);
                 const [totalDelivRes, femaleDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
-                    supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).catch(() => ({ count: 0 })),
-                    supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data').catch(() => ({ count: 0 })),
-                    supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data').catch(() => ({ count: 0 })),
-                    supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayIso).catch(() => ({ count: 0 })),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data'), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data'), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayIso), { count: 0 }),
                     (async () => {
                         try {
                             let q = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).limit(500);
@@ -9240,8 +9894,6 @@ async function runDuplicateCheck() {
                     let catBadge = '';
                     if (item.category === 'female_data') {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Data</span>';
-                    } else if (item.category === 'signal_data') {
-                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-cyan-100 text-cyan-900 font-black">📡 Signal Data</span>';
                     } else {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Data</span>';
                     }
@@ -9955,10 +10607,9 @@ async function loadClaimStockSector() {
             let qty = parseInt(input ? input.value : '100', 10);
             if (isNaN(qty) || qty <= 0) qty = 100;
 
-            const isLookupWorker = currentProfile && (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup' || activeClaimStockCategory === 'lookup');
-            const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true || isLookupWorker);
+            const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
             if (!isLeader && qty > 1000) {
-                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল অথবা লুকআপ ডিপার্টমেন্ট সক্রিয় করুন।');
+                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল সক্রিয় করুন।');
                 return;
             }
 
@@ -10260,7 +10911,7 @@ async function loadClaimStockSector() {
             try {
                 // Ensure profiles cache is available to display ALL team members including Team Leaders
                 if (!adminUsersCache || adminUsersCache.length === 0) {
-                    const { data: profs } = await supabaseClient.from('profiles').select('*');
+                    const { data: profs } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
                     if (profs) {
                         adminUsersCache = profs.map(p => ({
                             id: p.id,
@@ -11755,7 +12406,7 @@ async function loadClaimStockSector() {
                         'Age': item.age || '',
                         'Household Income': item.household_income || '',
                         'Est Market Value': item.est_market_value || '',
-                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : (item.report_type === 'signal_report' ? 'Signal Report' : 'Lookup Report'),
+                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
                         'Department': item.department || '-',
                         'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
                         'Submission Date': new Date(item.created_at).toLocaleDateString(),
