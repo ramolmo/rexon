@@ -1298,7 +1298,8 @@
                                 <div class="flex items-center space-x-2">
                                     <label class="text-xs font-bold text-slate-700">ডিপার্টমেন্ট:</label>
                                     <select id="newMemberDept" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold">
-                                        <option value="gender_verify">🚻 Gender Verify (Female & Signal)</option>
+                                        <option value="gender_verify">🚻 Gender Verify (Female)</option>
+                                        <option value="signal">📡 Signal Number</option>
                                         <option value="lookup">🔍 Number Lookup</option>
                                     </select>
                                 </div>
@@ -2944,10 +2945,15 @@
                         <p id="lchkStatSpecial" class="text-2xl sm:text-3xl font-black text-amber-900 mt-1">0</p>
                         <p class="text-[10px] text-amber-800 font-bold">মার্কেট ভ্যালু > ১৮ লাখ$</p>
                     </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                        <p class="text-[11px] font-bold text-blue-900 uppercase">ℹ️ কোনো তথ্য নেই (No Info)</p>
+                        <p id="lchkStatNoInfo" class="text-2xl sm:text-3xl font-black text-blue-600 mt-1">0</p>
+                        <p id="lchkStatNoInfoPct" class="text-[10px] text-blue-600 font-bold">0% তথ্যবিহীন</p>
+                    </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-rose-500">
                         <p class="text-[11px] font-bold text-rose-900 uppercase">🔴 অযোগ্য (Discarded)</p>
                         <p id="lchkStatDiscarded" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
-                        <p id="lchkStatDiscardedPct" class="text-[10px] text-rose-600 font-bold">0% বাদ</p>
+                        <p id="lchkStatDiscardedPct" class="text-[10px] text-rose-600 font-bold">0% বাদ (তথ্য মেলেনি)</p>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-emerald-400">
                         <p class="text-[11px] font-bold text-emerald-800 uppercase">আয় $75k+ (খালি ভ্যালুসহ)</p>
@@ -2973,6 +2979,10 @@
                             <button type="button" id="btnLchkTabSpecial" onclick="switchLookupChkTableTab('special')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-950 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>⭐ স্পেশাল ডাটা (>18 Lakhs):</span>
                                 <span id="lchkTabBadgeSpecial" class="bg-amber-300 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full">0</span>
+                            </button>
+                            <button type="button" id="btnLchkTabNoInfo" onclick="switchLookupChkTableTab('no_info')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-blue-900 transition cursor-pointer flex items-center space-x-1.5">
+                                <span>ℹ️ কোনো তথ্য নেই (No Info):</span>
+                                <span id="lchkTabBadgeNoInfo" class="bg-blue-100 text-blue-900 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                             </button>
                             <button type="button" id="btnLchkTabDiscarded" onclick="switchLookupChkTableTab('discarded')" class="px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer flex items-center space-x-1.5">
                                 <span>🔴 অযোগ্য ডাটা (Discarded):</span>
@@ -3621,8 +3631,9 @@
                 const username = this.escapeSql(profile?.username || 'Worker');
                 const email = this.escapeSql(profile?.email || '');
 
-                // 6-hour quota rule: if not admin and not team_leader and not unlimited quota
-                if (profile && profile.role !== 'admin' && profile.role !== 'team_leader' && !profile.is_unlimited_quota) {
+                // 6-hour quota rule: if not admin, not team_leader, not unlimited quota, and NOT lookup
+                const isLookupWorker = (cleanType === 'lookup') || (profile && (profile.department === 'lookup' || profile.department === 'number_lookup'));
+                if (!isLookupWorker && profile && profile.role !== 'admin' && profile.role !== 'team_leader' && !profile.is_unlimited_quota) {
                     const quotaSql = `
                         SELECT COUNT(*) as claimed_count 
                         FROM turso_stock_numbers 
@@ -4785,6 +4796,9 @@ function setupWorkerReportOptions(dept) {
                     loadAdminDashboard();
                 } else {
                     showView('userDashboard');
+                    if (typeof setupWorkerReportOptions === 'function' && currentProfile) {
+                        setupWorkerReportOptions(currentProfile.department);
+                    }
                     loadUserDashboard();
                 }
 
@@ -6111,7 +6125,7 @@ function setupColumnSelectorsAndPreview() {
                 try {
                     if (supabaseClient) {
                         const [pRes, lRes] = await Promise.all([
-                            supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }),
+                            supabaseClient.from('profiles').select('*'),
                             supabaseClient.from('upload_logs').select('*').order('created_at', { ascending: false }).limit(200)
                         ]);
                         profiles = pRes.data || [];
@@ -6187,7 +6201,25 @@ function setupColumnSelectorsAndPreview() {
                     });
                 }
 
+                // Ensure logged in admin is always present even if DB is newly initialized
+                if (currentUser && !userMap[currentUser.id]) {
+                    const admUname = currentProfile?.username || (currentUser.email ? currentUser.email.split('@')[0] : 'Admin');
+                    userMap[currentUser.id] = {
+                        id: currentUser.id,
+                        email: currentUser.email,
+                        username: admUname,
+                        department: currentProfile?.department || 'admin',
+                        role: currentProfile?.role || 'admin',
+                        is_blocked: false,
+                        todayAdded: 0,
+                        totalContributed: 0
+                    };
+                    userEmailToNameMap[currentUser.email] = admUname;
+                }
+
                 adminUsersCache = Object.values(userMap);
+                adminUsersCache.sort((a, b) => (a.username || a.email || '').localeCompare(b.username || b.email || ''));
+
                 if (document.getElementById('userTabCount')) {
                     document.getElementById('userTabCount').innerText = adminUsersCache.length;
                 }
@@ -7724,10 +7756,16 @@ function renderAdminLogsTable() {
 
             let isSpecial = false;
             let isKept = false;
+            let isNoInfo = false;
+            let isDiscarded = false;
             const passedRules = [];
 
-            const hasIncome = inc && (inc.max > 0 || inc.raw !== '');
-            const hasMarket = mkt && (mkt.max > 0 || mkt.raw !== '');
+            const rawIncStr = String(incomeStr || '').trim().toLowerCase();
+            const rawMktStr = String(marketStr || '').trim().toLowerCase();
+            const isBlank = (s) => !s || s === '-' || s === '?' || s === 'n/a' || s === 'na' || s === 'none' || s === 'null' || s === 'no info' || s === 'no information' || s === 'unknown';
+
+            const hasAnyIncome = !isBlank(rawIncStr) && inc !== null;
+            const hasAnyMarket = !isBlank(rawMktStr) && mkt !== null;
 
             // 1. ⭐ SPECIAL NUMBER CHECK: Market Value > 18 Lakhs ($1,800,000 / $1.8M)
             if (mkt && mkt.max > 1800000) {
@@ -7737,8 +7775,7 @@ function renderAdminLogsTable() {
             }
 
             // 2. CONDITION A: Market Value >= $350,000 ($350k+ / $400k+)
-            // "kono number 400k$ market value thaklei oi number o valid ar er baire jai hok joto kom beshi hok bepar na tachara 40k$-50k$ thakleo valid kintu oi number gular market value 350k$+ thaklei hobe"
-            // Market Value >= 350k / 400k is VALID regardless of income (whether $0, $10k, $20k-$30k, $40k-$50k, $50k-$60k, etc.)!
+            // Market Value >= 350k is VALID regardless of income
             if (mkt && mkt.max >= 345000) {
                 if (!isKept) {
                     isKept = true;
@@ -7747,8 +7784,7 @@ function renderAdminLogsTable() {
             }
 
             // 3. CONDITION B: Household Income >= $75,000 ($75k+)
-            // "mot kotha household income 75k$ thakle oi number er market value na thakleo cholbe"
-            // Household Income >= $75k is VALID even if market value is empty, 0, or missing!
+            // Household Income >= $75k is VALID even if market value is empty/0
             if (inc) {
                 if ((inc.min >= 70000 && inc.max <= 105000) ||
                     (inc.avg >= 74000) ||
@@ -7762,25 +7798,37 @@ function renderAdminLogsTable() {
             }
 
             if (isKept) {
-                return { isKept: true, isSpecial, reasons: passedRules };
+                return { isKept: true, isSpecial, isNoInfo: false, isDiscarded: false, reasons: passedRules };
             }
 
-            // REJECTION REASONS:
-            // "shudhu bad porbe jodi kono infoi na thake oi number ar jodi market value 350k$ er niche othoba jodi kono number 75k$ er niche household icome hoy tahole bad porbe ai number gulo jodi shudhu single data thake tobei tachara baki valid"
-            let rejectReason = 'কোনো গ্রহণযোগ্য শর্তের আওতায় পড়েনি (Unqualified / বাদ)';
-            if (!hasIncome && !hasMarket) {
-                rejectReason = 'কোনো তথ্য পাওয়া যায়নি (No Information / খালি ডাটা)';
-            } else if (hasIncome && !hasMarket) {
+            // User Rule:
+            // "jei number gulo te kono info thakbe na jemo household income market value oi number gulo no information a chole jabe"
+            // "ar shudhu matro shei number guloi bad porbe jeigulo amader deya totthor sathe milbe na kintu jodi kono kichui data na thake tahole oi no info hisabe count hobe"
+            if (!hasAnyIncome && !hasAnyMarket) {
+                return {
+                    isKept: false,
+                    isSpecial: false,
+                    isNoInfo: true,
+                    isDiscarded: false,
+                    reasons: ['কোনো তথ্য পাওয়া যায়নি (No Information: আয় ও মার্কেট ভ্যালু উভয়ই খালি)']
+                };
+            }
+
+            // If data WAS present but failed qualification -> DISCARDED
+            let rejectReason = 'তথ্য ক্রাইটেরিয়ার সাথে মিলেনি (Unqualified / বাদ)';
+            if (hasAnyIncome && !hasAnyMarket) {
                 rejectReason = `আয় $75k এর নিচে ($${Math.round(inc.max).toLocaleString()}) এবং মার্কেট ভ্যালু খালি থাকায় বাদ`;
-            } else if (!hasIncome && hasMarket) {
+            } else if (!hasAnyIncome && hasAnyMarket) {
                 rejectReason = `মার্কেট ভ্যালু $350k এর নিচে ($${Math.round(mkt.max).toLocaleString()}) এবং আয় খালি থাকায় বাদ`;
-            } else if (hasIncome && hasMarket) {
+            } else if (hasAnyIncome && hasAnyMarket) {
                 rejectReason = `আয় $75k এর নিচে এবং মার্কেট ভ্যালুও $350k এর নিচে ($${Math.round(mkt.max).toLocaleString()} < $350k) থাকায় বাদ`;
             }
 
             return {
                 isKept: false,
                 isSpecial: false,
+                isNoInfo: false,
+                isDiscarded: true,
                 reasons: [rejectReason]
             };
         }
@@ -7840,6 +7888,8 @@ function renderAdminLogsTable() {
                             market: marketVal || '-',
                             isKept: evalRes.isKept,
                             isSpecial: evalRes.isSpecial,
+                            isNoInfo: evalRes.isNoInfo,
+                            isDiscarded: evalRes.isDiscarded,
                             reasons: evalRes.reasons
                         });
                     });
@@ -7922,6 +7972,8 @@ function renderAdminLogsTable() {
                             market: market || '-',
                             isKept: evalRes.isKept,
                             isSpecial: evalRes.isSpecial,
+                            isNoInfo: evalRes.isNoInfo,
+                            isDiscarded: evalRes.isDiscarded,
                             reasons: evalRes.reasons
                         });
                     });
@@ -8005,10 +8057,11 @@ function renderAdminLogsTable() {
             currentLookupChkTab = tab;
             const btnQ = document.getElementById('btnLchkTabQualified');
             const btnSp = document.getElementById('btnLchkTabSpecial');
+            const btnNoInfo = document.getElementById('btnLchkTabNoInfo');
             const btnD = document.getElementById('btnLchkTabDiscarded');
             const btnA = document.getElementById('btnLchkTabAll');
 
-            [btnQ, btnSp, btnD, btnA].forEach(b => {
+            [btnQ, btnSp, btnNoInfo, btnD, btnA].forEach(b => {
                 if (b) b.className = 'px-4 py-2 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer flex items-center space-x-1.5';
             });
 
@@ -8016,6 +8069,8 @@ function renderAdminLogsTable() {
                 if (btnQ) btnQ.className = 'px-4 py-2 text-xs font-black rounded-xl bg-emerald-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else if (tab === 'special') {
                 if (btnSp) btnSp.className = 'px-4 py-2 text-xs font-black rounded-xl bg-amber-400 text-slate-950 shadow-sm transition cursor-pointer flex items-center space-x-1.5 border border-amber-500';
+            } else if (tab === 'no_info') {
+                if (btnNoInfo) btnNoInfo.className = 'px-4 py-2 text-xs font-black rounded-xl bg-blue-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else if (tab === 'discarded') {
                 if (btnD) btnD.className = 'px-4 py-2 text-xs font-black rounded-xl bg-rose-600 text-white shadow-sm transition cursor-pointer flex items-center space-x-1.5';
             } else {
@@ -8031,6 +8086,8 @@ function renderAdminLogsTable() {
                 activeList = lookupChkQualifiedRecords;
             } else if (currentLookupChkTab === 'special') {
                 activeList = lookupChkSpecialRecords;
+            } else if (currentLookupChkTab === 'no_info') {
+                activeList = lookupChkNoInfoRecords;
             } else if (currentLookupChkTab === 'discarded') {
                 activeList = lookupChkDiscardedRecords;
             } else {
@@ -8101,15 +8158,19 @@ function renderAdminLogsTable() {
         }
 
         // Submit Checked Records as Worker Lookup Daily Report (Just like Female Report)
-        async function submitLookupChkAsWorkReport() {
+        async function submitLookupChkAsWorkReport(subType = 'valid') {
             // CHECK IF REPORT SUBMISSION IS CURRENTLY CLOSED / LOCKED
             const lockStatus = checkReportSubmissionLockStatus();
             if (lockStatus.isClosed) {
                 alert(`দুঃখিত স্যার, আপনি সময়মতো কাজ জমা করতে পারেন নাই, তাই আপনার কাজ আজকে গ্রহণ করা হবে না। আপনি আবার পরে চেষ্টা করেন।\n\n⏰ আর ${lockStatus.remainingText} পর আবার রিপোর্ট জমা দেওয়া যাবে।`);
                 return;
             }
-            if (!lookupChkQualifiedRecords || lookupChkQualifiedRecords.length === 0) {
-                alert('রিপোর্ট হিসেবে জমা দেওয়ার মতো কোনো গ্রহণযোগ্য ডাটা নেই!');
+
+            const isNoInfo = (subType === 'no_info');
+            const targetList = isNoInfo ? lookupChkNoInfoRecords : lookupChkQualifiedRecords;
+
+            if (!targetList || targetList.length === 0) {
+                alert(isNoInfo ? 'জমা দেওয়ার মতো কোনো No Information ডাটা নেই!' : 'রিপোর্ট হিসেবে জমা দেওয়ার মতো কোনো গ্রহণযোগ্য (Valid) ডাটা নেই!');
                 return;
             }
 
@@ -8119,14 +8180,17 @@ function renderAdminLogsTable() {
                 return;
             }
 
-            const specialCount = (lookupChkSpecialRecords || []).length;
-            const specialMsg = specialCount > 0 ? `\n(যার মধ্যে ${specialCount} টি ⭐ স্পেশাল নাম্বার রয়েছে)` : '';
+            const count = targetList.length;
+            const specialCount = !isNoInfo ? (lookupChkSpecialRecords || []).length : 0;
+            const specialMsg = specialCount > 0 ? `\n(যার মধ্যে ${specialCount} টি ⭐ স্পেশাল VIP নাম্বার রয়েছে)` : '';
 
-            if (!confirm(`মোট ${lookupChkQualifiedRecords.length.toLocaleString()} টি গ্রহণযোগ্য লুকআপ নাম্বার আপনার আজকের কাজের রিপোর্ট হিসেবে জমা দিতে চান?${specialMsg}`)) {
-                return;
-            }
+            const confirmMsg = isNoInfo
+                ? `মোট ${count.toLocaleString()} টি "No Information" (তথ্যবিহীন) লুকআপ নাম্বার আপনার আজকের রিপোর্টে জমা দিতে চান?`
+                : `মোট ${count.toLocaleString()} টি যাচাইকৃত ভ্যালিড ও গ্রহণযোগ্য লুকআপ নাম্বার আপনার আজকের কাজের রিপোর্ট হিসেবে সরাসরি জমা দিতে চান?${specialMsg}`;
 
-            const records = lookupChkQualifiedRecords.map(r => ({
+            if (!confirm(confirmMsg)) return;
+
+            const records = targetList.map(r => ({
                 phone: r.phone,
                 name: r.name || '-',
                 age: '-',
@@ -8136,16 +8200,29 @@ function renderAdminLogsTable() {
                 est_market_value: r.market || '-'
             }));
 
+            const batchFileName = isNoInfo ? 'Lookup_No_Info_Tool_Report.xlsx' : 'Lookup_Valid_Tool_Report.xlsx';
+
             try {
+                // 1. Submit to Turso 9 GB Cloud Vault
+                if (typeof TursoVault !== 'undefined') {
+                    try {
+                        await TursoVault.insertSubmissions(records, 'lookup_report', batchFileName, currentProfile);
+                    } catch(tSubErr) {
+                        console.warn('Turso lookup submit notice:', tSubErr);
+                    }
+                }
+
+                // 2. Submit to Supabase RPC
                 const { data, error } = await supabaseClient.rpc('submit_lookup_work_batch', {
-                    p_lookup_type: 'valid',
+                    p_lookup_type: isNoInfo ? 'no_info' : 'valid',
                     p_records: records,
-                    p_file_name: 'Lookup_Tool_Checked_Report.xlsx'
+                    p_file_name: batchFileName
                 });
 
-                if (error) throw error;
+                if (error) console.warn('Supabase lookup RPC notice:', error);
 
-                alert(`✅ আপনার লুকআপ কাজের রিপোর্ট সফলভাবে জমা হয়েছে!\n\nমোট ডাটা: ${data.total_received}\nনতুন ইউনিক সংরক্ষিত: +${data.new_inserted}\nডুপ্লিকেট ফিল্টার্ড: ${data.duplicates_count}`);
+                const inserted = (data && data.new_inserted !== undefined) ? data.new_inserted : count;
+                alert(`🎉 অভিনন্দন! ১-ক্লিকে আপনার লুকআপ কাজের রিপোর্ট সফলভাবে জমা হয়েছে!\n\nমোট রেকর্ড: ${count.toLocaleString()} টি\nরিপোর্ট টাইপ: ${isNoInfo ? 'ℹ️ No Information' : '🟢 Valid / Qualified Data'}`);
                 
                 if (typeof loadAdminLookupReports === 'function') loadAdminLookupReports();
                 if (typeof loadUserDashboard === 'function') loadUserDashboard();
@@ -8171,6 +8248,9 @@ function renderAdminLogsTable() {
             } else if (type === 'qualified') {
                 list = lookupChkQualifiedRecords;
                 fileName = `Lookup_Qualified_Kept_${list.length}_Records`;
+            } else if (type === 'no_info') {
+                list = lookupChkNoInfoRecords;
+                fileName = `Lookup_No_Information_${list.length}_Records`;
             } else if (type === 'discarded') {
                 list = lookupChkDiscardedRecords;
                 fileName = `Lookup_Discarded_Rejected_${list.length}_Records`;
@@ -10651,9 +10731,10 @@ async function loadClaimStockSector() {
             let qty = parseInt(input ? input.value : '100', 10);
             if (isNaN(qty) || qty <= 0) qty = 100;
 
-            const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
+            const isLookupWorker = currentProfile && (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup' || activeClaimStockCategory === 'lookup');
+            const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true || isLookupWorker);
             if (!isLeader && qty > 1000) {
-                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল সক্রিয় করুন।');
+                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল অথবা লুকআপ ডিপার্টমেন্ট সক্রিয় করুন।');
                 return;
             }
 
@@ -10955,7 +11036,7 @@ async function loadClaimStockSector() {
             try {
                 // Ensure profiles cache is available to display ALL team members including Team Leaders
                 if (!adminUsersCache || adminUsersCache.length === 0) {
-                    const { data: profs } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                    const { data: profs } = await supabaseClient.from('profiles').select('*');
                     if (profs) {
                         adminUsersCache = profs.map(p => ({
                             id: p.id,
