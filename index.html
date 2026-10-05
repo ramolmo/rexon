@@ -234,8 +234,9 @@
                     <div id="deptSelectContainer" class="hidden">
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Select Your Department</label>
                         <select id="signupDept" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 font-semibold focus:ring-2 focus:ring-indigo-500">
-                                        <option value="gender_verify">🚻 1. Gender Verify Department (ফিমেল ও সিগন্যাল কাজ)</option>
-                                        <option value="lookup">🔍 2. Number Lookup Department (লুকআপ রিপোর্ট কাজ)</option>
+                                        <option value="gender_verify">🚻 1. Gender Verify Department (ফিমেল, মেল ও সিগন্যাল কাজ)</option>
+                                        <option value="male">👨 2. Male Department (পুরুষ ডাটা কাজ)</option>
+                                        <option value="lookup">🔍 3. Number Lookup Department (লুকআপ রিপোর্ট কাজ)</option>
                                     </select>
                     </div>
 
@@ -323,25 +324,25 @@
                 </div>
             </div>
 
-            <!-- 1B. DAILY TARGET TRACKER (দৈনিক ২৭০ নাম্বার টার্গেট: ২৭০ ফিমেল) -->
+            <!-- 1B. DAILY TARGET TRACKER (দৈনিক ৪২০ নাম্বার টার্গেট: ২১০ ফিমেল + ২১০ মেল) -->
             <div id="workerTargetTrackerCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
                 <!-- Header & Overall Status -->
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center text-xl font-black shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center text-xl font-black shadow-sm">
                             🎯
                         </div>
                         <div>
                             <div class="flex items-center space-x-2">
                                 <h3 class="font-extrabold text-base sm:text-lg text-slate-800">
-                                    দৈনিক Female কাজের টার্গেট (Daily Target: 270)
+                                    দৈনিক কাজের টার্গেট (Daily Target: 420)
                                 </h3>
                                 <span id="targetStatusBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
                                     ⏳ টার্গেট চলমান
                                 </span>
                             </div>
                             <p class="text-xs text-slate-500 mt-0.5">
-                                Gender Verify ডিপার্টমেন্টের দৈনিক লক্ষ্য: <span class="font-bold text-rose-600">২৭০টি Female ভেরিফাইড নাম্বার</span> (বয়স অবশ্যই ৪৩+ হতে হবে)।
+                                Gender Verify ডিপার্টমেন্টের দৈনিক লক্ষ্য: <span class="font-bold text-rose-600">২১০টি Female</span> এবং <span class="font-bold text-blue-600">২১০টি Male</span> ভেরিফাইড নাম্বার (সর্বমোট ৪২০টি)।
                             </p>
                         </div>
                     </div>
@@ -350,40 +351,76 @@
                     <div class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-right self-start sm:self-auto">
                         <span class="text-[11px] font-bold text-slate-400 uppercase block">আজ মোট সম্পন্ন:</span>
                         <span class="text-lg font-black text-slate-800">
-                            <span id="targetTotalDoneText" class="text-rose-600">0</span> <span class="text-xs text-slate-400">/ 270 টি</span>
+                            <span id="targetTotalDoneText" class="text-indigo-600 font-mono">0</span> <span class="text-xs text-slate-400 font-mono">/ 420 টি</span>
                         </span>
                     </div>
                 </div>
 
-                <!-- Female Single Full Progress Card (270 Target) -->
-                <div class="bg-rose-50/50 border border-rose-200 rounded-xl p-4 sm:p-5 space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-black text-rose-900 flex items-center space-x-1.5">
-                            <span>👩</span>
-                            <span>Female Report (টার্গেট: ২৭০ টি)</span>
-                        </span>
-                        <span id="targetFemaleDiffBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-rose-200 text-rose-900">
-                            বাকি ২৭০ টি
-                        </span>
+                <!-- Dual Progress Cards: Female (210) & Male (210) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <!-- Female Target Card (210) -->
+                    <div class="bg-rose-50/50 border border-rose-200 rounded-xl p-4 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-rose-900 flex items-center space-x-1.5">
+                                <span>👩</span>
+                                <span>Female Report (টার্গেট: ২১০ টি)</span>
+                            </span>
+                            <span id="targetFemaleDiffBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-rose-200 text-rose-900">
+                                বাকি ২১০ টি
+                            </span>
+                        </div>
+                        <div class="flex items-baseline justify-between text-xs">
+                            <span class="font-bold text-slate-700">জমা হয়েছে: <span id="targetFemaleDone" class="text-base font-black text-rose-600 font-mono">0</span> / ২১০ টি</span>
+                            <span id="targetFemalePercent" class="text-slate-500 font-extrabold font-mono">0%</span>
+                        </div>
+                        <div class="w-full bg-rose-100 rounded-full h-3 overflow-hidden">
+                            <div id="targetFemaleBar" class="bg-rose-500 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
                     </div>
-                    <div class="flex items-baseline justify-between text-xs">
-                        <span class="font-bold text-slate-700">জমা হয়েছে: <span id="targetFemaleDone" class="text-base font-black text-rose-600">0</span> টি</span>
-                        <span id="targetFemalePercent" class="text-slate-500 font-extrabold">0%</span>
-                    </div>
-                    <div class="w-full bg-rose-100 rounded-full h-3 overflow-hidden">
-                        <div id="targetFemaleBar" class="bg-rose-500 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
+
+                    <!-- Male Target Card (210) -->
+                    <div class="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-blue-900 flex items-center space-x-1.5">
+                                <span>👨</span>
+                                <span>Male Report (টার্গেট: ২১০ টি)</span>
+                            </span>
+                            <span id="targetMaleDiffBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-blue-200 text-blue-900">
+                                বাকি ২১০ টি
+                            </span>
+                        </div>
+                        <div class="flex items-baseline justify-between text-xs">
+                            <span class="font-bold text-slate-700">জমা হয়েছে: <span id="targetMaleDone" class="text-base font-black text-blue-600 font-mono">0</span> / ২১০ টি</span>
+                            <span id="targetMalePercent" class="text-slate-500 font-extrabold font-mono">0%</span>
+                        </div>
+                        <div class="w-full bg-blue-100 rounded-full h-3 overflow-hidden">
+                            <div id="targetMaleBar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Dynamic Motivation / Congratulation Banner -->
-                <div id="targetMotivationBanner" class="p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-amber-50 border-amber-300 text-amber-950">
+                <!-- Combined Progress Bar -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                            <span>📊 মোট দৈনিক অগ্রগতি (Combined Progress):</span>
+                        </span>
+                        <span id="targetTotalPercent" class="font-black text-indigo-700 font-mono">0% (0/420)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                        <div id="targetTotalBar" class="bg-gradient-to-r from-rose-500 via-purple-500 to-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Motivation / Alert Banner -->
+                <div id="targetMotivationBanner" class="p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-amber-50 border-amber-300 text-amber-950 shadow-sm">
                     <span id="targetMotivationIcon" class="text-2xl flex-shrink-0">⚠️</span>
                     <div class="flex-1">
-                        <h4 id="targetMotivationTitle" class="font-extrabold text-sm sm:text-base">
+                        <p id="targetMotivationTitle" class="font-extrabold text-xs sm:text-sm text-amber-900">
                             আপনি আপনার টার্গেট পূরণ করুন দ্রুতই!
-                        </h4>
-                        <p id="targetMotivationMessage" class="text-xs sm:text-sm text-amber-800 mt-0.5 leading-relaxed">
-                            আপনার আজকের ২৭০টি ফিমেল নাম্বারের টার্গেট এখনো বাকি আছে। দ্রুত কাজ সম্পন্ন করে টার্গেট পূরণ করুন।
+                        </p>
+                        <p id="targetMotivationMessage" class="text-xs sm:text-sm text-amber-900 mt-0.5 leading-relaxed font-medium">
+                            আপনার আজকের ২১০টি ফিমেল ও ২১০টি মেল নাম্বারের টার্গেট এখনো বাকি আছে। অনুগ্রহ করে দ্রুত কাজ সম্পন্ন করে আপনার টার্গেট পূরণ করুন।
                         </p>
                     </div>
                 </div>
@@ -613,6 +650,20 @@
                                 </div>
                                 <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
                                     কোম্পানির নতুন সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট।
+                                </span>
+                            </div>
+                        </label>
+
+                        <!-- Option 4: Male Report -->
+                        <label id="optMaleReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="male_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-blue-600 mt-1">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-black text-sm text-slate-800 block">👨 4. Male Report (পুরুষ ডাটা)</span>
+                                    <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded-full">Active</span>
+                                </div>
+                                <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
+                                    পুরুষ ভেরিফাইড ডাটার কাজের জমা রিপোর্ট (Phone, Name & Age)।
                                 </span>
                             </div>
                         </label>
@@ -921,7 +972,7 @@
             </div>
 
             <!-- Admin Stats Cards by Report Types -->
-            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 sm:gap-4">
                 <div onclick="filterAdminSubmissionsBy('all')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600 cursor-pointer hover:shadow-md hover:border-indigo-400 transition group">
                     <div class="flex items-center justify-between">
                         <p class="text-xs font-bold text-slate-500 uppercase">Total Database</p>
@@ -937,6 +988,14 @@
                     </div>
                     <p id="adminStatFemaleReport" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
                     <p class="text-xs text-slate-400">Click to view all female data</p>
+                </div>
+                <div onclick="filterAdminSubmissionsBy('male_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500 cursor-pointer hover:shadow-md hover:border-blue-400 transition group">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Reports</p>
+                        <span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold group-hover:bg-blue-100">Day-by-Day ➔</span>
+                    </div>
+                    <p id="adminStatMaleReport" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
+                    <p class="text-xs text-slate-400">Click to view all male data</p>
                 </div>
                 <div onclick="filterAdminSubmissionsBy('lookup_report')" class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500 cursor-pointer hover:shadow-md hover:border-purple-400 transition group">
                     <div class="flex items-center justify-between">
@@ -1184,6 +1243,9 @@
                                 🌟 All Data
                             </button>
 
+                            <button type="button" onclick="filterAdminSubmissionsBy('male_report')" id="qfBtnMale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition">
+                                👨 Male Data
+                            </button>
                             <button type="button" onclick="filterAdminSubmissionsBy('female_report')" id="qfBtnFemale" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-200 transition">
                                 👩 Female Data (দিন অনুযায়ী)
                             </button>
@@ -1227,6 +1289,7 @@
                                 <label class="text-xs font-semibold text-slate-600 block mb-1">Report Type:</label>
                                 <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                     <option value="all">All Report Types</option>
+                                    <option value="male_report">👨 Male Report (পুরুষ ডাটা)</option>
                                     <option value="female_report">👩 Female Report</option>
                                     <option value="lookup_report">🔍 Lookup Report (Valid - আয় ও মার্কেট ভ্যালু)</option>
                                     <option value="lookup_no_info">⚪ Lookup No Info (কোনো তথ্য নেই)</option>
@@ -1338,7 +1401,8 @@
                             <input type="text" id="adminUserSearchInput" oninput="renderAdminUserTable()" placeholder="Search worker email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs">
                             <select id="adminUserDeptFilter" onchange="renderAdminUserTable()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                 <option value="all">All Departments (সকল)</option>
-                                <option value="gender_verify">Gender Verify (Female & Signal)</option>
+                                <option value="gender_verify">Gender Verify (Female, Male & Signal)</option>
+                                <option value="male">Male Department</option>
                                 <option value="lookup">Number Lookup</option>
                             </select>
                         </div>
@@ -1408,7 +1472,7 @@
                     </div>
 
                     <!-- Stat Cards for Company Deliveries -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-indigo-600">
                             <p class="text-xs font-bold text-slate-500 uppercase">Total Given</p>
                             <p id="cdStatTotal" class="text-2xl font-extrabold text-indigo-700 mt-1">0</p>
@@ -1418,6 +1482,11 @@
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-pink-500">
                             <p class="text-xs font-bold text-slate-500 uppercase">👩 Female Data</p>
                             <p id="cdStatFemale" class="text-2xl font-extrabold text-pink-600 mt-1">0</p>
+                            <p class="text-[11px] text-slate-400">Delivered to company</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-blue-500">
+                            <p class="text-xs font-bold text-slate-500 uppercase">👨 Male Data</p>
+                            <p id="cdStatMale" class="text-2xl font-extrabold text-blue-600 mt-1">0</p>
                             <p class="text-[11px] text-slate-400">Delivered to company</p>
                         </div>
                         <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 border-t-4 border-t-purple-500">
@@ -1459,7 +1528,8 @@
                                     📂 Data Category (ক্যাটাগরি - ৩টি আলাদা সেক্টর):
                                 </label>
                                 <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
-                                    <option value="female_data">👩 1. Female Data (মহিলা ডাটা)</option>
+                                    <option value="male_data">👨 1. Male Data (পুরুষ ডাটা)</option>
+                                    <option value="female_data">👩 2. Female Data (মহিলা ডাটা)</option>
                                     <option value="signal_data">📡 2. Signal Data (সিগন্যাল ডাটা)</option>
                                     <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
                                 </select>
@@ -1560,6 +1630,7 @@
                                     <label class="text-xs font-bold text-slate-700 block mb-1">📂 Category:</label>
                                     <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
                                         <option value="all">All Categories (সবগুলো)</option>
+                                        <option value="male_data">👨 Male Data</option>
                                         <option value="female_data">👩 Female Data</option>
                                         <option value="signal_data">📡 Signal Data</option>
                                         <option value="lookup_data">🔍 Lookup Data</option>
@@ -3829,6 +3900,7 @@
                 const sql = `
                     SELECT 
                         COUNT(*) as total_unique,
+                        SUM(CASE WHEN report_type = 'male_report' OR report_type = 'male' THEN 1 ELSE 0 END) as male_count,
                         SUM(CASE WHEN report_type = 'female_report' OR report_type = 'female' THEN 1 ELSE 0 END) as female_count,
                         SUM(CASE WHEN (report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income != 'no_info' AND household_income != 'No Information' AND household_income != '-' AND household_income != 'no' AND household_income != '' AND household_income IS NOT NULL) THEN 1 ELSE 0 END) as lookup_count,
                         SUM(CASE WHEN report_type = 'lookup_no_info' OR ((report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income = 'no_info' OR household_income = 'No Information' OR household_income = '-' OR household_income = 'no' OR household_income = '' OR household_income IS NULL)) THEN 1 ELSE 0 END) as lookup_no_info_count,
@@ -3840,6 +3912,7 @@
                 const row = res.rows[0] || {};
                 return {
                     totalUnique: parseInt(row.total_unique || 0, 10),
+                    maleCount: parseInt(row.male_count || 0, 10),
                     femaleCount: parseInt(row.female_count || 0, 10),
                     lookupCount: parseInt(row.lookup_count || 0, 10),
                     lookupNoInfoCount: parseInt(row.lookup_no_info_count || 0, 10),
@@ -3879,6 +3952,7 @@
                 const sql = `
                     SELECT 
                         COUNT(*) as total,
+                        SUM(CASE WHEN category = 'male_data' THEN 1 ELSE 0 END) as male_deliv,
                         SUM(CASE WHEN category = 'female_data' THEN 1 ELSE 0 END) as female_deliv,
                         SUM(CASE WHEN category = 'signal_data' THEN 1 ELSE 0 END) as signal_deliv,
                         SUM(CASE WHEN category = 'lookup_data' THEN 1 ELSE 0 END) as lookup_deliv,
@@ -3889,6 +3963,7 @@
                 const row = res.rows[0] || {};
                 return {
                     total: parseInt(row.total || 0, 10),
+                    maleDeliv: parseInt(row.male_deliv || 0, 10),
                     femaleDeliv: parseInt(row.female_deliv || 0, 10),
                     signalDeliv: parseInt(row.signal_deliv || 0, 10),
                     lookupDeliv: parseInt(row.lookup_deliv || 0, 10),
@@ -5188,11 +5263,34 @@ function setupWorkerReportOptions(dept) {
                 if (directFemale !== null && directFemale !== undefined) {
                     todayFemaleDone = Math.max(todayFemaleDone, directFemale);
                 }
+
+                const { count: directMale } = await supabaseClient
+                    .from('master_numbers')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', currentUser.id)
+                    .eq('report_type', 'male_report')
+                    .gte('created_at', todayIso);
+
+                if (directMale !== null && directMale !== undefined) {
+                    todayMaleDone = Math.max(todayMaleDone, directMale);
+                }
+
+                // Also check Turso submissions for precision
+                if (typeof TursoVault !== 'undefined') {
+                    const tMaleRes = await safeQuery(TursoVault.query(`SELECT COUNT(*) as cnt FROM turso_submissions WHERE user_id = '${currentUser.id}' AND report_type = 'male_report' AND date(created_at) = date('now');`), null);
+                    if (tMaleRes && tMaleRes.rows && tMaleRes.rows[0]) {
+                        todayMaleDone = Math.max(todayMaleDone, parseInt(tMaleRes.rows[0].cnt || 0, 10));
+                    }
+                    const tFemRes = await safeQuery(TursoVault.query(`SELECT COUNT(*) as cnt FROM turso_submissions WHERE user_id = '${currentUser.id}' AND report_type = 'female_report' AND date(created_at) = date('now');`), null);
+                    if (tFemRes && tFemRes.rows && tFemRes.rows[0]) {
+                        todayFemaleDone = Math.max(todayFemaleDone, parseInt(tFemRes.rows[0].cnt || 0, 10));
+                    }
+                }
             } catch (cntErr) {
                 console.warn('Direct report type count notice:', cntErr);
             }
 
-            // Update Target Tracker UI (270 Female target)
+            // Update Target Tracker UI (210 Female + 210 Male = 420 Total target)
             updateWorkerTargetTrackerUI(todayFemaleDone, todayMaleDone);
 
             // =========================================================================
@@ -5282,12 +5380,15 @@ function setupWorkerReportOptions(dept) {
             }
 
             tbody.innerHTML = daysArr.map(d => {
-                const targetAchieved = d.femaleCount >= 270;
+                const mDone = d.maleCount || 0;
+                const fDone = d.femaleCount || 0;
+                const tot = fDone + mDone;
+                const targetAchieved = (fDone >= 210 && mDone >= 210) || tot >= 420;
                 let statusBadge = '';
                 if (targetAchieved) {
-                    statusBadge = `<span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">✅ ২৭০+ সম্পন্ন</span>`;
-                } else if (d.femaleCount > 0) {
-                    statusBadge = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">⏳ আংশিক (${d.femaleCount}/270)</span>`;
+                    statusBadge = `<span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">✅ ৪২০+ সম্পন্ন (${fDone}F, ${mDone}M)</span>`;
+                } else if (tot > 0) {
+                    statusBadge = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">⏳ আংশিক (${tot}/420: ${fDone}F, ${mDone}M)</span>`;
                 } else {
                     statusBadge = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">লুকআপ ডাটা</span>`;
                 }
@@ -5335,7 +5436,10 @@ function setupWorkerReportOptions(dept) {
 `;
 
             daysArr.forEach(d => {
-                const status = d.femaleCount >= 270 ? 'Target Met (270+)' : (d.femaleCount > 0 ? `Partial (${d.femaleCount}/270)` : 'Lookup');
+                const mDone = d.maleCount || 0;
+                const fDone = d.femaleCount || 0;
+                const tot = fDone + mDone;
+                const status = ((fDone >= 210 && mDone >= 210) || tot >= 420) ? `Target Met (${tot}/420: ${fDone}F, ${mDone}M)` : (tot > 0 ? `Partial (${tot}/420: ${fDone}F, ${mDone}M)` : 'Lookup');
                 csv += `"${d.date}","${d.filesCount}","${d.totalUnique}","${d.femaleCount}","${d.lookupCount}","${d.dupCount}","${status}"
 `;
             });
@@ -5434,6 +5538,58 @@ function setupWorkerReportOptions(dept) {
                                 'Phone Number': phone
                             });
                         }
+                    }
+                });
+            } else if (selectedRep === 'male_report') {
+                // Male Report parser: Phone, Name, Age (No age restrictions)
+                lines.forEach(l => {
+                    const trimmed = l.trim();
+                    if (!trimmed) return;
+
+                    const tokens = trimmed.split(/[\t,;]+|\s{2,}/).map(t => t.trim()).filter(Boolean);
+                    let phone = '';
+                    let name = '';
+                    let age = '';
+
+                    tokens.forEach(tok => {
+                        const cleanNum = tok.replace(/[^0-9]/g, '');
+                        const lowerTok = tok.toLowerCase();
+                        if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
+                            phone = cleanNum;
+                        } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 1 && parseInt(cleanNum) <= 120 && !age) {
+                            age = cleanNum;
+                        } else if (!age && (lowerTok.includes('dec') || lowerTok.includes('unk') || lowerTok.includes('dead') || lowerTok === '?')) {
+                            age = tok;
+                        } else if (!name && /[a-zA-Z]/.test(tok)) {
+                            name = tok;
+                        }
+                    });
+
+                    if (!phone || !name) {
+                        const words = trimmed.split(/\s+/);
+                        const nameParts = [];
+                        words.forEach(w => {
+                            const cleanNum = w.replace(/[^0-9]/g, '');
+                            const lowerW = w.toLowerCase();
+                            if (cleanNum.length >= 7 && cleanNum.length <= 16 && !phone) {
+                                phone = cleanNum;
+                            } else if (cleanNum.length <= 3 && parseInt(cleanNum) >= 1 && parseInt(cleanNum) <= 120 && !age) {
+                                age = cleanNum;
+                            } else if (!age && (lowerW.includes('dec') || lowerW.includes('unk') || lowerW.includes('dead') || lowerW === '?')) {
+                                age = w;
+                            } else {
+                                nameParts.push(w);
+                            }
+                        });
+                        if (nameParts.length > 0) name = nameParts.join(' ');
+                    }
+
+                    if (phone || name) {
+                        parsedRows.push({
+                            'Phone': phone,
+                            'Full Name': name || 'Unknown',
+                            'Age': age || '-'
+                        });
                     }
                 });
             } else if (selectedRep === 'signal_report') {
@@ -5658,6 +5814,7 @@ function setupWorkerReportOptions(dept) {
             const optFemale = document.getElementById('optFemaleReport');
             const optLookup = document.getElementById('optLookupReport');
             const optSignal = document.getElementById('optSignalReport');
+            const optMale = document.getElementById('optMaleReport');
             const femaleAgeBanner = document.getElementById('femaleAgeRuleBanner');
 
             const nameContainer = document.getElementById('workerColNameContainer');
@@ -5671,6 +5828,7 @@ function setupWorkerReportOptions(dept) {
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-purple-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
+                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition';
 
                 // HIDE Name and Age for Lookup Report!
                 if (nameContainer) nameContainer.classList.add('hidden');
@@ -5689,10 +5847,24 @@ function setupWorkerReportOptions(dept) {
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-cyan-500 shadow-sm cursor-pointer transition';
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
+                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition';
 
                 // HIDE Name, Age, Income, Market for Signal Report!
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            } else if (chosenReportType === 'male_report') {
+                if (subCard) subCard.classList.add('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-blue-500 shadow-sm hover:border-blue-600 cursor-pointer transition';
+                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
+                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
+                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
+
+                // SHOW Name and Age, HIDE Income and Market for Male Report!
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
                 if (marketContainer) marketContainer.classList.add('hidden');
             } else {
@@ -5702,6 +5874,7 @@ function setupWorkerReportOptions(dept) {
                 if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition';
                 if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
                 if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
+                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition';
 
                 // SHOW Name and Age, HIDE Income and Market for Female Report!
                 if (nameContainer) nameContainer.classList.remove('hidden');
@@ -5896,6 +6069,11 @@ function setupWorkerReportOptions(dept) {
                 if (ageContainer) ageContainer.classList.add('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
                 if (marketContainer) marketContainer.classList.add('hidden');
+            } else if (selectedRep === 'male_report') {
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             } else {
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
@@ -5946,6 +6124,13 @@ function setupWorkerReportOptions(dept) {
                     headerRow.innerHTML = `
                         <th class="py-2 px-3 border-r w-10 text-center">#</th>
                         <th class="py-2 px-3 bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
+                    `;
+                } else if (selectedRep === 'male_report') {
+                    headerRow.innerHTML = `
+                        <th class="py-2 px-3 border-r w-10 text-center">#</th>
+                        <th class="py-2 px-3 border-r bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
+                        <th class="py-2 px-3 border-r">👤 Full Name (পুরুষের নাম)</th>
+                        <th class="py-2 px-3">🎂 Age (বয়স)</th>
                     `;
                 } else {
                     // female_report
@@ -6251,7 +6436,7 @@ function setupWorkerReportOptions(dept) {
                 progressBar.style.width = '100%';
                 statusText.innerText = 'Report Submitted Successfully!';
 
-                const repTitle = chosenReportType === 'female_report' ? '👩 Female Report' : (chosenReportType === 'signal_report' ? '📡 Signal Report' : '🔍 Lookup Report');
+                const repTitle = chosenReportType === 'female_report' ? '👩 Female Report' : (chosenReportType === 'male_report' ? '👨 Male Report' : (chosenReportType === 'signal_report' ? '📡 Signal Report' : '🔍 Lookup Report'));
 
                 const resultCard = document.getElementById('lastUploadResultCard');
                 resultCard.className = 'mt-6 p-5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
@@ -6391,6 +6576,7 @@ function setupWorkerReportOptions(dept) {
                     pRes,
                     lRes,
                     sbTotalRes,
+                    sbMaleRes,
                     sbFemaleRes,
                     sbSignalRes,
                     sbLookupRes,
@@ -6411,8 +6597,9 @@ function setupWorkerReportOptions(dept) {
 
                     // Supabase Master Numbers Stats
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }), { count: 0 }),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'male_report'), { count: 0 }),
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'female_report'), { count: 0 }),
-                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).or('report_type.eq.signal_report,report_type.eq.male_report'), { count: 0 }),
+                    safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'signal_report'), { count: 0 }),
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).eq('report_type', 'lookup_report'), { count: 0 }),
                     safeQuery(supabaseClient.from('lookup_no_info_records').select('*', { count: 'exact', head: true }), { count: 0 }),
                     safeQuery(supabaseClient.from('master_numbers').select('*', { count: 'exact', head: true }).gte('created_at', todayIso), { count: 0 }),
@@ -6427,9 +6614,9 @@ function setupWorkerReportOptions(dept) {
 
                 // COMBINE ALL METRICS (Turso + Supabase) so no numbers ever disappear!
                 const totalUnique = (tursoSubStats.totalUnique || 0) + (sbTotalRes.count || 0);
+                const maleCount = (tursoSubStats.maleCount || 0) + (sbMaleRes.count || 0);
                 const femaleCount = (tursoSubStats.femaleCount || 0) + (sbFemaleRes.count || 0);
                 const signalCount = (tursoSubStats.signalCount || 0) + (sbSignalRes.count || 0);
-                const maleCount = signalCount;
                 const lookupCount = (tursoSubStats.lookupCount || 0) + (sbLookupRes.count || 0);
                 const lookupNoInfoCount = (tursoSubStats.lookupNoInfoCount || 0) + (sbLookupNoInfoRes.count || 0);
                 const todayTotal = (tursoSubStats.todayTotal || 0) + (sbTodayRes.count || 0);
@@ -10271,6 +10458,12 @@ async function runDuplicateCheck() {
                 if (ageContainer) ageContainer.classList.add('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
                 if (marketContainer) marketContainer.classList.add('hidden');
+            } else if (cat === 'male_data') {
+                if (hint) hint.innerHTML = `Enter or paste rows for Male Data: <span class="font-mono bg-blue-50 text-blue-900 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
             } else {
                 if (hint) hint.innerHTML = `Enter or paste rows for Female Data: <span class="font-mono bg-pink-50 text-pink-900 px-1 rounded font-bold">Phone Name Age</span> (e.g. 15136465609 John Doe 45)`;
                 if (nameContainer) nameContainer.classList.remove('hidden');
@@ -10689,8 +10882,9 @@ async function runDuplicateCheck() {
                 }
 
                 const todayIso = new Date().toISOString().slice(0, 10);
-                const [totalDelivRes, femaleDelivRes, signalDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
+                const [totalDelivRes, maleDelivRes, femaleDelivRes, signalDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'male_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'signal_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data'), { count: 0 }),
@@ -10709,6 +10903,7 @@ async function runDuplicateCheck() {
                 ]);
 
                 const sbTotal = totalDelivRes.count || 0;
+                const sbMale = maleDelivRes.count || 0;
                 const sbFemale = femaleDelivRes.count || 0;
                 const sbSignal = signalDelivRes.count || 0;
                 const sbLookup = lookupDelivRes.count || 0;
@@ -10717,12 +10912,14 @@ async function runDuplicateCheck() {
 
                 // COMBINE TURSO + SUPABASE DELIVERIES
                 const combTotal = (tStats.total || 0) + sbTotal;
+                const combMale = (tStats.maleDeliv || 0) + sbMale;
                 const combFemale = (tStats.femaleDeliv || 0) + sbFemale;
                 const combSignal = (tStats.signalDeliv || 0) + sbSignal;
                 const combLookup = (tStats.lookupDeliv || 0) + sbLookup;
                 const combToday = (tStats.todayDeliv || 0) + sbToday;
 
                 const elTotal = document.getElementById('cdStatTotal');
+                const elMale = document.getElementById('cdStatMale');
                 const elFemale = document.getElementById('cdStatFemale');
                 const elSignal = document.getElementById('cdStatSignal');
                 const elLookup = document.getElementById('cdStatLookup');
@@ -10730,6 +10927,7 @@ async function runDuplicateCheck() {
                 const badgeTotal = document.getElementById('companyDelivTotalBadge');
 
                 if (elTotal) elTotal.innerText = combTotal.toLocaleString();
+                if (elMale) elMale.innerText = combMale.toLocaleString();
                 if (elFemale) elFemale.innerText = combFemale.toLocaleString();
                 if (elSignal) elSignal.innerText = combSignal.toLocaleString();
                 if (elLookup) elLookup.innerText = combLookup.toLocaleString();
@@ -12040,96 +12238,149 @@ async function loadClaimStockSector() {
         // ==============================================================
         // GENDER VERIFY WORKER DAILY TARGET SYSTEM (270 Female Target)
         // ==============================================================
+        // GENDER VERIFY WORKER DAILY TARGET SYSTEM (210 Female + 210 Male = 420 Total Target)
+        // ==============================================================
         function updateWorkerTargetTrackerUI(femaleDone, maleDone) {
             const card = document.getElementById('workerTargetTrackerCard');
             if (!card) return;
 
-            if (currentProfile && currentProfile.department === 'number_lookup') {
+            if (currentProfile && (currentProfile.department === 'number_lookup' || currentProfile.department === 'lookup')) {
                 card.classList.add('hidden');
                 return;
             } else {
                 card.classList.remove('hidden');
             }
 
-            const femaleTarget = 270;
-            const totalDone = femaleDone || 0;
+            const femaleTarget = 210;
+            const maleTarget = 210;
+            const totalTarget = 420;
 
+            const fDone = femaleDone || 0;
+            const mDone = maleDone || 0;
+            const totalDone = fDone + mDone;
+
+            // Female Card Update
             const femaleDoneEl = document.getElementById('targetFemaleDone');
             const femaleDiffEl = document.getElementById('targetFemaleDiffBadge');
             const femalePctEl = document.getElementById('targetFemalePercent');
             const femaleBarEl = document.getElementById('targetFemaleBar');
 
-            if (femaleDoneEl) femaleDoneEl.innerText = totalDone.toLocaleString();
-            const femalePct = Math.min(100, Math.round((totalDone / femaleTarget) * 100));
+            if (femaleDoneEl) femaleDoneEl.innerText = fDone.toLocaleString();
+            const femalePct = Math.min(100, Math.round((fDone / femaleTarget) * 100));
             if (femalePctEl) femalePctEl.innerText = `${femalePct}%`;
             if (femaleBarEl) femaleBarEl.style.width = `${femalePct}%`;
 
             if (femaleDiffEl) {
-                if (totalDone >= femaleTarget) {
-                    const extra = totalDone - femaleTarget;
+                if (fDone >= femaleTarget) {
+                    const extra = fDone - femaleTarget;
                     femaleDiffEl.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-200 text-emerald-900';
                     femaleDiffEl.innerText = extra > 0 ? `✅ পূর্ণ (+${extra} বেশি)` : '✅ টার্গেট পূর্ণ';
                 } else {
-                    const short = femaleTarget - totalDone;
+                    const short = femaleTarget - fDone;
                     femaleDiffEl.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-rose-200 text-rose-900';
                     femaleDiffEl.innerText = `বাকি ${short} টি`;
                 }
             }
 
+            // Male Card Update
+            const maleDoneEl = document.getElementById('targetMaleDone');
+            const maleDiffEl = document.getElementById('targetMaleDiffBadge');
+            const malePctEl = document.getElementById('targetMalePercent');
+            const maleBarEl = document.getElementById('targetMaleBar');
+
+            if (maleDoneEl) maleDoneEl.innerText = mDone.toLocaleString();
+            const malePct = Math.min(100, Math.round((mDone / maleTarget) * 100));
+            if (malePctEl) malePctEl.innerText = `${malePct}%`;
+            if (maleBarEl) maleBarEl.style.width = `${malePct}%`;
+
+            if (maleDiffEl) {
+                if (mDone >= maleTarget) {
+                    const extra = mDone - maleTarget;
+                    maleDiffEl.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-200 text-emerald-900';
+                    maleDiffEl.innerText = extra > 0 ? `✅ পূর্ণ (+${extra} বেশি)` : '✅ টার্গেট পূর্ণ';
+                } else {
+                    const short = maleTarget - mDone;
+                    maleDiffEl.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-blue-200 text-blue-900';
+                    maleDiffEl.innerText = `বাকি ${short} টি`;
+                }
+            }
+
+            // Combined Total Update
             const totalDoneEl = document.getElementById('targetTotalDoneText');
             if (totalDoneEl) totalDoneEl.innerText = totalDone.toLocaleString();
 
+            const totalPct = Math.min(100, Math.round((totalDone / totalTarget) * 100));
+            const totalPctEl = document.getElementById('targetTotalPercent');
+            const totalBarEl = document.getElementById('targetTotalBar');
+            if (totalPctEl) totalPctEl.innerText = `${totalPct}% (${totalDone}/${totalTarget})`;
+            if (totalBarEl) totalBarEl.style.width = `${totalPct}%`;
+
+            // Motivation Banner
             const banner = document.getElementById('targetMotivationBanner');
             const iconEl = document.getElementById('targetMotivationIcon');
             const titleEl = document.getElementById('targetMotivationTitle');
             const msgEl = document.getElementById('targetMotivationMessage');
             const badgeEl = document.getElementById('targetStatusBadge');
 
-            const isTargetComplete = totalDone >= femaleTarget;
-            const isExceeded = totalDone > femaleTarget;
+            const isFemaleComplete = fDone >= femaleTarget;
+            const isMaleComplete = mDone >= maleTarget;
+            const isAllComplete = isFemaleComplete && isMaleComplete;
+            const isTotalExceeded = totalDone > totalTarget;
 
-            if (isExceeded) {
-                const extra = totalDone - femaleTarget;
-                banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-purple-50 border-purple-300 text-purple-950 shadow-sm';
+            if (isAllComplete && isTotalExceeded) {
+                const extra = totalDone - totalTarget;
+                if (banner) banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-purple-50 border-purple-300 text-purple-950 shadow-sm';
                 if (iconEl) iconEl.innerText = '🏆';
-                if (titleEl) titleEl.innerText = 'অসাধারণ পারফরম্যান্স! আপনি টার্গেটের চেয়েও বেশি ফিমেল নাম্বার দিয়েছেন!';
+                if (titleEl) titleEl.innerText = 'অসাধারণ পারফরম্যান্স! আপনি দৈনিক ৪২০ নাম্বারের চেয়েও বেশি কাজ জমা দিয়েছেন!';
                 if (msgEl) {
                     msgEl.className = 'text-xs sm:text-sm text-purple-800 mt-0.5 leading-relaxed font-medium';
-                    msgEl.innerText = `আপনি আজকের ২৭০টি ফিমেল নাম্বারের টার্গেট পূরণ করার পরও আরও +${extra} টি অতিরিক্ত নাম্বার দিয়েছেন! আপনার বোনাস পারফরম্যান্স ডাটাবেজে রেকর্ড করা হয়েছে। ধন্যবাদ!`;
+                    msgEl.innerText = `আপনি আজকের ৪২০টি নাম্বারের (২১০ ফিমেল + ২১০ মেল) টার্গেট সম্পূর্ণ পূরণ করার পরও আরও +${extra} টি অতিরিক্ত নাম্বার দিয়েছেন! আপনার বোনাস পারফরম্যান্স ডাটাবেজে রেকর্ড করা হয়েছে। ধন্যবাদ!`;
                 }
                 if (badgeEl) {
                     badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-black bg-purple-200 text-purple-900 animate-pulse';
                     badgeEl.innerText = `🌟 বোনাস: +${extra} টি বেশি!`;
                 }
-            } else if (isTargetComplete) {
-                banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm';
+            } else if (isAllComplete) {
+                if (banner) banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm';
                 if (iconEl) iconEl.innerText = '🎉';
-                if (titleEl) titleEl.innerText = 'অভিনন্দন! আপনি আজকের ২৭০টি ফিমেল নাম্বারের টার্গেট সফলভাবে পূরণ করেছেন!';
+                if (titleEl) titleEl.innerText = 'অভিনন্দন! আপনি আজকের ৪২০টি নাম্বারের পূর্ণ টার্গেট সফলভাবে সম্পন্ন করেছেন!';
                 if (msgEl) {
                     msgEl.className = 'text-xs sm:text-sm text-emerald-800 mt-0.5 leading-relaxed font-medium';
-                    msgEl.innerText = 'দারুণ কাজ! আপনি আজকের নির্ধারিত ২৭০টি ফিমেল (বয়স ৪৩+) নাম্বার সফলভাবে সম্পন্ন করেছেন। আজকের মতো আপনার দায়িত্ব নিখুঁতভাবে শেষ হয়েছে।';
+                    msgEl.innerText = 'দারুণ কাজ! আপনি আজকের নির্ধারিত ২১০টি ফিমেল এবং ২১০টি মেল নাম্বার সফলভাবে জমা দিয়েছেন। আজকের জন্য আপনার দায়িত্ব নিখুঁতভাবে সমাপ্ত হয়েছে।';
                 }
                 if (badgeEl) {
                     badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-extrabold bg-emerald-200 text-emerald-900';
-                    badgeEl.innerText = '✅ টার্গেট সম্পন্ন';
+                    badgeEl.innerText = '✅ পূর্ণ টার্গেট সম্পন্ন (৪২০/৪২০)';
                 }
             } else {
-                const short = femaleTarget - totalDone;
-                banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-amber-50 border-amber-300 text-amber-950 shadow-sm';
+                const shortF = Math.max(0, femaleTarget - fDone);
+                const shortM = Math.max(0, maleTarget - mDone);
+                const shortTotal = totalTarget - totalDone;
+
+                if (banner) banner.className = 'p-4 rounded-xl border transition-all duration-300 flex items-start space-x-3 bg-amber-50 border-amber-300 text-amber-950 shadow-sm';
                 if (iconEl) iconEl.innerText = '⚠️';
                 if (titleEl) titleEl.innerText = 'আপনি আপনার টার্গেট পূরণ করুন দ্রুতই!';
+
+                let remText = '';
+                if (shortF > 0 && shortM > 0) {
+                    remText = `ফিমেল বাকি ${shortF}টি এবং মেল বাকি ${shortM}টি (সর্বমোট বাকি ${shortTotal}টি)`;
+                } else if (shortF > 0) {
+                    remText = `ফিমেল বাকি ${shortF}টি (মেল সম্পন্ন ✅)`;
+                } else if (shortM > 0) {
+                    remText = `মেল বাকি ${shortM}টি (ফিমেল সম্পন্ন ✅)`;
+                }
+
                 if (msgEl) {
                     msgEl.className = 'text-xs sm:text-sm text-amber-900 mt-0.5 leading-relaxed font-medium';
-                    msgEl.innerText = `আপনার আজকের ২৭০টি ফিমেল নাম্বারের টার্গেট এখনো বাকি আছে। আপনার এখনো ${short}টি নাম্বার জমা দেওয়া বাকি রয়েছে। অনুগ্রহ করে দ্রুত কাজ সম্পন্ন করে আপনার টার্গেট পূরণ করুন।`;
+                    msgEl.innerText = `আপনার আজকের ৪২০টি নাম্বারের (২১০ ফিমেল + ২১০ মেল) টার্গেট এখনো বাকি আছে। আপনার এখনো ${remText} জমা দেওয়া বাকি রয়েছে। অনুগ্রহ করে দ্রুত কাজ সম্পন্ন করে আপনার টার্গেট পূরণ করুন।`;
                 }
                 if (badgeEl) {
                     badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-200 text-amber-900';
-                    badgeEl.innerText = `⚠️ বাকি ${short} টি`;
+                    badgeEl.innerText = `⚠️ বাকি ${shortTotal} টি`;
                 }
             }
         }
 
-        // Reload Admin Users & Dashboard Helper
         async function loadAdminUsers() {
             if (typeof loadAdminDashboard === 'function') {
                 await loadAdminDashboard();
