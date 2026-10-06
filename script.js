@@ -331,20 +331,20 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                 const username = this.escapeSql(profile?.username || 'Worker');
                 const email = this.escapeSql(profile?.email || '');
 
-                // 6-hour quota rule: if not admin and not team_leader and not unlimited quota
+                // 3-hour quota rule: if not admin and not team_leader and not unlimited quota
                 if (profile && profile.role !== 'admin' && profile.role !== 'team_leader' && !profile.is_unlimited_quota) {
                     const quotaSql = `
                         SELECT COUNT(*) as claimed_count 
                         FROM turso_stock_numbers 
                         WHERE (assigned_to_email = ${email} OR assigned_to_username = ${username})
-                          AND datetime(assigned_at) >= datetime('now', '-6 hours');
+                          AND datetime(assigned_at) >= datetime('now', '-3 hours');
                     `;
                     const qRes = await this.query(quotaSql);
                     const claimedCount = parseInt(qRes.rows[0]?.claimed_count || 0, 10);
                     if (claimedCount >= 1000) {
                         return {
                             success: false,
-                            message: `৬ ঘণ্টার কোটা লিমিট (১,০০০ টি) পূর্ণ হয়েছে! সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার নিতে পারেন। আপনি গত ৬ ঘণ্টায় ইতিমধ্যে ${claimedCount} টি নাম্বার নিয়েছেন। ৬ ঘণ্টা পূর্ণ হলে আবার স্বয়ংক্রিয়ভাবে নতুন কোটা পাবেন।`,
+                            message: `৩ ঘণ্টার কোটা লিমিট (১,০০০ টি) পূর্ণ হয়েছে! সাধারণ কর্মীরা প্রতি ৩ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার নিতে পারেন। আপনি গত ৩ ঘণ্টায় ইতিমধ্যে ${claimedCount} টি নাম্বার নিয়েছেন। ৩ ঘণ্টা পূর্ণ হলে আবার স্বয়ংক্রিয়ভাবে নতুন কোটা পাবেন।`,
                             count: 0,
                             data: []
                         };
@@ -3594,7 +3594,7 @@ function setupWorkerReportOptions(dept) {
                             <td class="py-2.5 px-2.5">
                                 ${isMaster ? '<span class="px-2 py-0.5 text-[11px] rounded-md font-black bg-purple-100 text-purple-900 border border-purple-300 whitespace-nowrap">⚡ Master</span>' : `
                                     <select onchange="adminChangeUserRole('${u.id}', this.value, '${u.username || u.email.split('@')[0]}')" class="text-xs py-1 px-2 rounded-lg border font-bold transition cursor-pointer ${u.role === 'team_leader' ? 'border-amber-400 bg-amber-50 text-amber-950 font-black shadow-sm' : (u.role === 'admin' ? 'border-purple-300 bg-purple-50 text-purple-900' : 'border-slate-300 bg-white text-slate-700')}">
-                                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 কর্মী (6h Limit)</option>
+                                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 কর্মী (3h Limit)</option>
                                         <option value="team_leader" ${u.role === 'team_leader' ? 'selected' : ''}>👑 টিম লিডার (Unlimited)</option>
                                         <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>⚡ অ্যাডমিন (Admin)</option>
                                     </select>
@@ -7879,7 +7879,7 @@ async function runDuplicateCheck() {
 
             const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
             if (!isLeader && qty > 1000) {
-                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
+                alert('সাধারণ কর্মীরা প্রতি ৩ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।');
                 return;
             }
 
@@ -7887,15 +7887,15 @@ async function runDuplicateCheck() {
             btn.disabled = true;
             btn.innerHTML = '<span>⏳ নাম্বার সংগ্রহ করা হচ্ছে...</span>';
 
-            // Strict 1,000 Quota Check per Worker (6-Hour Window)
+            // Strict 1,000 Quota Check per Worker (3-Hour Window)
             try {
-                const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+                const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
 
                 const { count: claimedTodayCount } = await supabaseClient
                     .from('company_received_numbers')
                     .select('*', { count: 'exact', head: true })
                     .eq('assigned_to_user_id', currentUser.id)
-                    .gte('assigned_at', sixHoursAgo.toISOString());
+                    .gte('assigned_at', threeHoursAgo.toISOString());
 
                 const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
 
@@ -7905,14 +7905,14 @@ async function runDuplicateCheck() {
                     const remainingQuota = Math.max(0, maxDailyQuota - alreadyClaimed);
 
                     if (alreadyClaimed >= maxDailyQuota) {
-                        alert(`❌ আপনার গত ৬ ঘণ্টার লিমিট (১,০০০ টি) পূর্ণ হয়েছে!\n\nসাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারেন। আপনি গত ৬ ঘণ্টায় ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। ৬ ঘণ্টা পূর্ণ হলে আবার নতুন কোটা পাবেন।\n\n💡 আনলিমিটেড কোটার প্রয়োজন হলে অ্যাডমিনের সাথে যোগাযোগ করুন।`);
+                        alert(`❌ আপনার গত ৩ ঘণ্টার লিমিট (১,০০০ টি) পূর্ণ হয়েছে!\n\nসাধারণ কর্মীরা প্রতি ৩ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারেন। আপনি গত ৩ ঘণ্টায় ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। ৩ ঘণ্টা পূর্ণ হলে আবার নতুন কোটা পাবেন।\n\n💡 আনলিমিটেড কোটার প্রয়োজন হলে অ্যাডমিনের সাথে যোগাযোগ করুন।`);
                         btn.disabled = false;
                         btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
                         return;
                     }
 
                     if (qty > remainingQuota) {
-                        alert(`⚠️ ৬ ঘণ্টার কোটা সীমা অতিক্রম করেছে!\n\nআপনি গত ৬ ঘণ্টায় ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। প্রতি ৬ ঘণ্টায় ১,০০০ লিমিট থাকায় এই মুহূর্তে আপনি আর মাত্র ${remainingQuota} টি নাম্বার সংগ্রহ করতে পারবেন।`);
+                        alert(`⚠️ ৩ ঘণ্টার কোটা সীমা অতিক্রম করেছে!\n\nআপনি গত ৩ ঘণ্টায় ইতিমধ্যে ${alreadyClaimed} টি নাম্বার নিয়েছেন। প্রতি ৩ ঘণ্টায় ১,০০০ লিমিট থাকায় এই মুহূর্তে আপনি আর মাত্র ${remainingQuota} টি নাম্বার সংগ্রহ করতে পারবেন।`);
                         input.value = remainingQuota;
                         btn.disabled = false;
                         btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
@@ -8323,7 +8323,7 @@ async function loadClaimStockSector() {
                                     <span class="text-2xl">👑</span>
                                     <div>
                                         <h4 class="font-black text-sm sm:text-base text-amber-900">টিম লিডার সুবিধা: আনলিমিটেড নাম্বার কোটা সক্রিয়!</h4>
-                                        <p class="text-xs text-amber-800 mt-0.5">আপনার অ্যাকাউন্টে কোনো ৬ ঘণ্টার ১,০০০ লিমিট নেই। আপনি কাজের প্রয়োজনে যেকোনো পরিমাণ নাম্বার সংগ্রহ করতে পারবেন।</p>
+                                        <p class="text-xs text-amber-800 mt-0.5">আপনার অ্যাকাউন্টে কোনো ৩ ঘণ্টার ১,০০০ লিমিট নেই। আপনি কাজের প্রয়োজনে যেকোনো পরিমাণ নাম্বার সংগ্রহ করতে পারবেন।</p>
                                     </div>
                                 </div>
                                 <span class="px-3 py-1 bg-amber-400 text-slate-950 font-black text-xs rounded-full uppercase tracking-wider flex-shrink-0">Unlimited Quota</span>
@@ -8335,15 +8335,15 @@ async function loadClaimStockSector() {
                     }
                 }
 
-                // 2. User claimed in last 6 hours count
+                // 2. User claimed in last 3 hours count
                 if (currentUser) {
-                    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+                    const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
 
                     const { data: recentClaims } = await supabaseClient
                         .from('company_received_numbers')
                         .select('assigned_at')
                         .eq('assigned_to_user_id', currentUser.id)
-                        .gte('assigned_at', sixHoursAgo.toISOString())
+                        .gte('assigned_at', threeHoursAgo.toISOString())
                         .order('assigned_at', { ascending: true });
 
                     const userTodayEl = document.getElementById('secWorkerClaimedToday');
@@ -8374,28 +8374,28 @@ async function loadClaimStockSector() {
                             btnClaim.innerHTML = '<span>⚡ Claim & Take Numbers (আনলিমিটেড সংগ্রহ করুন)</span>';
                         }
                     } else {
-                        // General Worker: Strict 1,000 per 6 Hours
+                        // General Worker: Strict 1,000 per 3 Hours
                         if (qtyInput) qtyInput.max = "1000";
-                        const sixHourLimit = 1000;
-                        const remaining = Math.max(0, sixHourLimit - cCount);
-                        const pct = Math.min(100, Math.round((cCount / sixHourLimit) * 100));
+                        const threeHourLimit = 1000;
+                        const remaining = Math.max(0, threeHourLimit - cCount);
+                        const pct = Math.min(100, Math.round((cCount / threeHourLimit) * 100));
 
                         let unlockTimeStr = '';
-                        if (cCount >= sixHourLimit && recentClaims && recentClaims.length > 0) {
+                        if (cCount >= threeHourLimit && recentClaims && recentClaims.length > 0) {
                             const oldestClaimTime = new Date(recentClaims[0].assigned_at).getTime();
-                            const unlockTime = new Date(oldestClaimTime + 6 * 60 * 60 * 1000);
+                            const unlockTime = new Date(oldestClaimTime + 3 * 60 * 60 * 1000);
                             unlockTimeStr = unlockTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         }
 
                         if (quotaRemEl) {
-                            if (cCount >= sixHourLimit) {
+                            if (cCount >= threeHourLimit) {
                                 quotaRemEl.innerHTML = `<span class="text-rose-600 font-bold text-xs sm:text-sm">০ (আনলক: ${unlockTimeStr || 'শীঘ্রই'})</span>`;
                             } else {
                                 quotaRemEl.innerText = remaining.toLocaleString();
                             }
                         }
                         if (quotaPctEl) {
-                            if (cCount >= sixHourLimit) {
+                            if (cCount >= threeHourLimit) {
                                 quotaPctEl.innerHTML = `<span class="text-rose-600 font-bold">১০০% ব্যবহৃত (পরবর্তী কোটা: ${unlockTimeStr || 'শীঘ্রই'})</span>`;
                             } else {
                                 quotaPctEl.innerText = `${pct}% ব্যবহৃত`;
@@ -8408,7 +8408,7 @@ async function loadClaimStockSector() {
                                 if (btnClaim) {
                                     btnClaim.disabled = true;
                                     btnClaim.className = 'w-full sm:w-auto bg-slate-300 text-slate-500 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2';
-                                    btnClaim.innerHTML = `<span>🔒 ৬ ঘণ্টার ১,০০০ লিমিট পূর্ণ (পরবর্তী আনলক: ${unlockTimeStr || '৬ ঘণ্টা পর'})</span>`;
+                                    btnClaim.innerHTML = `<span>🔒 ৩ ঘণ্টার ১,০০০ লিমিট পূর্ণ (পরবর্তী আনলক: ${unlockTimeStr || '৩ ঘণ্টা পর'})</span>`;
                                 }
                             } else {
                                 quotaBarEl.className = pct >= 80 ? 'bg-amber-500 h-2 rounded-full transition-all duration-300' : 'bg-indigo-600 h-2 rounded-full transition-all duration-300';
@@ -8439,7 +8439,7 @@ async function loadClaimStockSector() {
 
             const isLeader = currentProfile && (currentProfile.role === 'team_leader' || currentProfile.role === 'admin' || currentProfile.is_unlimited_quota === true);
             if (!isLeader && qty > 1000) {
-                alert('সাধারণ কর্মীরা প্রতি ৬ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল সক্রিয় করুন।');
+                alert('সাধারণ কর্মীরা প্রতি ৩ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার সংগ্রহ করতে পারবেন।\n\nআনলিমিটেড নাম্বারের জন্য অ্যাডমিনের সাথে যোগাযোগ করে টিম লিডার রোল সক্রিয় করুন।');
                 return;
             }
 
@@ -8478,6 +8478,11 @@ async function loadClaimStockSector() {
                         if (tursoRes && tursoRes.success && tursoRes.data && tursoRes.data.length > 0) {
                             records = tursoRes.data;
                             console.log(`✅ Claimed ${records.length} numbers directly from Turso Cloud Vault!`);
+                        } else if (tursoRes && !tursoRes.success && tursoRes.message) {
+                            alert(tursoRes.message);
+                            btn.disabled = false;
+                            btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                            return;
                         }
                     }
                 } catch (tursoClaimErr) {
@@ -9243,7 +9248,7 @@ async function loadClaimStockSector() {
         async function adminChangeUserRole(userId, newRole, username) {
             const roleLabels = {
                 'team_leader': '👑 টিম লিডার (Team Leader - আনলিমিটেড কোটা)',
-                'user': '👤 সাধারণ কর্মী (General Worker - ৬ ঘণ্টার লিমিট)',
+                'user': '👤 সাধারণ কর্মী (General Worker - ৩ ঘণ্টার লিমিট)',
                 'admin': '⚡ অ্যাডমিন (Admin - সম্পূর্ণ নিয়ন্ত্রণ)'
             };
             const targetLabel = roleLabels[newRole] || newRole;
@@ -9297,7 +9302,7 @@ async function loadClaimStockSector() {
                     .eq('id', userId);
 
                 if (error) throw error;
-                alert(`✅ কোটা সুবিধা আপডেট হয়েছে: ${newStatus ? 'আনলিমিটেড সক্রিয়' : 'প্রতি ৬ ঘণ্টায় ১,০০০ লিমিট'}`);
+                alert(`✅ কোটা সুবিধা আপডেট হয়েছে: ${newStatus ? 'আনলিমিটেড সক্রিয়' : 'প্রতি ৩ ঘণ্টায় ১,০০০ লিমিট'}`);
                 await loadAdminUsers();
             } catch (err) {
                 alert('কোটা আপডেটে ত্রুটি: ' + err.message);
