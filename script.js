@@ -344,6 +344,7 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                     if (claimedCount >= 1000) {
                         return {
                             success: false,
+                            quota_exceeded: true,
                             message: `৩ ঘণ্টার কোটা লিমিট (১,০০০ টি) পূর্ণ হয়েছে! সাধারণ কর্মীরা প্রতি ৩ ঘণ্টায় সর্বোচ্চ ১,০০০ টি নাম্বার নিতে পারেন। আপনি গত ৩ ঘণ্টায় ইতিমধ্যে ${claimedCount} টি নাম্বার নিয়েছেন। ৩ ঘণ্টা পূর্ণ হলে আবার স্বয়ংক্রিয়ভাবে নতুন কোটা পাবেন।`,
                             count: 0,
                             data: []
@@ -368,7 +369,7 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                 `;
                 const res = await this.query(fetchSql);
                 if (!res.rows || res.rows.length === 0) {
-                    return { success: false, message: 'স্টকে কোনো নতুন নাম্বার খালি নেই!', count: 0, data: [] };
+                    return { success: false, empty: true, message: 'স্টকে কোনো নতুন নাম্বার খালি নেই!', count: 0, data: [] };
                 }
 
                 const ids = res.rows.map(r => r.id).join(',');
@@ -7976,73 +7977,92 @@ async function runDuplicateCheck() {
 
             try {
                 let records = [];
-                // 1. Try atomic RPC first
+
+                // 1. Try Turso 9 GB Cloud Vault first
                 try {
-                    const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
-                        p_quantity: qty,
-                        p_stock_type: activeClaimStockCategory
-                    });
-                    if (error) throw error;
-
-                    if (data && data.success && data.data && data.data.length > 0) {
-                        records = data.data;
-                    } else if (data && !data.success) {
-                        alert(data.message || 'স্টকে কোনো নতুন নাম্বার খালি নেই!');
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
-                        return;
+                    if (typeof TursoVault !== 'undefined') {
+                        const tursoRes = await TursoVault.claimStock(qty, activeClaimStockCategory, currentProfile);
+                        if (tursoRes && tursoRes.success && tursoRes.data && tursoRes.data.length > 0) {
+                            records = tursoRes.data;
+                        } else if (tursoRes && tursoRes.quota_exceeded) {
+                            alert(tursoRes.message);
+                            btn.disabled = false;
+                            btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                            return;
+                        }
                     }
-                } catch (rpcErr) {
-                    console.warn('RPC fallback to direct claim:', rpcErr);
+                } catch (tErr) {
+                    console.warn('Turso worker claim notice:', tErr);
+                }
 
-                    // 2. Direct fallback: select unassigned and update
-                    let fbQuery = supabaseClient
-                        .from('company_received_numbers')
-                        .select('id, phone_number, full_name, age')
-                        .eq('is_assigned', false);
-
-                    if (activeClaimStockCategory === 'lookup') {
-                        fbQuery = fbQuery.eq('stock_type', 'lookup');
-                    } else if (activeClaimStockCategory === 'signal') {
-                        fbQuery = fbQuery.eq('stock_type', 'signal');
-                    } else {
-                        fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
+                // 2. Try Supabase RPC
+                if (!records || records.length === 0) {
+                    try {
+                        const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
+                            p_quantity: qty,
+                            p_stock_type: activeClaimStockCategory
+                        });
+                        if (!error && data && data.success && data.data && data.data.length > 0) {
+                            records = data.data;
+                        }
+                    } catch (rpcErr) {
+                        console.warn('RPC worker_claim_numbers notice:', rpcErr);
                     }
+                }
 
-                    const { data: stockRows, error: fetchErr } = await fbQuery
-                        .order('id', { ascending: true })
-                        .limit(qty);
+                // 3. Direct Supabase Table Query Fallback
+                if (!records || records.length === 0) {
+                    try {
+                        let fbQuery = supabaseClient
+                            .from('company_received_numbers')
+                            .select('id, phone_number, full_name, age')
+                            .eq('is_assigned', false);
 
-                    if (fetchErr) throw fetchErr;
+                        if (activeClaimStockCategory === 'lookup') {
+                            fbQuery = fbQuery.eq('stock_type', 'lookup');
+                        } else if (activeClaimStockCategory === 'signal') {
+                            fbQuery = fbQuery.eq('stock_type', 'signal');
+                        } else {
+                            fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
+                        }
 
-                    if (!stockRows || stockRows.length === 0) {
-                        alert('স্টকে কোনো নতুন নাম্বার খালি নেই! এডমিন কোম্পানি থেকে নতুন নাম্বার আপলোড করলে আবার চেষ্টা করুন।');
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
-                        return;
+                        const { data: stockRows, error: fetchErr } = await fbQuery
+                            .order('id', { ascending: true })
+                            .limit(qty);
+
+                        if (!fetchErr && stockRows && stockRows.length > 0) {
+                            const claimIds = stockRows.map(r => r.id);
+                            const username = currentProfile ? currentProfile.username : currentUser.email.split('@')[0];
+
+                            const { error: updateErr } = await supabaseClient
+                                .from('company_received_numbers')
+                                .update({
+                                    is_assigned: true,
+                                    assigned_to_user_id: currentUser.id,
+                                    assigned_to_username: username,
+                                    assigned_to_email: currentUser.email,
+                                    assigned_at: new Date().toISOString()
+                                })
+                                .in('id', claimIds);
+
+                            if (!updateErr) {
+                                records = stockRows.map(r => ({
+                                    phone: r.phone_number,
+                                    name: r.full_name || '',
+                                    age: r.age || ''
+                                }));
+                            }
+                        }
+                    } catch (fbErr) {
+                        console.warn('Direct fallback notice:', fbErr);
                     }
+                }
 
-                    const claimIds = stockRows.map(r => r.id);
-                    const username = currentProfile ? currentProfile.username : currentUser.email.split('@')[0];
-
-                    const { error: updateErr } = await supabaseClient
-                        .from('company_received_numbers')
-                        .update({
-                            is_assigned: true,
-                            assigned_to_user_id: currentUser.id,
-                            assigned_to_username: username,
-                            assigned_to_email: currentUser.email,
-                            assigned_at: new Date().toISOString()
-                        })
-                        .in('id', claimIds);
-
-                    if (updateErr) throw updateErr;
-
-                    records = stockRows.map(r => ({
-                        phone: r.phone_number,
-                        name: r.full_name || '',
-                        age: r.age || ''
-                    }));
+                if (!records || records.length === 0) {
+                    alert('স্টকে কোনো নতুন নাম্বার খালি নেই! এডমিন কোম্পানি থেকে নতুন নাম্বার আপলোড করলে আবার চেষ্টা করুন।\n\nপরামর্শ: অ্যাডমিন প্যানেলের "স্টক ডিপোজিট" থেকে এই ক্যাটাগরির নতুন নাম্বার আপলোড করুন।');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>⚡ Claim & Get Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                    return;
                 }
 
                 currentClaimedRecords = records;
@@ -8529,7 +8549,7 @@ async function loadClaimStockSector() {
                         if (tursoRes && tursoRes.success && tursoRes.data && tursoRes.data.length > 0) {
                             records = tursoRes.data;
                             console.log(`✅ Claimed ${records.length} numbers directly from Turso Cloud Vault!`);
-                        } else if (tursoRes && !tursoRes.success && tursoRes.message) {
+                        } else if (tursoRes && tursoRes.quota_exceeded) {
                             alert(tursoRes.message);
                             btn.disabled = false;
                             btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
@@ -8540,7 +8560,7 @@ async function loadClaimStockSector() {
                     console.warn('Turso stock claim notice, falling back to Supabase:', tursoClaimErr);
                 }
 
-                // 2. Fallback to Supabase if Turso was empty or offline
+                // 2. Try Supabase RPC if Turso had no stock or was offline
                 if (!records || records.length === 0) {
                     try {
                         const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
@@ -8555,74 +8575,59 @@ async function loadClaimStockSector() {
                     }
                 }
 
-                // 3. If still empty, try direct Supabase table query
-                if (!records || records.length === 0)
-                try {
-                    const { data, error } = await supabaseClient.rpc('worker_claim_numbers', {
-                        p_quantity: qty,
-                        p_stock_type: activeClaimStockCategory
-                    });
-                    if (error) throw error;
+                // 3. Direct Supabase Query Fallback (guarantees claiming from company_received_numbers)
+                if (!records || records.length === 0) {
+                    try {
+                        let fbQuery = supabaseClient
+                            .from('company_received_numbers')
+                            .select('id, phone_number, full_name, age')
+                            .eq('is_assigned', false);
 
-                    if (data && data.success && data.data && data.data.length > 0) {
-                        records = data.data;
-                    } else if (data && !data.success) {
-                        alert(data.message || 'স্টকে কোনো নতুন নাম্বার খালি নেই!');
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
-                        return;
+                        if (activeClaimStockCategory === 'lookup') {
+                            fbQuery = fbQuery.eq('stock_type', 'lookup');
+                        } else if (activeClaimStockCategory === 'signal') {
+                            fbQuery = fbQuery.eq('stock_type', 'signal');
+                        } else {
+                            fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
+                        }
+
+                        const { data: stockRows, error: fetchErr } = await fbQuery
+                            .order('id', { ascending: true })
+                            .limit(qty);
+
+                        if (!fetchErr && stockRows && stockRows.length > 0) {
+                            const claimIds = stockRows.map(r => r.id);
+                            const username = currentProfile ? currentProfile.username : currentUser.email.split('@')[0];
+
+                            const { error: updateErr } = await supabaseClient
+                                .from('company_received_numbers')
+                                .update({
+                                    is_assigned: true,
+                                    assigned_to_user_id: currentUser.id,
+                                    assigned_to_username: username,
+                                    assigned_to_email: currentUser.email,
+                                    assigned_at: new Date().toISOString()
+                                })
+                                .in('id', claimIds);
+
+                            if (!updateErr) {
+                                records = stockRows.map(r => ({
+                                    phone: r.phone_number,
+                                    name: r.full_name || '',
+                                    age: r.age || ''
+                                }));
+                            }
+                        }
+                    } catch (directErr) {
+                        console.warn('Direct stock claim notice:', directErr);
                     }
-                } catch (rpcErr) {
-                    console.warn('RPC fallback to direct claim query:', rpcErr);
+                }
 
-                    // 2. Direct fallback query
-                    let fbQuery = supabaseClient
-                        .from('company_received_numbers')
-                        .select('id, phone_number, full_name, age')
-                        .eq('is_assigned', false);
-
-                    if (activeClaimStockCategory === 'lookup') {
-                        fbQuery = fbQuery.eq('stock_type', 'lookup');
-                    } else if (activeClaimStockCategory === 'signal') {
-                        fbQuery = fbQuery.eq('stock_type', 'signal');
-                    } else {
-                        fbQuery = fbQuery.or('stock_type.eq.gender_verify,stock_type.is.null,stock_type.eq.');
-                    }
-
-                    const { data: stockRows, error: fetchErr } = await fbQuery
-                        .order('id', { ascending: true })
-                        .limit(qty);
-
-                    if (fetchErr) throw fetchErr;
-
-                    if (!stockRows || stockRows.length === 0) {
-                        alert('স্টকে কোনো নতুন নাম্বার খালি নেই! এডমিন নতুন স্টক আপলোড করলে আবার চেষ্টা করুন।');
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
-                        return;
-                    }
-
-                    const claimIds = stockRows.map(r => r.id);
-                    const username = currentProfile ? currentProfile.username : currentUser.email.split('@')[0];
-
-                    const { error: updateErr } = await supabaseClient
-                        .from('company_received_numbers')
-                        .update({
-                            is_assigned: true,
-                            assigned_to_user_id: currentUser.id,
-                            assigned_to_username: username,
-                            assigned_to_email: currentUser.email,
-                            assigned_at: new Date().toISOString()
-                        })
-                        .in('id', claimIds);
-
-                    if (updateErr) throw updateErr;
-
-                    records = stockRows.map(r => ({
-                        phone: r.phone_number,
-                        name: r.full_name || '',
-                        age: r.age || ''
-                    }));
+                if (!records || records.length === 0) {
+                    alert('স্টকে কোনো নতুন নাম্বার খালি নেই! এডমিন নতুন স্টক আপলোড করলে আবার চেষ্টা করুন।\n\nপরামর্শ: অ্যাডমিন প্যানেলের "স্টক ডিপোজিট (Stock Deposit)" থেকে এই ক্যাটাগরির (সিগন্যাল/জেন্ডার/লুকআপ) নতুন ফাইল আপলোড করুন।');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>⚡ Claim & Take Numbers (নাম্বার সংগ্রহ করুন)</span>';
+                    return;
                 }
 
                 secCurrentClaimed = records;
