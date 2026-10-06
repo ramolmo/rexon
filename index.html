@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REXON — Enterprise Operations & Workforce Verification Platform</title>
+    <title>REXON Data Portal</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client CDN -->
@@ -46,13 +46,13 @@
                 </div>
                 <div class="flex-1 overflow-hidden relative cursor-default min-w-0" style="min-width: 0;" title="মাউস রাখলে বা টাচ করলে নোটিশটি থেমে যাবে">
                     <div class="marquee-track flex whitespace-nowrap">
-                        <div class="marquee-item flex items-center pr-10 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed">
-                            <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
-                            <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
+                        <div id="dynamicMarqueeItem1" class="marquee-item flex items-center pr-10 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed">
+                            <span class="text-amber-300 mr-2 text-sm sm:text-base">📢</span>
+                            <span id="marqueeNoticeText1">আপনাদের সবার কাজ আগামী কালকে থেকে শুরু হবে (মেয়াদ: ০৮-১০-২০২৬ তারিখ পর্যন্ত) &bull; আপনারা ঠিক মতো কাজ করুন, যেকোনো সমস্যা হলে টেলিগ্রামে যোগাযোগ করুন।</span>
                         </div>
-                        <div class="marquee-item flex items-center pr-10 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed" aria-hidden="true">
-                            <span class="text-amber-300 mr-2 text-sm sm:text-base">⚠️</span>
-                            <span>আপনারা ঠিক মতো কাজ করুন, যদি কোনো ভুল পাওয়া যায় জরিমানা করা হবে এবং যেকোনো সমস্যা হলে আমার সাথে যোগাযোগ করুন টেলিগ্রামে।</span>
+                        <div id="dynamicMarqueeItem2" class="marquee-item flex items-center pr-10 sm:pr-16 text-xs sm:text-sm font-semibold tracking-wide text-white font-bangla leading-relaxed" aria-hidden="true">
+                            <span class="text-amber-300 mr-2 text-sm sm:text-base">📢</span>
+                            <span id="marqueeNoticeText2">আপনাদের সবার কাজ আগামী কালকে থেকে শুরু হবে (মেয়াদ: ০৮-১০-২০২৬ তারিখ পর্যন্ত) &bull; আপনারা ঠিক মতো কাজ করুন, যেকোনো সমস্যা হলে টেলিগ্রামে যোগাযোগ করুন।</span>
                         </div>
                     </div>
                 </div>
@@ -865,7 +865,52 @@
                 </div>
             </div>
 
-                        <!-- 1A. NEW MONTH GREETING & MOTIVATION BANNER (1st to 3rd of every month) -->
+                        <!-- 1. DYNAMIC ADMIN DEADLINE NOTICE BANNER (Active until 08-10-2026, then auto-cleans) -->
+            <div id="adminDeadlineNoticeBanner" class="p-5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-white shadow-xl space-y-3 border-2 border-amber-300 animate-in fade-in duration-300 relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full pointer-events-none"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                    <div class="flex items-start space-x-3.5">
+                        <span class="text-3xl animate-bounce flex-shrink-0">📢</span>
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-black/30 border border-white/30 text-amber-200 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                                    ⏰ কাজের সময়সীমা ও ডেডলাইন নোটিশ
+                                </span>
+                                <span class="bg-white text-rose-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
+                                    মেয়াদ: ০৮-১০-২০২৬ পর্যন্ত সক্রিয়
+                                </span>
+                            </div>
+                            <h3 class="font-black text-lg sm:text-xl text-white tracking-wide pt-0.5">
+                                আপনাদের সবার কাজ আগামী কালকে থেকে শুরু হবে
+                            </h3>
+                            <p class="text-xs sm:text-sm font-medium text-amber-100 leading-relaxed">
+                                সকল কর্মী ও টিম লিডারদের দৃষ্টি আকর্ষণ করা যাচ্ছে: পোর্টাল প্রস্তুতি ও সিস্টেম আপডেট সম্পন্ন হয়েছে। আপনাদের নির্ধারিত কাজ আগামী কালকে থেকে পূর্ণ উদ্যমে শুরু হবে। এই নোটিশটি ০৮-১০-২০২৬ তারিখ পর্যন্ত প্রদর্শিত থাকবে।
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+                        <span id="deadlineCountdownBadge" class="bg-black/40 border border-white/20 text-white font-mono text-xs px-3 py-1.5 rounded-xl font-bold">
+                            ⏳ ০৮-১০-২৬ পর্যন্ত বাকি
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. DYNAMIC ADMIN NOTICE BOARD DISPLAY (Live broadcast from Admin Panel) -->
+            <div id="workerLiveNoticeBoardCard" class="hidden p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border-2 border-indigo-200 dark:border-indigo-900/60 shadow-sm space-y-3 animate-in fade-in duration-200">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">📢</span>
+                        <h4 class="font-black text-sm text-slate-800 dark:text-white">অ্যাডমিন নোটিশ বোর্ড (Official Broadcasts)</h4>
+                    </div>
+                    <span id="workerNoticeCountBadge" class="text-[11px] font-black bg-indigo-100 text-indigo-900 dark:bg-indigo-900/60 dark:text-sky-300 px-2.5 py-0.5 rounded-full">১ টি সক্রিয় নোটিশ</span>
+                </div>
+                <div id="workerLiveNoticeBoardList" class="space-y-2.5">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- 1A. NEW MONTH GREETING & MOTIVATION BANNER (1st to 3rd of every month) -->
             <div id="newMonthGreetingBanner" class="hidden bg-gradient-to-r from-purple-800 via-indigo-700 to-pink-700 rounded-2xl shadow-xl p-5 sm:p-6 text-white border-2 border-amber-300 relative overflow-hidden animate-in fade-in duration-300">
                 <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/5 rounded-full pointer-events-none"></div>
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
@@ -1191,61 +1236,78 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                         Step 1: Select Report Type to Submit:
                     </label>
-                    <div id="workerReportTypeOptions" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <!-- Option 1: Female Report (Primary - বয়স ৪৩+ আবশ্যক) -->
-                        <label id="optFemaleReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition">
-                            <input type="radio" name="workerReportType" value="female_report" checked onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-rose-600 mt-1">
+                    <div id="workerReportTypeOptions" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <!-- Option 1: Female Normal (বয়স ৪৩+ আবশ্যক) -->
+                        <label id="optFemaleNormal" class="flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="female_normal" checked onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-rose-600 mt-1">
                             <div>
                                 <div class="flex items-center space-x-2">
-                                    <span class="font-black text-sm text-slate-900 block">👩 1. Female Report (ফিমেল ভেরিফাইড ডাটা)</span>
+                                    <span class="font-black text-sm text-slate-900 dark:text-white block">👩 1. Female Normal (ফিমেল নরমাল)</span>
                                     <span class="bg-rose-100 text-rose-800 text-[10px] font-black px-2 py-0.5 rounded-full">বয়স ৪৩+ আবশ্যক</span>
                                 </div>
-                                <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    বয়স অবশ্যই ৪৩ বছর বা তার বেশি হতে হবে। ৪৩ এর নিচের যেকোনো নাম্বার স্বয়ংক্রিয়ভাবে বাদ যাবে (Deceased / Unknown বয়স থাকলে কোনো সমস্যা নেই)।
+                                <span class="text-xs text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
+                                    বয়স অবশ্যই ৪৩ বছর বা তার বেশি হতে হবে। ৪৩ এর নিচে বাদ যাবে (Deceased / Unknown বয়স গ্রহণযোগ্য)।
                                 </span>
                             </div>
                         </label>
 
-                        <!-- Option 2: Lookup Report -->
-                        <label id="optLookupReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition">
+                        <!-- Option 2: Male Normal (বয়স ৪১+ আবশ্যক) -->
+                        <label id="optMaleNormal" class="flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-blue-400 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="male_normal" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-blue-600 mt-1">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-black text-sm text-slate-900 dark:text-white block">👨 2. Male Normal (পুরুষ নরমাল)</span>
+                                    <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded-full">বয়স ৪১+ আবশ্যক</span>
+                                </div>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
+                                    বয়স অবশ্যই ৪১ বছর বা তার বেশি হতে হবে। ৪১ এর নিচে বাদ যাবে (Deceased / Unknown বয়স গ্রহণযোগ্য)।
+                                </span>
+                            </div>
+                        </label>
+
+                        <!-- Option 3: Female Signal Report -->
+                        <label id="optFemaleSignal" class="flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-pink-400 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="female_signal" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-pink-600 mt-1">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-black text-sm text-slate-900 dark:text-white block">📡👩 3. Female Signal (ফিমেল সিগন্যাল)</span>
+                                    <span class="bg-pink-100 text-pink-800 text-[10px] font-black px-2 py-0.5 rounded-full">Signal Active</span>
+                                </div>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
+                                    ফিমেল সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট (ফোন নাম্বার বা তথ্য)।
+                                </span>
+                            </div>
+                        </label>
+
+                        <!-- Option 4: Male Signal Report -->
+                        <label id="optMaleSignal" class="flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-cyan-400 cursor-pointer transition">
+                            <input type="radio" name="workerReportType" value="male_signal" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-cyan-600 mt-1">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-black text-sm text-slate-900 dark:text-white block">📡👨 4. Male Signal (পুরুষ সিগন্যাল)</span>
+                                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full">Signal Active</span>
+                                </div>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
+                                    পুরুষ সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট (ফোন নাম্বার বা তথ্য)।
+                                </span>
+                            </div>
+                        </label>
+
+                        <!-- Option 5: Lookup Report -->
+                        <label id="optLookupReport" class="flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-purple-400 cursor-pointer transition">
                             <input type="radio" name="workerReportType" value="lookup_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-purple-600 mt-1">
                             <div class="flex-1">
-                                <span class="font-black text-sm text-slate-800 block">🔍 2. Lookup Report (লুকআপ ডাটা)</span>
-                                <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    Household Income & Market Value প্রাপ্ত নাম্বার।
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-black text-sm text-slate-900 dark:text-white block">🔍 5. Lookup Report (লুকআপ ডাটা)</span>
+                                    <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded-full">3 Columns</span>
+                                </div>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 block mt-0.5 leading-relaxed">
+                                    Household Income &amp; Market Value প্রাপ্ত নাম্বার (শর্ত ১: $75k+ অথবা শর্ত ২: $350k+)।
                                 </span>
                                 <button type="button" onclick="switchToSection('lookup_checker')" class="mt-2 text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2.5 py-1 rounded-lg transition inline-flex items-center space-x-1 shadow-2xs cursor-pointer">
                                     <span>🔍</span>
                                     <span>লুকআপ চেকার টুলে ডাটা যাচাই করুন ➔</span>
                                 </button>
-                            </div>
-                        </label>
-
-                        <!-- Option 3: Signal Report -->
-                        <label id="optSignalReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition">
-                            <input type="radio" name="workerReportType" value="signal_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-cyan-600 mt-1">
-                            <div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-black text-sm text-slate-800 block">📡 3. Signal Report (সিগন্যাল ডাটা)</span>
-                                    <span class="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full">New Work</span>
-                                </div>
-                                <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    কোম্পানির নতুন সিগন্যাল নাম্বারের কাজের জমা রিপোর্ট।
-                                </span>
-                            </div>
-                        </label>
-
-                        <!-- Option 4: Male Report -->
-                        <label id="optMaleReport" class="flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition">
-                            <input type="radio" name="workerReportType" value="male_report" onchange="handleWorkerReportTypeChanged()" class="w-4 h-4 text-blue-600 mt-1">
-                            <div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-black text-sm text-slate-800 block">👨 4. Male Report (পুরুষ ডাটা)</span>
-                                    <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded-full">বয়স ৪১+ আবশ্যক</span>
-                                </div>
-                                <span class="text-xs text-slate-500 block mt-0.5 leading-relaxed">
-                                    পুরুষ ভেরিফাইড ডাটার কাজের জমা রিপোর্ট। বয়স অবশ্যই ৪১ বছর বা তার বেশি হতে হবে। ৪১ এর নিচের যেকোনো নাম্বার স্বয়ংক্রিয়ভাবে বাদ যাবে (Deceased / Unknown বয়স থাকলে কোনো সমস্যা নেই, গ্রহণ করা হবে)।
-                                </span>
                             </div>
                         </label>
                     </div>
@@ -1528,6 +1590,10 @@
                     <button onclick="downloadMasterExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Download all consolidated data across workers">
                         <span>📥 Download Master Excel</span>
                     </button>
+                    <!-- 1-Click Clean All User Data Action Button -->
+                    <button onclick="adminOneClickCleanAllUserData()" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-black text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow-md flex items-center space-x-1.5 transition cursor-pointer" title="এক ক্লিকে ইউজারদের সমস্ত সাবমিশন ডাটা সম্পূর্ণ মুছে ডাটাবেজ ফ্রেশ করুন">
+                        <span>🧹 ১-ক্লিকে ইউজার ডাটা ক্লিয়ার</span>
+                    </button>
                     <button onclick="openResetDataModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Clear/delete previous data to start fresh daily data">
                         <span>🗑️ Reset / Delete Data</span>
                     </button>
@@ -1587,6 +1653,73 @@
                         <button type="button" id="btnAdminResumeSubmissions" onclick="adminResumeReportSubmissions()" class="hidden bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
                             <span>🟢 এখনই পুনরায় চালু করুন (Resume)</span>
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN NOTICE BOARD CONTROL CENTER (সবার জন্য নোটিশ দেওয়ার ব্যবস্থা) -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border-2 border-indigo-300 dark:border-indigo-900/60 p-5 sm:p-6 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl font-black shadow-xs flex-shrink-0">
+                            📢
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white">নোটিশ বোর্ড কন্ট্রোল সেন্টার (Notice Board Manager)</h3>
+                                <span class="bg-indigo-100 text-indigo-900 dark:bg-indigo-900/60 dark:text-sky-300 text-xs px-2.5 py-0.5 rounded-full font-bold">Live Broadcast</span>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                এখান থেকে সকল কর্মীদের উদ্দেশ্যে জরুরি নোটিশ, কাজের সময়সীমা ও ডেডলাইন প্রকাশ করুন। নোটিশ স্বয়ংক্রিয়ভাবে কর্মীদের স্ক্রিনে এবং উপরের নোটিশ টিকারে প্রদর্শিত হবে।
+                            </p>
+                        </div>
+                    </div>
+                    <span id="adminNoticeBoardActiveCount" class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 self-start sm:self-auto">
+                        ১ টি সক্রিয় নোটিশ
+                    </span>
+                </div>
+
+                <!-- Create Notice Form -->
+                <form onsubmit="handleAdminCreateNotice(event)" class="space-y-4 bg-slate-50/80 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">📌 নোটিশের শিরোনাম (Notice Title):</label>
+                            <input type="text" id="adminNoticeTitleInput" required placeholder="e.g. কাজের শুরু সংক্রান্ত জরুরি নোটিশ..." class="w-full px-3 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 font-bold focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🏷️ ধরন / প্রায়োরিটি (Priority):</label>
+                            <select id="adminNoticeTypeInput" class="w-full px-3 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 font-bold focus:ring-2 focus:ring-indigo-500">
+                                <option value="deadline">⏰ ডেডলাইন নোটিশ (Deadline / Amber)</option>
+                                <option value="urgent">🚨 জরুরি নোটিশ (Urgent / Red)</option>
+                                <option value="announcement">📢 সাধারণ ঘোষণা (Announcement / Indigo)</option>
+                                <option value="success">✅ সুসংবাদ / বোনাস (Success / Emerald)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">📅 মেয়াদ শেষ হওয়ার তারিখ (Expiry Date):</label>
+                            <input type="date" id="adminNoticeExpiryInput" value="2026-10-08" class="w-full px-3 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 font-bold focus:ring-2 focus:ring-indigo-500">
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">এই তারিখ পার হলে স্বয়ংক্রিয়ভাবে মুছে যাবে</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">📝 নোটিশের বার্তা / মেসেজ (Notice Message):</label>
+                        <textarea id="adminNoticeMessageInput" rows="2" required placeholder="e.g. আপনাদের সবার কাজ আগামী কালকে থেকে শুরু হবে..." class="w-full px-3 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 font-medium focus:ring-2 focus:ring-indigo-500">আপনাদের সবার কাজ আগামী কালকে থেকে শুরু হবে</textarea>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400">💡 নোটিশ পোস্ট করার সাথে সাথে তা সাথে সাথে সকল কর্মীদের কাছে পৌঁছে যাবে।</span>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5 cursor-pointer">
+                            <span>📢 নতুন নোটিশ প্রকাশ করুন (Publish Notice)</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Current Active Notices List -->
+                <div class="space-y-2">
+                    <h4 class="font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">বর্তমান নোটিশসমূহ (Active Notices):</h4>
+                    <div id="adminNoticeListContainer" class="space-y-2">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
@@ -1814,14 +1947,17 @@
                                 <input type="date" id="quickExportCustomDate" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500">
                             </div>
 
-                            <!-- Category Selector -->
+                            <!-- Category Selector (All 5 Separate Streams) -->
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">📂 ক্যাটাগরি (রিপোর্ট টাইপ):</label>
+                                <label class="block font-bold text-slate-700 uppercase mb-1">📂 ক্যাটাগরি (আলাদা আলাদা রিপোর্ট):</label>
                                 <select id="quickExportCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500">
-                                    <option value="all">🌟 সব ডাটা একসাথে (Female + Lookup + Signal)</option>
-                                    <option value="female_report">👩 শুধুমাত্র ফিমেল রিপোর্ট (Female Only)</option>
-                                    <option value="lookup_report">🔍 শুধুমাত্র লুকআপ রিপোর্ট (Lookup Only)</option>
-                                    <option value="signal_report">📡 শুধুমাত্র সিগন্যাল রিপোর্ট (Signal Only)</option>
+                                    <option value="all">🌟 সব ডাটা একসাথে (All Combined Data)</option>
+                                    <option value="female_normal">👩 ফিমেল নরমাল ডাটা (Female Normal 43+)</option>
+                                    <option value="male_normal">👨 মেল নরমাল ডাটা (Male Normal 41+)</option>
+                                    <option value="female_signal">📡👩 ফিমেল সিগন্যাল ডাটা (Female Signal)</option>
+                                    <option value="male_signal">📡👨 মেল সিগন্যাল ডাটা (Male Signal)</option>
+                                    <option value="lookup_report">🔍 শুধুমাত্র লুকআপ রিপোর্ট (Lookup Valid)</option>
+                                    <option value="lookup_no_info">⚪ লুকআপ নো-ইনফো (Lookup No Information)</option>
                                 </select>
                             </div>
 
@@ -1831,6 +1967,22 @@
                                 <select id="quickExportWorker" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-emerald-500">
                                     <option value="all">👥 সব কর্মী (All Workers)</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Download Once Memory Lock Protection (একবার ডাউনলোড হলে আর আসবে না) -->
+                        <div class="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 dark:from-slate-800/80 dark:to-indigo-950/60 rounded-xl border border-emerald-300 dark:border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                            <label class="flex items-center space-x-2.5 font-black text-emerald-950 dark:text-emerald-200 cursor-pointer select-none">
+                                <input type="checkbox" id="quickExportOnlyFresh" checked class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer">
+                                <span>🔒 শুধুমাত্র নতুন / আন-ডাউনলোড ডাটা ডাউনলোড করুন (একবার ডাউনলোড হলে আর আসবে না)</span>
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <span id="quickExportFreshCountBadge" class="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-200 text-emerald-900 shadow-2xs">
+                                    🟢 ডুপ্লিকেট ডাউনলোড লক সক্রিয়
+                                </span>
+                                <button type="button" onclick="adminResetDownloadLocks()" class="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 hover:text-indigo-950 bg-white dark:bg-slate-800 hover:bg-slate-100 border border-slate-300 dark:border-slate-700 px-2.5 py-1 rounded-lg transition" title="ডাউনলোড হিস্ট্রি রিসেট করুন যাতে প্রয়োজনে আবার ডাউনলোড করা যায়">
+                                    🔄 লক রিসেট
+                                </button>
                             </div>
                         </div>
 

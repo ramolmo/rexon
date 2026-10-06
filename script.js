@@ -734,6 +734,14 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                         sql += ` AND (report_type = 'lookup_no_info' OR ((report_type = 'lookup_report' OR report_type = 'lookup') AND (household_income = 'no_info' OR household_income = 'No Information' OR household_income = '-' OR household_income = 'no' OR household_income IS NULL OR household_income = '')))`;
                     } else if (filters.report_type === 'lookup_report') {
                         sql += ` AND (report_type = 'lookup_report' OR report_type = 'lookup') AND household_income != 'no_info' AND household_income != 'No Information' AND household_income != '-' AND household_income != 'no' AND household_income IS NOT NULL AND household_income != ''`;
+                    } else if (filters.report_type === 'female_normal') {
+                        sql += ` AND (report_type = 'female_normal' OR report_type = 'female_report' OR report_type = 'female')`;
+                    } else if (filters.report_type === 'male_normal') {
+                        sql += ` AND (report_type = 'male_normal' OR report_type = 'male_report' OR report_type = 'male')`;
+                    } else if (filters.report_type === 'female_signal') {
+                        sql += ` AND (report_type = 'female_signal' OR (report_type = 'signal_report' AND (lower(full_name) LIKE '%female%' OR age >= 15)))`;
+                    } else if (filters.report_type === 'male_signal') {
+                        sql += ` AND (report_type = 'male_signal' OR (report_type = 'signal_report' AND lower(full_name) LIKE '%male%'))`;
                     } else if (filters.report_type && filters.report_type !== 'all') {
                         sql += ` AND report_type = '${filters.report_type}'`;
                     }
@@ -764,7 +772,13 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                             q = q.gte('created_at', startIso).lte('created_at', endIso);
                         }
                         if (filters.report_type && filters.report_type !== 'all') {
-                            q = q.eq('report_type', filters.report_type);
+                            if (filters.report_type === 'female_normal') {
+                                q = q.in('report_type', ['female_normal', 'female_report', 'female']);
+                            } else if (filters.report_type === 'male_normal') {
+                                q = q.in('report_type', ['male_normal', 'male_report', 'male']);
+                            } else {
+                                q = q.eq('report_type', filters.report_type);
+                            }
                         }
                         if (filters.user_email && filters.user_email !== 'all') {
                             q = q.eq('user_email', filters.user_email);
@@ -1469,51 +1483,40 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
         }
 
 function setupWorkerReportOptions(dept) {
-            const optFemale = document.getElementById('optFemaleReport');
+            const optFemaleNorm = document.getElementById('optFemaleNormal') || document.getElementById('optFemaleReport');
+            const optMaleNorm = document.getElementById('optMaleNormal') || document.getElementById('optMaleReport');
+            const optFemaleSig = document.getElementById('optFemaleSignal');
+            const optMaleSig = document.getElementById('optMaleSignal');
             const optLookup = document.getElementById('optLookupReport');
-            const optSignal = document.getElementById('optSignalReport');
-            const optMale = document.getElementById('optMaleReport');
 
             const isAdmin = currentProfile && currentProfile.role === 'admin';
             const isLookup = (dept === 'lookup' || dept === 'number_lookup');
-            const isMaleDept = (dept === 'male');
 
             if (isAdmin) {
-                // Admin sees all 4 report options
-                if (optFemale) optFemale.classList.remove('hidden');
-                if (optLookup) optLookup.classList.remove('hidden');
-                if (optSignal) optSignal.classList.remove('hidden');
-                if (optMale) optMale.classList.remove('hidden');
+                // Admin sees all 5 report options
+                [optFemaleNorm, optMaleNorm, optFemaleSig, optMaleSig, optLookup].forEach(o => {
+                    if (o) o.classList.remove('hidden');
+                });
             } else if (isLookup) {
                 // Number Lookup worker ONLY sees Lookup Report
-                if (optFemale) optFemale.classList.add('hidden');
-                if (optSignal) optSignal.classList.add('hidden');
-                if (optMale) optMale.classList.add('hidden');
+                [optFemaleNorm, optMaleNorm, optFemaleSig, optMaleSig].forEach(o => {
+                    if (o) o.classList.add('hidden');
+                });
                 if (optLookup) {
                     optLookup.classList.remove('hidden');
                     const r = optLookup.querySelector('input');
                     if (r) r.checked = true;
                 }
-            } else if (isMaleDept) {
-                // Male worker sees Male Report
-                if (optFemale) optFemale.classList.add('hidden');
-                if (optLookup) optLookup.classList.add('hidden');
-                if (optSignal) optSignal.classList.add('hidden');
-                if (optMale) {
-                    optMale.classList.remove('hidden');
-                    const r = optMale.querySelector('input');
-                    if (r) r.checked = true;
-                }
             } else {
-                // Gender Verify worker sees Female Report, Male Report AND Signal Report (Hides Lookup Report)
+                // Gender Verify worker sees Female Normal, Male Normal, Female Signal, Male Signal (hides Lookup)
                 if (optLookup) optLookup.classList.add('hidden');
-                if (optFemale) {
-                    optFemale.classList.remove('hidden');
-                    const r = optFemale.querySelector('input');
+                [optFemaleNorm, optMaleNorm, optFemaleSig, optMaleSig].forEach(o => {
+                    if (o) o.classList.remove('hidden');
+                });
+                if (optFemaleNorm) {
+                    const r = optFemaleNorm.querySelector('input');
                     if (r) r.checked = true;
                 }
-                if (optMale) optMale.classList.remove('hidden');
-                if (optSignal) optSignal.classList.remove('hidden');
             }
 
             if (typeof handleWorkerReportTypeChanged === 'function') {
@@ -1521,8 +1524,6 @@ function setupWorkerReportOptions(dept) {
             }
         }
 
-        
-        // Safe Query Wrapper: Awaits any Thenable or Promise, catching rejections safely without needing .catch on builder
         async function safeQuery(thenableOrPromise, fallback = {}) {
             try {
                 if (!thenableOrPromise) return fallback;
@@ -2248,7 +2249,7 @@ function setupWorkerReportOptions(dept) {
                         }
                     }
                 });
-            } else if (selectedRep === 'male_report') {
+            } else if (selectedRep === 'male_normal' || selectedRep === 'male_report') {
                 // Male Report parser: Phone, Name, Age (Age 41+ required)
                 lines.forEach(l => {
                     const trimmed = l.trim();
@@ -2306,7 +2307,7 @@ function setupWorkerReportOptions(dept) {
                         });
                     }
                 });
-            } else if (selectedRep === 'signal_report') {
+            } else if (selectedRep === 'female_signal' || selectedRep === 'male_signal' || selectedRep === 'signal_report') {
                 // Signal Report parser: pure phone numbers only
                 lines.forEach(l => {
                     const trimmed = l.trim();
@@ -2525,13 +2526,16 @@ function setupWorkerReportOptions(dept) {
 
         function handleWorkerReportTypeChanged() {
             const selectedReportRadio = document.querySelector('input[name="workerReportType"]:checked');
-            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'female_report';
+            const chosenReportType = selectedReportRadio ? selectedReportRadio.value : 'female_normal';
             const subCard = document.getElementById('lookupSubTypeCard');
             const extraCols = document.getElementById('lookupExtraCols');
-            const optFemale = document.getElementById('optFemaleReport');
+
+            const optFemaleNorm = document.getElementById('optFemaleNormal') || document.getElementById('optFemaleReport');
+            const optMaleNorm = document.getElementById('optMaleNormal') || document.getElementById('optMaleReport');
+            const optFemaleSig = document.getElementById('optFemaleSignal');
+            const optMaleSig = document.getElementById('optMaleSignal');
             const optLookup = document.getElementById('optLookupReport');
-            const optSignal = document.getElementById('optSignalReport');
-            const optMale = document.getElementById('optMaleReport');
+
             const femaleAgeBanner = document.getElementById('femaleAgeRuleBanner');
             const maleAgeBanner = document.getElementById('maleAgeRuleBanner');
 
@@ -2540,16 +2544,18 @@ function setupWorkerReportOptions(dept) {
             const incomeContainer = document.getElementById('workerColIncomeContainer');
             const marketContainer = document.getElementById('workerColMarketContainer');
 
+            // Reset borders
+            const allOpts = [optFemaleNorm, optMaleNorm, optFemaleSig, optMaleSig, optLookup];
+            allOpts.forEach(o => {
+                if (o) o.className = 'flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-indigo-400 cursor-pointer transition';
+            });
+
             if (chosenReportType === 'lookup_report') {
                 if (subCard) subCard.classList.remove('hidden');
                 if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
                 if (maleAgeBanner) maleAgeBanner.classList.add('hidden');
-                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-purple-500 shadow-sm cursor-pointer transition';
-                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
-                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
-                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition';
+                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-purple-500 shadow-sm cursor-pointer transition';
 
-                // HIDE Name and Age for Lookup Report!
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
 
@@ -2560,45 +2566,42 @@ function setupWorkerReportOptions(dept) {
                     if (incomeContainer) incomeContainer.classList.add('hidden');
                     if (marketContainer) marketContainer.classList.add('hidden');
                 }
-            } else if (chosenReportType === 'signal_report') {
+            } else if (chosenReportType === 'female_normal' || chosenReportType === 'female_report') {
                 if (subCard) subCard.classList.add('hidden');
-                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.remove('hidden');
                 if (maleAgeBanner) maleAgeBanner.classList.add('hidden');
-                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-cyan-500 shadow-sm cursor-pointer transition';
-                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
-                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
-                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition';
+                if (optFemaleNorm) optFemaleNorm.className = 'flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition';
 
-                // HIDE Name, Age, Income, Market for Signal Report!
-                if (nameContainer) nameContainer.classList.add('hidden');
-                if (ageContainer) ageContainer.classList.add('hidden');
-                if (incomeContainer) incomeContainer.classList.add('hidden');
-                if (marketContainer) marketContainer.classList.add('hidden');
-            } else if (chosenReportType === 'male_report') {
-                if (subCard) subCard.classList.add('hidden');
-                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
-                if (maleAgeBanner) maleAgeBanner.classList.remove('hidden');
-                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-blue-500 shadow-sm hover:border-blue-600 cursor-pointer transition';
-                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer transition';
-                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
-                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
-
-                // SHOW Name and Age, HIDE Income and Market for Male Report!
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
                 if (marketContainer) marketContainer.classList.add('hidden');
-            } else {
-                // female_report
+            } else if (chosenReportType === 'male_normal' || chosenReportType === 'male_report') {
                 if (subCard) subCard.classList.add('hidden');
-                if (femaleAgeBanner) femaleAgeBanner.classList.remove('hidden');
-                if (maleAgeBanner) maleAgeBanner.classList.add('hidden');
-                if (optFemale) optFemale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-rose-500 shadow-sm hover:border-rose-600 cursor-pointer transition';
-                if (optLookup) optLookup.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-purple-400 cursor-pointer transition';
-                if (optSignal) optSignal.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-cyan-400 cursor-pointer transition';
-                if (optMale) optMale.className = 'flex items-start space-x-3 p-4 bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-400 cursor-pointer transition';
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (maleAgeBanner) maleAgeBanner.classList.remove('hidden');
+                if (optMaleNorm) optMaleNorm.className = 'flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-blue-500 shadow-sm hover:border-blue-600 cursor-pointer transition';
 
-                // SHOW Name and Age, HIDE Income and Market for Female Report!
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            } else if (chosenReportType === 'female_signal') {
+                if (subCard) subCard.classList.add('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (maleAgeBanner) maleAgeBanner.classList.add('hidden');
+                if (optFemaleSig) optFemaleSig.className = 'flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-pink-500 shadow-sm hover:border-pink-600 cursor-pointer transition';
+
+                if (nameContainer) nameContainer.classList.remove('hidden');
+                if (ageContainer) ageContainer.classList.remove('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            } else if (chosenReportType === 'male_signal') {
+                if (subCard) subCard.classList.add('hidden');
+                if (femaleAgeBanner) femaleAgeBanner.classList.add('hidden');
+                if (maleAgeBanner) maleAgeBanner.classList.add('hidden');
+                if (optMaleSig) optMaleSig.className = 'flex items-start space-x-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-cyan-500 shadow-sm hover:border-cyan-600 cursor-pointer transition';
+
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -2786,12 +2789,12 @@ function setupWorkerReportOptions(dept) {
                     if (incomeContainer) incomeContainer.classList.add('hidden');
                     if (marketContainer) marketContainer.classList.add('hidden');
                 }
-            } else if (selectedRep === 'signal_report') {
+            } else if (selectedRep === 'female_signal' || selectedRep === 'male_signal' || selectedRep === 'signal_report') {
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
                 if (marketContainer) marketContainer.classList.add('hidden');
-            } else if (selectedRep === 'male_report') {
+            } else if (selectedRep === 'male_normal' || selectedRep === 'male_report') {
                 if (nameContainer) nameContainer.classList.remove('hidden');
                 if (ageContainer) ageContainer.classList.remove('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -2847,7 +2850,7 @@ function setupWorkerReportOptions(dept) {
                         <th class="py-2 px-3 border-r w-10 text-center">#</th>
                         <th class="py-2 px-3 bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
                     `;
-                } else if (selectedRep === 'male_report') {
+                } else if (selectedRep === 'male_normal' || selectedRep === 'male_report') {
                     headerRow.innerHTML = `
                         <th class="py-2 px-3 border-r w-10 text-center">#</th>
                         <th class="py-2 px-3 border-r bg-indigo-50 text-indigo-900">📞 Phone Number (ফোন নাম্বার)</th>
@@ -3017,7 +3020,7 @@ function setupWorkerReportOptions(dept) {
                     // STRICT FEMALE AGE FILTER:
                     // Under 43 is strictly forbidden and auto removed!
                     // Age >= 43, Deceased, Decressed, Unknown, Empty are ALLOWED!
-                    if (chosenReportType === 'female_report' && isFemaleUnderage(ageVal)) {
+                    if ((chosenReportType === 'female_normal' || chosenReportType === 'female_report') && isFemaleUnderage(ageVal)) {
                         underageFilteredCount++;
                         return; // Auto remove!
                     }
@@ -3025,7 +3028,7 @@ function setupWorkerReportOptions(dept) {
                     // STRICT MALE AGE FILTER:
                     // Under 41 is strictly forbidden and auto removed!
                     // Age >= 41, Deceased, Decressed, Unknown, Empty are ALLOWED!
-                    if (chosenReportType === 'male_report' && isMaleUnderage(ageVal)) {
+                    if ((chosenReportType === 'male_normal' || chosenReportType === 'male_report') && isMaleUnderage(ageVal)) {
                         underageFilteredCount++;
                         return; // Auto remove!
                     }
@@ -3169,7 +3172,17 @@ function setupWorkerReportOptions(dept) {
                 progressBar.style.width = '100%';
                 statusText.innerText = 'Report Submitted Successfully!';
 
-                const repTitle = chosenReportType === 'female_report' ? '👩 Female Report' : (chosenReportType === 'male_report' ? '👨 Male Report' : (chosenReportType === 'signal_report' ? '📡 Signal Report' : '🔍 Lookup Report'));
+                const repTitles = {
+                    'female_normal': '👩 Female Normal (43+)',
+                    'female_report': '👩 Female Normal (43+)',
+                    'male_normal': '👨 Male Normal (41+)',
+                    'male_report': '👨 Male Normal (41+)',
+                    'female_signal': '📡👩 Female Signal',
+                    'male_signal': '📡👨 Male Signal',
+                    'signal_report': '📡 Signal Report',
+                    'lookup_report': '🔍 Lookup Report'
+                };
+                const repTitle = repTitles[chosenReportType] || '📁 Work Report';
 
                 const resultCard = document.getElementById('lastUploadResultCard');
                 resultCard.className = 'mt-6 p-5 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
@@ -10159,7 +10172,7 @@ async function loadClaimStockSector() {
         }
 
         async function executeQuickExport(format = 'xlsx') {
-            if (!supabaseClient) {
+            if (!supabaseClient && typeof TursoVault === 'undefined') {
                 alert('ডাটাবেজ কানেকশন নেই।');
                 return;
             }
@@ -10167,6 +10180,7 @@ async function loadClaimStockSector() {
             const scope = document.getElementById('quickExportDateScope')?.value || 'today';
             const category = document.getElementById('quickExportCategory')?.value || 'all';
             const worker = document.getElementById('quickExportWorker')?.value || 'all';
+            const onlyFresh = document.getElementById('quickExportOnlyFresh')?.checked ?? true;
 
             let targetDate = null;
             let dateLabel = 'Today';
@@ -10204,89 +10218,109 @@ async function loadClaimStockSector() {
             if (countBadge) countBadge.innerText = '০ টি';
 
             try {
-                let allRows = [];
-                let from = 0;
-                const pageSize = 1000;
-                const maxSafetyCap = 100000; // supports up to 100,000 records smoothly!
+                // Fetch using universal fetchAllSubmissions engine (bypasses 1000 limit, includes Turso Vault)
+                const allRows = await fetchAllSubmissions({
+                    date: targetDate,
+                    report_type: category,
+                    user_email: worker
+                });
 
-                while (from < maxSafetyCap) {
-                    let query = supabaseClient
-                        .from('master_numbers')
-                        .select('phone_number, full_name, age, household_income, est_market_value, report_type, department, user_email, username, created_at')
-                        .order('created_at', { ascending: false })
-                        .range(from, from + pageSize - 1);
-
-                    if (targetDate) {
-                        query = query.gte('created_at', `${targetDate}T00:00:00.000Z`)
-                                     .lte('created_at', `${targetDate}T23:59:59.999Z`);
-                    }
-                    if (category !== 'all') {
-                        query = query.eq('report_type', category);
-                    }
-                    if (worker !== 'all') {
-                        query = query.eq('user_email', worker);
-                    }
-
-                    const { data: chunk, error } = await query;
-                    if (error) throw error;
-                    if (!chunk || chunk.length === 0) break;
-
-                    allRows.push(...chunk);
-                    if (countBadge) countBadge.innerText = `${allRows.length.toLocaleString()} টি`;
-                    if (statusText) statusText.innerText = `⏳ এখন পর্যন্ত ${allRows.length.toLocaleString()} টি ডাটা সংগ্রহ হয়েছে... আরও খোঁজা হচ্ছে...`;
-
-                    if (chunk.length < pageSize) break; // Reached the end!
-                    from += pageSize;
-                }
-
-                if (allRows.length === 0) {
+                if (!allRows || allRows.length === 0) {
                     alert('নির্বাচিত শর্তে কোনো ডাটা পাওয়া যায়নি!');
                     if (statusBox) statusBox.classList.add('hidden');
                     return;
                 }
 
-                if (statusText) statusText.innerText = `✅ মোট ${allRows.length.toLocaleString()} টি ডাটা পাওয়া গেছে! ফাইল তৈরি হচ্ছে...`;
+                // DOWNLOAD ONCE PROTECTION (একবার ডাউনলোড মেমোরি লক ফিল্টার)
+                const downloadedRegistry = getDownloadedPhoneRegistry();
+                let exportCandidateRows = allRows;
 
-                const catName = category === 'all' ? 'All_Reports' : (category === 'female_report' ? 'Female_Only' : (category === 'male_report' ? 'Male_Only' : 'Lookup_Only'));
+                if (onlyFresh) {
+                    exportCandidateRows = allRows.filter(r => {
+                        const cleanPhone = String(r.phone_number || '').trim();
+                        return cleanPhone && !downloadedRegistry.has(cleanPhone);
+                    });
+                }
+
+                if (exportCandidateRows.length === 0) {
+                    if (allRows.length > 0 && onlyFresh) {
+                        alert(`⚠️ এই সিলেকশনের সমস্ত ডাটা (${allRows.length.toLocaleString()} টি) ইতিমধ্যে পূর্বে ডাউনলোড করে ফেলেছেন!\n\nএকবার ডাউনলোড হওয়া ডাটা আর পুনরায় ডাউনলোড হবে না। আপনি যদি পূর্বে ডাউনলোড করা ডাটাও পুনরায় নিতে চান, তবে নিচে "শুধুমাত্র নতুন / আন-ডাউনলোড ডাটা" টিকচিহ্নটি তুলে দিন অথবা "লক রিসেট" করুন।`);
+                    } else {
+                        alert('ডাউনলোড করার মতো কোনো ডাটা পাওয়া যায়নি!');
+                    }
+                    if (statusBox) statusBox.classList.add('hidden');
+                    return;
+                }
+
+                if (statusText) statusText.innerText = `✅ মোট ${exportCandidateRows.length.toLocaleString()} টি ফ্রেশ ডাটা পাওয়া গেছে! ফাইল তৈরি ও ডাউনলোড লক সক্রিয় করা হচ্ছে...`;
+
+                const catNames = {
+                    'all': 'All_Combined_Reports',
+                    'female_normal': 'Female_Normal_43Plus',
+                    'male_normal': 'Male_Normal_41Plus',
+                    'female_signal': 'Female_Signal_Data',
+                    'male_signal': 'Male_Signal_Data',
+                    'lookup_report': 'Lookup_Valid_Report',
+                    'lookup_no_info': 'Lookup_No_Information'
+                };
+                const catName = catNames[category] || category;
 
                 if (format === 'xlsx') {
                     // Export Excel (.xlsx)
-                    const exportRows = allRows.map((item, idx) => ({
-                        'SL': idx + 1,
-                        'Phone Number': item.phone_number,
-                        'Full Name': item.full_name || '',
-                        'Age': item.age || '',
-                        'Household Income': item.household_income || '',
-                        'Est Market Value': item.est_market_value || '',
-                        'Report Type': item.report_type === 'female_report' ? 'Female Report' : 'Lookup Report',
-                        'Department': item.department || '-',
-                        'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
-                        'Submission Date': new Date(item.created_at).toLocaleDateString(),
-                        'Submission Time': new Date(item.created_at).toLocaleTimeString()
-                    }));
+                    let exportRows;
+                    if (category === 'lookup_report') {
+                        exportRows = exportCandidateRows.map(r => ({
+                            'Phone Number': r.phone_number,
+                            'Household Income': r.household_income || '',
+                            'Est Market Value': r.est_market_value || ''
+                        }));
+                    } else if (category === 'lookup_no_info') {
+                        exportRows = exportCandidateRows.map(r => ({
+                            'Phone Number': r.phone_number,
+                            'Status': 'No Information (কোনো তথ্য পাওয়া যায় নাই)'
+                        }));
+                    } else {
+                        exportRows = exportCandidateRows.map((item, idx) => ({
+                            'SL': idx + 1,
+                            'Phone Number': item.phone_number,
+                            'Full Name': item.full_name || '',
+                            'Age': item.age || '',
+                            'Report Category': item.report_type || 'General',
+                            'Submitted By': item.username || userEmailToNameMap[item.user_email] || item.user_email,
+                            'Submission Date': item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+                            'Submission Time': item.created_at ? new Date(item.created_at).toLocaleTimeString() : ''
+                        }));
+                    }
 
                     const ws = XLSX.utils.json_to_sheet(exportRows);
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Records");
-                    const fileName = `Full_Report_${catName}_${dateLabel}_Total_${exportRows.length}.xlsx`;
+                    XLSX.utils.book_append_sheet(wb, ws, "Fresh_Records");
+                    const fileName = `${catName}_${dateLabel}_Total_${exportRows.length}.xlsx`;
                     XLSX.writeFile(wb, fileName);
-
                 } else {
                     // Export Plain Text (.txt) - 1 record per line
-                    const lines = allRows.map(r => `${r.phone_number}\t${r.full_name || ''}\t${r.age || ''}`);
+                    const lines = exportCandidateRows.map(r => `${r.phone_number}`);
                     const content = lines.join('\n');
                     const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `Full_Report_${catName}_${dateLabel}_Total_${allRows.length}.txt`;
+                    a.download = `${catName}_${dateLabel}_Total_${exportCandidateRows.length}.txt`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }
 
-                if (statusText) statusText.innerHTML = `<span class="text-emerald-700">🎉 সফল! মোট <b>${allRows.length.toLocaleString()} টি</b> সম্পূর্ণ ডাটা এক ক্লিকে ডাউনলোড হয়েছে!</span>`;
+                // MARK ALL DOWNLOADED NUMBERS AS DOWNLOADED IN REGISTRY
+                exportCandidateRows.forEach(r => {
+                    const p = String(r.phone_number || '').trim();
+                    if (p) downloadedRegistry.add(p);
+                });
+                saveDownloadedPhoneRegistry(downloadedRegistry);
+                updateDownloadLocksBadge();
+
+                if (statusText) statusText.innerHTML = `<span class="text-emerald-700">🎉 সফল! মোট <b>${exportCandidateRows.length.toLocaleString()} টি</b> ফ্রেশ ডাটা ডাউনলোড হয়েছে এবং লক করা হয়েছে (ভবিষ্যতে এই নাম্বারগুলো আর পুনরায় আসবে না)।</span>`;
 
             } catch(err) {
                 console.error('Quick export error:', err);
@@ -10297,7 +10331,6 @@ async function loadClaimStockSector() {
                 if (btnTxt) btnTxt.disabled = false;
             }
         }
-
 
         // =============================================================
         // REPORT SUBMISSION LOCK & AUTO-TIMER CONTROLLER
@@ -11016,3 +11049,338 @@ async function loadClaimStockSector() {
         async function testSystemApiPing() {
             alert('⚡ Testing REXON API Telemetry...\n\n1. Supabase Postgres Ping: 38ms (Healthy)\n2. Turso Cloud Smart Vault Ping: 42ms (AWS Mumbai - Connected)\n3. Dedup Concurrency Engine: 0 Conflicts\n\nStatus: All endpoints fully operational!');
         }
+
+
+        // =========================================================================
+        // REQUIREMENT 2: DOWNLOAD ONCE MEMORY LOCK PROTECTION REGISTRY
+        // =========================================================================
+        function getDownloadedPhoneRegistry() {
+            try {
+                const raw = localStorage.getItem('rexon_downloaded_phones_registry');
+                if (raw) return new Set(JSON.parse(raw));
+            } catch(e) {}
+            return new Set();
+        }
+
+        function saveDownloadedPhoneRegistry(phoneSet) {
+            try {
+                localStorage.setItem('rexon_downloaded_phones_registry', JSON.stringify(Array.from(phoneSet)));
+            } catch(e) {}
+        }
+
+        function adminResetDownloadLocks() {
+            if (!confirm('আপনি কি ডাউনলোড হিস্ট্রি ও মেমোরি লক রিসেট করতে চান?\n\nরিসেট করলে পূর্বে ডাউনলোড করা সমস্ত নাম্বার পুনরায় ফ্রেশ হিসেবে ডাউনলোড করার সুযোগ পাবেন।')) {
+                return;
+            }
+            localStorage.removeItem('rexon_downloaded_phones_registry');
+            updateDownloadLocksBadge();
+            alert('✅ ডাউনলোড হিস্ট্রি রিসেট সফল হয়েছে! এখন সমস্ত ডাটা পুনরায় ডাউনলোড করা যাবে।');
+        }
+
+        function updateDownloadLocksBadge() {
+            const reg = getDownloadedPhoneRegistry();
+            const badge = document.getElementById('quickExportFreshCountBadge');
+            if (badge) {
+                if (reg.size > 0) {
+                    badge.innerText = `🔒 ${reg.size.toLocaleString()} টি পূর্বে ডাউনলোড হয়েছে (লক সক্রিয়)`;
+                    badge.className = 'text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-amber-200 text-amber-950 shadow-2xs';
+                } else {
+                    badge.innerText = '🟢 সব ডাটা ফ্রেশ (০ টি লক)';
+                    badge.className = 'text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-200 text-emerald-900 shadow-2xs';
+                }
+            }
+        }
+
+        // =========================================================================
+        // REQUIREMENT 3: 1-CLICK CLEAN ALL USER DATA (ইউজারদের সব ডাটা এক ক্লিকে মুছুন)
+        // =========================================================================
+        async function adminOneClickCleanAllUserData() {
+            if (!confirm("⚠️ চূড়ান্ত সতর্কবার্তা (1-Click Clean All User Data):\n\nআপনি কি এক ক্লিকে ইউজারদের সমস্ত সাবমিশন ডাটা (Female, Male, Signal, Lookup) সম্পূর্ণ মুছে ফেলে ডাটাবেজ ফ্রেশ করতে চান?\n\n(কোম্পানিকে পূর্বে দেওয়া ডেলিভারি রেকর্ড সম্পূর্ণ নিরাপদ থাকবে)\n\nডাটাবেজ সম্পূর্ণ ক্লিন ও ০ করার জন্য 'OK' চাপুন।")) {
+                return;
+            }
+
+            try {
+                // 1. Wipe Turso Submissions Vault
+                if (typeof TursoVault !== 'undefined') {
+                    await TursoVault.query("DELETE FROM turso_submissions;");
+                }
+                // 2. Wipe Supabase Master Submissions & Logs
+                if (supabaseClient) {
+                    await Promise.all([
+                        supabaseClient.from('master_numbers').delete().neq('id', 0),
+                        supabaseClient.from('upload_logs').delete().neq('id', 0),
+                        supabaseClient.from('lookup_records').delete().neq('id', 0),
+                        supabaseClient.from('lookup_no_info_records').delete().neq('id', 0)
+                    ]);
+                }
+                // 3. Reset Local Caches
+                adminSubmissionsCache = [];
+                adminLogsCache = [];
+                adminLookupValidList = [];
+                adminLookupNoInfoList = [];
+                workerMonthlyArchive = {};
+
+                alert("✅ সফল! ইউজারদের সমস্ত জমা দেওয়া ডাটা সম্পূর্ণ মুছে ফেলা হয়েছে এবং ডাটাবেজ সম্পূর্ণ ক্লিন ও ০ করা হয়েছে!");
+                await loadAdminDashboard();
+                if (typeof loadUserDashboard === 'function') await loadUserDashboard();
+            } catch(err) {
+                console.error("Clean error:", err);
+                alert("ডাটা মুছতে সমস্যা হয়েছে: " + err.message);
+            }
+        }
+
+        // =========================================================================
+        // REQUIREMENT 4 & 5: NOTICE BOARD SYSTEM & DEADLINE BANNER (Valid until 08-10-26)
+        // =========================================================================
+        const DEFAULT_DEADLINE_NOTICE = {
+            id: 'notice_deadline_oct08',
+            title: 'কাজের শুরু সংক্রান্ত জরুরি ডেডলাইন',
+            message: 'আপনাদের সবার কাজ আগামী কালকে থেকে শুরু হবে',
+            type: 'deadline',
+            expiry: '2026-10-08',
+            audience: 'all',
+            created_at: '2026-10-06T10:00:00Z',
+            active: true
+        };
+
+        function getAdminNotices() {
+            try {
+                const raw = localStorage.getItem('rexon_admin_notices');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch(e) {}
+            return [DEFAULT_DEADLINE_NOTICE];
+        }
+
+        function saveAdminNotices(notices) {
+            try {
+                localStorage.setItem('rexon_admin_notices', JSON.stringify(notices));
+                // Background sync with Supabase app_settings
+                if (supabaseClient && currentProfile && currentProfile.role === 'admin') {
+                    supabaseClient.from('app_settings').upsert({
+                        key: 'admin_notice_board',
+                        value: notices,
+                        updated_at: new Date().toISOString()
+                    }).then();
+                }
+            } catch(e) {}
+        }
+
+        function isNoticeStillValid(expiryDateStr) {
+            if (!expiryDateStr) return true;
+            try {
+                const now = new Date();
+                const [y, m, d] = expiryDateStr.split('-').map(Number);
+                const expiry = new Date(y, m - 1, d, 23, 59, 59, 999);
+                return now <= expiry;
+            } catch(e) {
+                return true;
+            }
+        }
+
+        function checkDeadlineNoticeBanner() {
+            const banner = document.getElementById('adminDeadlineNoticeBanner');
+            if (!banner) return;
+
+            // Check if deadline date (2026-10-08) is still valid
+            const isValid = isNoticeStillValid('2026-10-08');
+
+            if (isValid) {
+                banner.classList.remove('hidden');
+                // Calculate countdown
+                const now = new Date();
+                const deadline = new Date(2026, 9, 8, 23, 59, 59);
+                const diffMs = deadline - now;
+                if (diffMs > 0) {
+                    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const badge = document.getElementById('deadlineCountdownBadge');
+                    if (badge) badge.innerText = `⏳ আর ${days} দিন ${hours} ঘণ্টা বাকি (০৮-১০-২৬)`;
+                }
+            } else {
+                // Auto-cleaned after October 8, 2026!
+                banner.classList.add('hidden');
+            }
+        }
+
+        function renderWorkerNotices() {
+            checkDeadlineNoticeBanner();
+            const container = document.getElementById('workerLiveNoticeBoardCard');
+            const list = document.getElementById('workerLiveNoticeBoardList');
+            const countBadge = document.getElementById('workerNoticeCountBadge');
+            if (!list) return;
+
+            const allNotices = getAdminNotices();
+            // Filter active and non-expired
+            const activeNotices = allNotices.filter(n => n.active && isNoticeStillValid(n.expiry));
+
+            if (countBadge) countBadge.innerText = `${activeNotices.length} টি সক্রিয় নোটিশ`;
+
+            if (activeNotices.length === 0) {
+                if (container) container.classList.add('hidden');
+                return;
+            }
+
+            if (container) container.classList.remove('hidden');
+
+            const typeStyles = {
+                'deadline': { bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/60', text: 'text-amber-950 dark:text-amber-200', badge: 'bg-amber-200 text-amber-950', icon: '⏰' },
+                'urgent': { bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700/60', text: 'text-rose-950 dark:text-rose-200', badge: 'bg-rose-200 text-rose-950', icon: '🚨' },
+                'announcement': { bg: 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-700/60', text: 'text-indigo-950 dark:text-indigo-200', badge: 'bg-indigo-200 text-indigo-950', icon: '📢' },
+                'success': { bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/60', text: 'text-emerald-950 dark:text-emerald-200', badge: 'bg-emerald-200 text-emerald-950', icon: '✅' }
+            };
+
+            list.innerHTML = activeNotices.map(n => {
+                const s = typeStyles[n.type] || typeStyles.announcement;
+                return `
+                    <div class="p-3.5 rounded-xl border ${s.bg} flex items-start space-x-3 text-xs shadow-2xs">
+                        <span class="text-xl flex-shrink-0">${s.icon}</span>
+                        <div class="flex-1 space-y-1">
+                            <div class="flex flex-wrap items-center justify-between gap-1.5">
+                                <h5 class="font-extrabold ${s.text} text-sm">${n.title}</h5>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${s.badge}">${n.type.toUpperCase()}</span>
+                                    <span class="text-[10px] text-slate-500 font-mono">মেয়াদ: ${n.expiry || 'চলমান'}</span>
+                                </div>
+                            </div>
+                            <p class="${s.text} font-medium leading-relaxed">${n.message}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateMarqueeNotices(activeNotices);
+        }
+
+        function updateMarqueeNotices(activeNotices) {
+            const txt1 = document.getElementById('marqueeNoticeText1');
+            const txt2 = document.getElementById('marqueeNoticeText2');
+            if (!txt1 || !txt2) return;
+
+            if (activeNotices && activeNotices.length > 0) {
+                const combinedText = activeNotices.map(n => `${n.title}: "${n.message}" (মেয়াদ: ${n.expiry || 'চলমান'})`).join('  ★  ');
+                txt1.innerText = combinedText;
+                txt2.innerText = combinedText;
+            } else {
+                const defaultMsg = 'আপনাদের সবার কাজ ঠিকমতো করুন, যেকোনো সমস্যা হলে টেলিগ্রামে যোগাযোগ করুন (@rexwarr)।';
+                txt1.innerText = defaultMsg;
+                txt2.innerText = defaultMsg;
+            }
+        }
+
+        function renderAdminNoticesList() {
+            const container = document.getElementById('adminNoticeListContainer');
+            const countBadge = document.getElementById('adminNoticeBoardActiveCount');
+            if (!container) return;
+
+            const allNotices = getAdminNotices();
+            const activeCount = allNotices.filter(n => n.active && isNoticeStillValid(n.expiry)).length;
+            if (countBadge) countBadge.innerText = `${activeCount} টি সক্রিয় নোটিশ`;
+
+            if (allNotices.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-xs py-3">বর্তমানে কোনো নোটিশ নেই। উপরের ফর্ম থেকে নতুন নোটিশ প্রকাশ করুন।</p>';
+                return;
+            }
+
+            container.innerHTML = allNotices.map((n, idx) => {
+                const isValid = isNoticeStillValid(n.expiry);
+                const statusBadge = (!n.active)
+                    ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700">নিষ্ক্রিয় (Off)</span>'
+                    : (isValid
+                        ? '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">🟢 সক্রিয় (Active)</span>'
+                        : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">⌛ মেয়াদোত্তীর্ণ (Expired)</span>');
+
+                return `
+                    <div class="p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div class="space-y-1 flex-1">
+                            <div class="flex items-center space-x-2">
+                                <h5 class="font-extrabold text-slate-900 dark:text-white text-sm">${n.title}</h5>
+                                ${statusBadge}
+                                <span class="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.2 rounded font-bold">${n.type}</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300 font-medium">${n.message}</p>
+                            <span class="text-[10px] text-slate-400 block">মেয়াদ: <b>${n.expiry || 'কোনো মেয়াদ নেই'}</b> | আইডি: ${n.id}</span>
+                        </div>
+                        <div class="flex items-center space-x-2 self-start sm:self-auto flex-shrink-0">
+                            <button type="button" onclick="adminToggleNoticeStatus('${n.id}')" class="px-3 py-1 rounded-lg text-xs font-bold border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                ${n.active ? '👁️ বন্ধ করুন' : '🟢 চালু করুন'}
+                            </button>
+                            <button type="button" onclick="adminDeleteNotice('${n.id}')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition">
+                                🗑️ মুছুন
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleAdminCreateNotice(e) {
+            e.preventDefault();
+            const titleInput = document.getElementById('adminNoticeTitleInput');
+            const typeInput = document.getElementById('adminNoticeTypeInput');
+            const expiryInput = document.getElementById('adminNoticeExpiryInput');
+            const msgInput = document.getElementById('adminNoticeMessageInput');
+
+            const title = (titleInput ? titleInput.value : '').trim();
+            const type = (typeInput ? typeInput.value : 'deadline');
+            const expiry = (expiryInput ? expiryInput.value : '');
+            const message = (msgInput ? msgInput.value : '').trim();
+
+            if (!title || !message) {
+                alert('অনুগ্রহ করে নোটিশের শিরোনাম ও বিস্তারিত বার্তা দিন।');
+                return;
+            }
+
+            const notices = getAdminNotices();
+            const newNotice = {
+                id: 'notice_' + Date.now(),
+                title: title,
+                message: message,
+                type: type,
+                expiry: expiry,
+                audience: 'all',
+                created_at: new Date().toISOString(),
+                active: true
+            };
+
+            notices.unshift(newNotice);
+            saveAdminNotices(notices);
+
+            if (titleInput) titleInput.value = '';
+            if (msgInput) msgInput.value = '';
+
+            renderAdminNoticesList();
+            renderWorkerNotices();
+
+            alert('📢 সফল! নতুন নোটিশটি প্রকাশিত হয়েছে এবং সকল কর্মীদের ড্যাশবোর্ডে লাইভ চলে গেছে।');
+        }
+
+        function adminDeleteNotice(id) {
+            if (!confirm('আপনি কি এই নোটিশটি মুছে ফেলতে চান?')) return;
+            let notices = getAdminNotices();
+            notices = notices.filter(n => n.id !== id);
+            saveAdminNotices(notices);
+            renderAdminNoticesList();
+            renderWorkerNotices();
+        }
+
+        function adminToggleNoticeStatus(id) {
+            const notices = getAdminNotices();
+            const n = notices.find(x => x.id === id);
+            if (n) {
+                n.active = !n.active;
+                saveAdminNotices(notices);
+                renderAdminNoticesList();
+                renderWorkerNotices();
+            }
+        }
+
+        // Auto-initialize notice board and download locks badge on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWorkerNotices();
+            renderAdminNoticesList();
+            updateDownloadLocksBadge();
+            checkDeadlineNoticeBanner();
+        });
