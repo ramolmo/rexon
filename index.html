@@ -2116,11 +2116,13 @@
                                 <label class="text-xs font-semibold text-slate-600 block mb-1">Report Type:</label>
                                 <select id="adminSubReportFilter" onchange="loadAdminSubmissionsData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-medium">
                                     <option value="all">All Report Types</option>
-                                    <option value="male_report">👨 Male Report (পুরুষ ডাটা)</option>
-                                    <option value="female_report">👩 Female Report</option>
+                                    <option value="male_normal">👨 Male Normal (পুরুষ ডাটা ৪১+)</option>
+                                    <option value="female_normal">👩 Female Normal (মহিলা ডাটা ৪৩+)</option>
+                                    <option value="female_signal">📡👩 Female Signal (ফিমেল সিগন্যাল ডাটা)</option>
+                                    <option value="male_signal">📡👨 Signal Male Report (মেল সিগন্যাল রিপোর্ট)</option>
+                                    <option value="signal_report">📡 All Signal Reports (সকল সিগন্যাল ডাটা)</option>
                                     <option value="lookup_report">🔍 Lookup Report (Valid - আয় ও মার্কেট ভ্যালু)</option>
                                     <option value="lookup_no_info">⚪ Lookup No Info (কোনো তথ্য নেই)</option>
-                                    <option value="signal_report">📡 Signal Report</option>
                                 </select>
                             </div>
                             <div>
@@ -2357,8 +2359,9 @@
                                 <select id="cdInputCategory" onchange="onCdCategoryChanged()" class="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-500">
                                     <option value="male_data">👨 1. Male Data (পুরুষ ডাটা)</option>
                                     <option value="female_data">👩 2. Female Data (মহিলা ডাটা)</option>
-                                    <option value="signal_data">📡 2. Signal Data (সিগন্যাল ডাটা)</option>
-                                    <option value="lookup_data">🔍 3. Lookup Data (Household Income & Market Val)</option>
+                                    <option value="signal_female">📡👩 3. Female Signal Data (ফিমেল সিগন্যাল ডাটা)</option>
+                                    <option value="signal_male">📡👨 4. Signal Male Report (মেল সিগন্যাল ডাটা / রিপোর্ট)</option>
+                                    <option value="lookup_data">🔍 5. Lookup Data (Household Income & Market Val)</option>
                                 </select>
                             </div>
                             <div>
@@ -2457,10 +2460,12 @@
                                     <label class="text-xs font-bold text-slate-700 block mb-1">📂 Category:</label>
                                     <select id="cdFilterCategory" onchange="loadCompanyDeliveriesData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white">
                                         <option value="all">All Categories (সবগুলো)</option>
-                                        <option value="male_data">👨 Male Data</option>
-                                        <option value="female_data">👩 Female Data</option>
-                                        <option value="signal_data">📡 Signal Data</option>
-                                        <option value="lookup_data">🔍 Lookup Data</option>
+                                        <option value="male_data">👨 1. Male Data (পুরুষ ডাটা)</option>
+                                        <option value="female_data">👩 2. Female Data (মহিলা ডাটা)</option>
+                                        <option value="signal_female">📡👩 3. Female Signal Data (ফিমেল সিগন্যাল)</option>
+                                        <option value="signal_male">📡👨 4. Signal Male Report (মেল সিগন্যাল রিপোর্ট)</option>
+                                        <option value="signal_data">📡 All Signal Data (সব সিগন্যাল ডাটা)</option>
+                                        <option value="lookup_data">🔍 5. Lookup Data (লুকআপ ডাটা)</option>
                                     </select>
                                 </div>
                                 <div>

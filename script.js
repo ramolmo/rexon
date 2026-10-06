@@ -518,7 +518,9 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                         COUNT(*) as total,
                         SUM(CASE WHEN category = 'male_data' THEN 1 ELSE 0 END) as male_deliv,
                         SUM(CASE WHEN category = 'female_data' THEN 1 ELSE 0 END) as female_deliv,
-                        SUM(CASE WHEN category = 'signal_data' THEN 1 ELSE 0 END) as signal_deliv,
+                        SUM(CASE WHEN category = 'signal_data' OR category = 'signal_female' OR category = 'signal_male' THEN 1 ELSE 0 END) as signal_deliv,
+                        SUM(CASE WHEN category = 'signal_male' THEN 1 ELSE 0 END) as signal_male_deliv,
+                        SUM(CASE WHEN category = 'signal_female' OR category = 'signal_data' THEN 1 ELSE 0 END) as signal_female_deliv,
                         SUM(CASE WHEN category = 'lookup_data' THEN 1 ELSE 0 END) as lookup_deliv,
                         SUM(CASE WHEN date(delivered_at) = date('now') OR date(created_at) = date('now') THEN 1 ELSE 0 END) as today_deliv
                     FROM turso_deliveries;
@@ -7210,8 +7212,14 @@ async function runDuplicateCheck() {
                 if (marketContainer) marketContainer.classList.remove('hidden');
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
-            } else if (cat === 'signal_data') {
-                if (hint) hint.innerHTML = 'Enter or paste rows for Signal Data: <span class="font-mono bg-sky-50 text-sky-900 px-1 rounded font-bold">Phone Number</span> (one per line, e.g. 15136465609)';
+            } else if (cat === 'signal_male') {
+                if (hint) hint.innerHTML = 'Enter or paste rows for Signal Male Report / Data: <span class="font-mono bg-cyan-50 text-cyan-900 px-1 rounded font-bold">Phone Number</span> (one per line, e.g. 15136465609)';
+                if (nameContainer) nameContainer.classList.add('hidden');
+                if (ageContainer) ageContainer.classList.add('hidden');
+                if (incomeContainer) incomeContainer.classList.add('hidden');
+                if (marketContainer) marketContainer.classList.add('hidden');
+            } else if (cat === 'signal_data' || cat === 'signal_female') {
+                if (hint) hint.innerHTML = 'Enter or paste rows for Female Signal Data: <span class="font-mono bg-sky-50 text-sky-900 px-1 rounded font-bold">Phone Number</span> (one per line, e.g. 15136465609)';
                 if (nameContainer) nameContainer.classList.add('hidden');
                 if (ageContainer) ageContainer.classList.add('hidden');
                 if (incomeContainer) incomeContainer.classList.add('hidden');
@@ -7417,8 +7425,19 @@ async function runDuplicateCheck() {
                                 });
                             }
                         }
+                    } else if (category === 'signal_male' || category === 'signal_female' || category === 'signal_data') {
+                        // Pure phone numbers or space-separated phone + optional note for signal data
+                        const spaceParts = cleanLine.split(/\s+/);
+                        const p = spaceParts[0].replace(/[\s\-\(\)\.]/g, '');
+                        if (p.length >= 6) {
+                            records.push({
+                                phone: p,
+                                name: spaceParts.slice(1).join(' ') || '',
+                                age: ''
+                            });
+                        }
                     } else {
-                        // Female or lookup data
+                        // Male or Female data: Phone Name Age
                         const parts = cleanLine.split(/\t|,|\s{2,}/);
                         if (parts.length >= 2) {
                             const p = parts[0].replace(/[\s\-\(\)\.]/g, '');
@@ -7630,7 +7649,13 @@ async function runDuplicateCheck() {
                         tStats = await safeQuery(TursoVault.getDeliveryStats(), { total: 0, femaleDeliv: 0, signalDeliv: 0, lookupDeliv: 0, todayDeliv: 0 });
                         let sql = `SELECT * FROM turso_deliveries WHERE 1=1 `;
                         if (dateFilter) sql += ` AND delivery_date = '${dateFilter}'`;
-                        if (catFilter !== 'all') sql += ` AND category = '${catFilter}'`;
+                        if (catFilter === 'signal_data') {
+                            sql += ` AND (category = 'signal_data' OR category = 'signal_female' OR category = 'signal_male')`;
+                        } else if (catFilter === 'signal_female') {
+                            sql += ` AND (category = 'signal_female' OR category = 'signal_data')`;
+                        } else if (catFilter !== 'all') {
+                            sql += ` AND category = '${catFilter}'`;
+                        }
                         sql += ` ORDER BY id DESC LIMIT 500;`;
                         const tRes = await safeQuery(TursoVault.query(sql), null);
                         if (tRes && tRes.rows) tRows = tRes.rows;
@@ -7644,14 +7669,20 @@ async function runDuplicateCheck() {
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'male_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data'), { count: 0 }),
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'signal_data'), { count: 0 }),
+                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data'), { count: 0 }),
                     safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayIso), { count: 0 }),
                     (async () => {
                         try {
                             let q = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).limit(500);
                             if (dateFilter) q = q.eq('delivery_date', dateFilter);
-                            if (catFilter !== 'all') q = q.eq('category', catFilter);
+                            if (catFilter === 'signal_data') {
+                                q = q.or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male');
+                            } else if (catFilter === 'signal_female') {
+                                q = q.or('category.eq.signal_female,category.eq.signal_data');
+                            } else if (catFilter !== 'all') {
+                                q = q.eq('category', catFilter);
+                            }
                             const { data } = await q;
                             return data || [];
                         } catch(e) {
@@ -7726,6 +7757,12 @@ async function runDuplicateCheck() {
                     let catBadge = '';
                     if (item.category === 'female_data') {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Data</span>';
+                    } else if (item.category === 'male_data') {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-blue-100 text-blue-800 font-bold">👨 Male Data</span>';
+                    } else if (item.category === 'signal_male') {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-cyan-100 text-cyan-800 font-bold">📡👨 Signal Male Report</span>';
+                    } else if (item.category === 'signal_female' || item.category === 'signal_data') {
+                        catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-sky-100 text-sky-800 font-bold">📡👩 Female Signal</span>';
                     } else {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-purple-100 text-purple-800 font-bold">🔍 Lookup Data</span>';
                     }
@@ -7737,6 +7774,14 @@ async function runDuplicateCheck() {
                                 ${item.household_income ? `<div class="text-xs font-bold text-emerald-700">💰 Income: ${item.household_income}</div>` : ''}
                                 ${item.est_market_value ? `<div class="text-xs font-bold text-purple-700">🏡 Market Val: ${item.est_market_value}</div>` : ''}
                                 ${!item.household_income && !item.est_market_value ? '<span class="text-slate-400">-</span>' : ''}
+                            </div>
+                        `;
+                    } else if (item.category === 'signal_male' || item.category === 'signal_female' || item.category === 'signal_data') {
+                        detailHtml = `
+                            <div>
+                                <span class="font-bold text-slate-800">${item.phone_number || '-'}</span>
+                                ${item.full_name ? `<span class="text-slate-600 text-xs ml-1">${item.full_name}</span>` : ''}
+                                <span class="text-sky-600 text-xs ml-1 font-semibold">(${item.category === 'signal_male' ? 'Signal Male' : 'Signal Female'})</span>
                             </div>
                         `;
                     } else {
@@ -7778,7 +7823,13 @@ async function runDuplicateCheck() {
                 while (from < 50000) {
                     let query = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).range(from, from + pageSize - 1);
                     if (dateFilter) query = query.eq('delivery_date', dateFilter);
-                    if (catFilter !== 'all') query = query.eq('category', catFilter);
+                    if (catFilter === 'signal_data') {
+                        query = query.or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male');
+                    } else if (catFilter === 'signal_female') {
+                        query = query.or('category.eq.signal_female,category.eq.signal_data');
+                    } else if (catFilter !== 'all') {
+                        query = query.eq('category', catFilter);
+                    }
 
                     const { data, error } = await query;
                     if (error) throw error;
@@ -7796,7 +7847,7 @@ async function runDuplicateCheck() {
                 const exportRows = allRows.map((item, idx) => ({
                     'SL': idx + 1,
                     'Delivery Date': item.delivery_date,
-                    'Category': item.category === 'female_data' ? 'Female Data' : 'Lookup Data',
+                    'Category': item.category === 'female_data' ? 'Female Data' : (item.category === 'male_data' ? 'Male Data' : (item.category === 'signal_male' ? 'Signal Male Report' : ((item.category === 'signal_female' || item.category === 'signal_data') ? 'Female Signal Data' : 'Lookup Data'))),
                     'Phone Number': item.phone_number,
                     'Full Name': item.full_name || '-',
                     'Age': item.age || '-',
