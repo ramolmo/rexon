@@ -372,3 +372,52 @@ html.dark table tbody tr:hover {
         transition-duration: 0.001ms !important;
     }
 }
+
+/* Additional REXON SaaS Refinements */
+html.dark .rx-saas-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #172554 100%) !important;
+    border-color: rgba(99, 102, 241, 0.28) !important;
+}
+
+html.dark .bg-slate-100 {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark .bg-indigo-50 {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+html.dark .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html.dark .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.12) !important;
+    border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+html.dark .bg-rose-50 {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+html.dark .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.dark .bg-sky-50 {
+    background-color: rgba(14, 165, 233, 0.12) !important;
+    border-color: rgba(14, 165, 233, 0.25) !important;
+}
+
+/* Zero horizontal overflow on small displays */
+@media (max-width: 640px) {
+    .max-w-7xl {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
