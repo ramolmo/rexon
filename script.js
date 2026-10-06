@@ -3648,9 +3648,21 @@ function setupWorkerReportOptions(dept) {
                                             🗑️
                                         </button>
                                     ` : ''}
-                                    <button onclick="downloadSingleUserData('${u.email}')" class="p-1 px-2 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md font-bold transition flex items-center space-x-1" title="এই কর্মীর ডাটা এক্সেল ডাউনলোড">
+                                    <button onclick="downloadSingleUserData('${u.email}')" class="p-1 px-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md font-bold transition flex items-center space-x-1" title="এই কর্মীর ডাটা এক্সেল ডাউনলোড">
                                         <span>📥</span>
                                         <span class="text-[10px]">Data</span>
+                                    </button>
+                                    <button onclick="openEditWorkerSalaryModal('${u.id}', '${u.username || u.email.split('@')[0]}', '${u.email}')" class="p-1 px-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-md font-bold transition flex items-center space-x-1" title="কর্মীর বেতন ও রেট এডিট করুন">
+                                        <span>💰</span>
+                                        <span class="text-[10px]">Salary</span>
+                                    </button>
+                                    <button onclick="openDisbursePaymentModal('${u.id}', '${u.username || u.email.split('@')[0]}', '${u.email}')" class="p-1 px-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md font-bold transition flex items-center space-x-1" title="টাকা পাঠান ও স্ক্রিনশট দিন">
+                                        <span>💸</span>
+                                        <span class="text-[10px]">Pay</span>
+                                    </button>
+                                    <button onclick="adminDeleteSingleWorkerSubmissions('${u.id}', '${u.username || u.email.split('@')[0]}', '${u.email}')" class="p-1 px-1.5 text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-md font-bold transition flex items-center space-x-1" title="এই কর্মীর সমস্ত কাজের ডাটা আলাদাভাবে মুছে ফেলুন (অ্যাকাউন্ট বহাল থাকবে)">
+                                        <span>🧹</span>
+                                        <span class="text-[10px]">Clean</span>
                                     </button>
                                 </div>
                             </td>
@@ -11383,4 +11395,480 @@ async function loadClaimStockSector() {
             renderAdminNoticesList();
             updateDownloadLocksBadge();
             checkDeadlineNoticeBanner();
+        });
+
+
+        // =========================================================================
+        // FEATURE 1: PER-USER DATA DELETION (প্রতিটি ইউজারের ডাটা আলাদা আলাদা ডিলিট)
+        // =========================================================================
+        async function adminDeleteSingleWorkerSubmissions(userId, username, email) {
+            const confirmMsg = `⚠️ সতর্কতা (Delete Single Worker Data):\n\nআপনি কি নিশ্চিতভাবে কর্মী "${username}" (${email}) এর সমস্ত কাজের ডাটা (Master numbers, upload logs, lookup records) সম্পূর্ণ মুছে ফেলতে চান?\n\nকর্মী অ্যাকাউন্ট বহাল থাকবে, শুধুমাত্র ডাটাবেজের সমস্ত কাজ মুছে ০ হয়ে যাবে।`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                // 1. Delete from Supabase tables
+                if (supabaseClient) {
+                    await Promise.all([
+                        supabaseClient.from('master_numbers').delete().or(`user_id.eq.${userId},user_email.eq.${email}`),
+                        supabaseClient.from('upload_logs').delete().or(`user_id.eq.${userId},user_email.eq.${email}`),
+                        supabaseClient.from('lookup_records').delete().or(`worker_email.eq.${email},worker_username.eq.${username}`),
+                        supabaseClient.from('lookup_no_info_records').delete().or(`worker_email.eq.${email},worker_username.eq.${username}`)
+                    ]);
+                }
+                // 2. Delete from Turso Vault
+                if (typeof TursoVault !== 'undefined') {
+                    await TursoVault.query(`DELETE FROM turso_submissions WHERE user_id = '${userId}' OR user_email = '${email}' OR username = '${username}';`);
+                }
+
+                alert(`✅ সফল! কর্মী "${username}" এর সমস্ত কাজের ডাটা মুছে ফেলা হয়েছে।`);
+                await loadAdminDashboard();
+            } catch (err) {
+                console.error('Delete worker data error:', err);
+                alert('ডাটা মুছতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        // =========================================================================
+        // FEATURE 2: MULTI-CURRENCY TOGGLE (৳ BDT & $ USD)
+        // =========================================================================
+        let currentCurrency = localStorage.getItem('rexon_currency') || 'BDT';
+        const USD_TO_BDT_RATE = 120.0;
+
+        function toggleCurrencyMode() {
+            currentCurrency = (currentCurrency === 'BDT') ? 'USD' : 'BDT';
+            localStorage.setItem('rexon_currency', currentCurrency);
+            applyCurrencyUI();
+        }
+
+        function applyCurrencyUI() {
+            const iconEl = document.getElementById('currencyToggleIcon');
+            const labelEl = document.getElementById('currencyToggleLabel');
+            const publicLabelEl = document.getElementById('currencyToggleLabelPublic');
+            const finBadge = document.getElementById('finHeadcountCurrencyBadge');
+            const billingUnit = document.getElementById('billingRateCurrencyUnit');
+            const workerUnit = document.getElementById('workerRateCurrencyUnit');
+
+            const sym = (currentCurrency === 'BDT') ? '৳' : '$';
+            const code = currentCurrency;
+
+            if (iconEl) iconEl.innerText = sym;
+            if (labelEl) labelEl.innerText = code;
+            if (publicLabelEl) publicLabelEl.innerText = `${sym} ${code}`;
+            if (finBadge) finBadge.innerText = `${sym} ${code}`;
+            if (billingUnit) billingUnit.innerText = `${sym} / ১,০০০ ডাটা`;
+            if (workerUnit) workerUnit.innerText = `${sym} / ১,০০০ ডাটা`;
+
+            // Recalculate financial views
+            if (typeof recalcCompanyVsWorkerFinances === 'function') recalcCompanyVsWorkerFinances();
+            if (typeof recalcWorkerPayrollEstimate === 'function') recalcWorkerPayrollEstimate();
+            if (typeof updateAdminFinanceUI === 'function') updateAdminFinanceUI();
+        }
+
+        function formatCurrency(amountBdt) {
+            if (currentCurrency === 'BDT') {
+                return `৳${Math.round(amountBdt).toLocaleString()}`;
+            } else {
+                const usd = amountBdt / USD_TO_BDT_RATE;
+                return `$${usd.toFixed(2)}`;
+            }
+        }
+
+        // =========================================================================
+        // FEATURE 3: COMPANY WORKFORCE HEADCOUNT & BILLING VS PAYROLL ACCOUNTING
+        // =========================================================================
+        function updateCompanyHeadcountReport() {
+            const totalWorkersEl = document.getElementById('hcTotalWorkers');
+            const activeTodayEl = document.getElementById('hcActiveToday');
+            const gvWorkersEl = document.getElementById('hcGvWorkers');
+            const lookupWorkersEl = document.getElementById('hcLookupWorkers');
+
+            const users = adminUsersCache || [];
+            const total = users.length;
+            const activeToday = users.filter(u => u.todayAdded && u.todayAdded > 0).length;
+            const gvCount = users.filter(u => u.department === 'gender_verify' || u.department === 'male').length;
+            const lookupCount = users.filter(u => u.department === 'lookup' || u.department === 'number_lookup').length;
+
+            if (totalWorkersEl) totalWorkersEl.innerText = `${total.toLocaleString()} জন`;
+            if (activeTodayEl) activeTodayEl.innerText = `${activeToday.toLocaleString()} জন`;
+            if (gvWorkersEl) gvWorkersEl.innerText = `${gvCount.toLocaleString()} জন`;
+            if (lookupWorkersEl) lookupWorkersEl.innerText = `${lookupCount.toLocaleString()} জন`;
+
+            recalcCompanyVsWorkerFinances();
+        }
+
+        function recalcCompanyVsWorkerFinances() {
+            const totalVolume = parseInt(document.getElementById('adminStatTotalUnique')?.innerText.replace(/,/g, '') || '0', 10);
+            const clientRateInput = parseFloat(document.getElementById('companyBillingRatePerK')?.value) || 5000;
+            const workerRateInput = parseFloat(document.getElementById('workerDefaultRatePerK')?.value) || 3000;
+
+            const totalClientBillBdt = (totalVolume / 1000) * clientRateInput;
+            const totalWorkerPayBdt = (totalVolume / 1000) * workerRateInput;
+            const netProfitBdt = Math.max(0, totalClientBillBdt - totalWorkerPayBdt);
+            const marginPct = totalClientBillBdt > 0 ? Math.round((netProfitBdt / totalClientBillBdt) * 100) : 0;
+
+            const billDisplay = document.getElementById('totalCompanyBillingDisplay');
+            const payDisplay = document.getElementById('totalWorkerPayrollDisplay');
+            const profitDisplay = document.getElementById('companyNetProfitDisplay');
+            const marginDisplay = document.getElementById('companyMarginPercentDisplay');
+
+            if (billDisplay) billDisplay.innerText = formatCurrency(totalClientBillBdt);
+            if (payDisplay) payDisplay.innerText = formatCurrency(totalWorkerPayBdt);
+            if (profitDisplay) profitDisplay.innerText = formatCurrency(netProfitBdt);
+            if (marginDisplay) marginDisplay.innerText = `মার্জিন: ${marginPct}% লাভ (${formatCurrency(netProfitBdt)})`;
+        }
+
+        // =========================================================================
+        // FEATURE 4: WORKER PAYMENT ACCOUNTS & ADMIN PAYMENT DISBURSEMENT (TrxID + Screenshot)
+        // =========================================================================
+        let currentDisburseTargetUser = null;
+        let selectedScreenshotBase64 = null;
+
+        // Worker Payment Modal
+        function openWorkerPaymentModal() {
+            const modal = document.getElementById('workerPaymentAccountModal');
+            if (!modal) return;
+
+            const saved = getWorkerSavedPaymentAccounts(currentUser ? currentUser.id : 'me');
+            document.getElementById('userPayPreferredMethod').value = saved.method || 'bkash';
+            document.getElementById('userPayBkash').value = saved.bkash || '';
+            document.getElementById('userPayNagad').value = saved.nagad || '';
+            document.getElementById('userPayRocket').value = saved.rocket || '';
+            document.getElementById('userPayBankName').value = saved.bankName || '';
+            document.getElementById('userPayAccountName').value = saved.accountName || '';
+            document.getElementById('userPayAccountNumber').value = saved.accountNumber || '';
+            document.getElementById('userPayBankBranch').value = saved.bankBranch || '';
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeWorkerPaymentModal() {
+            const modal = document.getElementById('workerPaymentAccountModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function getWorkerSavedPaymentAccounts(userId) {
+            try {
+                const map = JSON.parse(localStorage.getItem('rexon_payment_methods_map') || '{}');
+                return map[userId] || {};
+            } catch(e) {
+                return {};
+            }
+        }
+
+        function saveWorkerSavedPaymentAccounts(userId, details) {
+            try {
+                const map = JSON.parse(localStorage.getItem('rexon_payment_methods_map') || '{}');
+                map[userId] = details;
+                localStorage.setItem('rexon_payment_methods_map', JSON.stringify(map));
+                // Sync with profiles
+                if (supabaseClient && currentUser) {
+                    supabaseClient.from('profiles').update({
+                        payment_info: details
+                    }).eq('id', userId).then();
+                }
+            } catch(e) {}
+        }
+
+        function handleSaveWorkerPaymentDetails(e) {
+            e.preventDefault();
+            const userId = currentUser ? currentUser.id : 'me';
+            const details = {
+                method: document.getElementById('userPayPreferredMethod')?.value,
+                bkash: document.getElementById('userPayBkash')?.value.trim(),
+                nagad: document.getElementById('userPayNagad')?.value.trim(),
+                rocket: document.getElementById('userPayRocket')?.value.trim(),
+                bankName: document.getElementById('userPayBankName')?.value.trim(),
+                accountName: document.getElementById('userPayAccountName')?.value.trim(),
+                accountNumber: document.getElementById('userPayAccountNumber')?.value.trim(),
+                bankBranch: document.getElementById('userPayBankBranch')?.value.trim(),
+                updated_at: new Date().toISOString()
+            };
+
+            saveWorkerSavedPaymentAccounts(userId, details);
+            closeWorkerPaymentModal();
+            alert('✅ আপনার পেমেন্ট অ্যাকাউন্ট তথ্য (বিকাশ/নগদ/ব্যাংক) সফলভাবে সংরক্ষিত হয়েছে!');
+        }
+
+        // Admin Disburse Payment Modal
+        function openDisbursePaymentModal(workerId, username, email) {
+            currentDisburseTargetUser = { id: workerId, username, email };
+            const modal = document.getElementById('disbursePaymentModal');
+            if (!modal) return;
+
+            document.getElementById('disburseTargetWorkerName').innerText = username;
+            document.getElementById('disburseTargetWorkerEmail').innerText = email;
+
+            const savedAccs = getWorkerSavedPaymentAccounts(workerId);
+            const listEl = document.getElementById('disburseTargetAccountsList');
+            if (listEl) {
+                let html = '';
+                if (savedAccs.bkash) html += `<div>📱 বিকাশ (bKash): <b>${savedAccs.bkash}</b></div>`;
+                if (savedAccs.nagad) html += `<div>📱 নগদ (Nagad): <b>${savedAccs.nagad}</b></div>`;
+                if (savedAccs.rocket) html += `<div>📱 রকেট (Rocket): <b>${savedAccs.rocket}</b></div>`;
+                if (savedAccs.bankName && savedAccs.accountNumber) {
+                    html += `<div>🏦 ব্যাংক: <b>${savedAccs.bankName}</b> - A/C: <b>${savedAccs.accountNumber}</b> (${savedAccs.accountName || ''})</div>`;
+                }
+                if (!html) html = '<div class="text-slate-400 font-sans">কর্মী এখনো পেমেন্ট নাম্বার দেয়নি। সরাসরি বিকাশ/নগদে টাকা পাঠিয়ে TrxID লিখুন।</div>';
+                listEl.innerHTML = html;
+            }
+
+            document.getElementById('disburseAmount').value = '5000';
+            document.getElementById('disburseTrxId').value = '';
+            document.getElementById('disburseNote').value = `${username} এর বেতন পরিশোধ`;
+            selectedScreenshotBase64 = null;
+            document.getElementById('disburseScreenshotPreviewContainer').classList.add('hidden');
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeDisbursePaymentModal() {
+            const modal = document.getElementById('disbursePaymentModal');
+            if (modal) modal.classList.add('hidden');
+            currentDisburseTargetUser = null;
+        }
+
+        function handlePaymentScreenshotSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                selectedScreenshotBase64 = evt.target.result;
+                const previewImg = document.getElementById('disburseScreenshotPreview');
+                const container = document.getElementById('disburseScreenshotPreviewContainer');
+                if (previewImg && container) {
+                    previewImg.src = selectedScreenshotBase64;
+                    container.classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleDisbursePaymentSubmit(e) {
+            e.preventDefault();
+            if (!currentDisburseTargetUser) return;
+
+            const amount = parseFloat(document.getElementById('disburseAmount')?.value) || 0;
+            const currency = document.getElementById('disburseCurrency')?.value || 'BDT';
+            const method = document.getElementById('disburseMethod')?.value;
+            const trxId = document.getElementById('disburseTrxId')?.value.trim();
+            const note = document.getElementById('disburseNote')?.value.trim();
+
+            if (!amount || !trxId) {
+                alert('অনুগ্রহ করে টাকার পরিমাণ ও Transaction ID (TrxID) প্রদান করুন।');
+                return;
+            }
+
+            const paymentRecord = {
+                id: 'pay_' + Date.now(),
+                workerId: currentDisburseTargetUser.id,
+                username: currentDisburseTargetUser.username,
+                email: currentDisburseTargetUser.email,
+                amount: amount,
+                currency: currency,
+                method: method,
+                trxId: trxId,
+                screenshot: selectedScreenshotBase64 || '',
+                note: note,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save in payout history
+            try {
+                const history = JSON.parse(localStorage.getItem('rexon_payout_history') || '[]');
+                history.unshift(paymentRecord);
+                localStorage.setItem('rexon_payout_history', JSON.stringify(history));
+
+                // Save latest payment for this worker to trigger notification
+                localStorage.setItem(`rexon_latest_payment_${currentDisburseTargetUser.id}`, JSON.stringify(paymentRecord));
+            } catch(e) {}
+
+            closeDisbursePaymentModal();
+            alert(`✅ সফল! ${currentDisburseTargetUser.username} এর অ্যাকাউন্টে ${currency === 'BDT' ? '৳' : '$'}${amount} পেমেন্ট রেকর্ড সম্পন্ন হয়েছে এবং কর্মীর পোর্টালে স্ক্রিনশটসহ নোটিফিকেশন পাঠানো হয়েছে!`);
+        }
+
+        function checkWorkerPaymentNotifications() {
+            if (!currentUser) return;
+            const card = document.getElementById('workerPaymentNoticeCard');
+            if (!card) return;
+
+            try {
+                const raw = localStorage.getItem(`rexon_latest_payment_${currentUser.id}`);
+                if (!raw) return;
+                const p = JSON.parse(raw);
+
+                const amtEl = document.getElementById('payNoticeAmount');
+                const mthEl = document.getElementById('payNoticeMethod');
+                const trxEl = document.getElementById('payNoticeTrx');
+
+                const sym = (p.currency === 'USD') ? '$' : '৳';
+                if (amtEl) amtEl.innerText = `${sym}${p.amount.toLocaleString()}`;
+                if (mthEl) mthEl.innerText = p.method;
+                if (trxEl) trxEl.innerText = p.trxId;
+
+                card.classList.remove('hidden');
+                window.lastPaymentReceiptData = p;
+            } catch(e) {}
+        }
+
+        function openPaymentReceiptModal() {
+            const modal = document.getElementById('viewPaymentReceiptModal');
+            if (!modal) return;
+
+            const p = window.lastPaymentReceiptData;
+            if (!p) {
+                alert('পেমেন্ট রেকর্ড পাওয়া যায়নি।');
+                return;
+            }
+
+            const sym = (p.currency === 'USD') ? '$' : '৳';
+            document.getElementById('receiptAmountDisplay').innerText = `${sym}${p.amount.toLocaleString()}`;
+            document.getElementById('receiptMethodDisplay').innerText = p.method;
+            document.getElementById('receiptDateDisplay').innerText = new Date(p.timestamp).toLocaleDateString();
+            document.getElementById('receiptTrxDisplay').innerText = p.trxId;
+            document.getElementById('receiptNoteDisplay').innerText = `নোট: ${p.note || 'কোনো নোট নেই'}`;
+
+            const imgEl = document.getElementById('receiptScreenshotImage');
+            const noImg = document.getElementById('receiptNoScreenshotText');
+            if (p.screenshot) {
+                if (imgEl) { imgEl.src = p.screenshot; imgEl.classList.remove('hidden'); }
+                if (noImg) noImg.classList.add('hidden');
+            } else {
+                if (imgEl) imgEl.classList.add('hidden');
+                if (noImg) noImg.classList.remove('hidden');
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closePaymentReceiptModal() {
+            const modal = document.getElementById('viewPaymentReceiptModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // Edit Worker Salary Modal
+        let currentEditSalaryWorker = null;
+
+        function openEditWorkerSalaryModal(userId, username, email) {
+            currentEditSalaryWorker = { id: userId, username, email };
+            const modal = document.getElementById('editWorkerSalaryModal');
+            if (!modal) return;
+
+            document.getElementById('salaryModalWorkerName').innerText = username;
+            document.getElementById('salaryModalWorkerEmail').innerText = email;
+
+            const saved = getWorkerSalarySettings(userId);
+            document.getElementById('salaryModalCurrency').value = saved.currency || 'BDT';
+            document.getElementById('salaryModalRatePerK').value = saved.ratePerK || 3000;
+            document.getElementById('salaryModalTargetBonus').value = saved.targetBonus || 500;
+            document.getElementById('salaryModalFixedSalary').value = saved.fixedSalary || 0;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditWorkerSalaryModal() {
+            const modal = document.getElementById('editWorkerSalaryModal');
+            if (modal) modal.classList.add('hidden');
+            currentEditSalaryWorker = null;
+        }
+
+        function getWorkerSalarySettings(userId) {
+            try {
+                const map = JSON.parse(localStorage.getItem('rexon_worker_salaries') || '{}');
+                return map[userId] || {};
+            } catch(e) {
+                return {};
+            }
+        }
+
+        function handleSaveWorkerSalary(e) {
+            e.preventDefault();
+            if (!currentEditSalaryWorker) return;
+
+            const currency = document.getElementById('salaryModalCurrency')?.value || 'BDT';
+            const ratePerK = parseFloat(document.getElementById('salaryModalRatePerK')?.value) || 3000;
+            const targetBonus = parseFloat(document.getElementById('salaryModalTargetBonus')?.value) || 500;
+            const fixedSalary = parseFloat(document.getElementById('salaryModalFixedSalary')?.value) || 0;
+
+            try {
+                const map = JSON.parse(localStorage.getItem('rexon_worker_salaries') || '{}');
+                map[currentEditSalaryWorker.id] = { currency, ratePerK, targetBonus, fixedSalary, updated_at: new Date().toISOString() };
+                localStorage.setItem('rexon_worker_salaries', JSON.stringify(map));
+
+                if (supabaseClient) {
+                    supabaseClient.from('profiles').update({
+                        rate_per_k: ratePerK,
+                        target_bonus: targetBonus,
+                        fixed_salary: fixedSalary,
+                        currency: currency
+                    }).eq('id', currentEditSalaryWorker.id).then();
+                }
+            } catch(err) {}
+
+            closeEditWorkerSalaryModal();
+            alert(`✅ কর্মী "${currentEditSalaryWorker.username}" এর বেতন রেট (${currency === 'BDT' ? '৳' : '$'}${ratePerK}/১,০০০) সফলভাবে সেভ করা হয়েছে!`);
+            if (typeof loadAdminPayrollRoster === 'function') loadAdminPayrollRoster();
+        }
+
+        // =========================================================================
+        // FEATURE 5: MULTI-LANGUAGE ENGINE (বাংলা / ENGLISH)
+        // =========================================================================
+        let currentLanguage = localStorage.getItem('rexon_language') || 'bn';
+
+        const REXON_TRANSLATIONS = {
+            'bn': {
+                'nav_home': 'হোম',
+                'nav_features': 'ফিচারস',
+                'nav_about': 'আমাদের সম্পর্কে',
+                'nav_security': 'নিরাপত্তা',
+                'nav_faq': 'প্রশ্নোত্তর',
+                'nav_contact': 'যোগাযোগ',
+                'btn_signin': 'লগইন',
+                'nav_public_site': '🌐 পাবলিক সাইট',
+                'btn_logout': 'লগআউট',
+                'btn_payment_acc': 'পেমেন্ট একাউন্ট'
+            },
+            'en': {
+                'nav_home': 'Home',
+                'nav_features': 'Features',
+                'nav_about': 'About',
+                'nav_security': 'Security',
+                'nav_faq': 'FAQ',
+                'nav_contact': 'Contact',
+                'btn_signin': 'Sign In',
+                'nav_public_site': '🌐 Public Site',
+                'btn_logout': 'Logout',
+                'btn_payment_acc': 'Payment A/C'
+            }
+        };
+
+        function toggleRexonLanguage() {
+            currentLanguage = (currentLanguage === 'bn') ? 'en' : 'bn';
+            localStorage.setItem('rexon_language', currentLanguage);
+            applyRexonLanguage(currentLanguage);
+        }
+
+        function applyRexonLanguage(lang) {
+            const labelPublic = document.getElementById('langToggleLabelPublic');
+            const labelAuth = document.getElementById('langToggleLabel');
+
+            const displayLabel = (lang === 'bn') ? 'বাংলা' : 'EN';
+            if (labelPublic) labelPublic.innerText = displayLabel;
+            if (labelAuth) labelAuth.innerText = displayLabel;
+
+            const dict = REXON_TRANSLATIONS[lang] || REXON_TRANSLATIONS['bn'];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    el.innerText = dict[key];
+                }
+            });
+        }
+
+        // Hook initializations into DOMContentLoaded
+        window.addEventListener('DOMContentLoaded', () => {
+            applyCurrencyUI();
+            applyRexonLanguage(currentLanguage);
+            checkWorkerPaymentNotifications();
+            if (typeof updateCompanyHeadcountReport === 'function') updateCompanyHeadcountReport();
         });

@@ -83,40 +83,69 @@
 
                 <!-- Unauthenticated Public Nav Controls -->
                 <div id="publicNavControls" class="flex items-center space-x-1 sm:space-x-2 text-xs font-bold">
-                    <button type="button" onclick="switchToSection('public_home')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition">Home</button>
-                    <button type="button" onclick="switchToSection('public_features')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden md:inline-block">Features</button>
-                    <button type="button" onclick="switchToSection('public_about')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden md:inline-block">About</button>
-                    <button type="button" onclick="switchToSection('public_security')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden lg:inline-block">Security</button>
-                    <button type="button" onclick="switchToSection('public_faq')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden lg:inline-block">FAQ</button>
-                    <button type="button" onclick="switchToSection('public_contact')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition">Contact</button>
+                    <button type="button" onclick="switchToSection('public_home')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition" data-i18n="nav_home">Home</button>
+                    <button type="button" onclick="switchToSection('public_features')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden md:inline-block" data-i18n="nav_features">Features</button>
+                    <button type="button" onclick="switchToSection('public_about')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden md:inline-block" data-i18n="nav_about">About</button>
+                    <button type="button" onclick="switchToSection('public_security')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden lg:inline-block" data-i18n="nav_security">Security</button>
+                    <button type="button" onclick="switchToSection('public_faq')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition hidden lg:inline-block" data-i18n="nav_faq">FAQ</button>
+                    <button type="button" onclick="switchToSection('public_contact')" class="px-2.5 py-1.5 rounded-lg text-indigo-100 hover:text-white hover:bg-indigo-600/60 transition" data-i18n="nav_contact">Contact</button>
                     
+                    <!-- Language Switcher Button -->
+                    <button type="button" onclick="window.toggleRexonLanguage()" class="text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2.5 py-1.5 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Language (বাংলা / English)">
+                        <span>🌐</span>
+                        <span id="langToggleLabelPublic">বাংলা</span>
+                    </button>
+
+                    <!-- Currency Switcher Button -->
+                    <button type="button" onclick="window.toggleCurrencyMode()" class="text-xs bg-indigo-900/70 hover:bg-indigo-900 text-emerald-300 font-bold px-2.5 py-1.5 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Currency (৳ BDT / $ USD)">
+                        <span id="currencyToggleLabelPublic">৳ BDT</span>
+                    </button>
+
                     <button type="button" onclick="window.toggleRexonTheme()" class="text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2.5 py-1.5 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Dark / Light Mode">
                         <span id="themeToggleIconPublic">🌙</span>
                     </button>
 
-                    <button type="button" onclick="switchToSection('login')" class="bg-white text-indigo-950 font-black px-4 py-1.5 rounded-lg shadow-sm hover:bg-indigo-50 transition ml-1">
+                    <button type="button" onclick="switchToSection('login')" class="bg-white text-indigo-950 font-black px-4 py-1.5 rounded-lg shadow-sm hover:bg-indigo-50 transition ml-1" data-i18n="btn_signin">
                         Sign In
                     </button>
                 </div>
 
                 <!-- Authenticated User Controls -->
-                <div id="userInfo" class="hidden items-center space-x-1.5 sm:space-x-3 flex-wrap sm:flex-nowrap justify-end ml-auto">
+                <div id="userInfo" class="hidden items-center space-x-1.5 sm:space-x-2 flex-wrap sm:flex-nowrap justify-end ml-auto">
                     <span id="userBadge" class="text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-bold shadow-sm"></span>
                     <div class="flex items-center space-x-1 bg-indigo-800/80 border border-indigo-500/50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
                         <span class="text-[11px] sm:text-xs">👤</span>
-                        <span id="userEmail" class="text-[11px] sm:text-xs font-bold text-white truncate max-w-[90px] sm:max-w-[200px]"></span>
+                        <span id="userEmail" class="text-[11px] sm:text-xs font-bold text-white truncate max-w-[80px] sm:max-w-[160px]"></span>
                         <button onclick="openUsernameModal()" class="ml-0.5 text-indigo-300 hover:text-white p-0.5 rounded transition" title="Change Username">
                             ✏️
                         </button>
                     </div>
-                    <button type="button" onclick="switchToSection('public_home')" class="text-[11px] sm:text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-indigo-400/40 transition hidden sm:inline-flex items-center space-x-1" title="Preview Public Corporate Site">
-                        <span>🌐 Public Site</span>
+
+                    <!-- Worker Payment Account Settings Button -->
+                    <button type="button" onclick="openWorkerPaymentModal()" id="btnUserPaymentMethod" class="text-[11px] sm:text-xs bg-emerald-700/80 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg border border-emerald-400/40 transition flex items-center space-x-1" title="পেমেন্ট নেওয়ার বিকাশ, নগদ বা ব্যাংক একাউন্ট দিন">
+                        <span>💳</span>
+                        <span class="hidden md:inline" data-i18n="btn_payment_acc">পেমেন্ট একাউন্ট</span>
                     </button>
-                    <button type="button" onclick="window.toggleRexonTheme()" id="navThemeToggleBtn" class="text-[11px] sm:text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Dark / Light Mode">
+
+                    <!-- Currency Switcher Toggle Button (৳ BDT / $ USD) -->
+                    <button type="button" onclick="window.toggleCurrencyMode()" id="navCurrencyToggleBtn" class="text-[11px] sm:text-xs bg-indigo-900/70 hover:bg-indigo-900 text-emerald-300 font-bold px-2 py-1 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Currency (৳ BDT / $ USD)">
+                        <span id="currencyToggleIcon">৳</span>
+                        <span id="currencyToggleLabel" class="text-[10px]">BDT</span>
+                    </button>
+
+                    <!-- Language Switcher Toggle Button (বাংলা / English) -->
+                    <button type="button" onclick="window.toggleRexonLanguage()" id="navLangToggleBtn" class="text-[11px] sm:text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2.5 py-1 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Language (বাংলা / English)">
+                        <span>🌐</span>
+                        <span id="langToggleLabel" class="text-[10px]">বাংলা</span>
+                    </button>
+
+                    <button type="button" onclick="switchToSection('public_home')" class="text-[11px] sm:text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2 py-1 rounded-lg border border-indigo-400/40 transition hidden lg:inline-flex items-center space-x-1" title="Preview Public Corporate Site">
+                        <span data-i18n="nav_public_site">🌐 Public Site</span>
+                    </button>
+                    <button type="button" onclick="window.toggleRexonTheme()" id="navThemeToggleBtn" class="text-[11px] sm:text-xs bg-indigo-900/70 hover:bg-indigo-900 text-sky-200 font-bold px-2.5 py-1 rounded-lg border border-indigo-400/40 transition flex items-center space-x-1" title="Toggle Dark / Light Mode">
                         <span id="themeToggleIcon">🌙</span>
-                        <span class="hidden md:inline text-[10px]">Theme</span>
                     </button>
-                    <button onclick="handleLogout()" class="text-[11px] sm:text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow transition">
+                    <button onclick="handleLogout()" class="text-[11px] sm:text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-2.5 py-1 rounded-lg shadow transition" data-i18n="btn_logout">
                         Logout
                     </button>
                 </div>
@@ -811,6 +840,32 @@
 
         <!-- 3. Worker Dashboard View -->
         <div id="userDashboard" class="hidden space-y-8">
+            <!-- WORKER PAYMENT RECEIVED NOTIFICATION BANNER (Real-time Payout Alert) -->
+            <div id="workerPaymentNoticeCard" class="hidden p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-700 text-white shadow-xl space-y-3 border-2 border-emerald-300 animate-in fade-in duration-300">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center space-x-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-white text-emerald-700 flex items-center justify-center text-2xl font-black shadow-md flex-shrink-0">
+                            💸
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-black text-base sm:text-lg text-white">আপনার বেতন/পেমেন্ট পরিশোধ করা হয়েছে!</h4>
+                                <span class="bg-emerald-200 text-emerald-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase">PAID &bull; সফল</span>
+                            </div>
+                            <p id="workerPaymentNoticeDetails" class="text-xs sm:text-sm text-emerald-100 mt-0.5 font-medium leading-relaxed">
+                                পরিমাণ: <b id="payNoticeAmount">৳০.০০</b> | মাধ্যম: <b id="payNoticeMethod">bKash</b> | TrxID: <code id="payNoticeTrx" class="bg-black/30 px-1.5 py-0.5 rounded font-mono">--</code>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+                        <button type="button" onclick="openPaymentReceiptModal()" class="px-4 py-2 rounded-xl bg-white hover:bg-emerald-50 text-emerald-950 font-black text-xs shadow-md transition flex items-center space-x-1.5 cursor-pointer">
+                            <span>👁️</span>
+                            <span>পেমেন্ট স্ক্রিনশট ও রসিদ দেখুন</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- REXON SaaS Workspace Banner -->
             <div class="rx-saas-hero p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="space-y-2 z-10 max-w-2xl">
@@ -4688,6 +4743,91 @@
                 </button>
             </div>
 
+            <!-- COMPANY HEADCOUNT & BILLING VS WORKER PAYROLL ACCOUNTING -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 text-white p-6 rounded-3xl border-2 border-indigo-400/40 shadow-xl space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-700/60 pb-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-11 h-11 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-md">
+                            📊
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="font-black text-lg text-white">কোম্পানি কর্মী সংখ্যা ও বিলিং-বেতন হিসাব (Workforce &amp; Billing Ledger)</h3>
+                                <span class="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Real-Time</span>
+                            </div>
+                            <p class="text-xs text-indigo-200 mt-0.5">
+                                কোম্পানি থেকে কতজন কর্মী কাজ করছে, কোম্পানি কত টাকা বিল দিচ্ছে, কর্মীদের কত বেতন দেওয়া হচ্ছে এবং আপনার নিট মুনাফা কত—সব হিসাব এখানে রয়েছে।
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <button type="button" onclick="window.toggleCurrencyMode()" class="px-3.5 py-1.5 rounded-xl bg-indigo-800 hover:bg-indigo-700 text-emerald-300 font-black text-xs border border-indigo-400/40 transition flex items-center space-x-1 cursor-pointer">
+                            <span>কারেন্সি পরিবর্তন: </span>
+                            <span id="finHeadcountCurrencyBadge">৳ BDT</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Workforce Headcount Breakdown Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/10">
+                        <span class="text-indigo-200 font-bold block uppercase text-[10px]">মোট কর্মী সংখ্যা (Headcount)</span>
+                        <span id="hcTotalWorkers" class="text-2xl font-black text-white block mt-1">0 জন</span>
+                        <span class="text-[10px] text-slate-300">কোম্পানির রেজিস্টার্ড কর্মী</span>
+                    </div>
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/10">
+                        <span class="text-indigo-200 font-bold block uppercase text-[10px]">আজ সক্রিয় কর্মী (Active Today)</span>
+                        <span id="hcActiveToday" class="text-2xl font-black text-emerald-400 block mt-1">0 জন</span>
+                        <span class="text-[10px] text-emerald-300">আজ কাজ সাবমিট করেছে</span>
+                    </div>
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/10">
+                        <span class="text-indigo-200 font-bold block uppercase text-[10px]">Gender Verify কর্মী</span>
+                        <span id="hcGvWorkers" class="text-2xl font-black text-pink-400 block mt-1">0 জন</span>
+                        <span class="text-[10px] text-pink-300">Female &bull; Male &bull; Signal</span>
+                    </div>
+                    <div class="bg-white/10 p-3.5 rounded-xl border border-white/10">
+                        <span class="text-indigo-200 font-bold block uppercase text-[10px]">Number Lookup কর্মী</span>
+                        <span id="hcLookupWorkers" class="text-2xl font-black text-purple-400 block mt-1">0 জন</span>
+                        <span class="text-[10px] text-purple-300">Household &bull; Valuation</span>
+                    </div>
+                </div>
+
+                <!-- 2. Company Billing vs Worker Payroll Accounting Grid -->
+                <div class="p-4 bg-black/30 rounded-2xl border border-white/10 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-extrabold text-sm text-amber-300">কোম্পানি আয় বনাম কর্মী বেতন মার্জিন ক্যালকুলেটর:</h4>
+                        <span class="text-[11px] text-slate-400">প্রতি ১,০০০ নাম্বারে রেট হিসাব</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3 bg-white/10 rounded-xl border border-white/10 space-y-1">
+                            <span class="text-indigo-200 font-bold block text-[11px]">১. কোম্পানি আমাদের কত টাকা দিচ্ছে? (Client Rate):</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" id="companyBillingRatePerK" value="5000" oninput="recalcCompanyVsWorkerFinances()" class="w-28 px-2.5 py-1 bg-white text-slate-900 font-black rounded-lg text-sm text-center">
+                                <span class="text-xs font-bold text-amber-300" id="billingRateCurrencyUnit">৳ / ১,০০০ ডাটা</span>
+                            </div>
+                            <span class="text-[10px] text-slate-300 block">মোট কোম্পানির নিকট বিল: <b id="totalCompanyBillingDisplay" class="text-emerald-300 font-mono">৳০.০০</b></span>
+                        </div>
+
+                        <div class="p-3 bg-white/10 rounded-xl border border-white/10 space-y-1">
+                            <span class="text-indigo-200 font-bold block text-[11px]">২. আমরা কর্মীদের কত টাকা বেতন দিচ্ছি? (Worker Rate):</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" id="workerDefaultRatePerK" value="3000" oninput="recalcCompanyVsWorkerFinances()" class="w-28 px-2.5 py-1 bg-white text-slate-900 font-black rounded-lg text-sm text-center">
+                                <span class="text-xs font-bold text-amber-300" id="workerRateCurrencyUnit">৳ / ১,০০০ ডাটা</span>
+                            </div>
+                            <span class="text-[10px] text-slate-300 block">মোট কর্মীদের প্রদেয় বেতন: <b id="totalWorkerPayrollDisplay" class="text-amber-300 font-mono">৳০.০০</b></span>
+                        </div>
+
+                        <div class="p-3 bg-emerald-950/60 rounded-xl border border-emerald-400/50 space-y-1">
+                            <span class="text-emerald-300 font-bold block text-[11px]">৩. আপনার নিট লাভ / মার্জিন (Net Operational Profit):</span>
+                            <div id="companyNetProfitDisplay" class="text-2xl font-black text-emerald-400 font-mono">
+                                ৳০.০০
+                            </div>
+                            <span class="text-[10px] text-emerald-200 block" id="companyMarginPercentDisplay">মার্জিন: ৪০% লাভ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Financial Metric Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -5379,6 +5519,246 @@
             </div>
         </div>
     </footer>
+
+<!-- Modal: Edit Worker Salary & Rate (in BDT ৳ and USD $) -->
+    <div id="editWorkerSalaryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl max-w-md w-full p-6 sm:p-7 space-y-4 border border-slate-200 dark:border-slate-800 shadow-2xl animate-in fade-in duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">💰</span>
+                    <div>
+                        <h3 class="font-extrabold text-base text-slate-800 dark:text-white">কর্মীর বেতন ও রেট এডিট করুন</h3>
+                        <p class="text-xs text-slate-500">Edit Worker Salary &amp; Rate</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditWorkerSalaryModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-1 text-xs">
+                <p>কর্মী: <b id="salaryModalWorkerName" class="text-indigo-600 dark:text-sky-300">--</b></p>
+                <p>ইমেইল: <span id="salaryModalWorkerEmail" class="font-mono text-slate-500">--</span></p>
+            </div>
+
+            <form onsubmit="handleSaveWorkerSalary(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">কারেন্সি নির্বাচন করুন (Currency):</label>
+                    <select id="salaryModalCurrency" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold">
+                        <option value="BDT" selected>৳ BDT (বাংলাদেশী টাকা)</option>
+                        <option value="USD">$ USD (মার্কিন ডলার)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">প্রতি ১,০০০ ভেরিফাইড নাম্বারের রেট (Rate per 1,000):</label>
+                    <input type="number" id="salaryModalRatePerK" step="1" required placeholder="e.g. 3000" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold font-mono text-sm">
+                    <span class="text-[10px] text-slate-400 block mt-0.5">ডিফল্ট: ৩,০০০ টাকা / $২৫</span>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">দৈনিক ৪২০ টার্গেট বোনাস (Target Met Bonus / Day):</label>
+                    <input type="number" id="salaryModalTargetBonus" step="1" required placeholder="e.g. 500" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold font-mono text-sm">
+                    <span class="text-[10px] text-slate-400 block mt-0.5">প্রতিদিন ৪২০ টার্গেট পূর্ণ করলে অতিরিক্ত বোনাস</span>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">মাসিক ফিক্সড বেতন (ঐচ্ছিক / Fixed Base):</label>
+                    <input type="number" id="salaryModalFixedSalary" step="1" placeholder="0" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold font-mono text-sm">
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeEditWorkerSalaryModal()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">বাতিল</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-md">💾 বেতন সেভ করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Worker Payment Account Profile (bKash, Nagad, Bank) -->
+    <div id="workerPaymentAccountModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 border border-slate-200 dark:border-slate-800 shadow-2xl animate-in fade-in duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">💳</span>
+                    <div>
+                        <h3 class="font-extrabold text-base text-slate-800 dark:text-white">পেমেন্ট অ্যাকাউন্ট সেটিংস (Payment Settings)</h3>
+                        <p class="text-xs text-slate-500">আপনার বেতন ও বোনাস নেওয়ার বিকাশ, নগদ বা ব্যাংক একাউন্ট নম্বর দিন</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeWorkerPaymentModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+
+            <form onsubmit="handleSaveWorkerPaymentDetails(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">পছন্দের পেমেন্ট মাধ্যম (Preferred Method):</label>
+                    <select id="userPayPreferredMethod" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold">
+                        <option value="bkash">বিকাশ (bKash Personal)</option>
+                        <option value="nagad">নগদ (Nagad Personal)</option>
+                        <option value="rocket">রকেট (Rocket)</option>
+                        <option value="bank">ব্যাংক একাউন্ট (Bank Transfer)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-pink-700 dark:text-pink-400 mb-1">বিকাশ নম্বর (bKash Number):</label>
+                        <input type="text" id="userPayBkash" placeholder="017XXXXXXXX" class="w-full px-3 py-2 rounded-xl border border-pink-300 dark:border-pink-800 bg-white dark:bg-slate-800 font-bold font-mono">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-700 dark:text-amber-400 mb-1">নগদ নম্বর (Nagad Number):</label>
+                        <input type="text" id="userPayNagad" placeholder="018XXXXXXXX" class="w-full px-3 py-2 rounded-xl border border-amber-300 dark:border-amber-800 bg-white dark:bg-slate-800 font-bold font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-indigo-700 dark:text-indigo-400 mb-1">রকেট নম্বর (Rocket Number - Optional):</label>
+                    <input type="text" id="userPayRocket" placeholder="019XXXXXXXXX" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono">
+                </div>
+
+                <!-- Bank Transfer Details -->
+                <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2.5">
+                    <span class="font-extrabold text-slate-800 dark:text-white block">🏦 ব্যাংক একাউন্ট বিবরণ (ঐচ্ছিক):</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-0.5">ব্যাংকের নাম (Bank Name):</label>
+                            <input type="text" id="userPayBankName" placeholder="e.g. Islami Bank, DBBL" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-0.5">একাউন্ট হোল্ডার নাম (Account Name):</label>
+                            <input type="text" id="userPayAccountName" placeholder="e.g. Md Rahim" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-0.5">একাউন্ট নম্বর (Account Number):</label>
+                            <input type="text" id="userPayAccountNumber" placeholder="e.g. 2050XXXXXXXXX" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 font-mono text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-0.5">ব্রাঞ্চ ও রাউটিং (Branch / Routing):</label>
+                            <input type="text" id="userPayBankBranch" placeholder="e.g. Dhanmondi Branch" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeWorkerPaymentModal()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">বাতিল</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-md">💾 পেমেন্ট তথ্য সংরক্ষণ করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Admin Disburse Payment (Send Money with TrxID & Screenshot proof) -->
+    <div id="disbursePaymentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 border border-slate-200 dark:border-slate-800 shadow-2xl animate-in fade-in duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">💸</span>
+                    <div>
+                        <h3 class="font-extrabold text-base text-slate-800 dark:text-white">কর্মীকে পেমেন্ট প্রদান ও স্ক্রিনশট পাঠান</h3>
+                        <p class="text-xs text-slate-500">Send Payment Proof, TrxID &amp; Notify Worker</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDisbursePaymentModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+
+            <!-- Worker saved payment accounts preview -->
+            <div id="disburseWorkerSavedAccountsCard" class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 rounded-xl space-y-1 text-xs">
+                <span class="font-black text-emerald-900 dark:text-emerald-200 block">কর্মী ও পেমেন্ট নাম্বার:</span>
+                <p>কর্মী: <b id="disburseTargetWorkerName" class="text-slate-900 dark:text-white">--</b> (<span id="disburseTargetWorkerEmail" class="font-mono text-slate-500">--</span>)</p>
+                <div id="disburseTargetAccountsList" class="pt-1 space-y-0.5 font-mono text-[11px] text-emerald-950 dark:text-emerald-300">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <form onsubmit="handleDisbursePaymentSubmit(event)" class="space-y-3.5 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">টাকার পরিমাণ (Amount):</label>
+                        <div class="flex items-center space-x-1.5">
+                            <input type="number" id="disburseAmount" step="1" required placeholder="e.g. 5000" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold font-mono text-base">
+                            <select id="disburseCurrency" class="px-2 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold">
+                                <option value="BDT">৳ BDT</option>
+                                <option value="USD">$ USD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">পেমেন্ট মাধ্যম (Method):</label>
+                        <select id="disburseMethod" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold">
+                            <option value="bKash">বিকাশ (bKash)</option>
+                            <option value="Nagad">নগদ (Nagad)</option>
+                            <option value="Rocket">রকেট (Rocket)</option>
+                            <option value="Bank">ব্যাংক ট্রান্সফার (Bank)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ট্রানজেকশন আইডি (TrxID):</label>
+                    <input type="text" id="disburseTrxId" required placeholder="e.g. 9J28DA10K বা 202610060012" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono font-bold text-sm">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">পেমেন্ট স্ক্রিনশট / রসিদ ছবি আপলোড (Upload Screenshot Proof):</label>
+                    <input type="file" id="disburseScreenshotFile" accept="image/*" onchange="handlePaymentScreenshotSelect(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white cursor-pointer">
+                    <div id="disburseScreenshotPreviewContainer" class="hidden mt-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                        <img id="disburseScreenshotPreview" src="" alt="Screenshot Preview" class="max-h-40 mx-auto rounded-lg shadow-sm">
+                        <span class="text-[10px] text-emerald-600 font-bold block mt-1">✓ স্ক্রিনশট সফলভাবে যুক্ত হয়েছে</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">নোট / বিবরণ (Note / Remarks):</label>
+                    <input type="text" id="disburseNote" placeholder="e.g. অক্টোবর ১ম সপ্তাহের বেতন পরিশোধ" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs">
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeDisbursePaymentModal()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">বাতিল</button>
+                    <button type="submit" id="btnSubmitDisburse" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-md flex items-center space-x-1.5 cursor-pointer">
+                        <span>✅ পেমেন্ট সম্পন্ন ও নোটিফিকেশন পাঠান</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: View Payment Receipt & Screenshot (Worker & Admin view) -->
+    <div id="viewPaymentReceiptModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-200 dark:border-slate-800 shadow-2xl animate-in fade-in duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🧾</span>
+                    <h3 class="font-extrabold text-base text-slate-800 dark:text-white">পেমেন্ট রসিদ ও স্ক্রিনশট প্রমাণ</h3>
+                </div>
+                <button type="button" onclick="closePaymentReceiptModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 text-center space-y-0.5">
+                    <span class="text-xs text-emerald-800 dark:text-emerald-300 font-bold">পরিশোধিত অর্থ:</span>
+                    <div id="receiptAmountDisplay" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">৳০.০০</div>
+                    <span class="text-[11px] text-slate-500 font-medium">স্ট্যাটাস: <b class="text-emerald-700">সফলভাবে পরিশোধিত (PAID)</b></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl font-mono text-[11px]">
+                    <div>মাধ্যম: <b id="receiptMethodDisplay">bKash</b></div>
+                    <div>তারিখ: <span id="receiptDateDisplay">--</span></div>
+                    <div class="col-span-2 break-all">TrxID: <b id="receiptTrxDisplay" class="text-indigo-600 dark:text-sky-400 font-black">--</b></div>
+                    <div class="col-span-2 text-slate-500 font-sans" id="receiptNoteDisplay">নোট: --</div>
+                </div>
+
+                <div class="space-y-1">
+                    <span class="font-black text-slate-700 dark:text-slate-300 block">টাকা পাঠানোর স্ক্রিনশট / ব্যাংক রসিদ:</span>
+                    <div id="receiptScreenshotContainer" class="p-2 bg-black/5 dark:bg-black/40 rounded-xl border border-slate-200 dark:border-slate-700 text-center max-h-72 overflow-y-auto">
+                        <img id="receiptScreenshotImage" src="" alt="Payment Screenshot" class="mx-auto rounded-lg max-h-64 shadow">
+                        <p id="receiptNoScreenshotText" class="hidden text-slate-400 text-xs py-6">কোনো স্ক্রিনশট ইমেজ দেওয়া হয়নি।</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                <button type="button" onclick="closePaymentReceiptModal()" class="px-5 py-2 rounded-xl bg-slate-800 text-white font-bold text-xs">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
 
 <!-- REXON Direct Telegram Support Widget -->
     <a href="https://t.me/rexwarr" target="_blank" rel="noopener noreferrer" class="rx-telegram-dock" title="Contact Admin on Telegram: @rexwarr">
