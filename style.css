@@ -281,7 +281,65 @@ html.dark .rx-saas-hero {
     border-color: rgba(99, 102, 241, 0.3);
 }
 
+/* Telegram Direct Support Floating Badge */
+.rx-telegram-dock {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: white;
+    border-radius: 999px;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+.rx-telegram-dock:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(2, 132, 199, 0.45);
+    color: white;
+}
+.rx-telegram-dock .rx-tg-icon {
+    width: 26px;
+    height: 26px;
+    background: white;
+    color: #0284c7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+.rx-telegram-dock .rx-tg-dot {
+    width: 8px;
+    height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80;
+    animation: rxPulseDot 1.6s infinite;
+}
+@keyframes rxPulseDot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+}
 
+@media (max-width: 640px) {
+    .rx-telegram-dock {
+        right: 12px;
+        bottom: 12px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
 
 /* Modals */
 .fixed.inset-0 {
@@ -314,37 +372,105 @@ html.dark table tbody tr:hover {
         transition-duration: 0.001ms !important;
     }
 }
-/* Clean Horizontal Navigation Scrollbar & Touch Scrolling */
-.nav-scroll-container {
-    display: flex;
-    align-items: center;
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
+
+/* Additional REXON SaaS Refinements */
+html.dark .rx-saas-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #172554 100%) !important;
+    border-color: rgba(99, 102, 241, 0.28) !important;
+}
+
+html.dark .bg-slate-100 {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark .bg-indigo-50 {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+html.dark .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html.dark .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.12) !important;
+    border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+html.dark .bg-rose-50 {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+html.dark .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.dark .bg-sky-50 {
+    background-color: rgba(14, 165, 233, 0.12) !important;
+    border-color: rgba(14, 165, 233, 0.25) !important;
+}
+
+/* Zero horizontal overflow on small displays */
+@media (max-width: 640px) {
+    .max-w-7xl {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+
+/* =========================================================================
+   ENHANCED SCROLLABLE HORIZONTAL NAVIGATION BAR SYSTEM
+   ========================================================================= */
+.custom-nav-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-    padding: 6px 8px;
-    gap: 8px;
 }
-.nav-scroll-container::-webkit-scrollbar {
-    height: 4px;
+
+.custom-nav-scrollbar::-webkit-scrollbar {
+    height: 5px;
 }
-.nav-scroll-container::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.2);
+
+.custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.35);
     border-radius: 9999px;
+    margin: 0 8px;
 }
-.nav-scroll-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.25);
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.28);
     border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
 }
-.nav-scroll-container::-webkit-scrollbar-thumb:hover {
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(2, 6, 23, 0.5);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* Subtle focus rings - Avoid excessive glow */
-*:focus-visible {
-    outline: 2px solid #6366f1 !important;
-    outline-offset: 2px !important;
+.nav-tab-pill {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.nav-tab-pill:active {
+    transform: scale(0.96);
 }
