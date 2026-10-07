@@ -119,7 +119,7 @@
 
                 <!-- Authenticated User Controls -->
                 <div id="userInfo" class="hidden items-center space-x-1.5 sm:space-x-2 flex-wrap sm:flex-nowrap justify-end ml-auto">
-                    <span id="userBadge" class="text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-bold shadow-sm"></span>
+                    <span id="userBadge" class="whitespace-nowrap text-[11px] sm:text-xs px-2.5 py-1 rounded-lg font-bold shadow-xs border border-indigo-300 flex-shrink-0 flex items-center justify-center"></span>
                     <div class="flex items-center space-x-1 bg-indigo-800/80 border border-indigo-500/50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
                         <span class="text-[11px] sm:text-xs">👤</span>
                         <span id="userEmail" class="text-[11px] sm:text-xs font-bold text-white truncate max-w-[80px] sm:max-w-[160px]"></span>
@@ -176,92 +176,51 @@
 
                     <!-- Scrollable Tabs Container with smooth wheel & touch drag support -->
                     <div id="navTabsScrollContainer" class="flex-1 flex items-center overflow-x-auto scroll-smooth py-1 px-1 custom-nav-scrollbar relative">
-                        <!-- Worker Tabs Set -->
-                        <div id="workerNavTabsSet" class="flex items-center space-x-1.5">
-                            <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-3.5 py-1.5 rounded-xl shadow-sm transition-all flex items-center space-x-1.5 border border-indigo-500/40 flex-shrink-0 nav-tab-pill">
-                                <span>📊</span><span>Dashboard</span>
+                        <!-- Worker Tabs Set (Clean, Purpose-Built, Zero Clutter) -->
+                        <div id="workerNavTabsSet" class="flex items-center space-x-2">
+                            <button id="navBtnDashboard" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-indigo-500/40 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span>👷</span><span>My Work (আমার কাজ)</span>
                             </button>
-                            <button id="navBtnClaimStock" onclick="switchToSection('claim_stock')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
+                            <button id="navBtnClaimStock" onclick="switchToSection('claim_stock')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-800 text-indigo-100 hover:text-white font-semibold px-3.5 py-2 rounded-xl transition-all flex items-center space-x-1.5 border border-indigo-700/40 flex-shrink-0 nav-tab-pill cursor-pointer">
                                 <span>🎁</span><span>Tasks (Stock)</span>
                             </button>
-                            <button id="navBtnReports" onclick="switchToSection('worker_reports')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>📋</span><span>Reports</span>
+                            <!-- Highlighted Duplicate Checker -->
+                            <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-emerald-600 hover:bg-emerald-500 text-white font-black px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-emerald-400 flex-shrink-0 nav-tab-pill cursor-pointer" title="ফোন নাম্বার ডুপ্লিকেট চেকার টুল">
+                                <span>🔎</span><span>Duplicate Checker (ডুপ্লিকেট চেকার)</span>
                             </button>
-                            <button id="navBtnWorkers" onclick="switchToSection('worker_team')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>👥</span><span>Workers</span>
+                            <button id="navBtnLookupChecker" onclick="switchToSection('lookup_checker')" class="text-xs whitespace-nowrap bg-purple-700 hover:bg-purple-600 text-white font-black px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-purple-400 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span>🔍</span><span>Lookup Checker (রিপোর্ট ফিল্টার)</span>
                             </button>
-                            <button id="navBtnClients" onclick="switchToSection('worker_clients')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>🏢</span><span>Clients</span>
-                            </button>
-                            <button id="navBtnProjects" onclick="switchToSection('worker_projects')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>📁</span><span>Projects</span>
-                            </button>
-                            <button id="navBtnPayroll" onclick="switchToSection('worker_payroll')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>💳</span><span>Payroll</span>
-                            </button>
-                            <button id="navBtnFinance" onclick="switchToSection('worker_finance')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>💰</span><span>Finance</span>
-                            </button>
-                            <button id="navBtnAnalytics" onclick="switchToSection('worker_analytics')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>📈</span><span>Analytics</span>
-                            </button>
-                            <button id="navBtnNotifications" onclick="switchToSection('worker_notifications')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>🔔</span><span>Notifications</span>
-                            </button>
-                            <button id="navBtnLookupChecker" onclick="switchToSection('lookup_checker')" class="text-xs whitespace-nowrap bg-purple-700/80 hover:bg-purple-700 text-white font-black px-3.5 py-1.5 rounded-xl shadow-sm transition-all flex items-center space-x-1.5 border border-purple-400 flex-shrink-0 nav-tab-pill">
-                                <span>🔍</span><span>Lookup Checker</span>
-                            </button>
-                            <button id="navBtnDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-teal-600/80 hover:bg-teal-600 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-teal-400 flex-shrink-0 nav-tab-pill">
-                                <span>🔎</span><span>Duplicate Checker</span>
-                            </button>
-                            <button id="navBtnSupport" onclick="switchToSection('worker_support')" class="text-xs whitespace-nowrap bg-sky-700/80 hover:bg-sky-700 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-sky-400 flex-shrink-0 nav-tab-pill">
-                                <span>💬</span><span>Support</span>
+                            <button id="navBtnQuickSearch" onclick="openQuickSearchModal()" class="text-xs whitespace-nowrap bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-amber-300 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span class="text-sm">⚡</span><span>Quick Search</span>
                             </button>
                         </div>
 
                         <!-- Owner / Admin Tabs Set (Visible for admin role) -->
-                        <div id="adminNavTabsSet" class="hidden items-center space-x-1.5">
-                            <button id="navBtnOwnerCenter" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-3.5 py-1.5 rounded-xl shadow-sm transition-all flex items-center space-x-1.5 border border-indigo-500/40 flex-shrink-0 nav-tab-pill">
-                                <span>👑</span><span>Owner Center</span>
+                        <div id="adminNavTabsSet" class="hidden items-center space-x-2">
+                            <button id="navBtnOwnerCenter" onclick="switchToSection('dashboard')" class="text-xs whitespace-nowrap bg-indigo-950 text-white font-bold px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-indigo-500/40 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span>👑</span><span>Admin Panel</span>
                             </button>
-                            <button id="navBtnAdminSubmissions" onclick="switchAdminTab('submissions')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
+                            <button id="navBtnAdminSubmissions" onclick="switchAdminTab('submissions')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-800 text-indigo-100 hover:text-white font-semibold px-3.5 py-2 rounded-xl transition-all flex items-center space-x-1.5 border border-indigo-700/40 flex-shrink-0 nav-tab-pill cursor-pointer">
                                 <span>📊</span><span>Submissions</span>
                             </button>
-                            <button id="navBtnAdminStock" onclick="switchAdminTab('rec_stock')" class="text-xs whitespace-nowrap bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-emerald-400 flex-shrink-0 nav-tab-pill">
+                            <button id="navBtnAdminStock" onclick="switchAdminTab('rec_stock')" class="text-xs whitespace-nowrap bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl transition-all flex items-center space-x-1.5 border border-emerald-400 flex-shrink-0 nav-tab-pill cursor-pointer">
                                 <span>📥</span><span>Received Stock</span>
                             </button>
-                            <button id="navBtnAdminTeam" onclick="switchAdminTab('users')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>👥</span><span>Team &amp; Roles</span>
+                            <button id="navBtnAdminTeam" onclick="switchAdminTab('users')" class="text-xs whitespace-nowrap bg-indigo-900/60 hover:bg-indigo-800 text-indigo-100 hover:text-white font-semibold px-3.5 py-2 rounded-xl transition-all flex items-center space-x-1.5 border border-indigo-700/40 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span>👥</span><span>Team Members</span>
                             </button>
-                            <button id="navBtnAdminClients" onclick="switchAdminTab('company')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>🏢</span><span>Clients</span>
-                            </button>
-                            <button id="navBtnAdminFinance" onclick="switchToSection('admin_finance')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>💰</span><span>Company Finance</span>
-                            </button>
-                            <button id="navBtnAdminPayroll" onclick="switchToSection('admin_payroll')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>💳</span><span>Payroll Manager</span>
-                            </button>
-                            <button id="navBtnAdminProjects" onclick="switchToSection('admin_projects')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>📁</span><span>Projects</span>
-                            </button>
-                            <button id="navBtnAdminLookup" onclick="switchAdminTab('lookup_reports')" class="text-xs whitespace-nowrap bg-purple-700/80 hover:bg-purple-700 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-purple-400 flex-shrink-0 nav-tab-pill">
-                                <span>🔍</span><span>Lookup Reports</span>
-                            </button>
-                            <button id="navBtnAdminDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-teal-600/80 hover:bg-teal-600 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-teal-400 flex-shrink-0 nav-tab-pill" title="ফোন নাম্বার ডুপ্লিকেট চেকার টুল">
-                                <span>🔎</span><span>Duplicate Checker</span>
-                            </button>
-                            <button id="navBtnAdminAnalytics" onclick="switchToSection('admin_analytics')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>📈</span><span>Analytics</span>
-                            </button>
-                            <button id="navBtnAdminSecurity" onclick="switchToSection('admin_security_audit')" class="text-xs whitespace-nowrap bg-indigo-900/50 hover:bg-indigo-800/80 text-indigo-100 hover:text-white font-semibold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-transparent flex-shrink-0 nav-tab-pill">
-                                <span>🛡️</span><span>Security &amp; Audit</span>
-                            </button>
-                            <button id="navBtnAdminVault" onclick="switchAdminTab('backup')" class="text-xs whitespace-nowrap bg-amber-600/80 hover:bg-amber-600 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-amber-400 flex-shrink-0 nav-tab-pill">
+                            <button id="navBtnAdminVault" onclick="switchAdminTab('backup')" class="text-xs whitespace-nowrap bg-amber-600 hover:bg-amber-500 text-white font-bold px-3.5 py-2 rounded-xl transition-all flex items-center space-x-1.5 border border-amber-400 flex-shrink-0 nav-tab-pill cursor-pointer">
                                 <span>🗄️</span><span>Turso Vault</span>
                             </button>
-                            <button id="navBtnAdminDev" onclick="switchToSection('admin_dev_docs')" class="text-xs whitespace-nowrap bg-sky-700/80 hover:bg-sky-700 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 border border-sky-400 flex-shrink-0 nav-tab-pill">
-                                <span>⚡</span><span>Developer API</span>
+                            <button id="navBtnAdminLookup" onclick="switchAdminTab('lookup_reports')" class="text-xs whitespace-nowrap bg-purple-700 hover:bg-purple-600 text-white font-bold px-3.5 py-2 rounded-xl transition-all flex items-center space-x-1.5 border border-purple-400 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span>🔍</span><span>Lookup Reports</span>
+                            </button>
+                            <button id="navBtnAdminDuplicate" onclick="switchToSection('duplicate_check')" class="text-xs whitespace-nowrap bg-emerald-600 hover:bg-emerald-500 text-white font-black px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-emerald-400 flex-shrink-0 nav-tab-pill cursor-pointer" title="ফোন নাম্বার ডুপ্লিকেট চেকার টুল">
+                                <span>🔎</span><span>Duplicate Checker</span>
+                            </button>
+                            <button id="navBtnAdminQuickSearch" onclick="openQuickSearchModal()" class="text-xs whitespace-nowrap bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 border border-amber-300 flex-shrink-0 nav-tab-pill cursor-pointer">
+                                <span class="text-sm">⚡</span><span>Quick Search</span>
                             </button>
                         </div>
                     </div>
@@ -1689,6 +1648,9 @@
                     <!-- 1-Click Clean All User Data Action Button -->
                     <button onclick="adminOneClickCleanAllUserData()" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-black text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg shadow-md flex items-center space-x-1.5 transition cursor-pointer" title="এক ক্লিকে ইউজারদের সমস্ত সাবমিশন ডাটা সম্পূর্ণ মুছে ডাটাবেজ ফ্রেশ করুন">
                         <span>🧹 ১-ক্লিকে ইউজার ডাটা ক্লিয়ার</span>
+                    </button>
+                    <button type="button" onclick="adminCleanAllUsersDashboards()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition border border-indigo-400" title="শুধুমাত্র কর্মীদের ড্যাশবোর্ড ক্লিন করুন (কোম্পানির কোনো ডাটা ডিলিট হবে না)">
+                        <span>🧹 Clean All Users' Dashboards</span>
                     </button>
                     <button onclick="openResetDataModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-lg shadow flex items-center space-x-1.5 transition" title="Clear/delete previous data to start fresh daily data">
                         <span>🗑️ Reset / Delete Data</span>
@@ -4146,8 +4108,22 @@
                         মুছার ধরণ নির্বাচন করুন (Select Deletion Scope):
                     </label>
                     <div class="space-y-2">
+                        <!-- Option 0: 100% SAFE - CLEAN USERS DASHBOARD ONLY -->
+                        <label class="flex items-start space-x-3 p-3.5 bg-emerald-50 rounded-xl border-2 border-emerald-400 hover:border-emerald-500 cursor-pointer shadow-xs transition">
+                            <input type="radio" name="deleteScope" value="users_dashboard_only" checked class="mt-0.5 w-4 h-4 text-emerald-600" onchange="toggleDateInputVisibility()">
+                            <div>
+                                <span class="font-black text-emerald-950 block text-xs flex items-center space-x-1.5">
+                                    <span>🟢 শুধুমাত্র কর্মীদের ড্যাশবোর্ড ক্লিন করুন (Clean Users' Dashboard Only)</span>
+                                    <span class="bg-emerald-200 text-emerald-900 text-[10px] font-black px-2 py-0.5 rounded-full">১০০% নিরাপদ</span>
+                                </span>
+                                <span class="text-emerald-800 text-[11px] leading-relaxed block mt-1">
+                                    <strong>কোম্পানির কোনো ডাটা ডিলিট হবে না:</strong> কোম্পানি ডেলিভারি (Company Deliveries), রিসিভড স্টক (Received Stock) বা আগের মূল ডাটা কিচ্ছু ডিলিট হবে না। শুধুমাত্র কর্মীদের ড্যাশবোর্ডের ৪২০ টার্গেট কাউন্টার ও আজকের কাজ ০ হয়ে ফ্রেশ শুরু হবে।
+                                </span>
+                            </div>
+                        </label>
+
                         <label class="flex items-start space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-rose-300 cursor-pointer">
-                            <input type="radio" name="deleteScope" value="all" checked class="mt-0.5 w-4 h-4 text-rose-600" onchange="toggleDateInputVisibility()">
+                            <input type="radio" name="deleteScope" value="all" class="mt-0.5 w-4 h-4 text-rose-600" onchange="toggleDateInputVisibility()">
                             <div>
                                 <span class="font-bold text-slate-800 block text-xs">🔴 পূর্বের সমস্ত ডাটা মুছে ফেলুন (Delete All Previous Data)</span>
                                 <span class="text-slate-500 text-[11px]">ডাটাবেজের সব ফোন নম্বর খালি হয়ে যাবে এবং কাউন্টার ০ হয়ে যাবে। সম্পূর্ণ নতুন করে কাজ শুরু হবে।</span>

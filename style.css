@@ -424,46 +424,43 @@ html.dark .bg-sky-50 {
 
 
 /* =========================================================================
-   ENHANCED SCROLLABLE HORIZONTAL NAVIGATION BAR SYSTEM
+   ENHANCED SCROLLABLE HORIZONTAL NAVIGATION BAR SYSTEM (PREMIUM NO-TRACK LOOK)
    ========================================================================= */
 .custom-nav-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 }
 
 .custom-nav-scrollbar::-webkit-scrollbar {
-    height: 5px;
+    display: none !important; /* Chrome, Safari, Opera */
+    width: 0 !important;
+    height: 0 !important;
 }
 
-.custom-nav-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.35);
-    border-radius: 9999px;
-    margin: 0 8px;
-}
-
-.custom-nav-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.28);
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    transition: background 0.2s ease;
-}
-
-.custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.6);
-}
-
-html.dark .custom-nav-scrollbar::-webkit-scrollbar-track {
-    background: rgba(2, 6, 23, 0.5);
-}
-
-html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
+/* Fluid responsive refinements for small viewports */
+@media (max-width: 640px) {
+    .rx-saas-hero {
+        padding: 1.25rem !important;
+    }
+    .rx-saas-hero h2 {
+        font-size: 1.35rem !important;
+        line-height: 1.25 !important;
+    }
+    #userInfo {
+        gap: 0.35rem !important;
+    }
+    #userBadge {
+        font-size: 10px !important;
+        padding: 2px 7px !important;
+        max-width: 140px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    #userEmail {
+        max-width: 110px !important;
+    }
 }
 
 .nav-tab-pill {

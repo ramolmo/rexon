@@ -119,6 +119,7 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                             department TEXT,
                             user_email TEXT,
                             username TEXT,
+                            user_id TEXT,
                             file_name TEXT,
                             created_at TEXT,
                             archived_at TEXT DEFAULT (datetime('now')),
@@ -130,6 +131,8 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                     await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_user ON turso_submissions(username);`);
                     await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_email ON turso_submissions(user_email);`);
                     await this.query(`CREATE INDEX IF NOT EXISTS idx_ts_report ON turso_submissions(report_type);`);
+                    try { await this.query("ALTER TABLE turso_submissions ADD COLUMN user_id TEXT;"); } catch(e) {}
+                    try { await this.query("ALTER TABLE turso_stock_numbers ADD COLUMN assigned_to_user_id TEXT;"); } catch(e) {}
 
                     await this.query(`
                         CREATE TABLE IF NOT EXISTS turso_stock_numbers (
@@ -240,12 +243,13 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                         const file = this.escapeSql(fileName || '');
                         const created = this.escapeSql(new Date().toISOString());
                         const src = this.escapeSql('master_numbers');
-                        return `(${src}, ${phone}, ${name}, ${age}, ${inc}, ${val}, ${rep}, ${dept}, ${email}, ${user}, ${file}, ${created})`;
+                        const uid = this.escapeSql(profile?.id || currentUser?.id || '');
+                        return `(${src}, ${phone}, ${name}, ${age}, ${inc}, ${val}, ${rep}, ${dept}, ${email}, ${user}, ${uid}, ${file}, ${created})`;
                     }).join(', ');
 
                     const sql = `
                         INSERT OR IGNORE INTO turso_submissions 
-                        (source_table, phone_number, full_name, age, household_income, est_market_value, report_type, department, user_email, username, file_name, created_at)
+                        (source_table, phone_number, full_name, age, household_income, est_market_value, report_type, department, user_email, username, user_id, file_name, created_at)
                         VALUES ${valuesSql};
                     `;
                     const res = await this.query(sql);
@@ -1913,25 +1917,30 @@ window.addEventListener('DOMContentLoaded', () => {
                 const navLookupBtn = document.getElementById('navBtnLookupChecker');
 
                 if (currentProfile.role === 'admin') {
-                    badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-purple-200 text-purple-900';
+                    badge.className = 'whitespace-nowrap text-xs px-2.5 py-1 rounded-lg font-bold bg-purple-100 text-purple-900 border border-purple-300 shadow-xs flex-shrink-0';
                     badge.innerText = '⚡ Master Admin';
+                    badge.title = 'REXON System Master Administrator';
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👑</span><span>Admin Panel</span>';
                     if (navLookupBtn) navLookupBtn.classList.remove('hidden');
                     switchToSection('dashboard');
                 } else if (isLeader) {
-                    badge.className = 'text-xs px-2.5 py-1 rounded-full font-black bg-amber-400 text-slate-950 shadow-sm border border-amber-300';
-                    badge.innerText = '👑 Team Leader (আনলিমিটেড)';
-                    let deptName = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify (Female & Signal)';
+                    badge.className = 'whitespace-nowrap text-xs px-2.5 py-1 rounded-lg font-black bg-amber-400 text-slate-950 shadow-xs border border-amber-300 flex-shrink-0';
+                    badge.innerText = '👑 Team Leader';
+                    let deptName = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify';
+                    badge.title = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
                     document.getElementById('userDeptTitle').innerText = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👷</span><span>My Work (আমার কাজ)</span>';
                     if (navLookupBtn) navLookupBtn.classList.remove('hidden');
                     setupWorkerReportOptions(currentProfile.department);
                     switchToSection('dashboard');
                 } else {
-                    let deptLabel = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify (Female & Signal)';
-                    badge.className = 'text-xs px-2.5 py-1 rounded-full font-semibold bg-indigo-200 text-indigo-900';
-                    badge.innerText = deptLabel;
-                    document.getElementById('userDeptTitle').innerText = deptLabel;
+                    const isLookup = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup');
+                    const compactLabel = isLookup ? '🔍 Number Lookup' : '🚻 Gender Verify';
+                    const fullLabel = isLookup ? 'Number Lookup Department' : 'Gender Verify (Female & Signal)';
+                    badge.className = 'whitespace-nowrap text-[11px] sm:text-xs px-2.5 py-1 rounded-lg font-bold bg-indigo-100 text-indigo-900 border border-indigo-300 shadow-xs flex-shrink-0';
+                    badge.innerText = compactLabel;
+                    badge.title = fullLabel;
+                    document.getElementById('userDeptTitle').innerText = fullLabel;
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👷</span><span>My Work (আমার কাজ)</span>';
                     if (navLookupBtn) navLookupBtn.classList.remove('hidden');
                     setupWorkerReportOptions(currentProfile.department);
@@ -2494,11 +2503,12 @@ function setupWorkerReportOptions(dept) {
 
                 // Also check Turso submissions for precision
                 if (typeof TursoVault !== 'undefined') {
-                    const tMaleRes = await safeQuery(TursoVault.query(`SELECT COUNT(*) as cnt FROM turso_submissions WHERE user_id = '${currentUser.id}' AND report_type = 'male_report' AND date(created_at) = date('now');`), null);
+                    const tUserCond = `(user_email = '${currentUser.email}' OR username = '${currentProfile?.username || ''}')`;
+                    const tMaleRes = await safeQuery(TursoVault.query(`SELECT COUNT(*) as cnt FROM turso_submissions WHERE ${tUserCond} AND report_type = 'male_report' AND date(created_at) = date('now');`), null);
                     if (tMaleRes && tMaleRes.rows && tMaleRes.rows[0]) {
                         todayMaleDone = Math.max(todayMaleDone, parseInt(tMaleRes.rows[0].cnt || 0, 10));
                     }
-                    const tFemRes = await safeQuery(TursoVault.query(`SELECT COUNT(*) as cnt FROM turso_submissions WHERE user_id = '${currentUser.id}' AND report_type = 'female_report' AND date(created_at) = date('now');`), null);
+                    const tFemRes = await safeQuery(TursoVault.query(`SELECT COUNT(*) as cnt FROM turso_submissions WHERE ${tUserCond} AND report_type = 'female_report' AND date(created_at) = date('now');`), null);
                     if (tFemRes && tFemRes.rows && tFemRes.rows[0]) {
                         todayFemaleDone = Math.max(todayFemaleDone, parseInt(tFemRes.rows[0].cnt || 0, 10));
                     }
@@ -3964,10 +3974,10 @@ function setupWorkerReportOptions(dept) {
                 // D. From Turso submissions
                 try {
                     if (typeof TursoVault !== 'undefined') {
-                        const tUsersRes = await safeQuery(TursoVault.query("SELECT DISTINCT user_id, user_email, username, department FROM turso_submissions WHERE user_id IS NOT NULL;"), null);
+                        const tUsersRes = await safeQuery(TursoVault.query("SELECT DISTINCT user_email, username, department FROM turso_submissions WHERE user_email IS NOT NULL AND user_email != '';"), null);
                         if (tUsersRes && tUsersRes.rows) {
                             tUsersRes.rows.forEach(tu => {
-                                const uid = tu.user_id;
+                                const uid = tu.user_email;
                                 if (uid && !userMap[uid]) {
                                     const uEmail = tu.user_email || `${tu.username || 'worker'}@portal.com`;
                                     const uName = tu.username || uEmail.split('@')[0];
@@ -11978,28 +11988,127 @@ async function loadClaimStockSector() {
         // FEATURE 1: PER-USER DATA DELETION (প্রতিটি ইউজারের ডাটা আলাদা আলাদা ডিলিট)
         // =========================================================================
         async function adminDeleteSingleWorkerSubmissions(userId, username, email) {
-            const confirmMsg = `⚠️ সতর্কতা (Delete Single Worker Data):\n\nআপনি কি নিশ্চিতভাবে কর্মী "${username}" (${email}) এর সমস্ত কাজের ডাটা (Master numbers, upload logs, lookup records) সম্পূর্ণ মুছে ফেলতে চান?\n\nকর্মী অ্যাকাউন্ট বহাল থাকবে, শুধুমাত্র ডাটাবেজের সমস্ত কাজ মুছে ০ হয়ে যাবে।`;
+            const confirmMsg = `⚠️ সতর্কতা (Clean Single Worker Dashboard):
+
+আপনি কি নিশ্চিতভাবে কর্মী "${username}" (${email}) এর ড্যাশবোর্ডের সমস্ত কাজের ডাটা (Master numbers, upload logs, lookup records) সম্পূর্ণ মুছে ০ করতে চান?
+
+✅ ১০০% নিরাপদ গ্যারান্টি:
+• কর্মী অ্যাকাউন্ট ও লগইন বহাল থাকবে।
+• শুধুমাত্র তার ড্যাশবোর্ডের কাজ ও কাউন্টার মুছে ০ হবে।
+• কোম্পানির কোনো ডেলিভারি (Company Deliveries) বা রিসিভড স্টক ফাইল ডিলিট হবে না।`;
             if (!confirm(confirmMsg)) return;
 
             try {
                 // 1. Delete from Supabase tables
                 if (supabaseClient) {
-                    await Promise.all([
-                        supabaseClient.from('master_numbers').delete().or(`user_id.eq.${userId},user_email.eq.${email}`),
-                        supabaseClient.from('upload_logs').delete().or(`user_id.eq.${userId},user_email.eq.${email}`),
-                        supabaseClient.from('lookup_records').delete().or(`worker_email.eq.${email},worker_username.eq.${username}`),
-                        supabaseClient.from('lookup_no_info_records').delete().or(`worker_email.eq.${email},worker_username.eq.${username}`)
-                    ]);
-                }
-                // 2. Delete from Turso Vault
-                if (typeof TursoVault !== 'undefined') {
-                    await TursoVault.query(`DELETE FROM turso_submissions WHERE user_id = '${userId}' OR user_email = '${email}' OR username = '${username}';`);
+                    const orWorker = [];
+                    if (userId) orWorker.push(`user_id.eq.${userId}`);
+                    if (email) orWorker.push(`user_email.eq.${email}`);
+                    const orWorkerStr = orWorker.join(',');
+
+                    const orLookup = [];
+                    if (email) orLookup.push(`worker_email.eq.${email}`);
+                    if (username) orLookup.push(`worker_username.eq.${username}`);
+                    const orLookupStr = orLookup.join(',');
+
+                    const promises = [];
+                    if (orWorkerStr) {
+                        promises.push(supabaseClient.from('master_numbers').delete().or(orWorkerStr));
+                        promises.push(supabaseClient.from('upload_logs').delete().or(orWorkerStr));
+                    }
+                    if (orLookupStr) {
+                        promises.push(supabaseClient.from('lookup_records').delete().or(orLookupStr));
+                        promises.push(supabaseClient.from('lookup_no_info_records').delete().or(orLookupStr));
+                    }
+
+                    // Release claimed stock back to available pool so no company numbers are lost
+                    if (orWorkerStr) {
+                        promises.push(supabaseClient.from('company_received_numbers').update({
+                            is_assigned: false,
+                            assigned_to_user_id: null,
+                            assigned_to_username: null,
+                            assigned_to_email: null,
+                            assigned_at: null
+                        }).or(`assigned_to_user_id.eq.${userId},assigned_to_email.eq.${email}`));
+                    }
+
+                    await Promise.all(promises);
                 }
 
-                alert(`✅ সফল! কর্মী "${username}" এর সমস্ত কাজের ডাটা মুছে ফেলা হয়েছে।`);
+                // 2. Delete from Turso Vault (Safe query - checks email and username which exist in SQLite)
+                if (typeof TursoVault !== 'undefined') {
+                    try {
+                        let whereParts = [];
+                        if (email) whereParts.push(`user_email = '${email}'`);
+                        if (username) whereParts.push(`username = '${username}'`);
+                        if (whereParts.length > 0) {
+                            await TursoVault.query(`DELETE FROM turso_submissions WHERE ${whereParts.join(' OR ')};`);
+                        }
+                    } catch (tErr) {
+                        console.warn('Turso delete single worker notice:', tErr);
+                    }
+                }
+
+                alert(`✅ সফল! কর্মী "${username}" এর ড্যাশবোর্ডের সমস্ত ডাটা সফলভাবে ক্লিন করা হয়েছে।
+
+কোম্পানির ডেলিভারি বা মূল স্টক ডাটা সম্পূর্ণ সুরক্ষিত আছে।`);
                 await loadAdminDashboard();
             } catch (err) {
                 console.error('Delete worker data error:', err);
+                alert('ডাটা মুছতে সমস্যা হয়েছে: ' + err.message);
+            }
+        }
+
+        // =========================================================================
+        // FEATURE: CLEAN ALL USERS' DASHBOARDS (100% Zero Loss of Company Data)
+        // =========================================================================
+        async function adminCleanAllUsersDashboards() {
+            const confirmMsg = `⚠️ চূড়ান্ত সতর্কতা (Clean All Users' Dashboards):
+
+আপনি কি সমস্ত কর্মীদের ড্যাশবোর্ড সম্পূর্ণ ক্লিন ও ০ করতে চান?
+
+✅ ১০০% নিরাপদ গ্যারান্টি:
+• সমস্ত কর্মীদের ড্যাশবোর্ড কাউন্টার, আজকের কাজ, এবং সাবমিশন হিস্ট্রি মুছে ০ হয়ে যাবে।
+• কোম্পানি ডেলিভারি (Company Deliveries) এর কোনো ডাটা ডিলিট হবে না।
+• কোম্পানির রিসিভড স্টক (Received Stock) এর কোনো ডাটা ডিলিট হবে না।
+• কর্মীদের নেওয়া আন-সাবমিটেড নাম্বারগুলো আবার কোম্পানির ফ্রি স্টকে ফেরত চলে যাবে।
+• টারসো ক্লাউড ভল্টের ডেলিভারি হিস্ট্রি এবং কর্মী অ্যাকাউন্টগুলো সম্পূর্ণ বহাল থাকবে।`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                // 1. Delete all worker upload logs and submissions from Supabase
+                if (supabaseClient) {
+                    await Promise.all([
+                        supabaseClient.from('upload_logs').delete().neq('id', 0),
+                        supabaseClient.from('master_numbers').delete().neq('id', 0),
+                        supabaseClient.from('lookup_records').delete().neq('id', 0),
+                        supabaseClient.from('lookup_no_info_records').delete().neq('id', 0)
+                    ]);
+
+                    // Release all claimed stock back to available stock (Zero loss of company received numbers!)
+                    await supabaseClient.from('company_received_numbers').update({
+                        is_assigned: false,
+                        assigned_to_user_id: null,
+                        assigned_to_username: null,
+                        assigned_to_email: null,
+                        assigned_at: null
+                    }).eq('is_assigned', true);
+                }
+
+                // 2. Clear Turso worker submissions (Leaves turso_deliveries & turso_stock_numbers 100% intact!)
+                if (typeof TursoVault !== 'undefined') {
+                    try {
+                        await TursoVault.query(`DELETE FROM turso_submissions;`);
+                        await TursoVault.query(`UPDATE turso_stock_numbers SET is_assigned = 0, assigned_to_username = NULL, assigned_to_email = NULL, assigned_at = NULL WHERE is_assigned = 1;`);
+                    } catch(tErr) {
+                        console.warn('Turso clean all notice:', tErr);
+                    }
+                }
+
+                alert();
+                await loadAdminDashboard();
+            } catch (err) {
+                console.error('Clean all users error:', err);
                 alert('ডাটা মুছতে সমস্যা হয়েছে: ' + err.message);
             }
         }
