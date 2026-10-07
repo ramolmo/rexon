@@ -281,11 +281,32 @@ html.dark .rx-saas-hero {
     border-color: rgba(99, 102, 241, 0.3);
 }
 
-
+/* Telegram Direct Support Floating Badge */
+.rx-telegram-dock {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: white;
+    border-radius: 999px;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+.rx-telegram-dock:hover {
     transform: translateY(-3px) scale(1.02);
     box-shadow: 0 15px 35px rgba(2, 132, 199, 0.45);
     color: white;
 }
+.rx-telegram-dock .rx-tg-icon {
     width: 26px;
     height: 26px;
     background: white;
@@ -298,6 +319,7 @@ html.dark .rx-saas-hero {
     font-weight: 900;
     flex-shrink: 0;
 }
+.rx-telegram-dock .rx-tg-dot {
     width: 8px;
     height: 8px;
     background: #4ade80;
@@ -311,7 +333,12 @@ html.dark .rx-saas-hero {
 }
 
 @media (max-width: 640px) {
-    
+    .rx-telegram-dock {
+        right: 12px;
+        bottom: 12px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
 }
 
 /* Modals */
@@ -346,73 +373,104 @@ html.dark table tbody tr:hover {
     }
 }
 
-/* =========================================================================
-   ANIMATED BRAND LOGO & SMOOTH HORIZONTAL SCROLLBAR SYSTEM
-   ========================================================================= */
-.rx-brand-logo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    color: #4f46e5;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
-    border: 1px solid rgba(255, 255, 255, 0.85);
-    cursor: pointer;
-    animation: rxLogoFloat 3.2s ease-in-out infinite;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-    will-change: transform;
+/* Additional REXON SaaS Refinements */
+html.dark .rx-saas-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #172554 100%) !important;
+    border-color: rgba(99, 102, 241, 0.28) !important;
 }
-.rx-brand-logo:hover {
-    transform: scale(1.12) rotate(6deg);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
+
+html.dark .bg-slate-100 {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
 }
-.rx-brand-logo .rx-logo-icon {
-    display: inline-block;
-    animation: rxBoltPulse 2.2s ease-in-out infinite alternate;
-    font-size: 1.25rem;
-    line-height: 1;
+
+html.dark .bg-indigo-50 {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
 }
-@keyframes rxLogoFloat {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-4px) rotate(-3deg);
-    }
+
+html.dark .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
 }
-@keyframes rxBoltPulse {
-    0% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.3));
-    }
-    100% {
-        transform: scale(1.15);
-        filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.8));
+
+html.dark .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.12) !important;
+    border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+html.dark .bg-rose-50 {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+html.dark .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.dark .bg-sky-50 {
+    background-color: rgba(14, 165, 233, 0.12) !important;
+    border-color: rgba(14, 165, 233, 0.25) !important;
+}
+
+/* Zero horizontal overflow on small displays */
+@media (max-width: 640px) {
+    .max-w-7xl {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
     }
 }
 
+
+/* =========================================================================
+   ENHANCED SCROLLABLE HORIZONTAL NAVIGATION BAR SYSTEM
+   ========================================================================= */
 .custom-nav-scrollbar {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 }
+
 .custom-nav-scrollbar::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+    height: 5px;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.35);
+    border-radius: 9999px;
+    margin: 0 8px;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(2, 6, 23, 0.5);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .nav-tab-pill {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
 }
+
 .nav-tab-pill:active {
     transform: scale(0.96);
-}
-
-.rx-saas-hero {
-    background: linear-gradient(135deg, #0b1120 0%, #1e1b4b 60%, #1e293b 100%) !important;
-    border: 1px solid rgba(99, 102, 241, 0.2) !important;
 }
