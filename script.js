@@ -1916,16 +1916,19 @@ window.addEventListener('DOMContentLoaded', () => {
                 const navDashBtn = document.getElementById('navBtnDashboard');
                 const navLookupBtn = document.getElementById('navBtnLookupChecker');
 
+                const badgeTextEl = document.getElementById('userBadgeText');
                 if (currentProfile.role === 'admin') {
-                    badge.className = 'whitespace-nowrap text-xs px-2.5 py-1 rounded-lg font-bold bg-purple-100 text-purple-900 border border-purple-300 shadow-xs flex-shrink-0';
-                    badge.innerText = '⚡ Master Admin';
+                    badge.className = 'whitespace-nowrap text-xs px-3 py-1.5 rounded-xl font-bold bg-purple-950/80 text-purple-200 border border-purple-400/50 shadow-xs flex-shrink-0 inline-flex items-center gap-1.5';
+                    if (badgeTextEl) badgeTextEl.innerText = 'Master Admin';
+                    else badge.innerText = '⚡ Master Admin';
                     badge.title = 'REXON System Master Administrator';
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👑</span><span>Admin Panel</span>';
                     if (navLookupBtn) navLookupBtn.classList.remove('hidden');
                     switchToSection('dashboard');
                 } else if (isLeader) {
-                    badge.className = 'whitespace-nowrap text-xs px-2.5 py-1 rounded-lg font-black bg-amber-400 text-slate-950 shadow-xs border border-amber-300 flex-shrink-0';
-                    badge.innerText = '👑 Team Leader';
+                    badge.className = 'whitespace-nowrap text-xs px-3 py-1.5 rounded-xl font-black bg-amber-400 text-slate-950 border border-amber-300 shadow-xs flex-shrink-0 inline-flex items-center gap-1.5';
+                    if (badgeTextEl) badgeTextEl.innerText = '👑 Team Leader';
+                    else badge.innerText = '👑 Team Leader';
                     let deptName = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup') ? 'Number Lookup' : 'Gender Verify';
                     badge.title = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
                     document.getElementById('userDeptTitle').innerText = `${deptName} — 👑 টিম লিডার (আনলিমিটেড কোটা)`;
@@ -1935,10 +1938,11 @@ window.addEventListener('DOMContentLoaded', () => {
                     switchToSection('dashboard');
                 } else {
                     const isLookup = (currentProfile.department === 'lookup' || currentProfile.department === 'number_lookup');
-                    const compactLabel = isLookup ? '🔍 Number Lookup' : '🚻 Gender Verify';
-                    const fullLabel = isLookup ? 'Number Lookup Department' : 'Gender Verify (Female & Signal)';
-                    badge.className = 'whitespace-nowrap text-[11px] sm:text-xs px-2.5 py-1 rounded-lg font-bold bg-indigo-100 text-indigo-900 border border-indigo-300 shadow-xs flex-shrink-0';
-                    badge.innerText = compactLabel;
+                    const compactLabel = isLookup ? 'Number Lookup' : 'Gender Verify';
+                    const fullLabel = isLookup ? 'Number Lookup Department' : 'Gender Verify Department (Female 43+ & Male 41+)';
+                    badge.className = 'whitespace-nowrap text-xs px-3 py-1.5 rounded-xl font-bold bg-indigo-950/80 text-indigo-100 border border-indigo-400/40 shadow-xs flex-shrink-0 inline-flex items-center gap-1.5';
+                    if (badgeTextEl) badgeTextEl.innerText = compactLabel;
+                    else badge.innerText = compactLabel;
                     badge.title = fullLabel;
                     document.getElementById('userDeptTitle').innerText = fullLabel;
                     if (navDashBtn) navDashBtn.innerHTML = '<span>👷</span><span>My Work (আমার কাজ)</span>';
