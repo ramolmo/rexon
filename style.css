@@ -421,3 +421,56 @@ html.dark .bg-sky-50 {
         padding-right: 0.75rem !important;
     }
 }
+
+
+/* =========================================================================
+   ENHANCED SCROLLABLE HORIZONTAL NAVIGATION BAR SYSTEM
+   ========================================================================= */
+.custom-nav-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar {
+    height: 5px;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.35);
+    border-radius: 9999px;
+    margin: 0 8px;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(2, 6, 23, 0.5);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.nav-tab-pill {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.nav-tab-pill:active {
+    transform: scale(0.96);
+}
