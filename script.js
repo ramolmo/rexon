@@ -2880,7 +2880,7 @@ function setupWorkerReportOptions(dept) {
 
             const selectedRep = document.querySelector('input[name="workerReportType"]:checked')?.value || 'female_report';
             const isLookup = (selectedRep === 'lookup_report');
-            const isSignal = (selectedRep === 'signal_report');
+            const isSignal = (selectedRep === 'signal_report' || selectedRep === 'female_signal' || selectedRep === 'male_signal' || selectedRep === 'signal_male_report');
 
             // Dynamic Table Header update!
             const headerRow = document.getElementById('workerLivePreviewHeaderRow');
@@ -10837,20 +10837,55 @@ async function loadClaimStockSector() {
         }
 
         // 4. Worker Payroll Calculations
+        function renderWorkerSavedAccountsCard() {
+            const container = document.getElementById('workerSavedPaymentDetailsDisplay');
+            if (!container) return;
+            const userId = currentUser ? currentUser.id : 'me';
+            const accs = getWorkerSavedPaymentAccounts(userId);
+
+            let html = '';
+            if (accs.bkash) html += `<div class="text-pink-600 font-bold">📱 বিকাশ (bKash): <b>${accs.bkash}</b></div>`;
+            if (accs.nagad) html += `<div class="text-amber-600 font-bold">📱 নগদ (Nagad): <b>${accs.nagad}</b></div>`;
+            if (accs.rocket) html += `<div class="text-indigo-600 font-bold">📱 রকেট (Rocket): <b>${accs.rocket}</b></div>`;
+            if (accs.bankName && accs.accountNumber) {
+                html += `<div>🏦 ব্যাংক: <b>${accs.bankName}</b> - A/C: <b>${accs.accountNumber}</b> (${accs.accountName || ''})</div>`;
+            }
+            if (!html) {
+                html = '<p class="text-slate-400 font-sans">কোনো পেমেন্ট একাউন্ট দেওয়া হয়নি। "এডিট করুন" বাটনে ক্লিক করে আপনার বিকাশ বা নগদ নাম্বার দিন।</p>';
+            }
+            container.innerHTML = html;
+        }
+
         function updateWorkerPayrollUI() {
             const mObj = workerMonthlyArchive[currentWorkerSelectedMonthKey] || { totalUnique: 0, days: {} };
+            const volume = mObj.totalUnique || 0;
+
+            let activeDays = 0;
+            let targetMetDays = 0;
+            Object.values(mObj.days || {}).forEach(d => {
+                const tot = (d.femaleCount || 0) + (d.maleCount || 0);
+                if (tot > 0 || (d.totalUnique || 0) > 0) activeDays++;
+                if (tot >= 420 || ((d.femaleCount || 0) >= 210 && (d.maleCount || 0) >= 210)) {
+                    targetMetDays++;
+                }
+            });
+
             const volEl = document.getElementById('payrollMonthVolume');
-            if (volEl) volEl.innerText = (mObj.totalUnique || 0).toLocaleString();
+            const daysEl = document.getElementById('payrollDaysWorked');
+            const targetDaysEl = document.getElementById('payrollTargetMetDays');
+
+            if (volEl) volEl.innerText = volume.toLocaleString();
+            if (daysEl) daysEl.innerText = `${activeDays} দিন`;
+            if (targetDaysEl) targetDaysEl.innerText = `${targetMetDays} দিন`;
 
             recalcWorkerPayrollEstimate();
+            renderWorkerSavedAccountsCard();
             renderWorkerFinanceLedger();
         }
 
         function recalcWorkerPayrollEstimate() {
             const mObj = workerMonthlyArchive[currentWorkerSelectedMonthKey] || { totalUnique: 0, days: {} };
             const volume = mObj.totalUnique || 0;
-            const rate = parseFloat(document.getElementById('calcRatePerThousand')?.value) || 25.0;
-            const bonusPerMet = parseFloat(document.getElementById('calcBonusPerMet')?.value) || 5.0;
 
             let targetMetDays = 0;
             Object.values(mObj.days || {}).forEach(d => {
@@ -10860,15 +10895,33 @@ async function loadClaimStockSector() {
                 }
             });
 
+            const rateInput = document.getElementById('calcRatePerThousand');
+            const bonusInput = document.getElementById('calcBonusPerMet');
+
+            const isBdt = (currentCurrency === 'BDT');
+            const defaultRate = isBdt ? 3000 : 25;
+            const defaultBonus = isBdt ? 500 : 5;
+
+            const rate = parseFloat(rateInput ? rateInput.value : defaultRate) || defaultRate;
+            const bonusPerMet = parseFloat(bonusInput ? bonusInput.value : defaultBonus) || defaultBonus;
+
             const basePay = (volume / 1000) * rate;
             const bonusPay = targetMetDays * bonusPerMet;
             const totalEst = basePay + bonusPay;
 
+            const sym = isBdt ? '৳' : '$';
             const earnEl = document.getElementById('payrollEstimatedEarnings');
-            if (earnEl) earnEl.innerText = `$${totalEst.toFixed(2)}`;
+            if (earnEl) earnEl.innerText = `${sym}${Math.round(totalEst).toLocaleString()}`;
 
             const dispEl = document.getElementById('calcTotalEstimatedDisplay');
-            if (dispEl) dispEl.innerHTML = `<span>$${totalEst.toFixed(2)}</span><span class="text-xs font-bold text-emerald-700">Base: $${basePay.toFixed(2)} + Bonus: $${bonusPay.toFixed(2)}</span>`;
+            if (dispEl) {
+                dispEl.innerHTML = `
+                    <span class="text-xl sm:text-2xl">${sym}${Math.round(totalEst).toLocaleString()}</span>
+                    <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+                        মূল: ${sym}${Math.round(basePay).toLocaleString()} + টার্গেট বোনাস: ${sym}${Math.round(bonusPay).toLocaleString()} (${targetMetDays} দিন টার্গেট পূর্ণ)
+                    </span>
+                `;
+            }
         }
 
         function exportWorkerPayrollStatement() {
@@ -11069,57 +11122,200 @@ async function loadClaimStockSector() {
             URL.revokeObjectURL(url);
         }
 
-        function loadAdminPayrollRoster() {
+        async function loadAdminPayrollRoster() {
             const tbody = document.getElementById('adminPayrollRosterBody');
             if (!tbody) return;
-            const users = (adminUsersCache && adminUsersCache.length > 0) ? adminUsersCache : [
-                { username: 'Alex_Lead', department: 'gender_verify', thisMonthAdded: 8400, todayAdded: 420 },
-                { username: 'Salma_Worker', department: 'lookup', thisMonthAdded: 6200, todayAdded: 350 },
-                { username: 'Rahim_Verif', department: 'gender_verify', thisMonthAdded: 7800, todayAdded: 420 }
-            ];
 
-            tbody.innerHTML = users.map(u => {
-                const vol = u.thisMonthAdded || u.totalContributed || 0;
-                const base = ((vol / 1000) * 25.0).toFixed(2);
-                const bonusDays = Math.floor(vol / 420);
-                const bonus = (bonusDays * 5.0).toFixed(2);
-                const gross = (parseFloat(base) + parseFloat(bonus)).toFixed(2);
-                return `
-                    <tr class="hover:bg-slate-50 transition text-xs font-mono">
-                        <td class="py-2.5 px-3 font-bold text-slate-900">${u.username || 'Worker'}</td>
-                        <td class="py-2.5 px-3 uppercase text-[10px] font-semibold text-slate-500">${u.department || 'General'}</td>
-                        <td class="py-2.5 px-3 text-right font-bold text-indigo-700">${vol.toLocaleString()}</td>
-                        <td class="py-2.5 px-3 text-right">${bonusDays} Days</td>
-                        <td class="py-2.5 px-3 text-right">$${base}</td>
-                        <td class="py-2.5 px-3 text-right text-emerald-600">$${bonus}</td>
-                        <td class="py-2.5 px-3 text-right font-black text-slate-900">$${gross}</td>
-                        <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">Approved</span></td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-slate-400">⏳ কর্মী বেতন ও টার্গেট হিস্ট্রি লোড হচ্ছে...</td></tr>';
+
+            try {
+                if (!adminUsersCache || adminUsersCache.length === 0) {
+                    if (supabaseClient) {
+                        const { data: profs } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                        if (profs) {
+                            adminUsersCache = profs.map(p => ({
+                                id: p.id,
+                                email: p.email,
+                                username: p.username || (p.email ? p.email.split('@')[0] : 'Worker'),
+                                department: p.department || 'gender_verify',
+                                role: p.role || 'user',
+                                payment_info: p.payment_info || null,
+                                thisMonthAdded: 0,
+                                totalContributed: 0
+                            }));
+                        }
+                    }
+                }
+
+                // Calculate volume & target met days per worker from logs
+                const userMetrics = {};
+                (adminUsersCache || []).forEach(u => {
+                    userMetrics[u.email.toLowerCase()] = {
+                        user: u,
+                        volume: u.thisMonthAdded || u.totalContributed || 0,
+                        activeDays: 0,
+                        targetMetDays: 0
+                    };
+                });
+
+                if (supabaseClient) {
+                    try {
+                        const firstDayIso = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+                        const { data: logs } = await supabaseClient
+                            .from('upload_logs')
+                            .select('user_email, created_at, new_inserted, report_type')
+                            .gte('created_at', firstDayIso);
+
+                        if (logs && logs.length > 0) {
+                            const userDaysMap = {};
+                            logs.forEach(l => {
+                                const email = (l.user_email || '').toLowerCase();
+                                if (!email) return;
+                                const dateKey = l.created_at ? l.created_at.slice(0, 10) : 'today';
+                                const key = `${email}_${dateKey}`;
+
+                                if (!userDaysMap[key]) {
+                                    userDaysMap[key] = { email, date: dateKey, total: 0, female: 0, male: 0 };
+                                }
+                                userDaysMap[key].total += (l.new_inserted || 0);
+                                if (l.report_type === 'female_normal' || l.report_type === 'female_report') userDaysMap[key].female += (l.new_inserted || 0);
+                                else if (l.report_type === 'male_normal' || l.report_type === 'male_report') userDaysMap[key].male += (l.new_inserted || 0);
+                            });
+
+                            Object.values(userDaysMap).forEach(d => {
+                                if (userMetrics[d.email]) {
+                                    if (d.total > 0) userMetrics[d.email].activeDays++;
+                                    if (d.total >= 420 || (d.female >= 210 && d.male >= 210)) {
+                                        userMetrics[d.email].targetMetDays++;
+                                    }
+                                }
+                            });
+                        }
+                    } catch(logErr) {
+                        console.warn('Payroll logs calculation notice:', logErr);
+                    }
+                }
+
+                const isBdt = (currentCurrency === 'BDT');
+                const sym = isBdt ? '৳' : '$';
+                const rows = Object.values(userMetrics);
+
+                if (rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-slate-400">কোনো কর্মী তালিকা পাওয়া যায়নি।</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = rows.map(item => {
+                    const u = item.user;
+                    const vol = Math.max(item.volume, u.thisMonthAdded || u.totalContributed || 0);
+                    const saved = getWorkerSalarySettings(u.id);
+                    let savedAccs = getWorkerSavedPaymentAccounts(u.id);
+                    if ((!savedAccs || Object.keys(savedAccs).length === 0) && u.payment_info) {
+                        savedAccs = u.payment_info;
+                    }
+
+                    const defaultRate = isBdt ? 3000 : 25;
+                    const defaultBonus = isBdt ? 500 : 5;
+
+                    const ratePerK = saved.ratePerK || defaultRate;
+                    const targetBonus = saved.targetBonus || defaultBonus;
+                    const fixedSalary = saved.fixedSalary || 0;
+
+                    const targetMetDays = item.targetMetDays || (vol >= 420 ? Math.floor(vol / 420) : 0);
+                    const daysWorked = Math.max(targetMetDays, item.activeDays || (vol > 0 ? Math.ceil(vol / 350) : 0));
+
+                    const base = (vol / 1000) * ratePerK;
+                    const bonus = targetMetDays * targetBonus;
+                    const gross = base + bonus + fixedSalary;
+
+                    return `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                            <td class="py-3 px-3 font-bold text-slate-900 dark:text-white">
+                                <div class="flex items-center space-x-1.5">
+                                    <span>👤</span>
+                                    <div>
+                                        <span class="font-extrabold text-slate-900 dark:text-white block font-sans">${u.username || 'Worker'}</span>
+                                        <span class="text-[10px] text-slate-400 font-mono">${u.email || '-'}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 uppercase text-[10px] font-semibold text-slate-500 font-sans">${u.department || 'General'}</td>
+                            <td class="py-3 px-3">
+                                <div class="space-y-1 font-mono">
+                                    ${savedAccs.bkash ? `<div class="text-[11px] text-pink-600 dark:text-pink-400 font-bold flex items-center space-x-1"><span>📱 বিকাশ:</span><span>${savedAccs.bkash}</span></div>` : ''}
+                                    ${savedAccs.nagad ? `<div class="text-[11px] text-amber-600 dark:text-amber-400 font-bold flex items-center space-x-1"><span>📱 নগদ:</span><span>${savedAccs.nagad}</span></div>` : ''}
+                                    ${savedAccs.rocket ? `<div class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold flex items-center space-x-1"><span>📱 রকেট:</span><span>${savedAccs.rocket}</span></div>` : ''}
+                                    ${savedAccs.bankName && savedAccs.accountNumber ? `<div class="text-[10px] text-slate-700 dark:text-slate-300">🏦 ${savedAccs.bankName}: <b>${savedAccs.accountNumber}</b> (${savedAccs.accountName || ''})</div>` : ''}
+                                    ${(!savedAccs.bkash && !savedAccs.nagad && !savedAccs.rocket && !savedAccs.accountNumber) ? `<span class="text-[10px] text-slate-400 italic">নম্বর যুক্ত হয়নি</span>` : ''}
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-right font-black text-indigo-700 dark:text-sky-400 font-mono text-sm">${vol.toLocaleString()}</td>
+                            <td class="py-3 px-3 text-center font-bold text-slate-700 dark:text-slate-300 font-mono">${daysWorked} দিন</td>
+                            <td class="py-3 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${targetMetDays > 0 ? 'bg-purple-100 text-purple-900 border border-purple-200 dark:bg-purple-900/40 dark:text-purple-300' : 'bg-slate-100 text-slate-500'}">
+                                    ${targetMetDays} দিন সম্পন্ন
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-right font-bold text-slate-600 dark:text-slate-400 font-mono">${sym}${ratePerK.toLocaleString()}</td>
+                            <td class="py-3 px-3 text-right font-bold text-emerald-600 font-mono">+${sym}${Math.round(bonus).toLocaleString()}</td>
+                            <td class="py-3 px-3 text-right font-black text-emerald-700 dark:text-emerald-400 text-sm font-mono">${sym}${Math.round(gross).toLocaleString()}</td>
+                            <td class="py-3 px-3 text-center">
+                                <div class="inline-flex items-center space-x-1">
+                                    <button type="button" onclick="openDisbursePaymentModal('${u.id}', '${u.username || 'Worker'}', '${u.email || ''}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-[11px] shadow-xs transition flex items-center space-x-1 cursor-pointer" title="বেতন পরিশোধ ও প্রমাণ পাঠান">
+                                        <span>💸</span><span>Pay</span>
+                                    </button>
+                                    <button type="button" onclick="openEditWorkerSalaryModal('${u.id}', '${u.username || 'Worker'}', '${u.email || ''}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-[11px] border border-slate-300 transition cursor-pointer" title="বেতন রেট নির্ধারণ করুন">
+                                        <span>⚙️</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('loadAdminPayrollRoster error:', err);
+                tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-rose-500 font-bold">রোস্টার লোড করতে সমস্যা: ${err.message}</td></tr>`;
+            }
         }
 
         function exportAdminTeamPayrollExcel() {
             const todayStr = new Date().toISOString().slice(0, 10);
             let csv = '\uFEFF"REXON Master Team Payroll Roster"\n';
-            csv += `"Export Date:","${todayStr}"\n\n`;
-            csv += `"Worker Username","Department","This Month Volume","Base Amount","Bonus","Gross Payout","Status"\n`;
+            csv += '"Export Date:","' + todayStr + '"\n';
+            csv += '"Currency:","' + (currentCurrency || 'BDT') + '"\n\n';
+            csv += '"Worker Username","Email","Department","Payment Account / Methods","This Month Volume","Days Worked","420 Target Met Days","Rate per 1k","Target Bonus","Total Net Salary","Status"\n';
 
-            const users = (adminUsersCache && adminUsersCache.length > 0) ? adminUsersCache : [];
-            users.forEach(u => {
-                const vol = u.thisMonthAdded || u.totalContributed || 0;
-                const base = ((vol / 1000) * 25.0).toFixed(2);
-                const bonus = (Math.floor(vol / 420) * 5.0).toFixed(2);
-                const gross = (parseFloat(base) + parseFloat(bonus)).toFixed(2);
-                csv += `"${u.username}","${u.department}","${vol}","$${base}","$${bonus}","$${gross}","Approved"\n`;
-            });
+            const table = document.getElementById('adminPayrollRosterBody');
+            if (table) {
+                const trs = table.querySelectorAll('tr');
+                trs.forEach(tr => {
+                    const tds = tr.querySelectorAll('td');
+                    if (tds.length >= 9) {
+                        const uname = tds[0].querySelector('span.font-extrabold')?.innerText || '';
+                        const email = tds[0].querySelector('span.font-mono')?.innerText || '';
+                        const dept = tds[1].innerText.trim();
+                        const payAcc = tds[2].innerText.replace(/\n+/g, ' | ').trim();
+                        const vol = tds[3].innerText.trim().replace(/,/g, '');
+                        const days = tds[4].innerText.trim();
+                        const targetDays = tds[5].innerText.trim();
+                        const rate = tds[6].innerText.trim();
+                        const bonus = tds[7].innerText.trim();
+                        const total = tds[8].innerText.trim();
+
+                        csv += '"' + uname + '","' + email + '","' + dept + '","' + payAcc + '","' + vol + '","' + days + '","' + targetDays + '","' + rate + '","' + bonus + '","' + total + '","Approved"\n';
+                    }
+                });
+            }
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Master_Team_Payroll_${todayStr}.csv`;
+            a.download = 'Master_Team_Payroll_' + todayStr + '.csv';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
@@ -11702,6 +11898,7 @@ async function loadClaimStockSector() {
 
             saveWorkerSavedPaymentAccounts(userId, details);
             closeWorkerPaymentModal();
+            if (typeof renderWorkerSavedAccountsCard === 'function') renderWorkerSavedAccountsCard();
             alert('✅ আপনার পেমেন্ট অ্যাকাউন্ট তথ্য (বিকাশ/নগদ/ব্যাংক) সফলভাবে সংরক্ষিত হয়েছে!');
         }
 

@@ -1400,6 +1400,7 @@
                             <span class="font-black text-rose-900">ফিমেল রিপোর্ট বয়স ফিল্টার সক্রিয়:</span>
                             <span class="text-rose-800 font-medium ml-1">যেকোনো নাম্বার ৪৩ বছরের নিচে হলে তা স্বয়ংক্রিয়ভাবে বাদ যাবে। ৪৩ বা তার বেশি বয়সী নাম্বার এবং Deceased বা Unknown বয়স থাকলে কোনো সমস্যা নেই, গ্রহণ করা হবে।</span>
                         </div>
+                    </div>
 
                     <!-- Male Age Rule Notice Banner -->
                     <div id="maleAgeRuleBanner" class="hidden mt-3 p-3.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 flex items-center space-x-2.5 text-blue-950 text-xs shadow-xs">
@@ -1408,7 +1409,6 @@
                             <span class="font-black text-blue-900">পুরুষ রিপোর্ট বয়স ফিল্টার সক্রিয়:</span>
                             <span class="text-blue-800 font-medium ml-1">যেকোনো নাম্বার ৪১ বছরের নিচে হলে তা স্বয়ংক্রিয়ভাবে বাদ যাবে। ৪১ বা তার বেশি বয়সী নাম্বার এবং Deceased বা Unknown বয়স থাকলে কোনো সমস্যা নেই, গ্রহণ করা হবে।</span>
                         </div>
-                    </div>
                     </div>
 
                     <!-- Underage Filter Alert Notification Banner (Dynamic) -->
@@ -4525,62 +4525,124 @@
         <!-- WORKER SECTION 5: WORKER PAYROLL VIEW -->
         <!-- ============================================================= -->
         <div id="workerPayrollView" class="hidden space-y-6 animate-in fade-in duration-200">
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <span class="text-xs font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">Compensation &amp; Payouts</span>
-                    <h2 class="text-2xl font-black text-slate-900 mt-2">Worker Compensation Center</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Real-time calculations based on verified valid volume, bonus targets, and monthly cycles.</p>
+            <div class="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <span class="text-xs font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/80 border border-emerald-400/40 px-3 py-1 rounded-full">
+                        💰 Worker Compensation &amp; Salary Center
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white mt-2">
+                        আমার বেতন ও পারিশ্রমিক হিসাব
+                    </h2>
+                    <p class="text-xs sm:text-sm text-emerald-100 font-medium">
+                        আপনার চলতি মাসের কাজের ভলিউম, সক্রিয় কাজের দিন, এবং ডেইলি ৪২০ টার্গেট বোনাস অনুযায়ী স্বয়ংক্রিয় বেতন হিসাব।
+                    </p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="exportWorkerPayrollStatement()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition">
-                        <span>📥 Download Payroll Statement</span>
+                    <button type="button" onclick="exportWorkerPayrollStatement()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs shadow-md transition flex items-center space-x-1.5 cursor-pointer">
+                        <span>📥</span>
+                        <span>ডাউনলোড বেতন স্লিপ (.csv)</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Payroll Metric Breakdown -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-slate-500 font-bold uppercase text-[10px]">Verified Volume (Month)</span>
-                    <span id="payrollMonthVolume" class="text-2xl font-black text-indigo-700 block mt-1">0</span>
-                    <span class="text-[10px] text-slate-400">Valid unique records</span>
+            <!-- Payroll Metric Breakdown (ভলিউম, কত দিন কাজ করলো, টার্গেট পূরণ, মোট বেতন) -->
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <!-- 1. চলতি মাসের মোট ইউনিক কাজ -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                    <span class="text-slate-500 font-bold uppercase text-[10px]">চলতি মাসের কাজ (Volume)</span>
+                    <span id="payrollMonthVolume" class="text-2xl sm:text-3xl font-black text-indigo-700 dark:text-sky-400 block font-mono">0</span>
+                    <span class="text-[11px] text-slate-400">টি ভেরিফাইড ইউনিক নাম্বার</span>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-slate-500 font-bold uppercase text-[10px]">Estimated Earnings</span>
-                    <span id="payrollEstimatedEarnings" class="text-2xl font-black text-emerald-600 block mt-1">$0.00</span>
-                    <span class="text-[10px] text-slate-400">Based on approved rate</span>
+
+                <!-- 2. কত দিন কাজ করলো -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                    <span class="text-slate-500 font-bold uppercase text-[10px]">কাজের দিন (Days Worked)</span>
+                    <span id="payrollDaysWorked" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white block font-mono">0 দিন</span>
+                    <span class="text-[11px] text-emerald-600 font-bold">চলতি মাসে সক্রিয় উপস্থিতি</span>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-slate-500 font-bold uppercase text-[10px]">420 Target Bonus Tier</span>
-                    <span id="payrollBonusStatus" class="text-2xl font-black text-purple-700 block mt-1">Standard</span>
-                    <span class="text-[10px] text-purple-600 font-semibold">+Bonus for &gt; 420 days</span>
+
+                <!-- 3. ডেইলি ৪২০ টার্গেট পূর্ণের দিন -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                    <span class="text-slate-500 font-bold uppercase text-[10px]">ডেইলি ৪২০ টার্গেট পূরণ</span>
+                    <span id="payrollTargetMetDays" class="text-2xl sm:text-3xl font-black text-purple-700 dark:text-purple-400 block font-mono">0 দিন</span>
+                    <span class="text-[11px] text-purple-600 font-bold">২১০ ফিমেল + ২১০ মেল সম্পন্ন</span>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    <span class="text-slate-500 font-bold uppercase text-[10px]">Next Disbursement</span>
-                    <span class="text-2xl font-black text-slate-800 block mt-1">Cycle Close</span>
-                    <span class="text-[10px] text-slate-400">Monthly 1st-30/31st</span>
+
+                <!-- 4. সর্বমোট প্রদেয় বেতন -->
+                <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white p-5 rounded-2xl shadow-md space-y-1">
+                    <span class="text-emerald-100 font-bold uppercase text-[10px]">সর্বমোট প্রদেয় বেতন (Total Net Salary)</span>
+                    <span id="payrollEstimatedEarnings" class="text-2xl sm:text-3xl font-black text-white block font-mono">৳০</span>
+                    <span class="text-[11px] text-emerald-100 font-medium">বেস বেতন + টার্গেট বোনাস</span>
                 </div>
             </div>
 
-            <!-- Interactive Payroll Estimator -->
-            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-3 text-xs">
-                <h3 class="font-black text-sm text-slate-800">Dynamic Earnings Calculator</h3>
+            <!-- Dynamic Salary Rate & Target Bonus Calculator -->
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 text-xs">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div>
+                        <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white">বেতন ও বোনাস ক্যালকুলেটর (Salary &amp; Bonus Breakdown)</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">রেট ও টার্গেট বোনাস অনুযায়ী আপনার বেতন হিসাব যাচাই করুন</p>
+                    </div>
+                    <span class="text-[11px] font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-300">
+                        সক্রিয় হিসাব
+                    </span>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Standard Rate per 1,000 Verified:</label>
-                        <input type="number" id="calcRatePerThousand" value="25.00" step="0.5" oninput="recalcWorkerPayrollEstimate()" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-bold font-mono">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">প্রতি ১,০০০ ভেরিফাইড ডাটার রেট:</label>
+                        <input type="number" id="calcRatePerThousand" value="3000" step="50" oninput="recalcWorkerPayrollEstimate()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 font-bold font-mono text-sm">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">ডিফল্ট: ৩,০০০ টাকা / $২৫</span>
                     </div>
+
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Target Completion Bonus:</label>
-                        <input type="number" id="calcBonusPerMet" value="5.00" step="0.5" oninput="recalcWorkerPayrollEstimate()" class="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-bold font-mono">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">প্রতিদিন ৪২০ টার্গেট পূরণের বোনাস:</label>
+                        <input type="number" id="calcBonusPerMet" value="500" step="50" oninput="recalcWorkerPayrollEstimate()" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700 font-bold font-mono text-sm">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">ডিফল্ট: ৫০০ টাকা / $৫ প্রতিদিন</span>
                     </div>
+
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Total Estimated Payout:</label>
-                        <div id="calcTotalEstimatedDisplay" class="px-4 py-2 bg-emerald-100 text-emerald-950 font-black rounded-xl text-lg font-mono flex items-center justify-between">
-                            <span>$0.00</span>
-                            <span class="text-xs font-bold text-emerald-700">Calculated</span>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">মোট প্রদেয় বেতন (Total Net Payable):</label>
+                        <div id="calcTotalEstimatedDisplay" class="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 font-black rounded-xl text-base sm:text-lg font-mono flex flex-col justify-center">
+                            <span>৳০.০০</span>
+                            <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">হিসাবকৃত</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Worker Payment Accounts Settings & Latest Receipt Proof -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- Payment Account Details -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">💳</span>
+                            <h4 class="font-black text-sm text-slate-900 dark:text-white">আমার পেমেন্ট একাউন্ট (বিকাশ / নগদ / ব্যাংক)</h4>
+                        </div>
+                        <button type="button" onclick="openWorkerPaymentModal()" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg border border-indigo-200 transition cursor-pointer">
+                            ✏️ এডিট করুন
+                        </button>
+                    </div>
+                    <div id="workerSavedPaymentDetailsDisplay" class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-1 font-mono text-[11px]">
+                        <p class="text-slate-400">পেমেন্ট গ্রহণের জন্য আপনার বিকাশ, নগদ বা ব্যাংক একাউন্ট নম্বর সেট করুন।</p>
+                    </div>
+                </div>
+
+                <!-- Latest Payment Receipt & Notification -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">🧾</span>
+                            <h4 class="font-black text-sm text-slate-900 dark:text-white">সর্বশেষ পেমেন্ট রসিদ ও প্রমাণ</h4>
+                        </div>
+                        <button type="button" onclick="openPaymentReceiptModal()" class="px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg border border-emerald-200 transition cursor-pointer">
+                            👁️ রসিদ দেখুন
+                        </button>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed text-[11px]">
+                        অ্যাডমিন আপনার একাউন্টে টাকা পাঠানোর পর TrxID ও পেমেন্ট স্ক্রিনশট এখানে সরাসরি দেখতে পাবেন।
+                    </p>
                 </div>
             </div>
         </div>
@@ -4941,16 +5003,18 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs min-w-[750px]">
-                        <thead class="bg-slate-50 text-slate-600 font-bold uppercase border-b">
+                        <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-bold uppercase border-b">
                             <tr>
-                                <th class="py-2.5 px-3">Worker Username</th>
-                                <th class="py-2.5 px-3">Department</th>
-                                <th class="py-2.5 px-3 text-right">This Month Volume</th>
-                                <th class="py-2.5 px-3 text-right">420 Target Days</th>
-                                <th class="py-2.5 px-3 text-right">Base Pay ($)</th>
-                                <th class="py-2.5 px-3 text-right">Bonus ($)</th>
-                                <th class="py-2.5 px-3 text-right font-black">Gross Payout ($)</th>
-                                <th class="py-2.5 px-3 text-center">Status</th>
+                                <th class="py-2.5 px-3">কর্মী (Worker)</th>
+                                <th class="py-2.5 px-3">ডিপার্টমেন্ট</th>
+                                <th class="py-2.5 px-3">পেমেন্ট একাউন্ট ও নাম্বার (Payment Details)</th>
+                                <th class="py-2.5 px-3 text-right">চলতি মাসের কাজ</th>
+                                <th class="py-2.5 px-3 text-center">কাজের দিন</th>
+                                <th class="py-2.5 px-3 text-center">৪২০ টার্গেট পূরণ</th>
+                                <th class="py-2.5 px-3 text-right">রেট (/১০০০)</th>
+                                <th class="py-2.5 px-3 text-right">টার্গেট বোনাস</th>
+                                <th class="py-2.5 px-3 text-right font-black">মোট প্রদেয় বেতন (Net)</th>
+                                <th class="py-2.5 px-3 text-center">অ্যাকশন (Actions)</th>
                             </tr>
                         </thead>
                         <tbody id="adminPayrollRosterBody" class="divide-y divide-slate-100 font-mono">
