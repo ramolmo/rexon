@@ -64,14 +64,23 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                     ]
                 };
 
-                const res = await fetch(`${cleanUrl}/v2/pipeline`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${config.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
+                let res;
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    res = await fetch(`${cleanUrl}/v2/pipeline`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${config.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                } catch (netErr) {
+                    throw new Error(`Turso connection timeout/error: ${netErr.message}`);
+                }
 
                 if (!res.ok) {
                     const errTxt = await res.text();
@@ -7614,18 +7623,20 @@ async function runDuplicateCheck() {
                 // 2. DUAL-WRITE: SUPABASE company_deliveries IN SAFE CHUNKS OF 100
                 let sbInserted = 0;
                 if (supabaseClient) {
+                    // Safe mapping for Postgres check constraints (in case table has check constraint)
+                    const sbCategory = (category === 'signal_male') ? 'male_data' : ((category === 'signal_female' || category === 'signal_data') ? 'female_data' : category);
                     const CHUNK_SIZE = 100;
                     for (let i = 0; i < uniqueRecords.length; i += CHUNK_SIZE) {
                         const chunk = uniqueRecords.slice(i, i + CHUNK_SIZE).map(r => ({
                             delivery_date: deliveryDate,
-                            category: category,
+                            category: sbCategory,
                             phone_number: r.phone,
                             full_name: r.name || '',
                             age: r.age || '',
                             household_income: r.income || '',
                             est_market_value: r.market_value || '',
                             company_name: companyName,
-                            batch_name: `Batch_${deliveryDate}`
+                            batch_name: (category === 'signal_female' ? 'Female_Signal_' : (category === 'signal_male' ? 'Male_Signal_' : 'Batch_')) + deliveryDate
                         }));
 
                         try {
@@ -7635,7 +7646,7 @@ async function runDuplicateCheck() {
                                 .select('phone_number');
                             if (!insErr && insData) {
                                 sbInserted += insData.length;
-                            } else if (insErr) {
+                            } else {
                                 const { data: dirData } = await supabaseClient
                                     .from('company_deliveries')
                                     .insert(chunk)
@@ -7693,7 +7704,7 @@ async function runDuplicateCheck() {
                     </div>
                 `;
 
-                // Immediately prepend the newly recorded records to local cache so they show at the top of the table right away!
+                // Immediately prepend newly uploaded records to local cache so they show at the top of the table right away!
                 const freshRows = uniqueRecords.map(r => ({
                     delivery_date: deliveryDate,
                     category: category,
@@ -7709,7 +7720,7 @@ async function runDuplicateCheck() {
                 cdDeliveriesCache = [...freshRows, ...(cdDeliveriesCache || [])];
                 filterCompanyDeliveriesLocal();
 
-                // Clear input
+                // Clear input fields immediately
                 cdParsedRows = [];
                 cdSelectedFile = null;
                 const fileInput = document.getElementById('cdFileInput');
@@ -7717,23 +7728,23 @@ async function runDuplicateCheck() {
                 const textInput = document.getElementById('cdTextInput');
                 if (textInput) textInput.value = '';
 
-                // Background sync full stats and tables
-                await loadCompanyDeliveriesData();
+                // Restore button immediately so it never stays stuck
+                btn.disabled = false;
+                btn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
+
+                // Sync in background without blocking button
+                loadCompanyDeliveriesData().catch(e => console.warn('Background sync error:', e));
 
             } catch (err) {
                 resultCard.className = 'p-4 rounded-xl border bg-red-50 border-red-200 text-red-800 block';
                 resultCard.innerText = 'Failed to record company delivery: ' + err.message;
-            } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
             }
         }
 
         async function loadCompanyDeliveriesData() {
-            if (!supabaseClient && typeof TursoVault === 'undefined') return;
-
             const tableBody = document.getElementById('cdTableBody');
-
             const dateFilter = document.getElementById('cdFilterDate')?.value || '';
             const catFilter = document.getElementById('cdFilterCategory')?.value || 'all';
 
@@ -7750,6 +7761,8 @@ async function runDuplicateCheck() {
                             sql += ` AND (category = 'signal_data' OR category = 'signal_female' OR category = 'signal_male')`;
                         } else if (catFilter === 'signal_female') {
                             sql += ` AND (category = 'signal_female' OR category = 'signal_data')`;
+                        } else if (catFilter === 'signal_male') {
+                            sql += ` AND (category = 'signal_male' OR category = 'signal_data')`;
                         } else if (catFilter !== 'all') {
                             sql += ` AND category = '${catFilter}'`;
                         }
@@ -7781,6 +7794,8 @@ async function runDuplicateCheck() {
                                         q = q.or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male');
                                     } else if (catFilter === 'signal_female') {
                                         q = q.or('category.eq.signal_female,category.eq.signal_data');
+                                    } else if (catFilter === 'signal_male') {
+                                        q = q.or('category.eq.signal_male,category.eq.signal_data');
                                     } else if (catFilter !== 'all') {
                                         q = q.eq('category', catFilter);
                                     }
