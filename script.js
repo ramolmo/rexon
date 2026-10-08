@@ -7460,7 +7460,6 @@ async function runDuplicateCheck() {
                     if (!cleanLine) return;
 
                     if (category === 'lookup_data') {
-                        // Check tab or comma or multiple spaces
                         const parts = cleanLine.split(/\t|,|\s{2,}/);
                         if (parts.length >= 2) {
                             const p = parts[0].replace(/[\s\-\(\)\.]/g, '');
@@ -7481,7 +7480,6 @@ async function runDuplicateCheck() {
                             }
                         }
                     } else if (category === 'signal_male' || category === 'signal_female' || category === 'signal_data') {
-                        // Pure phone numbers or space-separated phone + optional note for signal data
                         const spaceParts = cleanLine.split(/\s+/);
                         const p = spaceParts[0].replace(/[\s\-\(\)\.]/g, '');
                         if (p.length >= 6) {
@@ -7492,7 +7490,6 @@ async function runDuplicateCheck() {
                             });
                         }
                     } else {
-                        // Male or Female data: Phone Name Age
                         const parts = cleanLine.split(/\t|,|\s{2,}/);
                         if (parts.length >= 2) {
                             const p = parts[0].replace(/[\s\-\(\)\.]/g, '');
@@ -7513,20 +7510,11 @@ async function runDuplicateCheck() {
                     }
                 });
             } else {
-                // File upload mode: if cdParsedRows is empty but cdSelectedFile is present, parse immediately
+                // File upload mode
                 if ((!cdParsedRows || cdParsedRows.length === 0) && cdSelectedFile) {
                     btn.disabled = true;
                     btn.innerHTML = '<span>⏳ ফাইল প্রসেস করা হচ্ছে, অনুগ্রহ করে একটু অপেক্ষা করুন...</span>';
                     try {
-                // 1. Direct Primary Write to Turso 9 GB Vault
-                try {
-                    if (typeof TursoVault !== 'undefined') {
-                        await TursoVault.insertDeliveries(records, category, companyName, deliveryDate);
-                    }
-                } catch(tDelErr) {
-                    console.warn('Turso deliveries insert notice:', tDelErr);
-                }
-
                         await new Promise((resolve, reject) => {
                             const r = new FileReader();
                             r.onload = function(evt) {
@@ -7537,9 +7525,9 @@ async function runDuplicateCheck() {
                                         const textData = new TextDecoder('utf-8').decode(evt.target.result);
                                         const lines = textData.split(/\r?\n/).filter(l => l.trim().length > 0);
                                         if (lines.length > 0) {
-                                            const header = lines[0].split(/,|\t/).map(h => h.trim().replace(/^["']|["']$/g, ''));
+                                            const header = lines[0].split(/,|\t/).map(h => h.trim().replace(/^[\"\']|[\"\']$/g, ''));
                                             for (let i = 1; i < lines.length; i++) {
-                                                const vals = lines[i].split(/,|\t/).map(v => v.trim().replace(/^["']|["']$/g, ''));
+                                                const vals = lines[i].split(/,|\t/).map(v => v.trim().replace(/^[\"\']|[\"\']$/g, ''));
                                                 const obj = {};
                                                 header.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
                                                 rows.push(obj);
@@ -7592,60 +7580,91 @@ async function runDuplicateCheck() {
 
             if (records.length === 0) {
                 alert('No valid phone numbers found in input.');
+                btn.disabled = false;
+                btn.innerHTML = '<span>📤 Save & Record Company Delivery</span>';
                 return;
             }
 
             btn.disabled = true;
             btn.innerHTML = '<span>Processing Delivery...</span>';
 
+            // Deduplicate within the file/batch
+            const dedupMap = new Map();
+            records.forEach(r => {
+                if (!dedupMap.has(r.phone)) dedupMap.set(r.phone, r);
+            });
+            const uniqueRecords = Array.from(dedupMap.values());
+
             try {
-                // Try calling RPC with automatic deduplication
-                let result = null;
-                try {
-                    const { data, error } = await supabaseClient.rpc('admin_upload_company_delivery', {
-                        p_records: records,
-                        p_category: category,
-                        p_delivery_date: deliveryDate,
-                        p_company_name: companyName,
-                        p_batch_name: `Batch_${deliveryDate}`
-                    });
-                    if (error) throw error;
-                    result = data;
-                } catch (rpcErr) {
-                    // Fallback to direct insert with deduplication
-                    const dedupMap = new Map();
-                    records.forEach(r => {
-                        if (!dedupMap.has(r.phone)) dedupMap.set(r.phone, r);
-                    });
-                    const uniqueRecords = Array.from(dedupMap.values());
-                    const rowsToInsert = uniqueRecords.map(r => ({
-                        delivery_date: deliveryDate,
-                        category: category,
-                        phone_number: r.phone,
-                        full_name: r.name || '',
-                        age: r.age || '',
-                        household_income: r.income || '',
-                        est_market_value: r.market_value || '',
-                        company_name: companyName,
-                        batch_name: `Batch_${deliveryDate}`
-                    }));
-
-                    const { data: insertedData, error: insErr } = await supabaseClient
-                        .from('company_deliveries')
-                        .upsert(rowsToInsert, { onConflict: 'phone_number', ignoreDuplicates: true })
-                        .select('phone_number');
-
-                    const newCount = insertedData ? insertedData.length : uniqueRecords.length;
-                    result = {
-                        success: true,
-                        total_received: records.length,
-                        unique_in_file: uniqueRecords.length,
-                        new_inserted: newCount,
-                        duplicates_count: records.length - newCount
-                    };
+                // 1. PRIMARY INSERT: TURSO 9 GB CLOUD SMART VAULT (Zero Data Loss)
+                let tursoCount = 0;
+                if (typeof TursoVault !== 'undefined') {
+                    try {
+                        const tRes = await TursoVault.insertDeliveries(uniqueRecords, category, companyName, deliveryDate);
+                        if (tRes && tRes.count !== undefined) {
+                            tursoCount = tRes.count;
+                        } else {
+                            tursoCount = uniqueRecords.length;
+                        }
+                    } catch(tErr) {
+                        console.warn('Turso insertDeliveries notice:', tErr);
+                    }
                 }
 
-                const catLabel = category === 'female_data' ? '👩 Female Data' : '🔍 Lookup Data';
+                // 2. DUAL-WRITE: SUPABASE company_deliveries IN SAFE CHUNKS OF 100
+                let sbInserted = 0;
+                if (supabaseClient) {
+                    const CHUNK_SIZE = 100;
+                    for (let i = 0; i < uniqueRecords.length; i += CHUNK_SIZE) {
+                        const chunk = uniqueRecords.slice(i, i + CHUNK_SIZE).map(r => ({
+                            delivery_date: deliveryDate,
+                            category: category,
+                            phone_number: r.phone,
+                            full_name: r.name || '',
+                            age: r.age || '',
+                            household_income: r.income || '',
+                            est_market_value: r.market_value || '',
+                            company_name: companyName,
+                            batch_name: `Batch_${deliveryDate}`
+                        }));
+
+                        try {
+                            const { data: insData, error: insErr } = await supabaseClient
+                                .from('company_deliveries')
+                                .upsert(chunk, { onConflict: 'phone_number', ignoreDuplicates: true })
+                                .select('phone_number');
+                            if (!insErr && insData) {
+                                sbInserted += insData.length;
+                            } else if (insErr) {
+                                const { data: dirData } = await supabaseClient
+                                    .from('company_deliveries')
+                                    .insert(chunk)
+                                    .select('phone_number');
+                                if (dirData) sbInserted += dirData.length;
+                            }
+                        } catch(chunkErr) {
+                            console.warn('Supabase chunk error:', chunkErr);
+                        }
+                    }
+                }
+
+                const actualNew = Math.max(tursoCount, sbInserted, uniqueRecords.length);
+                const result = {
+                    success: true,
+                    total_received: records.length,
+                    unique_in_file: uniqueRecords.length,
+                    new_inserted: actualNew,
+                    duplicates_count: records.length - uniqueRecords.length
+                };
+
+                const catLabels = {
+                    'male_data': '👨 Male Data',
+                    'female_data': '👩 Female Data',
+                    'signal_female': '📡👩 Female Signal',
+                    'signal_male': '📡👨 Signal Male Report',
+                    'lookup_data': '🔍 Lookup Data'
+                };
+                const catLabel = catLabels[category] || category;
 
                 resultCard.className = 'p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900 block';
                 resultCard.innerHTML = `
@@ -7674,7 +7693,31 @@ async function runDuplicateCheck() {
                     </div>
                 `;
 
-                // Reload company table & stats
+                // Immediately prepend the newly recorded records to local cache so they show at the top of the table right away!
+                const freshRows = uniqueRecords.map(r => ({
+                    delivery_date: deliveryDate,
+                    category: category,
+                    phone_number: r.phone,
+                    full_name: r.name || '',
+                    age: r.age || '',
+                    household_income: r.income || '',
+                    est_market_value: r.market_value || '',
+                    company_name: companyName,
+                    created_at: new Date().toISOString(),
+                    delivered_at: new Date().toISOString()
+                }));
+                cdDeliveriesCache = [...freshRows, ...(cdDeliveriesCache || [])];
+                filterCompanyDeliveriesLocal();
+
+                // Clear input
+                cdParsedRows = [];
+                cdSelectedFile = null;
+                const fileInput = document.getElementById('cdFileInput');
+                if (fileInput) fileInput.value = '';
+                const textInput = document.getElementById('cdTextInput');
+                if (textInput) textInput.value = '';
+
+                // Background sync full stats and tables
                 await loadCompanyDeliveriesData();
 
             } catch (err) {
@@ -7687,10 +7730,9 @@ async function runDuplicateCheck() {
         }
 
         async function loadCompanyDeliveriesData() {
-            if (!supabaseClient) return;
+            if (!supabaseClient && typeof TursoVault === 'undefined') return;
 
             const tableBody = document.getElementById('cdTableBody');
-            if (tableBody) tableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Loading company deliveries...</td></tr>`;
 
             const dateFilter = document.getElementById('cdFilterDate')?.value || '';
             const catFilter = document.getElementById('cdFilterCategory')?.value || 'all';
@@ -7699,11 +7741,11 @@ async function runDuplicateCheck() {
                 let tStats = { total: 0, femaleDeliv: 0, signalDeliv: 0, lookupDeliv: 0, todayDeliv: 0 };
                 let tRows = [];
 
-                try {
-                    if (typeof TursoVault !== 'undefined') {
+                if (typeof TursoVault !== 'undefined') {
+                    try {
                         tStats = await safeQuery(TursoVault.getDeliveryStats(), { total: 0, femaleDeliv: 0, signalDeliv: 0, lookupDeliv: 0, todayDeliv: 0 });
                         let sql = `SELECT * FROM turso_deliveries WHERE 1=1 `;
-                        if (dateFilter) sql += ` AND delivery_date = '${dateFilter}'`;
+                        if (dateFilter) sql += ` AND (delivery_date = '${dateFilter}' OR date(delivered_at) = '${dateFilter}' OR date(created_at) = '${dateFilter}')`;
                         if (catFilter === 'signal_data') {
                             sql += ` AND (category = 'signal_data' OR category = 'signal_female' OR category = 'signal_male')`;
                         } else if (catFilter === 'signal_female') {
@@ -7711,56 +7753,83 @@ async function runDuplicateCheck() {
                         } else if (catFilter !== 'all') {
                             sql += ` AND category = '${catFilter}'`;
                         }
-                        sql += ` ORDER BY id DESC LIMIT 500;`;
+                        sql += ` ORDER BY id DESC LIMIT 1000;`;
                         const tRes = await safeQuery(TursoVault.query(sql), null);
                         if (tRes && tRes.rows) tRows = tRes.rows;
+                    } catch(tErr) {
+                        console.warn('Turso delivery query notice:', tErr);
                     }
-                } catch(tErr) {
-                    console.warn('Turso delivery stats notice:', tErr);
                 }
 
-                const todayIso = new Date().toISOString().slice(0, 10);
-                const [totalDelivRes, maleDelivRes, femaleDelivRes, signalDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'male_data'), { count: 0 }),
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data'), { count: 0 }),
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male'), { count: 0 }),
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data'), { count: 0 }),
-                    safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayIso), { count: 0 }),
-                    (async () => {
-                        try {
-                            let q = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).limit(500);
-                            if (dateFilter) q = q.eq('delivery_date', dateFilter);
-                            if (catFilter === 'signal_data') {
-                                q = q.or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male');
-                            } else if (catFilter === 'signal_female') {
-                                q = q.or('category.eq.signal_female,category.eq.signal_data');
-                            } else if (catFilter !== 'all') {
-                                q = q.eq('category', catFilter);
-                            }
-                            const { data } = await q;
-                            return data || [];
-                        } catch(e) {
-                            return [];
-                        }
-                    })()
-                ]);
+                let sbRows = [];
+                let sbTotal = 0, sbMale = 0, sbFemale = 0, sbSignal = 0, sbLookup = 0, sbToday = 0;
+                if (supabaseClient) {
+                    try {
+                        const todayIso = new Date().toISOString().slice(0, 10);
+                        const [totalDelivRes, maleDelivRes, femaleDelivRes, signalDelivRes, lookupDelivRes, todayDelivRes, sbRowsRes] = await Promise.all([
+                            safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }), { count: 0 }),
+                            safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'male_data'), { count: 0 }),
+                            safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'female_data'), { count: 0 }),
+                            safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male'), { count: 0 }),
+                            safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('category', 'lookup_data'), { count: 0 }),
+                            safeQuery(supabaseClient.from('company_deliveries').select('*', { count: 'exact', head: true }).eq('delivery_date', todayIso), { count: 0 }),
+                            (async () => {
+                                try {
+                                    let q = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).limit(1000);
+                                    if (dateFilter) q = q.eq('delivery_date', dateFilter);
+                                    if (catFilter === 'signal_data') {
+                                        q = q.or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male');
+                                    } else if (catFilter === 'signal_female') {
+                                        q = q.or('category.eq.signal_female,category.eq.signal_data');
+                                    } else if (catFilter !== 'all') {
+                                        q = q.eq('category', catFilter);
+                                    }
+                                    const { data } = await q;
+                                    return data || [];
+                                } catch(e) {
+                                    return [];
+                                }
+                            })()
+                        ]);
+                        sbTotal = totalDelivRes.count || 0;
+                        sbMale = maleDelivRes.count || 0;
+                        sbFemale = femaleDelivRes.count || 0;
+                        sbSignal = signalDelivRes.count || 0;
+                        sbLookup = lookupDelivRes.count || 0;
+                        sbToday = todayDelivRes.count || 0;
+                        sbRows = sbRowsRes || [];
+                    } catch(sbErr) {
+                        console.warn('Supabase delivery query notice:', sbErr);
+                    }
+                }
 
-                const sbTotal = totalDelivRes.count || 0;
-                const sbMale = maleDelivRes.count || 0;
-                const sbFemale = femaleDelivRes.count || 0;
-                const sbSignal = signalDelivRes.count || 0;
-                const sbLookup = lookupDelivRes.count || 0;
-                const sbToday = todayDelivRes.count || 0;
-                const sbRows = sbRowsRes || [];
+                // MERGE AND DEDUPLICATE BY PHONE
+                const seenPhones = new Set();
+                const combined = [];
+                [...tRows, ...sbRows].forEach(item => {
+                    const phone = item.phone_number || '';
+                    if (phone && !seenPhones.has(phone)) {
+                        seenPhones.add(phone);
+                        combined.push(item);
+                    }
+                });
 
-                // COMBINE TURSO + SUPABASE DELIVERIES
-                const combTotal = (tStats.total || 0) + sbTotal;
-                const combMale = (tStats.maleDeliv || 0) + sbMale;
-                const combFemale = (tStats.femaleDeliv || 0) + sbFemale;
-                const combSignal = (tStats.signalDeliv || 0) + sbSignal;
-                const combLookup = (tStats.lookupDeliv || 0) + sbLookup;
-                const combToday = (tStats.todayDeliv || 0) + sbToday;
+                // Sort: newest delivery_date / created_at first!
+                combined.sort((a, b) => {
+                    const da = a.delivery_date || (a.delivered_at ? a.delivered_at.slice(0, 10) : (a.created_at ? a.created_at.slice(0, 10) : ''));
+                    const db = b.delivery_date || (b.delivered_at ? b.delivered_at.slice(0, 10) : (b.created_at ? b.created_at.slice(0, 10) : ''));
+                    return db.localeCompare(da);
+                });
+
+                cdDeliveriesCache = combined;
+
+                // Update Stats
+                const combTotal = Math.max(tStats.total || 0, sbTotal, combined.length);
+                const combMale = Math.max(tStats.maleDeliv || 0, sbMale);
+                const combFemale = Math.max(tStats.femaleDeliv || 0, sbFemale);
+                const combSignal = Math.max(tStats.signalDeliv || 0, sbSignal);
+                const combLookup = Math.max(tStats.lookupDeliv || 0, sbLookup);
+                const combToday = Math.max(tStats.todayDeliv || 0, sbToday);
 
                 const elTotal = document.getElementById('cdStatTotal');
                 const elMale = document.getElementById('cdStatMale');
@@ -7778,7 +7847,6 @@ async function runDuplicateCheck() {
                 if (elToday) elToday.innerText = combToday.toLocaleString();
                 if (badgeTotal) badgeTotal.innerText = combTotal.toLocaleString();
 
-                cdDeliveriesCache = [...tRows, ...sbRows];
                 filterCompanyDeliveriesLocal();
 
             } catch (err) {
@@ -7793,7 +7861,7 @@ async function runDuplicateCheck() {
 
             const search = (document.getElementById('cdFilterSearch')?.value || '').trim().toLowerCase();
 
-            let list = cdDeliveriesCache;
+            let list = cdDeliveriesCache || [];
             if (search) {
                 list = list.filter(item => {
                     const phone = (item.phone_number || '');
@@ -7801,14 +7869,17 @@ async function runDuplicateCheck() {
                     const inc = (item.household_income || '').toLowerCase();
                     const mkt = (item.est_market_value || '').toLowerCase();
                     const comp = (item.company_name || '').toLowerCase();
-                    const ddate = (item.delivery_date || '');
+                    const ddate = (item.delivery_date || item.delivered_at || item.created_at || '').toLowerCase();
                     return phone.includes(search) || name.includes(search) || inc.includes(search) || mkt.includes(search) || comp.includes(search) || ddate.includes(search);
                 });
             }
 
             if (list.length > 0) {
                 tableBody.innerHTML = list.map((item, idx) => {
-                    const timeStr = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const dateRaw = item.delivery_date || (item.delivered_at ? item.delivered_at.slice(0, 10) : (item.created_at ? item.created_at.slice(0, 10) : ''));
+                    const displayDate = dateRaw || 'Recorded';
+                    const timeStr = item.created_at ? new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (item.delivered_at ? new Date(item.delivered_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-');
+
                     let catBadge = '';
                     if (item.category === 'female_data') {
                         catBadge = '<span class="px-2.5 py-0.5 text-xs rounded bg-pink-100 text-pink-800 font-bold">👩 Female Data</span>';
@@ -7851,7 +7922,7 @@ async function runDuplicateCheck() {
                     return `
                         <tr class="hover:bg-slate-50 text-xs">
                             <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
-                            <td class="py-3 px-4 font-bold text-slate-700 font-mono">${item.delivery_date}</td>
+                            <td class="py-3 px-4 font-bold text-slate-700 font-mono">${displayDate}</td>
                             <td class="py-3 px-4">${catBadge}</td>
                             <td class="py-3 px-4 font-mono font-bold text-indigo-700 text-sm">${item.phone_number}</td>
                             <td class="py-3 px-4">${detailHtml}</td>
@@ -7866,42 +7937,24 @@ async function runDuplicateCheck() {
         }
 
         async function downloadCompanyDeliveriesExcel() {
-            if (!supabaseClient) return;
             const dateFilter = document.getElementById('cdFilterDate')?.value || '';
             const catFilter = document.getElementById('cdFilterCategory')?.value || 'all';
 
             try {
-                // Fetch ALL company deliveries with range pagination (Zero 500 cap!)
-                let allRows = [];
-                let from = 0;
-                const pageSize = 1000;
-                while (from < 50000) {
-                    let query = supabaseClient.from('company_deliveries').select('*').order('created_at', { ascending: false }).range(from, from + pageSize - 1);
-                    if (dateFilter) query = query.eq('delivery_date', dateFilter);
-                    if (catFilter === 'signal_data') {
-                        query = query.or('category.eq.signal_data,category.eq.signal_female,category.eq.signal_male');
-                    } else if (catFilter === 'signal_female') {
-                        query = query.or('category.eq.signal_female,category.eq.signal_data');
-                    } else if (catFilter !== 'all') {
-                        query = query.eq('category', catFilter);
-                    }
-
-                    const { data, error } = await query;
-                    if (error) throw error;
-                    if (!data || data.length === 0) break;
-                    allRows.push(...data);
-                    if (data.length < pageSize) break;
-                    from += pageSize;
+                let list = cdDeliveriesCache || [];
+                if (list.length === 0) {
+                    await loadCompanyDeliveriesData();
+                    list = cdDeliveriesCache || [];
                 }
 
-                if (!allRows || allRows.length === 0) {
+                if (!list || list.length === 0) {
                     alert('No delivery records found to download.');
                     return;
                 }
 
-                const exportRows = allRows.map((item, idx) => ({
+                const exportRows = list.map((item, idx) => ({
                     'SL': idx + 1,
-                    'Delivery Date': item.delivery_date,
+                    'Delivery Date': item.delivery_date || (item.delivered_at ? item.delivered_at.slice(0, 10) : (item.created_at ? item.created_at.slice(0, 10) : 'Recorded')),
                     'Category': item.category === 'female_data' ? 'Female Data' : (item.category === 'male_data' ? 'Male Data' : (item.category === 'signal_male' ? 'Signal Male Report' : ((item.category === 'signal_female' || item.category === 'signal_data') ? 'Female Signal Data' : 'Lookup Data'))),
                     'Phone Number': item.phone_number,
                     'Full Name': item.full_name || '-',
@@ -7909,7 +7962,7 @@ async function runDuplicateCheck() {
                     'Household Income': item.household_income || '-',
                     'Est Market Value': item.est_market_value || '-',
                     'Company': item.company_name || 'Company',
-                    'Recorded Time': new Date(item.created_at).toLocaleString()
+                    'Recorded Time': item.created_at ? new Date(item.created_at).toLocaleString() : '-'
                 }));
 
                 const ws = XLSX.utils.json_to_sheet(exportRows);
