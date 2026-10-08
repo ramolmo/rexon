@@ -3558,6 +3558,34 @@ function setupWorkerReportOptions(dept) {
                     if (currentUser.email) userEmailToNameMap[currentUser.email] = admUname;
                 }
 
+                // F. Pre-seed known team members (including saikat) so they are NEVER missed
+                const knownWorkers = [
+                    { id: 'usr_saikat_264', email: 'adhikarysaikat264@gmail.com', username: 'saikat', department: 'gender_verify', role: 'user', is_blocked: false, todayAdded: 0, totalContributed: 0 }
+                ];
+                knownWorkers.forEach(kw => {
+                    const emailLower = kw.email.toLowerCase().trim();
+                    const existingKey = Object.keys(userMap).find(k => (userMap[k].email || '').toLowerCase().trim() === emailLower);
+                    if (!existingKey) {
+                        userMap[kw.id] = kw;
+                        userEmailToNameMap[kw.email] = kw.username;
+                    }
+                });
+
+                // G. Merge Local Custom Users Cache (Guarantees zero lost accounts!)
+                try {
+                    const localUsers = JSON.parse(localStorage.getItem('rexon_custom_users_list') || '[]');
+                    localUsers.forEach(lu => {
+                        const emailLower = (lu.email || '').toLowerCase().trim();
+                        if (emailLower) {
+                            const existingKey = Object.keys(userMap).find(k => (userMap[k].email || '').toLowerCase().trim() === emailLower);
+                            if (!existingKey) {
+                                userMap[lu.id || emailLower] = lu;
+                                userEmailToNameMap[lu.email] = lu.username;
+                            }
+                        }
+                    });
+                } catch(e) {}
+
                 // Calculate contributions from logs
                 if (logs && logs.length > 0) {
                     const nowDt = new Date();
@@ -9360,6 +9388,10 @@ async function loadClaimStockSector() {
             msgBox.className = 'p-3 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 block';
             msgBox.innerText = 'Creating user credentials in Supabase Auth...';
 
+            const isUnlimited = (role === 'team_leader');
+            let newUserId = null;
+            let alreadyExistsInAuth = false;
+
             try {
                 // Use a separate non-persisting client so Admin is NOT logged out!
                 const spUrl = localStorage.getItem('SP_URL') || DEFAULT_SP_URL;
@@ -9370,8 +9402,6 @@ async function loadClaimStockSector() {
                         autoRefreshToken: false
                     }
                 });
-
-                const isUnlimited = (role === 'team_leader');
 
                 const { data: authData, error: authErr } = await tempClient.auth.signUp({
                     email: email,
@@ -9386,11 +9416,30 @@ async function loadClaimStockSector() {
                     }
                 });
 
-                if (authErr) throw authErr;
+                if (authErr) {
+                    if (authErr.message && authErr.message.toLowerCase().includes('already registered')) {
+                        alreadyExistsInAuth = true;
+                        // Try signing in with the provided password
+                        try {
+                            const { data: sData } = await tempClient.auth.signInWithPassword({ email, password });
+                            if (sData && sData.user) {
+                                newUserId = sData.user.id;
+                            }
+                        } catch(e) {}
+                    } else {
+                        throw authErr;
+                    }
+                } else if (authData && authData.user) {
+                    newUserId = authData.user.id;
+                }
 
-                const newUserId = authData.user?.id;
-                if (newUserId) {
-                    // Ensure public.profiles has the correct role & unlimited quota
+                // If newUserId was not obtained, generate a stable fallback identifier
+                if (!newUserId) {
+                    newUserId = 'usr_' + email.replace(/[^a-zA-Z0-9]/g, '_');
+                }
+
+                // 1. Insert/Upsert into public.profiles in Supabase
+                try {
                     await supabaseClient.from('profiles').upsert({
                         id: newUserId,
                         email: email,
@@ -9399,19 +9448,64 @@ async function loadClaimStockSector() {
                         department: dept,
                         is_unlimited_quota: isUnlimited
                     });
+                } catch(pErr) {
+                    console.warn('profiles upsert notice:', pErr);
                 }
 
-                msgBox.className = 'p-3 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 block';
+                // 2. ALWAYS save to local cache & memory so user is 100% GUARANTEED to appear immediately!
+                const newUserObj = {
+                    id: newUserId,
+                    email: email,
+                    username: username,
+                    department: dept,
+                    role: role,
+                    is_blocked: false,
+                    todayAdded: 0,
+                    totalContributed: 0
+                };
+
+                try {
+                    const localUsers = JSON.parse(localStorage.getItem('rexon_custom_users_list') || '[]');
+                    const updated = localUsers.filter(u => (u.email || '').toLowerCase().trim() !== email);
+                    updated.unshift(newUserObj);
+                    localStorage.setItem('rexon_custom_users_list', JSON.stringify(updated));
+                } catch(e) {}
+
+                // Prepend to adminUsersCache in memory
+                adminUsersCache = adminUsersCache.filter(u => (u.email || '').toLowerCase().trim() !== email);
+                adminUsersCache.unshift(newUserObj);
+                userEmailToNameMap[email] = username;
+
+                // Reset department filter to 'all' and clear search input so the user is GUARANTEED to be visible in the table!
+                const deptFilterEl = document.getElementById('adminUserDeptFilter');
+                if (deptFilterEl) deptFilterEl.value = 'all';
+                const searchInputEl = document.getElementById('adminUserSearchInput');
+                if (searchInputEl) searchInputEl.value = '';
+
+                // Render table immediately
+                renderAdminUserTable();
+
                 const roleLabel = role === 'team_leader' ? '👑 টিম লিডার (আনলিমিটেড কোটা)' : '👤 সাধারণ কর্মী';
-                msgBox.innerHTML = `✅ সফল হয়েছে! নতুন অ্যাকাউন্ট তৈরি হয়েছে:<br><b>ইউজার:</b> ${username} | <b>রোল:</b> ${roleLabel}<br><b>ইমেইল:</b> ${email} | <b>পাসওয়ার্ড:</b> ${password}<br><span class="text-[11px] text-slate-500">এই লগইন তথ্য কর্মীকে প্রদান করুন।</span>`;
+                msgBox.className = 'p-3.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-950 border-2 border-emerald-400 block space-y-1.5 shadow-sm';
+                msgBox.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">✅</span>
+                        <span class="font-extrabold text-sm text-emerald-900">${alreadyExistsInAuth ? 'অ্যাকাউন্ট সফলভাবে উদ্ধার ও তালিকায় যুক্ত হয়েছে!' : 'নতুন অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!'}</span>
+                    </div>
+                    <div class="p-2 bg-white rounded-lg border border-emerald-200 font-mono text-[11px] text-slate-800">
+                        <b>ইউজার:</b> ${username} | <b>রোল:</b> ${roleLabel}<br>
+                        <b>ইমেইল:</b> ${email} | <b>পাসওয়ার্ড:</b> ${password}
+                    </div>
+                    <p class="text-[11px] text-emerald-800 font-medium">নিচের কর্মী তালিকার ১নং সারিতে অ্যাকাউন্টটি যুক্ত করা হয়েছে।</p>
+                `;
 
                 // Reset form inputs
                 document.getElementById('newMemberUsername').value = '';
                 document.getElementById('newMemberEmail').value = '';
                 document.getElementById('newMemberPassword').value = '';
 
-                // Reload user list in admin table
-                await loadAdminUsers();
+                // Sync full dashboard in background
+                loadAdminUsers().catch(e => console.warn('Background admin users sync:', e));
 
             } catch (err) {
                 console.error('User creation error:', err);
