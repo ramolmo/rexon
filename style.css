@@ -1,0 +1,476 @@
+/* =========================================================================
+   REXON ULTRA-PREMIUM DESIGN SYSTEM
+   Professional Enterprise SaaS Stylesheet
+   Compatible with light and dark mode, zero horizontal overflow, fluid responsive
+   ========================================================================= */
+
+:root {
+    --rx-bg: #f8fafc;
+    --rx-surface: #ffffff;
+    --rx-surface-alt: #f1f5f9;
+    --rx-surface-border: #e2e8f0;
+    --rx-surface-card: #ffffff;
+    --rx-text-main: #0f172a;
+    --rx-text-muted: #64748b;
+    --rx-text-sub: #475569;
+    --rx-primary: #4f46e5;
+    --rx-primary-hover: #4338ca;
+    --rx-primary-light: #eef2ff;
+    --rx-primary-glow: rgba(79, 70, 229, 0.15);
+    --rx-accent: #0284c7;
+    --rx-accent-glow: rgba(2, 132, 199, 0.15);
+    --rx-success: #10b981;
+    --rx-warning: #f59e0b;
+    --rx-danger: #ef4444;
+    --rx-nav-bg: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+    --rx-marquee-bg: linear-gradient(90deg, #991b1b 0%, #be123c 50%, #b45309 100%);
+    --rx-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --rx-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --rx-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --rx-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --rx-radius-card: 16px;
+    --rx-radius-btn: 10px;
+}
+
+html.dark {
+    --rx-bg: #090e17;
+    --rx-surface: #0f172a;
+    --rx-surface-alt: #162032;
+    --rx-surface-border: #1e293b;
+    --rx-surface-card: #0f172a;
+    --rx-text-main: #f8fafc;
+    --rx-text-muted: #94a3b8;
+    --rx-text-sub: #cbd5e1;
+    --rx-primary: #6366f1;
+    --rx-primary-hover: #4f46e5;
+    --rx-primary-light: #1e1b4b;
+    --rx-primary-glow: rgba(99, 102, 241, 0.25);
+    --rx-nav-bg: linear-gradient(135deg, #050811 0%, #0c1220 50%, #151c2e 100%);
+    --rx-marquee-bg: linear-gradient(90deg, #7f1d1d 0%, #881337 50%, #78350f 100%);
+    --rx-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --rx-shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.5);
+    --rx-shadow-xl: 0 20px 35px rgba(0, 0, 0, 0.6);
+}
+
+/* Base & Typography */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--rx-bg);
+    color: var(--rx-text-main);
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+.font-bangla {
+    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Subtle SaaS geometric background texture */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.45;
+    background-image: 
+        radial-gradient(circle at 10% 10%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(2, 132, 199, 0.06) 0%, transparent 40%),
+        linear-gradient(to right, rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+html.dark body::before {
+    opacity: 0.35;
+    background-image: 
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(14, 165, 233, 0.1) 0%, transparent 40%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+/* Top Marquee Bar */
+.marquee-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: marqueeScroll 28s linear infinite;
+}
+.marquee-track:hover, .marquee-track:active {
+    animation-play-state: paused;
+}
+@keyframes marqueeScroll {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Header & Nav */
+header.sticky {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+header.sticky > div:first-child {
+    background: var(--rx-marquee-bg) !important;
+}
+header.sticky nav {
+    background: var(--rx-nav-bg) !important;
+}
+
+/* Smooth Touch Scrolling & Styled Scrollbars */
+.overflow-x-auto, .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.7);
+}
+
+/* Cards & Surface Polish */
+.bg-white {
+    background-color: var(--rx-surface) !important;
+    border-color: var(--rx-surface-border) !important;
+    color: var(--rx-text-main);
+}
+html.dark .bg-slate-50 {
+    background-color: var(--rx-surface-alt) !important;
+    border-color: var(--rx-surface-border) !important;
+    color: var(--rx-text-sub);
+}
+html.dark .text-slate-800, html.dark .text-slate-900 {
+    color: #f1f5f9 !important;
+}
+html.dark .text-slate-700 {
+    color: #e2e8f0 !important;
+}
+html.dark .text-slate-600 {
+    color: #cbd5e1 !important;
+}
+html.dark .text-slate-500 {
+    color: #94a3b8 !important;
+}
+html.dark .border-slate-200, html.dark .border-slate-100 {
+    border-color: var(--rx-surface-border) !important;
+}
+html.dark .border-slate-300 {
+    border-color: #334155 !important;
+}
+
+/* Inputs, Selects & Textareas */
+input:not([type="radio"]):not([type="checkbox"]),
+select,
+textarea {
+    border-radius: 10px;
+    border: 1px solid var(--rx-surface-border);
+    background-color: var(--rx-surface);
+    color: var(--rx-text-main);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+html.dark input:not([type="radio"]):not([type="checkbox"]),
+html.dark select,
+html.dark textarea {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+input:not([type="radio"]):not([type="checkbox"]):focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--rx-primary) !important;
+    box-shadow: 0 0 0 3px var(--rx-primary-glow) !important;
+}
+
+/* Button Micro-Interactions */
+button {
+    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease, filter 0.15s ease, background-color 0.15s ease;
+}
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Metric / Stat Card Micro-Hover */
+.grid > .group, #workerMonthlyHistoryCard, #workerTargetTrackerCard {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.grid > .group:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--rx-shadow-lg) !important;
+}
+
+/* Progress Bar Glowing Shine Animation */
+#targetFemaleBar, #targetMaleBar, #targetTotalBar, #secWorkerQuotaBar {
+    position: relative;
+    overflow: hidden;
+}
+#targetFemaleBar::after, #targetMaleBar::after, #targetTotalBar::after, #secWorkerQuotaBar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+    animation: rxBarShine 2.5s infinite;
+}
+@keyframes rxBarShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Hero Section Styles */
+.rx-saas-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    border: 1px solid rgba(129, 140, 248, 0.25);
+    color: white;
+    box-shadow: var(--rx-shadow-lg);
+}
+.rx-saas-hero::before {
+    content: "";
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    right: -80px;
+    top: -120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+}
+.rx-saas-hero::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    left: 20%;
+    bottom: -90px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+html.dark .rx-saas-hero {
+    background: linear-gradient(135deg, #0b1324 0%, #151c33 50%, #1e1b4b 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Telegram Direct Support Floating Badge */
+.rx-telegram-dock {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: white;
+    border-radius: 999px;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+.rx-telegram-dock:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(2, 132, 199, 0.45);
+    color: white;
+}
+.rx-telegram-dock .rx-tg-icon {
+    width: 26px;
+    height: 26px;
+    background: white;
+    color: #0284c7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+.rx-telegram-dock .rx-tg-dot {
+    width: 8px;
+    height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80;
+    animation: rxPulseDot 1.6s infinite;
+}
+@keyframes rxPulseDot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+@media (max-width: 640px) {
+    .rx-telegram-dock {
+        right: 12px;
+        bottom: 12px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Modals */
+.fixed.inset-0 {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+html.dark .fixed.inset-0 .bg-white {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* Tables */
+table tbody tr {
+    transition: background-color 0.15s ease;
+}
+html.dark table thead {
+    background-color: #162032 !important;
+    color: #94a3b8 !important;
+}
+html.dark table tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+}
+
+/* Accessibility & Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* Additional REXON SaaS Refinements */
+html.dark .rx-saas-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #172554 100%) !important;
+    border-color: rgba(99, 102, 241, 0.28) !important;
+}
+
+html.dark .bg-slate-100 {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark .bg-indigo-50 {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+    border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+html.dark .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html.dark .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.12) !important;
+    border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+html.dark .bg-rose-50 {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+html.dark .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+html.dark .bg-sky-50 {
+    background-color: rgba(14, 165, 233, 0.12) !important;
+    border-color: rgba(14, 165, 233, 0.25) !important;
+}
+
+/* Zero horizontal overflow on small displays */
+@media (max-width: 640px) {
+    .max-w-7xl {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+
+/* =========================================================================
+   ENHANCED SCROLLABLE HORIZONTAL NAVIGATION BAR SYSTEM
+   ========================================================================= */
+.custom-nav-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar {
+    height: 5px;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.35);
+    border-radius: 9999px;
+    margin: 0 8px;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
+}
+
+.custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-track {
+    background: rgba(2, 6, 23, 0.5);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .custom-nav-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.nav-tab-pill {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.nav-tab-pill:active {
+    transform: scale(0.96);
+}
