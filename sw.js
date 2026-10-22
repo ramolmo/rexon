@@ -1,5 +1,5 @@
 // REXON Enterprise Service Worker (Offline Cache & Omnichannel Push)
-const CACHE_NAME = 'rexon-portal-v76-lite';
+const CACHE_NAME = 'rexon-portal-v77-hangfix';
 const STATIC_ASSETS = [
   './index.html',
   './style.css',

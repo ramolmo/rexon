@@ -375,6 +375,13 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
             catch (e) { alert('Excel library load hoyni — internet check kore abar try koro.'); return false; }
         }
 
+        // --- REXON v77 hang-fix: hand control back to the browser regularly during
+        // heavy loops (file parsing, record building, bulk inserts) so Chrome does
+        // not declare the page "unresponsive" while a big upload is still working.
+        function __yieldUI() {
+            return new Promise(function (resolve) { setTimeout(resolve, 0); });
+        }
+
         const TursoVault = {
             getConfig() {
                 return {
@@ -744,6 +751,7 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                 const totalChunks = Math.ceil(records.length / subChunkSize);
 
                 for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+                    await __yieldUI(); // v77 hang-fix: let the page breathe between chunks
                     const start = chunkIdx * subChunkSize;
                     const sub = records.slice(start, start + subChunkSize);
 
@@ -813,6 +821,7 @@ const DEFAULT_SP_URL = 'https://pxejdzlrcesjepndgpyo.supabase.co';
                 const bName = this.escapeSql(batchName || `Batch_${deliveryDate}`);
 
                 for (let i = 0; i < records.length; i += subChunkSize) {
+                    await __yieldUI(); // v77 hang-fix: keep the page responsive between chunks
                     const sub = records.slice(i, i + subChunkSize);
                     const valuesSql = sub.map(r => {
                         const phone = this.escapeSql(r.phone || r.phone_number);
@@ -6041,7 +6050,8 @@ function setupWorkerReportOptions(dept) {
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
+                await __yieldUI(); // v77 hang-fix: paint any pending UI before the heavy parse
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
@@ -6052,15 +6062,17 @@ function setupWorkerReportOptions(dept) {
 
             if (file.name.endsWith('.txt')) {
                 const textReader = new FileReader();
-                textReader.onload = function(e) {
+                textReader.onload = async function(e) {
                     const lines = e.target.result.split(/\r?\n/);
                     recStockParsedRows = [];
-                    lines.forEach(l => {
-                        const cleanNum = l.replace(/[^0-9]/g, '');
+                    // v77 hang-fix: parse in slices so a 65k-line file cannot freeze the page
+                    for (let li = 0; li < lines.length; li++) {
+                        const cleanNum = lines[li].replace(/[^0-9]/g, '');
                         if (cleanNum.length >= 6) {
                             recStockParsedRows.push({ phone: cleanNum });
                         }
-                    });
+                        if (li % 5000 === 4999) await __yieldUI();
+                    }
                     alert(`TXT ফাইল থেকে ${recStockParsedRows.length} টি ফোন নাম্বার পাওয়া গেছে।`);
                 };
                 textReader.readAsText(file);
@@ -6085,7 +6097,9 @@ function setupWorkerReportOptions(dept) {
 
             // From parsed file
             if (recStockParsedRows && recStockParsedRows.length > 0) {
-                recStockParsedRows.forEach(row => {
+                // v77 hang-fix: indexed loop with periodic yields (was one blocking forEach)
+                for (let ri = 0; ri < recStockParsedRows.length; ri++) {
+                    const row = recStockParsedRows[ri];
                     let phone = '';
                     let name = '';
                     let age = '';
@@ -6105,18 +6119,21 @@ function setupWorkerReportOptions(dept) {
                     if (phone) {
                         records.push({ phone, name, age });
                     }
-                });
+                    if (ri % 4000 === 3999) await __yieldUI();
+                }
             }
 
             // From text paste
             if (textInput && textInput.value.trim()) {
                 const lines = textInput.value.split(/\r?\n/);
-                lines.forEach(line => {
-                    const cleanNum = line.replace(/[^0-9]/g, '');
+                // v77 hang-fix: chunked with yields for very large pastes
+                for (let li = 0; li < lines.length; li++) {
+                    const cleanNum = lines[li].replace(/[^0-9]/g, '');
                     if (cleanNum.length >= 6) {
                         records.push({ phone: cleanNum, name: '', age: '' });
                     }
-                });
+                    if (li % 8000 === 7999) await __yieldUI();
+                }
             }
 
             if (records.length === 0) {
@@ -6134,7 +6151,12 @@ function setupWorkerReportOptions(dept) {
                 const targetStockType = stockTypeInput ? stockTypeInput.value : 'gender_verify';
 
                 // Live progress renderer — big clear processing line (Thomas's request)
+                // v77 hang-fix: skip re-render when stage+% are unchanged (less layout thrash)
+                let _rpLastKey = '';
                 const renderProgress = (stage, pct, done, total) => {
+                    const _rpKey = stage + '|' + pct + '|' + total;
+                    if (_rpKey === _rpLastKey) return;
+                    _rpLastKey = _rpKey;
                     resultCard.className = 'p-4 rounded-xl text-xs font-medium bg-indigo-50 border-2 border-indigo-300 text-indigo-950 shadow-sm';
                     resultCard.innerHTML = `
                         <div class="flex items-center justify-between text-sm font-black text-indigo-950 mb-2">
